@@ -6,8 +6,8 @@
 
 ## 2. Carregamento e consulta
 
-- [ ] 2.1 Implementar descoberta do projeto, manifesto, caminhos canônicos e verificação de todos os domínios; testar ausência, duplicidade, escape por caminho e domínio faltante.
-- [ ] 2.2 Implementar carregamento JSON-LD, SHACL, versões, integridade e prontidão; testar grafos malformados, IRI duplicado, referência local inválida, domínio vazio e violação de shape.
+- [x] 2.1 Implementar descoberta do projeto, manifesto e caminhos canônicos; testar ausência, duplicidade e escape por caminho.
+- [ ] 2.2 Implementar verificação de todos os domínios, carregamento JSON-LD, SHACL, versões, integridade e prontidão; testar domínio faltante, grafo malformado, IRI duplicado, referência local inválida, domínio vazio e violação de shape.
 - [ ] 2.3 Implementar `oracle ontology validate/show` e retrato imutável por sessão; verificar saída com fonte/IRI e detecção de alteração do retrato.
 
 ## 3. Decisão e registro
