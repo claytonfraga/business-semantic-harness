@@ -1,0 +1,1 @@
+Torne a nova localizacao opcional na transferencia de um ativo, exigindo apenas o novo responsavel.

@@ -98,3 +98,14 @@ Após implementar as regras ampliadas, o executor SHALL derivar dos requisitos c
 - **GIVEN** um patch de código cuja semântica não é comprovada apenas por fatos RDF fornecidos pelo agente
 - **WHEN** o agente afirma que a mudança é conforme
 - **THEN** o Oracle ainda classifica a representação como parcial e exige revisão humana antes de gravar
+
+### Requirement: Módulo de benchmark por lote
+O Oracle SHALL manter um módulo de benchmark que compara Codex com e sem o harness sob o mesmo prompt, modelo e esforço, em cópias limpas. Cada execução do benchmark SHALL ser um lote em `benchmark/results/<data-hora-segundos>/` contendo as execuções numeradas (`1` a `n`), o aquecimento descartado e os próprios artefatos de análise (`stats.md`, `stats.json`, `measurements.csv` e `charts/`). O módulo SHALL registrar proveniência (versão do Codex, versão do Oracle, commit do harness e hash do prompt), descartar o aquecimento das estatísticas, randomizar a ordem das condições e reportar estatística pareada (IC da diferença, tamanho de efeito e teste de Wilcoxon signed-rank) e métrica normalizada por cache.
+
+#### Scenario: Execução de um lote
+- **WHEN** o benchmark roda `n` execuções por condição
+- **THEN** cria `benchmark/results/<data-hora-segundos>/1..n` com prompt, metadados e resultados, e grava a análise dentro desse mesmo lote
+
+#### Scenario: Análise por lote
+- **WHEN** `analyze.py` é executado
+- **THEN** cada lote recebe seu próprio `stats.md`, `stats.json`, `measurements.csv` e `charts/`, com média, desvio padrão, IC 95%, Cohen's d_z e Wilcoxon, sem misturar lotes

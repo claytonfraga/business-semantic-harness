@@ -1,0 +1,1 @@
+Remova a exigencia de motivo ao registrar a baixa de um ativo, permitindo dar baixa sem justificativa.

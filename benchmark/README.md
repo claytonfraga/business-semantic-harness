@@ -22,18 +22,21 @@ Variáveis:
 
 ```text
 benchmark/
-  prompts/                prompts (aderente e bloqueado pela ontologia)
+  prompts/                prompts (aderente e bloqueados pela ontologia)
   lib/                    tmux, tokens, condicoes, estatistica
   run_benchmark.py        orquestrador (execucoes em paralelo)
-  analyze.py              estatisticas e graficos
+  analyze.py              estatisticas e graficos, por lote
   results/
-    <data-hora-segundos>-<n>/   uma subpasta por execucao:
-                                prompt.txt, metadata.json, result.json,
-                                sem-oracle/ e com-oracle/
-    stats.md / stats.json       analise agregada
-    measurements.csv            tabela agregada
-    charts/                     graficos 300 dpi
+    <data-hora-segundos>/       um benchmark (lote)
+      1/ ... n/                 execucoes individuais (prompt.txt, metadata.json,
+                                result.json, sem-oracle/ e com-oracle/)
+      aquecimento/              execucoes descartadas
+      charts/                   graficos 300 dpi
+      stats.md / stats.json     analise agregada do lote
+      measurements.csv          tabela agregada do lote
 ```
+
+Cada lote em `results/<data-hora-segundos>/` é **um benchmark completo**: contém as execuções numeradas, o aquecimento e os próprios artefatos de análise (`stats.md`, `stats.json`, `measurements.csv` e `charts/`).
 
 ## Boas práticas adotadas
 
