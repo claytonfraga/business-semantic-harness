@@ -1,0 +1,21 @@
+{
+  "name": "oracle-ontology-harness",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "oracle": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "check": "tsc --noEmit",
+    "test": "npm run build && node --test"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "typescript": "^7.0.2"
+  }
+}

@@ -1,6 +1,6 @@
 ## 1. Base do projeto e formato
 
-- [ ] 1.1 Criar pacote TypeScript para Node.js 22, CLI `oracle` e testes; verificar compilação, execução de `oracle --help` e testes básicos.
+- [x] 1.1 Criar pacote TypeScript para Node.js 22, CLI `oracle` e testes; verificar compilação, execução de `oracle --help` e testes básicos.
 - [ ] 1.2 Publicar vocabulário Oracle versionado e exemplos JSON-LD/SHACL de `ativos`; verificar parsing RDF e validação SHACL do exemplo válido e de um exemplo inválido.
 - [ ] 1.3 Implementar `oracle init` e `oracle domain add`; verificar geração sem sobrescrita e falha de `oracle codex` enquanto o projeto não tem domínios válidos.
 
