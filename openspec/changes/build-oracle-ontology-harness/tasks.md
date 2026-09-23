@@ -12,9 +12,9 @@
 
 ## 3. Decisão e registro
 
-- [ ] 3.1 Implementar representação RDF de ações e avaliador SHACL; testar conformidade, violação, falta de fatos e ação opaca contra cenários dos specs.
-- [ ] 3.2 Implementar broker de aprovação vinculado a hash de ação e ontologia; testar permitir uma vez, negar, timeout e mudança de argumentos.
-- [ ] 3.3 Implementar trilha JSONL local, redação de segredos e falha fechada de gravação; testar consulta de decisão, segredo redigido e armazenamento indisponível.
+- [x] 3.1 Implementar representação RDF de ações e avaliador SHACL; testar conformidade, violação, falta de fatos e ação opaca contra cenários dos specs.
+- [x] 3.2 Implementar broker de aprovação vinculado a hash de ação e ontologia; testar permitir uma vez, negar, timeout e mudança de argumentos.
+- [x] 3.3 Implementar trilha JSONL local, redação de segredos e falha fechada de gravação; testar consulta de decisão, segredo redigido e armazenamento indisponível.
 
 ## 4. Adaptador Codex
 
