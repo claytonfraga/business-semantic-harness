@@ -1,0 +1,21 @@
+{
+  "@context": {
+    "ex": "urn:pilot:ativos:",
+    "oracle": "urn:oracle:ns:v1:",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+  },
+  "@graph": [
+    { "@id": "ex:Ativo", "@type": "rdfs:Class", "rdfs:label": "Ativo" },
+    { "@id": "ex:Responsavel", "@type": "rdfs:Class", "rdfs:label": "Responsável" },
+    { "@id": "ex:TransferenciaAtivo", "@type": "rdfs:Class", "rdfs:label": "Transferência de ativo" },
+    { "@id": "ex:EmUso", "rdfs:label": "Em uso" },
+    { "@id": "ex:Disponivel", "rdfs:label": "Disponível" },
+    {
+      "@id": "ex:justificativa-adequada",
+      "@type": "oracle:Policy",
+      "oracle:governs": { "@id": "ex:TransferenciaAtivo" },
+      "oracle:requiresHumanReview": true,
+      "rdfs:comment": "A justificativa da transferência deve ser adequada."
+    }
+  ]
+}

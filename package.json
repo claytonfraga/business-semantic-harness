@@ -15,7 +15,14 @@
     "node": ">=22"
   },
   "devDependencies": {
+    "@types/jsonld": "^1.5.15",
+    "@types/n3": "^1.26.4",
     "@types/node": "^26.6.2",
     "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "jsonld": "^9.0.0",
+    "n3": "^2.7.12",
+    "rdf-validate-shacl": "^0.6.5"
   }
 }
