@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { resolveProjectFile } from '../../dist/project/paths.js';
 
-test('resolves a domain file inside the canonical project root', async () => {
+test('Given a file inside the project, when resolved, then its canonical path is returned', async () => {
   const root = await mkdtemp(join(tmpdir(), 'oracle-path-'));
   try {
     await mkdir(join(root, 'domains', 'assets'), { recursive: true });
@@ -16,7 +16,7 @@ test('resolves a domain file inside the canonical project root', async () => {
   }
 });
 
-test('rejects parent traversal before opening its target', async () => {
+test('Given parent traversal, when resolving a file, then access is rejected', async () => {
   const root = await mkdtemp(join(tmpdir(), 'oracle-path-'));
   try {
     await assert.rejects(resolveProjectFile(root, '../outside.jsonld'), /fora do projeto/);
@@ -25,7 +25,7 @@ test('rejects parent traversal before opening its target', async () => {
   }
 });
 
-test('rejects a symlink whose target leaves the project', async () => {
+test('Given a symlink leaving the project, when resolving it, then access is rejected', async () => {
   const root = await mkdtemp(join(tmpdir(), 'oracle-path-'));
   const outside = await mkdtemp(join(tmpdir(), 'oracle-outside-'));
   try {

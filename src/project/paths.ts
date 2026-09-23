@@ -19,3 +19,12 @@ export async function resolveProjectFile(root: string, relative: string): Promis
   }
   return canonicalTarget;
 }
+
+export async function assertProjectDirectory(root: string, directory: string): Promise<void> {
+  const canonicalRoot = await realpath(root);
+  const canonicalDirectory = await realpath(directory);
+  const fromRoot = relativePath(canonicalRoot, canonicalDirectory);
+  if (!fromRoot || fromRoot === '..' || fromRoot.startsWith('..' + sep) || isAbsolute(fromRoot)) {
+    throw new Error(`Diretório fora do projeto: ${directory}`);
+  }
+}

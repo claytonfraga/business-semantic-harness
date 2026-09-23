@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { initProject, addDomain } from '../../dist/project/scaffold.js';
 
-test('initializes a draft project and adds one domain with distinct JSON-LD and SHACL files', async () => {
+test('Given an empty project, when initialized and a domain is added, then distinct ontology and shape files exist', async () => {
   const root = await mkdtemp(join(tmpdir(), 'oracle-scaffold-'));
   try {
     await initProject(root);
@@ -25,7 +25,7 @@ test('initializes a draft project and adds one domain with distinct JSON-LD and 
   }
 });
 
-test('does not overwrite files when a domain is added twice', async () => {
+test('Given an existing domain, when added again, then its files are preserved', async () => {
   const root = await mkdtemp(join(tmpdir(), 'oracle-scaffold-'));
   try {
     await initProject(root);
@@ -39,7 +39,7 @@ test('does not overwrite files when a domain is added twice', async () => {
   }
 });
 
-test('does not overwrite an existing project manifest', async () => {
+test('Given an existing manifest, when initializing again, then its bytes are preserved', async () => {
   const root = await mkdtemp(join(tmpdir(), 'oracle-scaffold-'));
   try {
     await initProject(root);

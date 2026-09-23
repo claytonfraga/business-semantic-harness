@@ -1,6 +1,7 @@
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import { loadManifest, type ProjectManifest } from './manifest.js';
+import { assertProjectDirectory } from './paths.js';
 
 function projectIdFrom(root: string): string {
   const id = basename(root).toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '');
@@ -10,6 +11,7 @@ function projectIdFrom(root: string): string {
 export async function initProject(root: string): Promise<void> {
   const oracleDir = join(root, '.oracle');
   await mkdir(oracleDir, { recursive: true });
+  await assertProjectDirectory(root, oracleDir);
   const manifest: ProjectManifest = {
     schemaVersion: 1,
     projectId: projectIdFrom(root),
@@ -41,6 +43,7 @@ export async function addDomain(root: string, id: string): Promise<void> {
   const oracleDir = join(root, '.oracle');
   const domainDir = join(oracleDir, 'domains', id);
   await mkdir(join(oracleDir, 'domains'), { recursive: true });
+  await assertProjectDirectory(root, join(oracleDir, 'domains'));
   try {
     await mkdir(domainDir);
   } catch (error) {
@@ -49,6 +52,8 @@ export async function addDomain(root: string, id: string): Promise<void> {
     }
     throw error;
   }
+
+  await assertProjectDirectory(root, domainDir);
 
   const baseIri = `urn:${manifest.projectId}:${id}:`;
   const ontology = {

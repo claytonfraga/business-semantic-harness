@@ -20,7 +20,7 @@ const domain = (id) => ({
   shapes: `domains/${id}/shapes.ttl`,
 });
 
-test('loads two declared domains with their distinct ontology paths', async () => {
+test('Given two declared domains, when loading the manifest, then both distinct paths are retained', async () => {
   const root = await projectWith({ schemaVersion: 1, projectId: 'inventory', domains: [domain('assets'), domain('contracts')] });
   try {
     const manifest = await loadManifest(root);
@@ -32,7 +32,7 @@ test('loads two declared domains with their distinct ontology paths', async () =
   }
 });
 
-test('reports a missing project manifest before starting a session', async () => {
+test('Given no manifest, when loading the project, then an explicit error is reported', async () => {
   const root = await mkdtemp(join(tmpdir(), 'oracle-manifest-'));
   try {
     await assert.rejects(loadManifest(root), /Manifesto.*ausente/);
@@ -41,7 +41,7 @@ test('reports a missing project manifest before starting a session', async () =>
   }
 });
 
-test('rejects duplicate domain identifiers', async () => {
+test('Given duplicate domain IDs, when loading the manifest, then it is rejected', async () => {
   const root = await projectWith({ schemaVersion: 1, projectId: 'inventory', domains: [domain('assets'), domain('assets')] });
   try {
     await assert.rejects(loadManifest(root), /Domínio duplicado: assets/);
@@ -50,7 +50,7 @@ test('rejects duplicate domain identifiers', async () => {
   }
 });
 
-test('rejects a format version newer than the CLI supports', async () => {
+test('Given a future format version, when loading the manifest, then it is rejected', async () => {
   const root = await projectWith({ schemaVersion: 99, projectId: 'inventory', domains: [domain('assets')] });
   try {
     await assert.rejects(loadManifest(root), /versão.*99/i);

@@ -7,4 +7,7 @@ export const ORACLE_TERMS = {
   governs: `${ORACLE_NAMESPACE}governs`,
   requiresHumanReview: `${ORACLE_NAMESPACE}requiresHumanReview`,
   version: `${ORACLE_NAMESPACE}version`,
+  reason: `${ORACLE_NAMESPACE}reason`,
+  scope: `${ORACLE_NAMESPACE}scope`,
+  source: `${ORACLE_NAMESPACE}source`,
 } as const;

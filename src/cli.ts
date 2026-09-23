@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import { addDomain, initProject } from './project/scaffold.js';
+import { queryOntology } from './ontology/query.js';
+import { validateProject } from './ontology/validate.js';
 
 export async function main(argv: string[]): Promise<number> {
   if (argv.length === 1 && argv[0] === '--help') {
@@ -24,6 +26,22 @@ export async function main(argv: string[]): Promise<number> {
     if (command.length === 3 && command[0] === 'domain' && command[1] === 'add') {
       await addDomain(projectRoot, command[2]);
       process.stdout.write(`Domínio ${command[2]} criado. Defina conceitos e regras antes de iniciar sessões.\n`);
+      return 0;
+    }
+    if (command.length === 2 && command[0] === 'ontology' && command[1] === 'validate') {
+      const report = await validateProject(projectRoot);
+      if (report.issues.length === 0) {
+        process.stdout.write('Ontologia válida e pronta.\n');
+        return 0;
+      }
+      for (const issue of report.issues) {
+        process.stderr.write(`${issue.severity} ${issue.domain} ${issue.file} ${issue.rule}: ${issue.message}\n`);
+      }
+      return 1;
+    }
+    if ((command.length === 3 || command.length === 4) && command[0] === 'ontology' && command[1] === 'show') {
+      const result = await queryOntology(projectRoot, command[2], command[3]);
+      process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
       return 0;
     }
   } catch (error) {

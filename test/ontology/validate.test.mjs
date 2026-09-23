@@ -22,7 +22,7 @@ async function project(ids = ['ativos']) {
   return root;
 }
 
-test('complete project with distinct domains is ready', async () => {
+test('Given two complete domains, when validated, then the project is ready', async () => {
   const root = await project(['ativos', 'contratos']);
   try {
     const second = join(root, '.oracle/domains/contratos/ontology.jsonld');
@@ -39,30 +39,32 @@ test('complete project with distinct domains is ready', async () => {
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('reports a missing domain file with domain and path', async () => {
+test('Given a missing domain file, when validated, then its domain and path are reported', async () => {
   const root = await project();
   try {
     await rm(join(root, '.oracle/domains/ativos/shapes.ttl'));
     const result = await validateProject(root);
+    assert.equal(result.ok, false);
     assert.equal(result.ready, false);
     assert.ok(result.issues.some(issue => issue.domain === 'ativos' && issue.file.endsWith('shapes.ttl')));
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('draft without concept and active shape is not ready', async () => {
+test('Given a draft without concept or rule, when validated, then it is not ready', async () => {
   const root = await project();
   try {
     const file = join(root, '.oracle/domains/ativos/ontology.jsonld');
     await writeFile(file, JSON.stringify({ '@context': { oracle: 'urn:oracle:ns:v1:' }, '@graph': [{ '@id': 'urn:draft:ontology', '@type': 'oracle:Domain', 'oracle:version': '1.0.0' }] }));
     await writeFile(join(root, '.oracle/domains/ativos/shapes.ttl'), '@prefix sh: <http://www.w3.org/ns/shacl#> .');
     const result = await validateProject(root);
+    assert.equal(result.ok, true);
     assert.equal(result.ready, false);
     assert.ok(result.issues.some(issue => issue.rule === 'business-concept'));
-    assert.ok(result.issues.some(issue => issue.rule === 'active-shape'));
+    assert.ok(result.issues.some(issue => issue.rule === 'active-rule'));
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('incompatible IRI definitions identify both domain files', async () => {
+test('Given conflicting IRI definitions, when validated, then both origins are reported', async () => {
   const root = await project(['ativos', 'contratos']);
   try {
     const file = join(root, '.oracle/domains/contratos/ontology.jsonld');
@@ -73,7 +75,7 @@ test('incompatible IRI definitions identify both domain files', async () => {
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('future ontology format version is rejected without rewrite', async () => {
+test('Given a future ontology version, when validated, then it fails without rewriting the file', async () => {
   const root = await project();
   try {
     const file = join(root, '.oracle/domains/ativos/ontology.jsonld');
@@ -86,7 +88,7 @@ test('future ontology format version is rejected without rewrite', async () => {
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('SHACL reports violating action and accepts conforming action', async () => {
+test('Given conforming and violating actions, when SHACL runs, then only the violation is reported', async () => {
   const shapes = parseShapes(await readFile(new URL('shapes.ttl', fixture), 'utf8'));
   const good = parseShapes(await readFile(new URL('valid-action.ttl', fixture), 'utf8'));
   const bad = parseShapes(await readFile(new URL('invalid-action.ttl', fixture), 'utf8'));

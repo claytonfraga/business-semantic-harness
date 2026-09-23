@@ -13,6 +13,9 @@ const OWL_CLASS = namedNode('http://www.w3.org/2002/07/owl#Class');
 const SH_NODE_SHAPE = namedNode('http://www.w3.org/ns/shacl#NodeShape');
 const SH_TARGET_CLASS = namedNode('http://www.w3.org/ns/shacl#targetClass');
 const SH_PROPERTY = namedNode('http://www.w3.org/ns/shacl#property');
+const SH_PATH = namedNode('http://www.w3.org/ns/shacl#path');
+const SH_MIN_COUNT = namedNode('http://www.w3.org/ns/shacl#minCount');
+const SH_CONSTRAINTS = ['minCount', 'maxCount', 'in', 'datatype', 'class', 'pattern', 'nodeKind', 'hasValue'].map((term) => namedNode(`http://www.w3.org/ns/shacl#${term}`));
 
 export interface ValidationIssue {
   domain: string;
@@ -75,7 +78,14 @@ export async function validateProject(root: string): Promise<ValidationReport> {
     add(issues, 'project', '.oracle/project.json', 'no-domains', 'Projeto sem domínios declarados');
   }
   const seen = new Map<string, { definition: string; domain: string; file: string }>();
+  const baseIris = new Map<string, string>();
   for (const domain of manifest.domains) {
+    const priorDomain = baseIris.get(domain.baseIri);
+    if (priorDomain) {
+      add(issues, domain.id, '.oracle/project.json', 'duplicate-base-iri', `IRI base ${domain.baseIri} compartilhado por ${priorDomain} e ${domain.id}`);
+    } else {
+      baseIris.set(domain.baseIri, domain.id);
+    }
     let ontology: Store;
     let shapes: Store;
     try {
@@ -100,10 +110,27 @@ export async function validateProject(root: string): Promise<ValidationReport> {
     if (classes.length === 0) {
       add(issues, domain.id, domain.ontology, 'business-concept', 'Domínio sem conceito de negócio declarado');
     }
-    const activeShapes = shapes.getQuads(null, RDF_TYPE, SH_NODE_SHAPE, null)
-      .filter((q) => shapes.countQuads(q.subject, SH_TARGET_CLASS, null, null) > 0 && shapes.countQuads(q.subject, SH_PROPERTY, null, null) > 0);
-    if (activeShapes.length === 0) {
-      add(issues, domain.id, domain.shapes, 'active-shape', 'Domínio sem shape ativo com alvo e restrição');
+    const shapeNodes = shapes.getQuads(null, RDF_TYPE, SH_NODE_SHAPE, null);
+    for (const shape of shapeNodes) {
+      for (const property of shapes.getQuads(shape.subject, SH_PROPERTY, null, null)) {
+        if (shapes.countQuads(property.object, SH_PATH, null, null) !== 1) {
+          add(issues, domain.id, domain.shapes, 'invalid-shape', `Property shape sem caminho único em ${shape.subject.value}`);
+        }
+        for (const count of shapes.getQuads(property.object, SH_MIN_COUNT, null, null)) {
+          if (count.object.termType !== 'Literal' || !/^\d+$/.test(count.object.value)) {
+            add(issues, domain.id, domain.shapes, 'invalid-shape', `sh:minCount inválido em ${shape.subject.value}`);
+          }
+        }
+      }
+    }
+    const activeShapes = shapeNodes.filter((q) => shapes.countQuads(q.subject, SH_TARGET_CLASS, null, null) > 0 && shapes.getQuads(q.subject, SH_PROPERTY, null, null)
+      .some((property) => shapes.countQuads(property.object, SH_PATH, null, null) === 1 &&
+        SH_CONSTRAINTS.some((constraint) => shapes.countQuads(property.object, constraint, null, null) > 0)));
+    const humanPolicies = ontology.getQuads(null, RDF_TYPE, namedNode(ORACLE_TERMS.Policy), null)
+      .filter((q) => ontology.getQuads(q.subject, namedNode(ORACLE_TERMS.requiresHumanReview), null, null).some((review) => review.object.value === 'true') &&
+        ontology.countQuads(q.subject, namedNode(ORACLE_TERMS.governs), null, null) > 0);
+    if (activeShapes.length === 0 && humanPolicies.length === 0) {
+      add(issues, domain.id, domain.shapes, 'active-rule', 'Domínio sem restrição SHACL ou política de revisão humana ativa');
     }
     for (const q of ontology.getQuads(null, namedNode(ORACLE_TERMS.governs), null, null)) {
       if (q.object.termType === 'NamedNode' && q.object.value.startsWith(domain.baseIri) && ontology.countQuads(q.object, null, null, null) === 0) {
@@ -124,5 +151,6 @@ export async function validateProject(root: string): Promise<ValidationReport> {
       add(issues, domain.id, domain.shapes, 'shacl-graph', error instanceof Error ? error.message : String(error));
     }
   }
-  return { ok: issues.length === 0, ready: issues.length === 0, issues };
+  const readinessRules = new Set(['no-domains', 'business-concept', 'active-rule']);
+  return { ok: issues.every((issue) => readinessRules.has(issue.rule)), ready: issues.length === 0, issues };
 }
