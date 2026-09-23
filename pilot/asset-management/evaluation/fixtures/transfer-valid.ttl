@@ -1,0 +1,4 @@
+@prefix ex: <urn:oracle:pilot:ativos:> .
+ex:transfer-1 a ex:TransferenciaAtivo ;
+  ex:estadoAtual ex:EmUso ;
+  ex:novoResponsavel ex:Daniel .
