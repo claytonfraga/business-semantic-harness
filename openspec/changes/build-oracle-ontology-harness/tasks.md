@@ -1,13 +1,13 @@
 ## 1. Base do projeto e formato
 
 - [x] 1.1 Criar pacote TypeScript para Node.js 22, CLI `oracle` e testes; verificar compilação, execução de `oracle --help` e testes básicos.
-- [ ] 1.2 Publicar vocabulário Oracle versionado e exemplos JSON-LD/SHACL de `ativos`; verificar parsing RDF e validação SHACL do exemplo válido e de um exemplo inválido.
+- [x] 1.2 Publicar vocabulário Oracle versionado e exemplos JSON-LD/SHACL de `ativos`; verificar parsing RDF e validação SHACL do exemplo válido e de um exemplo inválido.
 - [x] 1.3 Implementar `oracle init` e `oracle domain add`; verificar geração sem sobrescrita. A recusa de `oracle codex` enquanto o projeto não tem domínios válidos é coberta por 4.4.
 
 ## 2. Carregamento e consulta
 
 - [x] 2.1 Implementar descoberta do projeto, manifesto e caminhos canônicos; testar ausência, duplicidade e escape por caminho.
-- [ ] 2.2 Implementar verificação de todos os domínios, carregamento JSON-LD, SHACL, versões, integridade e prontidão; testar domínio faltante, grafo malformado, IRI duplicado, referência local inválida, domínio vazio e violação de shape.
+- [x] 2.2 Implementar verificação de todos os domínios, carregamento JSON-LD, SHACL, versões, integridade e prontidão; testar domínio faltante, grafo malformado, IRI duplicado, referência local inválida, domínio vazio e violação de shape.
 - [ ] 2.3 Implementar `oracle ontology validate/show` e retrato imutável por sessão; verificar saída com fonte/IRI e detecção de alteração do retrato.
 
 ## 3. Decisão e registro

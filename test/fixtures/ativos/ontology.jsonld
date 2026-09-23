@@ -5,6 +5,7 @@
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
   },
   "@graph": [
+    { "@id": "ex:ontology", "@type": "oracle:Domain", "oracle:version": "1.0.0" },
     { "@id": "ex:Ativo", "@type": "rdfs:Class", "rdfs:label": "Ativo" },
     { "@id": "ex:Responsavel", "@type": "rdfs:Class", "rdfs:label": "Responsável" },
     { "@id": "ex:TransferenciaAtivo", "@type": "rdfs:Class", "rdfs:label": "Transferência de ativo" },

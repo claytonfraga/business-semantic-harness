@@ -1,0 +1,2 @@
+@prefix ex: <urn:pilot:ativos:> .
+ex:transferencia-1 a ex:TransferenciaAtivo ; ex:estadoAtual ex:Baixado .
