@@ -67,6 +67,8 @@ Alternativas consideradas: `codex exec --json` (captura simples, interação ins
 
 O segundo adaptador usa o executável `agy` do Google Antigravity CLI, que pode usar modelos Gemini. Ele implementa o mesmo contrato de eventos, ações, decisões e cancelamento do Codex e aponta para os mesmos arquivos `.oracle/` do projeto; não cria uma segunda ontologia. O protocolo e as superfícies de ferramenta do Agy devem ser inspecionados na versão instalada antes da implementação. O modo headless estruturado é candidato para captura, mas só pode ser usado em sessão governada se houver mediação comprovada antes de qualquer efeito. `oracle agy` falha com diagnóstico quando a capacidade faltar. O piloto de ativos e a avaliação devem incluir Agy em uma rodada separada, com versão, modelo e condições registrados, sem misturar seus resultados com a comparação A/B/C do Codex.
 
+O desbloqueio concreto do primeiro adaptador está em [codex-unblock-proposal.md](codex-unblock-proposal.md): Codex somente leitura, proposta de patch em cópia isolada, broker Oracle para avaliação e promoção, e diagnóstico baseado em capacidades observadas.
+
 ### 5. Captura, auditoria e revisão
 
 Eventos `PostToolUse` e conclusão de turno alimentam um extrator de candidatos. Ele só gera proposta se puder citar arquivo, trecho ou evento observável; caso contrário guarda a afirmação como insuficiente, sem promoção. A proposta carrega domínio, tipo RDF, conteúdo, evidência, hash da ontologia de base e estado. `oracle proposals list/show/accept/reject` aplica uma proposta por vez, revalida todos os domínios afetados e escreve atomicamente. Conflitos mantêm a proposta pendente.
