@@ -1,5 +1,7 @@
 # Proposta para desbloquear `oracle codex`
 
+> Histórico de decisão. A sessão inicial foi desbloqueada em 2026-09-23 com isolamento Linux e broker de patch por arquivo. A rodada funcional e suas limitações estão em `pilot/asset-management/evaluation/functional-e2e-2026-09-23-run.md`. Os critérios ainda não cobertos permanecem como tarefas abertas em `tasks.md`.
+
 ## Diagnóstico observado
 
 O teste funcional de 2026-09-23 no piloto terminou antes do primeiro turno. `src/agents/codex/doctor.ts` acrescenta incondicionalmente a razão “Fronteira de mutação do Codex ainda não verificada” e devolve `ready: false`; `src/cli.ts` apenas chama esse diagnóstico e encerra. O cliente JSON-RPC e o MCP existentes são protótipos parciais. O resultado não mede a capacidade do Codex de respeitar a ontologia.

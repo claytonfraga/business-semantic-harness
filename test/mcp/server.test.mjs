@@ -70,3 +70,30 @@ test('Given unverifiable evidence, when an MCP proposal is submitted, then it is
     await rm(root, { recursive: true, force: true });
   }
 });
+
+test('Given a governed Codex session, when the agent queries and reports a conflict, then MCP records no project mutation', async () => {
+  const root = await project();
+  const transport = new StdioClientTransport({ command: process.execPath, args: [resolve('dist/mcp/server.js'), root, 'governed'] });
+  const client = new Client({ name: 'oracle-quality', version: '0.1.0' });
+  try {
+    await client.connect(transport);
+    const listed = await client.listTools();
+    assert.deepEqual(listed.tools.map(tool => tool.name).sort(), ['oracle_propose_patch', 'oracle_query_ontology', 'oracle_report_conflict']);
+    const before = await readFile(join(root, 'README.md'), 'utf8');
+    const query = await client.callTool({ name: 'oracle_query_ontology', arguments: { domain: 'ativos' } });
+    assert.equal(query.isError, undefined);
+    const conflict = await client.callTool({ name: 'oracle_report_conflict', arguments: {
+      domain: 'ativos', request: 'Permitir violação', conflictingRules: ['regra de transferência'], reason: 'Conflito observado',
+    } });
+    assert.equal(JSON.parse(conflict.content[0].text).status, 'submitted');
+    const patch = await client.callTool({ name: 'oracle_propose_patch', arguments: {
+      domain: 'ativos', summary: 'Trocar texto', files: [{ path: 'README.md', beforeSha256: 'a'.repeat(64), content: 'alterado' }],
+    } });
+    assert.equal(JSON.parse(patch.content[0].text).status, 'submitted');
+    assert.equal(await readFile(join(root, 'README.md'), 'utf8'), before);
+    await assert.rejects(readFile(join(root, '.oracle/local/events.jsonl')), /ENOENT/);
+  } finally {
+    await client.close();
+    await rm(root, { recursive: true, force: true });
+  }
+});

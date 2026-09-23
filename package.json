@@ -1,21 +1,30 @@
 {
   "name": "oracle-ontology-harness",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
-  "files": ["dist/", "README.md"],
+  "files": [
+    "dist/",
+    "README.md"
+  ],
   "bin": {
     "oracle": "./dist/cli.js"
   },
   "scripts": {
     "build": "tsc && node scripts/prepare-bin.mjs",
     "check": "tsc --noEmit",
+    "lint": "biome lint src",
+    "quality": "npm run check && npm run lint",
+    "pretest": "npm run quality",
     "test": "npm run build && node --test test/*.test.mjs test/*/*.test.mjs",
+    "test:e2e": "npm run build && node --test --experimental-test-isolation=none test/e2e-live/*.e2e.mjs",
+    "capture": "python3 test/support/tmux-screenshot.py",
     "prepack": "npm run build"
   },
   "engines": {
     "node": ">=22"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.14",
     "@types/jsonld": "^1.5.15",
     "@types/n3": "^1.26.4",
     "@types/node": "^26.6.2",

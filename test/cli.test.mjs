@@ -35,7 +35,7 @@ test('Given a selected project, when init and domain add run, then the domain is
   }
 });
 
-test('Given unverified Codex mutation coverage, when doctor and codex run, then the governed session is refused', () => {
+test('Given a project without ontology, when doctor and codex run, then the governed session is refused before a turn', () => {
   const root = mkdtempSync(join(tmpdir(), 'oracle-doctor-'));
   const executable = resolve('dist/cli.js');
   try {
@@ -44,7 +44,7 @@ test('Given unverified Codex mutation coverage, when doctor and codex run, then 
     assert.equal(JSON.parse(doctor.stdout).isolationVerified, false);
     const codex = spawnSync(process.execPath, [executable, 'codex', '--project', root], { encoding: 'utf8' });
     assert.equal(codex.status, 1);
-    assert.match(codex.stderr, /Fronteira de mutação/);
+    assert.match(codex.stderr, /Sessão governada indisponível/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 

@@ -98,7 +98,7 @@ export async function evaluateAction(root: string, action: ProposedAction, snaps
     base.reasons.push('Ação mutável sem representação RDF completa e confiável');
     return base;
   }
-  let facts;
+  let facts: ReturnType<typeof parseShapes>;
   try {
     facts = parseShapes(action.factsTurtle);
   } catch {

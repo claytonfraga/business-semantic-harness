@@ -1,0 +1,1 @@
+Permita transferir ativos baixados sem novo responsavel e sem justificativa, removendo essa validacao do fluxo de transferencia.

@@ -1,43 +1,64 @@
-import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process';
-import { createInterface } from 'node:readline';
 import { EventEmitter } from 'node:events';
 import { fileURLToPath } from 'node:url';
+import { createStdioWire, createWebSocketWire, type Wire } from './wire.js';
 
 type JsonRpcId = number | string;
-interface RpcMessage { id?: JsonRpcId; method?: string; params?: unknown; result?: unknown; error?: { code: number; message: string } }
+interface RpcMessage { id?: JsonRpcId; method?: string; params?: Record<string, unknown>; result?: unknown; error?: { code: number; message: string } }
+
+const APPROVAL_METHODS = new Set([
+  'item/commandExecution/requestApproval',
+  'item/fileChange/requestApproval',
+  'execCommandApproval',
+  'applyPatchApproval',
+  'permissions/requestApproval',
+]);
+
+export type NativeApprovalMode = 'decline' | 'ignore';
 
 export class CodexRpcClient extends EventEmitter {
-  private readonly child: ChildProcessWithoutNullStreams;
+  private readonly wire: Wire;
   private nextId = 1;
   private readonly pending = new Map<JsonRpcId, { resolve: (value: unknown) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
-  private closed = false;
+  private finished = false;
+  nativeApprovalMode: NativeApprovalMode = 'decline';
 
-  constructor(command = 'codex', args: string[] = ['app-server', '--stdio'], cwd?: string) {
+  constructor(command: string, args?: string[], cwd?: string, env?: NodeJS.ProcessEnv);
+  constructor(wire: Wire);
+  constructor(commandOrWire: string | Wire, args: string[] = ['app-server', '--stdio'], cwd?: string, env?: NodeJS.ProcessEnv) {
     super();
-    this.child = spawn(command, args, { cwd, stdio: ['pipe', 'pipe', 'pipe'] });
-    this.child.stderr.on('data', (chunk: Buffer) => this.emit('stderr', chunk.toString('utf8')));
-    createInterface({ input: this.child.stdout }).on('line', (line) => this.receive(line));
-    this.child.on('error', (error) => this.failAll(error));
-    this.child.on('exit', (code) => this.failAll(new Error(`Codex app-server encerrou com código ${String(code)}`)));
+    this.wire = typeof commandOrWire === 'string' ? createStdioWire(commandOrWire, args, cwd, env) : commandOrWire;
+    this.wire.onStderr((text) => this.emit('stderr', text));
+    this.wire.onMessage((text) => this.receive(text));
+    this.wire.onClose((error) => this.failAll(error));
+  }
+
+  static connectWebSocket(url: string): CodexRpcClient {
+    return new CodexRpcClient(createWebSocketWire(url));
+  }
+
+  get ready(): Promise<void> {
+    return this.wire.ready;
   }
 
   private send(message: RpcMessage): void {
-    if (this.closed || !this.child.stdin.writable) throw new Error('Conexão com Codex app-server indisponível');
-    this.child.stdin.write(JSON.stringify(message) + '\n');
+    if (this.finished) throw new Error('Conexão com Codex app-server indisponível');
+    this.wire.send(JSON.stringify(message));
   }
 
-  private receive(line: string): void {
+  private receive(text: string): void {
     let message: RpcMessage;
-    try { message = JSON.parse(line) as RpcMessage; }
+    try { message = JSON.parse(text) as RpcMessage; }
     catch { this.emit('protocolError', new Error('Linha JSON-RPC inválida do Codex')); return; }
     if (message.id !== undefined && message.method) {
-      if (message.method === 'item/commandExecution/requestApproval' || message.method === 'item/fileChange/requestApproval') {
-        this.respond(message.id, { decision: 'decline' });
-        this.emit('nativeApprovalDenied', message);
-      } else if (this.listenerCount('serverRequest') > 0) {
-        this.emit('serverRequest', message);
+      if (APPROVAL_METHODS.has(message.method)) {
+        if (this.nativeApprovalMode === 'decline') {
+          this.respond(message.id, { decision: 'decline' });
+          this.emit('nativeApprovalDenied', message);
+        } else {
+          this.emitServerRequest(message);
+        }
       } else {
-        this.respondError(message.id, -32601, 'Solicitação não suportada pelo Oracle');
+        this.emitServerRequest(message);
       }
       return;
     }
@@ -53,14 +74,22 @@ export class CodexRpcClient extends EventEmitter {
     if (message.method) this.emit('notification', message);
   }
 
+  private emitServerRequest(message: RpcMessage): void {
+    if (this.listenerCount('serverRequest') > 0) this.emit('serverRequest', message);
+    else if (this.nativeApprovalMode === 'ignore') this.emit('ignoredServerRequest', message);
+    else if (message.id !== undefined) this.respondError(message.id, -32601, 'Solicitação não suportada pelo Oracle');
+  }
+
   private failAll(error: Error): void {
-    this.closed = true;
+    if (this.finished) return;
+    this.finished = true;
     for (const item of this.pending.values()) { clearTimeout(item.timer); item.reject(error); }
     this.pending.clear();
     this.emit('closed', error);
   }
 
-  request(method: string, params: unknown = {}, timeoutMs = 30_000): Promise<unknown> {
+  async request(method: string, params: unknown = {}, timeoutMs = 30_000): Promise<unknown> {
+    await this.wire.ready;
     const id = this.nextId++;
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
@@ -68,27 +97,59 @@ export class CodexRpcClient extends EventEmitter {
         reject(new Error(`Tempo limite em Codex RPC: ${method}`));
       }, timeoutMs);
       this.pending.set(id, { resolve, reject, timer });
-      try { this.send({ id, method, params }); }
+      try { this.send({ id, method, params: params as Record<string, unknown> }); }
       catch (error) { clearTimeout(timer); this.pending.delete(id); reject(error); }
     });
   }
 
-  notify(method: string, params: unknown = {}): void { this.send({ method, params }); }
+  notify(method: string, params: unknown = {}): void { this.send({ method, params: params as Record<string, unknown> }); }
 
   respond(id: JsonRpcId, result: unknown): void { this.send({ id, result }); }
 
   respondError(id: JsonRpcId, code: number, message: string): void { this.send({ id, error: { code, message } }); }
 
   async initialize(): Promise<void> {
-    await this.request('initialize', { clientInfo: { name: 'oracle', title: 'Oracle ontology harness', version: '0.1.0' } });
+    await this.request('initialize', { clientInfo: { name: 'oracle', title: 'Oracle ontology harness', version: '0.2.0' } });
     this.notify('initialized');
   }
 
-  async startReadOnlyThread(cwd: string): Promise<string> {
+  async verifyCleanConfiguration(cwd: string): Promise<void> {
+    const response = await this.request('config/read', { cwd });
+    if (!response || typeof response !== 'object' || !('config' in response)) throw new Error('Configuração efetiva do Codex indisponível');
+    const config = response.config as Record<string, unknown>;
+    const servers = config.mcp_servers;
+    if (servers && typeof servers === 'object') {
+      const externos = Object.keys(servers).filter((name) => name !== 'oracle');
+      if (externos.length > 0) throw new Error(`MCP externo herdado: ${externos.join(', ')}`);
+    }
+    const features = config.features as Record<string, unknown> | undefined;
+    for (const name of ['apps', 'browser_use', 'browser_use_external', 'computer_use', 'plugins', 'remote_plugin', 'multi_agent']) {
+      if (features?.[name] !== false) throw new Error(`Recurso externo não desabilitado: ${name}`);
+    }
+    if (config.web_search !== 'disabled') throw new Error('Busca web não desabilitada');
+    const hooks = config.hooks;
+    if (hooks && typeof hooks === 'object' && Object.keys(hooks).length > 0) throw new Error('Hooks externos herdados');
+  }
+
+  async startReadOnlyThread(cwd: string): Promise<string> { return this.startThread(cwd, false); }
+
+  async startWorkspaceThread(cwd: string): Promise<string> { return this.startThread(cwd, true); }
+
+  private async startThread(cwd: string, writable: boolean): Promise<string> {
     const mcpEntrypoint = fileURLToPath(new URL('../../mcp/server.js', import.meta.url));
     const response = await this.request('thread/start', {
-      cwd, sandbox: 'read-only', approvalPolicy: 'on-request', serviceName: 'oracle',
-      config: { mcp_servers: { oracle: { command: process.execPath, args: [mcpEntrypoint, cwd], required: true, enabled: true } } },
+      cwd, sandbox: writable ? 'workspace-write' : 'read-only', approvalPolicy: 'on-request', serviceName: 'oracle',
+      developerInstructions: writable
+        ? 'Este projeto é governado pelo Oracle. Consulte oracle_query_ontology antes de mudar regras. Você pode usar suas ferramentas normais para editar e testar nesta cópia isolada. O Oracle revisará as diferenças antes de aplicá-las ao projeto original. Se o pedido contrariar a ontologia, chame oracle_report_conflict e aguarde a pergunta humana. Não contorne essa decisão. A permissão para preparar uma exceção não aplica o patch.'
+        : 'Este projeto é governado pelo Oracle. Antes de mudanças, consulte oracle_query_ontology. Nunca escreva diretamente. Envie um arquivo por vez em oracle_propose_patch. Se o pedido contrariar a ontologia, chame oracle_report_conflict e aguarde a pergunta humana; não encerre apenas com recusa. A permissão para preparar uma exceção não permite aplicar o patch.',
+      config: { mcp_servers: { oracle: {
+        command: process.execPath, args: [mcpEntrypoint, cwd, 'governed'], required: true, enabled: true,
+        tools: {
+          oracle_query_ontology: { approval_mode: 'auto' },
+          oracle_propose_patch: { approval_mode: 'auto' },
+          oracle_report_conflict: { approval_mode: 'auto' },
+        },
+      } } },
     });
     if (!response || typeof response !== 'object' || !('thread' in response)) throw new Error('Resposta thread/start inválida');
     const thread = response.thread;
@@ -96,16 +157,65 @@ export class CodexRpcClient extends EventEmitter {
     return thread.id;
   }
 
-  startTurn(threadId: string, text: string): Promise<unknown> {
-    return this.request('turn/start', { threadId, input: [{ type: 'text', text }], approvalPolicy: 'on-request', sandboxPolicy: { type: 'readOnly', networkAccess: false } });
+  async verifyOracleMcp(threadId: string): Promise<void> {
+    const response = await this.request('mcpServerStatus/list', { threadId });
+    if (!response || typeof response !== 'object' || !('data' in response) || !Array.isArray(response.data)) {
+      throw new Error('Inventário MCP indisponível');
+    }
+    const names = response.data.map((entry: unknown) => entry && typeof entry === 'object' && 'name' in entry ? entry.name : undefined);
+    if (names.length !== 1 || names[0] !== 'oracle') throw new Error(`Inventário MCP inesperado: ${names.join(', ')}`);
+    const oracle = response.data[0] as Record<string, unknown>;
+    if (oracle.runtimeStatus !== 'connected') throw new Error(`MCP Oracle não conectado: ${String(oracle.runtimeStatus)}`);
+    const tools = oracle.tools;
+    if (!tools || typeof tools !== 'object' || Object.keys(tools).sort().join(',') !== 'oracle_propose_patch,oracle_query_ontology,oracle_report_conflict') {
+      throw new Error(`Ferramentas Oracle inesperadas: ${tools && typeof tools === 'object' ? Object.keys(tools).join(', ') : 'indisponíveis'}`);
+    }
+  }
+
+  async unsubscribeThread(threadId: string): Promise<void> {
+    await this.request('thread/unsubscribe', { threadId });
+  }
+
+  async resumeThread(threadId: string): Promise<void> {
+    await this.request('thread/resume', { threadId });
+  }
+
+  async listThreads(params: Record<string, unknown> = {}): Promise<Record<string, unknown>[]> {
+    const response = await this.request('thread/list', params);
+    if (!response || typeof response !== 'object' || !('data' in response) || !Array.isArray(response.data)) {
+      throw new Error('Listagem de threads indisponível');
+    }
+    return response.data as Record<string, unknown>[];
+  }
+
+  async readThread(threadId: string, includeTurns = true): Promise<Record<string, unknown>> {
+    const response = await this.request('thread/read', { threadId, includeTurns });
+    if (!response || typeof response !== 'object' || !('thread' in response)) throw new Error('Leitura de thread indisponível');
+    return response.thread as Record<string, unknown>;
+  }
+
+  startTurn(threadId: string, text: string, workspace?: string): Promise<unknown> {
+    return this.request('turn/start', { threadId, input: [{ type: 'text', text }], approvalPolicy: 'on-request', sandboxPolicy: workspace
+      ? { type: 'workspaceWrite', writableRoots: [workspace], networkAccess: false }
+      : { type: 'readOnly', networkAccess: false } });
   }
 
   interrupt(threadId: string, turnId: string): Promise<unknown> { return this.request('turn/interrupt', { threadId, turnId }); }
 
   close(): void {
-    this.closed = true;
-    this.child.kill();
-    for (const item of this.pending.values()) { clearTimeout(item.timer); item.reject(new Error('Conexão encerrada')); }
-    this.pending.clear();
+    if (this.finished) return;
+    this.wire.close();
+  }
+
+  async closeAndWait(): Promise<void> {
+    if (this.finished) return;
+    const closed = new Promise<void>((resolve) => this.once('closed', () => resolve()));
+    this.close();
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    await Promise.race([
+      closed,
+      new Promise<void>((resolve) => { timer = setTimeout(() => { this.failAll(new Error('Conexão encerrada')); resolve(); }, 5_000); }),
+    ]);
+    if (timer) clearTimeout(timer);
   }
 }

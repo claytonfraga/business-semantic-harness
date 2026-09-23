@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { DataFactory, Store } from 'n3';
+import { DataFactory, type Store } from 'n3';
 import SHACLValidator from 'rdf-validate-shacl';
 import { loadManifest } from '../project/manifest.js';
 import { resolveProjectFile } from '../project/paths.js';
@@ -67,7 +67,7 @@ function definitions(store: Store): Map<string, string> {
 
 export async function validateProject(root: string): Promise<ValidationReport> {
   const issues: ValidationIssue[] = [];
-  let manifest;
+  let manifest: Awaited<ReturnType<typeof loadManifest>>;
   try {
     manifest = await loadManifest(root);
   } catch (error) {

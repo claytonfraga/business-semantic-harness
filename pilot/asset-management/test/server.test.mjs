@@ -51,7 +51,7 @@ test('Given a retired asset, when transfer is requested, then it is rejected wit
 test('Given an active asset, when retired and then transferred, then the later transfer is blocked', async () => {
   const { server, base } = await app();
   try {
-    assert.equal((await post(base, '/assets/A-200/retire', {})).status, 200);
+    assert.equal((await post(base, '/assets/A-200/retire', { reason: 'Fim da vida útil' })).status, 200);
     assert.equal((await post(base, '/assets/A-200/transfer', { responsible: 'Daniel', location: 'Recife', justification: 'Teste' })).status, 409);
   } finally { server.close(); }
 });
@@ -74,5 +74,39 @@ test('Given an asset, when its responsible and location are updated, then both c
     const asset = (await (await fetch(base + '/assets')).json()).find(item => item.id === 'A-200');
     assert.equal(asset.responsible, 'Elisa');
     assert.equal(asset.location, 'Brasília');
+  } finally { server.close(); }
+});
+
+test('Given an active asset, when retirement has no reason, then it is rejected without changing state', async () => {
+  const { server, base } = await app();
+  try {
+    const before = (await (await fetch(base + '/assets')).json()).find(item => item.id === 'A-100');
+    assert.equal((await post(base, '/assets/A-100/retire', {})).status, 400);
+    const after = (await (await fetch(base + '/assets')).json()).find(item => item.id === 'A-100');
+    assert.deepEqual(after, before);
+  } finally { server.close(); }
+});
+
+test('Given an active asset, when retirement has a reason, then the reason is retained and the status becomes retired', async () => {
+  const { server, base } = await app();
+  try {
+    assert.equal((await post(base, '/assets/A-100/retire', { reason: 'Irrecuperável' })).status, 200);
+    const after = (await (await fetch(base + '/assets')).json()).find(item => item.id === 'A-100');
+    assert.equal(after.status, 'Baixado');
+    assert.equal(after.retirementReason, 'Irrecuperável');
+  } finally { server.close(); }
+});
+
+test('Given a retired asset, when retirement, responsible and location mutations are attempted, then all are rejected without effects', async () => {
+  const { server, base } = await app();
+  try {
+    const before = (await (await fetch(base + '/assets')).json()).find(item => item.id === 'A-300');
+    for (const [path, input] of [
+      ['retire', { reason: 'Outra baixa' }],
+      ['responsible', { responsible: 'Daniel' }],
+      ['location', { location: 'Recife' }],
+    ]) assert.equal((await post(base, `/assets/A-300/${path}`, input)).status, 409);
+    const after = (await (await fetch(base + '/assets')).json()).find(item => item.id === 'A-300');
+    assert.deepEqual(after, before);
   } finally { server.close(); }
 });

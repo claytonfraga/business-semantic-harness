@@ -2,10 +2,12 @@
 
 import { realpathSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 import { addDomain, initProject } from './project/scaffold.js';
 import { queryOntology } from './ontology/query.js';
 import { validateProject } from './ontology/validate.js';
 import { diagnoseCodex } from './agents/codex/doctor.js';
+import { runCodexSession } from './agents/codex/session.js';
 
 export async function main(argv: string[]): Promise<number> {
   if (argv.length === 1 && argv[0] === '--help') {
@@ -18,7 +20,7 @@ export async function main(argv: string[]): Promise<number> {
     process.stderr.write('Caminho ausente após --project.\n');
     return 2;
   }
-  const projectRoot = projectFlag >= 0 ? argv[projectFlag + 1] : process.cwd();
+  const projectRoot = resolve(projectFlag >= 0 ? argv[projectFlag + 1] : process.cwd());
   const command = projectFlag >= 0 ? argv.filter((_, index) => index !== projectFlag && index !== projectFlag + 1) : argv;
   try {
     if (command.length === 1 && command[0] === 'init') {
@@ -54,8 +56,12 @@ export async function main(argv: string[]): Promise<number> {
     }
     if ((command.length === 1 && command[0] === 'codex') || (command.length === 2 && command[0] === 'code' && command[1] === 'base')) {
       const report = await diagnoseCodex(projectRoot);
-      process.stderr.write(`Sessão governada indisponível: ${report.reasons.join('; ')}\n`);
-      return 1;
+      if (!report.ready) {
+        process.stderr.write(`Sessão governada indisponível: ${report.reasons.join('; ')}\n`);
+        return 1;
+      }
+      await runCodexSession(projectRoot);
+      return 0;
     }
     if (command.length === 1 && command[0] === 'agy') {
       process.stderr.write('Adaptador Agy ainda não disponível: mediação de ações do Google Antigravity CLI não verificada.\n');
