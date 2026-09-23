@@ -34,3 +34,16 @@ test('Given a selected project, when init and domain add run, then the domain is
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('Given unverified Codex mutation coverage, when doctor and codex run, then the governed session is refused', () => {
+  const root = mkdtempSync(join(tmpdir(), 'oracle-doctor-'));
+  const executable = resolve('dist/cli.js');
+  try {
+    const doctor = spawnSync(process.execPath, [executable, 'doctor', '--project', root], { encoding: 'utf8' });
+    assert.equal(doctor.status, 1);
+    assert.equal(JSON.parse(doctor.stdout).isolationVerified, false);
+    const codex = spawnSync(process.execPath, [executable, 'codex', '--project', root], { encoding: 'utf8' });
+    assert.equal(codex.status, 1);
+    assert.match(codex.stderr, /Fronteira de mutação/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

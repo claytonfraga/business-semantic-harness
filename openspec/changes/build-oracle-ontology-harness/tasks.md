@@ -20,8 +20,8 @@
 
 - [ ] 4.1 Implementar contrato de adaptador e cliente `codex app-server` por stdio; verificar handshake, thread, eventos, solicitações nativas e cancelamento com testes de protocolo.
 - [ ] 4.2 Implementar servidor MCP local obrigatório para consulta ontológica e proposta explícita; verificar respostas por domínio/IRI e falha de abertura de sessão quando o MCP não inicia.
-- [ ] 4.3 Implementar hooks `PreToolUse`/`PostToolUse` e ponte IPC com o broker; testar permissão após resposta, negativa, timeout, perda de IPC e ferramenta mutável não suportada antes de efeitos.
-- [ ] 4.4 Implementar `oracle codex` e `oracle doctor`; verificar contexto inicial, prontidão de hooks/MCP, recusa de bypass e diagnóstico de Codex indisponível.
+- [ ] 4.3 Implementar ferramentas MCP Oracle para mutações mediadas pelo broker, além de hooks `PreToolUse`/`PostToolUse` para observação; testar permissão após resposta, negativa, timeout, perda de IPC, elevação nativa negada e ferramenta mutável não suportada antes de efeitos.
+- [ ] 4.4 Implementar `oracle codex` e `oracle doctor`; verificar contexto inicial, MCP obrigatório, isolamento `readOnly`, recusa de bypass e diagnóstico de Codex indisponível. Só iniciar sessão governada após comprovar a fronteira de mutação na versão instalada.
 
 ## 5. Conhecimento e revisão
 

@@ -21,8 +21,10 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.1",
     "jsonld": "^9.0.0",
     "n3": "^2.7.12",
-    "rdf-validate-shacl": "^0.6.5"
+    "rdf-validate-shacl": "^0.6.5",
+    "zod": "^4.6.5"
   }
 }

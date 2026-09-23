@@ -57,9 +57,9 @@ O estado local é gravado por projeto sob `.oracle/local/`, com escrita atômica
 
 O adaptador usa `codex app-server` por stdio para iniciar threads, mostrar eventos, encaminhar solicitações nativas de aprovação e manter a conversa interativa. Um servidor MCP local obrigatório expõe consulta de ontologia e envio explícito de propostas; o contexto inicial identifica os domínios e orienta o agente a consultar essas ferramentas. A inicialização falha se o servidor MCP obrigatório não carregar.
 
-Hooks `PreToolUse` e `PostToolUse` entregam ao Oracle as ações de ferramentas. Um pequeno processo de hook se comunica com o `approval-broker` por socket local autenticado e aguarda sua decisão. Em conflito ou incerteza, o broker mostra a pergunta na interface Oracle; o hook só devolve `allow` após resposta explícita. Negativa, timeout ou perda de IPC devolvem `deny`. O hook não usa `permissionDecision: "ask"`, que a documentação atual não suporta. Aprovações nativas do Codex continuam valendo; uma permissão Oracle não substitui uma permissão de sandbox ou rede.
+O Codex opera em `readOnly` e sem aprovação nativa de elevação durante a sessão governada. Escritas são oferecidas apenas por ferramentas MCP locais do Oracle, que chamam o `approval-broker` e executam somente após concessão consumida uma vez e auditoria persistida. Solicitações nativas de elevação são negadas. O sandbox não controla MCP externo, apps/conectores, navegador, Computer Use, busca web ou tarefas de nuvem; o adaptador deve desabilitar essas superfícies ou comprovar mediação antes de permitir a sessão. Hooks `PreToolUse` e `PostToolUse` complementam observação e diagnóstico, mas não são a fronteira de fiscalização: caminhos especializados podem não passar pelos hooks e saídas inválidas de hook podem falhar sem bloquear a ferramenta. O adaptador deve comprovar em testes de contrato a cobertura efetiva de todas as superfícies disponíveis nesta versão; se não puder, recusa a sessão governada.
 
-Antes do primeiro turno, o adaptador verifica versão/protocolo, configuração e confiança dos hooks, capacidade de interceptação e caminho do projeto. Opções que desabilitam hooks ou sandbox são recusadas. A implementação deve testar com a versão do Codex instalada e gerar bindings do protocolo para a versão suportada. Se uma ferramenta não passar pelo hook, ela não é habilitada para mutação na sessão governada. Não se usa `codex exec --json` como sessão principal porque é voltado a execução não interativa.
+Antes do primeiro turno, o adaptador verifica versão/protocolo, configuração, MCP obrigatório, isolamento `readOnly` e caminho do projeto. Opções que desabilitam o sandbox ou habilitam elevação nativa são recusadas. A implementação deve testar com a versão do Codex instalada e gerar bindings do protocolo para a versão suportada. Não se usa `codex exec --json` como sessão principal porque é voltado a execução não interativa.
 
 Alternativas consideradas: `codex exec --json` (captura simples, interação insuficiente) e apenas instruções em prompt (sem fiscalização prévia).
 
@@ -173,7 +173,7 @@ O relatório permite comparar A→B (efeito de contexto) e B→C (efeito adicion
 
 ## Risks / Trade-offs
 
-- **Cobertura incompleta de ferramentas Codex** → iniciar apenas com superfícies interceptadas e testadas; ferramenta desconhecida que possa mutar recebe negativa até ser suportada.
+- **Cobertura incompleta de hooks e sandbox Codex** → combinar `readOnly`, elevação nativa negada, superfícies externas desabilitadas/mediadas e ferramenta Oracle; sem comprovação da fronteira na versão instalada, não iniciar sessão governada.
 - **Comandos shell opacos** → classificar como incertos e perguntar ao usuário; não alegar conformidade automática.
 - **Hooks dependem de confiança e versão do Codex** → checagem de prontidão, versão suportada e testes de contrato; falhar sem iniciar sessão se não estiverem ativos.
 - **SHACL valida um grafo, não intenção de negócio implícita em código** → explicitar fatos usados na avaliação e consultar o usuário quando faltar representação.
@@ -189,3 +189,5 @@ Como não existe implementação anterior, não há migração de dados. A entre
 - [JSON-LD 1.1](https://www.w3.org/TR/json-ld11/) e [SHACL](https://www.w3.org/TR/shacl/).
 - [Codex app-server](https://developers.openai.com/codex/app-server), incluindo eventos, aprovações e geração de bindings TypeScript.
 - [Hooks do Codex](https://learn.chatgpt.com/docs/hooks), incluindo `PreToolUse` e limitações de `permissionDecision`.
+- [Cobertura e limitações dos hooks](https://learn.chatgpt.com/docs/hooks#tool-coverage) e [política `readOnly` do app-server](https://learn.chatgpt.com/docs/app-server#sandbox-read-access-readonlyaccess), verificadas para Codex CLI 0.156.1.
+- [Superfícies fora do sandbox Codex](https://learn.chatgpt.com/docs/agent-approvals-security), incluindo MCP, apps, navegador e Computer Use.

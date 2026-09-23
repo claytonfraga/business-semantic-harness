@@ -3,10 +3,11 @@
 import { addDomain, initProject } from './project/scaffold.js';
 import { queryOntology } from './ontology/query.js';
 import { validateProject } from './ontology/validate.js';
+import { diagnoseCodex } from './agents/codex/doctor.js';
 
 export async function main(argv: string[]): Promise<number> {
   if (argv.length === 1 && argv[0] === '--help') {
-    process.stdout.write('oracle: init | domain add | ontology validate | ontology show\n');
+    process.stdout.write('oracle: init | domain add | ontology validate | ontology show | doctor | codex\n');
     return 0;
   }
 
@@ -43,6 +44,16 @@ export async function main(argv: string[]): Promise<number> {
       const result = await queryOntology(projectRoot, command[2], command[3]);
       process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
       return 0;
+    }
+    if (command.length === 1 && command[0] === 'doctor') {
+      const report = await diagnoseCodex(projectRoot);
+      process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+      return report.ready ? 0 : 1;
+    }
+    if (command.length === 1 && command[0] === 'codex') {
+      const report = await diagnoseCodex(projectRoot);
+      process.stderr.write(`Sessão governada indisponível: ${report.reasons.join('; ')}\n`);
+      return 1;
     }
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
