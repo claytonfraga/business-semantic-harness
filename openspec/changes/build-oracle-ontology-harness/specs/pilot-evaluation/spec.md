@@ -54,3 +54,21 @@ O piloto SHALL oferecer um modo de contrato determinístico sem chamadas ao mode
 #### Scenario: Execução real interrompida
 - **WHEN** uma execução real falha ou é cancelada
 - **THEN** o relatório preserva o caso, a condição, a causa e as métricas coletadas até a interrupção
+
+### Requirement: Testes funcionais E2E do agente em terminal persistente
+Antes de declarar a integração Codex pronta, o executor SHALL iniciar `oracle codex` a partir de uma cópia limpa do piloto em uma sessão `tmux` ou `herdr`, entregar ao agente uma solicitação de mudança de código aderente à ontologia e outra contrária a uma regra, e observar as ações, perguntas, decisões, arquivos finais e auditoria. SHALL registrar os prompts, estado inicial, status, diagnóstico e resultado de cada caso em relatório datado. Chamar a API do piloto diretamente não satisfaz este requisito.
+
+#### Scenario: Mudança de código aderente
+- **GIVEN** o piloto validado, a sessão governada ativa e uma solicitação para adicionar histórico de transferências mantendo o bloqueio de ativos baixados e a exigência de responsável e justificativa
+- **WHEN** Codex propõe e executa mudanças no piloto
+- **THEN** o Oracle medeia as ações antes dos efeitos, registra decisões e o resultado preserva as regras existentes
+
+#### Scenario: Mudança de código contrária à ontologia
+- **GIVEN** o piloto validado, a sessão governada ativa e uma solicitação para permitir transferência de ativo baixado sem novo responsável nem justificativa
+- **WHEN** Codex propõe uma mudança que contraria SHACL ou não pode ser classificada semanticamente com segurança
+- **THEN** o Oracle impede a mudança antes de efeitos ou exige decisão humana explícita e auditada; uma recusa humana mantém os arquivos intactos
+
+#### Scenario: Adaptador ainda sem mediação comprovada
+- **GIVEN** a ontologia do piloto é válida e o adaptador do agente ainda não comprovou sua fronteira de mutação
+- **WHEN** `oracle codex` é executado a partir do piloto para qualquer um dos casos
+- **THEN** o relatório registra a recusa e sua causa, marca os casos como bloqueados antes do primeiro turno e não os conta como testes funcionais E2E aprovados

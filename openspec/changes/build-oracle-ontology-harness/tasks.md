@@ -46,3 +46,5 @@
 - [ ] 7.3 Executar avaliação de contrato e, quando Codex estiver autenticado, a avaliação real; publicar relatório JSON/Markdown com contagens, denominadores, casos individuais e limitações observadas.
 - [ ] 7.4 Documentar instalação, criação de ontologia por domínio, limites da análise semântica e atualização de versão do Codex; verificar comandos do guia em ambiente limpo.
 - [ ] 7.5 Executar os casos do piloto com Agy em uma rodada separada e registrar versão, modelo, resultados e limitações sem misturá-los ao relatório A/B/C do Codex.
+- [x] 7.6 Definir a regra de teste funcional E2E em `tmux` ou `herdr`, especificar casos aderente e contrário à ontologia e registrar a tentativa inicial de `oracle codex` com seu bloqueio antes do primeiro turno.
+- [ ] 7.7 Após comprovar a fronteira de mutação, executar os dois casos funcionais com `oracle codex` em cópias limpas do piloto; verificar ações, decisões humanas, arquivos finais e auditoria com evidência reproduzível.

@@ -97,6 +97,8 @@ oracle ontology validate --project pilot/asset-management
 
 O servidor do piloto usa `npm run build --prefix pilot/asset-management` e `node pilot/asset-management/dist/server.js`. A API lista ativos em `GET /assets` e recebe operações em `POST /assets/{id}/transfer`, `/retire`, `/responsible` e `/location`.
 
+O teste funcional E2E exige abrir `oracle codex` em uma sessão persistente `tmux` ou `herdr` e pedir ao agente mudanças de código aderentes e contrárias à ontologia. A regra está em [AGENTS.md](AGENTS.md), e a [primeira tentativa funcional](pilot/asset-management/evaluation/functional-e2e-2026-09-23.md) documenta o bloqueio encontrado antes do primeiro turno. Testes HTTP diretos do piloto não comprovam a governança do Oracle.
+
 ## Estado do projeto
 
 A base de ontologia, o núcleo de decisão, a trilha de auditoria e o piloto são executáveis. A integração governada com Codex, a revisão de propostas e a avaliação A/B/C ainda estão em desenvolvimento conforme [OpenSpec](openspec/changes/build-oracle-ontology-harness/tasks.md). Nenhum pacote foi publicado no npm.
