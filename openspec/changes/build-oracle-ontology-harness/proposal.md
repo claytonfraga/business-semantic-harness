@@ -4,7 +4,8 @@ Agentes de programação recebem contexto fragmentado e podem executar mudanças
 
 ## What Changes
 
-- Criar um CLI `oracle` em TypeScript, com `oracle codex` como primeira integração interativa.
+- Criar um CLI `oracle` em TypeScript, com `oracle code base` (`oracle codex`) como primeira integração interativa e `oracle agy` como segunda integração planejada.
+- Distribuir o CLI como pacote npm executável no Linux, utilizável globalmente ou via `npx` de dentro de qualquer codebase com `.oracle/` próprio.
 - Representar conceitos e relações em JSON-LD e restrições verificáveis em SHACL, com vocabulário Oracle versionado para regras de ação e revisão humana.
 - Exigir um manifesto do projeto e uma ontologia válida para cada domínio declarado antes de iniciar sessões.
 - Disponibilizar comandos para criar, inspecionar e validar ontologias de domínio.
@@ -12,7 +13,7 @@ Agentes de programação recebem contexto fragmentado e podem executar mudanças
 - Avaliar ações antes da execução; consultar o usuário quando houver conflito ou incerteza; registrar sua decisão.
 - Capturar descobertas do agente como propostas com evidência, sujeitas a revisão humana antes de entrar na ontologia.
 - Registrar eventos e decisões da sessão para auditoria e recuperação.
-- Definir uma interface de adaptador para outros agentes; entregar apenas o adaptador Codex nesta mudança.
+- Definir uma interface de adaptador independente do agente; entregar Codex primeiro e depois Agy (Google Antigravity CLI, executável `agy`), sujeitos aos mesmos gates de segurança.
 - Incluir um projeto piloto isolado de gestão de ativos, com ontologia própria, cenários de referência e avaliação comparativa mensurável.
 
 ## Capabilities
@@ -36,6 +37,6 @@ Nenhuma. O projeto ainda não possui capacidades implementadas.
 
 - Novo pacote CLI para Node.js/TypeScript e arquivos JSON-LD/SHACL versionáveis em cada projeto consumidor.
 - Dependência operacional do Codex CLI e de sua interface de sessão e hooks na primeira versão.
-- Nenhuma integração Claude ou Agy nesta mudança; o contrato permite adaptadores futuros.
+- Agy é o segundo adaptador exigido; Claude permanece fora do escopo desta mudança.
 - Dados locais de sessão e propostas permanecem separados da ontologia aprovada.
 - Projeto piloto em `pilot/asset-management/`, independente das ontologias e do estado do próprio Oracle.

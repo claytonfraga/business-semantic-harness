@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import { realpathSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import * as z from 'zod/v4';
@@ -46,7 +48,7 @@ export async function main(root: string): Promise<void> {
   await createOracleMcpServer(root).connect(new StdioServerTransport());
 }
 
-if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+if (process.argv[1] && fileURLToPath(import.meta.url) === realpathSync(process.argv[1])) {
   await main(process.argv[2] ?? process.cwd()).catch((error) => {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
     process.exitCode = 1;

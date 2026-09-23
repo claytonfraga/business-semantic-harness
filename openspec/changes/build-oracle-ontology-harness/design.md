@@ -16,7 +16,7 @@ JSON-LD descreve dados interligados; SHACL valida grafos RDF contra shapes. Uma 
 **Non-Goals:**
 
 - Provar automaticamente que todo código gerado preserva qualquer regra de negócio em linguagem natural.
-- Entregar adaptadores Claude ou Agy, interface web, armazenamento remoto ou edição colaborativa na primeira versão.
+- Entregar adaptador Claude, interface web do Oracle, armazenamento remoto ou edição colaborativa na primeira versão. Agy vem após o gate do adaptador Codex.
 - Tratar uma aprovação pontual como alteração permanente da ontologia.
 
 ## Decisions
@@ -63,6 +63,10 @@ Antes do primeiro turno, o adaptador verifica versão/protocolo, configuração,
 
 Alternativas consideradas: `codex exec --json` (captura simples, interação insuficiente) e apenas instruções em prompt (sem fiscalização prévia).
 
+### 4A. Integração Agy
+
+O segundo adaptador usa o executável `agy` do Google Antigravity CLI, que pode usar modelos Gemini. Ele implementa o mesmo contrato de eventos, ações, decisões e cancelamento do Codex e aponta para os mesmos arquivos `.oracle/` do projeto; não cria uma segunda ontologia. O protocolo e as superfícies de ferramenta do Agy devem ser inspecionados na versão instalada antes da implementação. O modo headless estruturado é candidato para captura, mas só pode ser usado em sessão governada se houver mediação comprovada antes de qualquer efeito. `oracle agy` falha com diagnóstico quando a capacidade faltar. O piloto de ativos e a avaliação devem incluir Agy em uma rodada separada, com versão, modelo e condições registrados, sem misturar seus resultados com a comparação A/B/C do Codex.
+
 ### 5. Captura, auditoria e revisão
 
 Eventos `PostToolUse` e conclusão de turno alimentam um extrator de candidatos. Ele só gera proposta se puder citar arquivo, trecho ou evento observável; caso contrário guarda a afirmação como insuficiente, sem promoção. A proposta carrega domínio, tipo RDF, conteúdo, evidência, hash da ontologia de base e estado. `oracle proposals list/show/accept/reject` aplica uma proposta por vez, revalida todos os domínios afetados e escreve atomicamente. Conflitos mantêm a proposta pendente.
@@ -77,6 +81,8 @@ oracle domain add <id>
 oracle ontology validate
 oracle ontology show <domain> [iri]
 oracle codex [--project <path>]
+oracle code base [--project <path>]
+oracle agy [--project <path>]
 oracle proposals list|show|accept|reject
 oracle sessions list|show
 oracle eval run|report
@@ -84,6 +90,8 @@ oracle doctor
 ```
 
 `oracle init` prepara manifesto vazio e orienta a criação de ao menos um domínio. Isso não autoriza `oracle codex`: a sessão só começa quando há domínio declarado e todas as ontologias estão íntegras e prontas. `oracle doctor` examina Codex, protocolo, hooks, MCP e permissões locais antes da primeira sessão.
+
+O pacote npm expõe `dist/cli.js` como binário `oracle` com shebang e modo executável gerados em `prepack`. O CLI assume `process.cwd()` como raiz do codebase e aceita `--project`. A distribuição é testada como tarball em um prefixo npm temporário e via `npx --package=<tarball> oracle`, sem instalar no sistema do desenvolvedor ou publicar sem autorização.
 
 ### 7. Exemplo mínimo do domínio `ativos`
 
@@ -191,3 +199,4 @@ Como não existe implementação anterior, não há migração de dados. A entre
 - [Hooks do Codex](https://learn.chatgpt.com/docs/hooks), incluindo `PreToolUse` e limitações de `permissionDecision`.
 - [Cobertura e limitações dos hooks](https://learn.chatgpt.com/docs/hooks#tool-coverage) e [política `readOnly` do app-server](https://learn.chatgpt.com/docs/app-server#sandbox-read-access-readonlyaccess), verificadas para Codex CLI 0.156.1.
 - [Superfícies fora do sandbox Codex](https://learn.chatgpt.com/docs/agent-approvals-security), incluindo MCP, apps, navegador e Computer Use.
+- [Antigravity CLI e executável `agy`](https://antigravity.google/docs/getting-started?tab=cli) e [modo headless](https://antigravity.google/docs/cli/headless/), consultados antes do desenho do segundo adaptador.

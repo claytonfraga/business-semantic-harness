@@ -47,3 +47,9 @@ test('Given unverified Codex mutation coverage, when doctor and codex run, then 
     assert.match(codex.stderr, /Fronteira de mutação/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
+
+test('Given an unverified Agy adapter, when requested, then Oracle reports its missing mediation', () => {
+  const run = spawnSync(process.execPath, [resolve('dist/cli.js'), 'agy'], { encoding: 'utf8' });
+  assert.equal(run.status, 1);
+  assert.match(run.stderr, /Adaptador Agy.*não disponível/);
+});

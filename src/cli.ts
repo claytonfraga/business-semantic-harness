@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import { realpathSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { addDomain, initProject } from './project/scaffold.js';
 import { queryOntology } from './ontology/query.js';
 import { validateProject } from './ontology/validate.js';
@@ -7,7 +9,7 @@ import { diagnoseCodex } from './agents/codex/doctor.js';
 
 export async function main(argv: string[]): Promise<number> {
   if (argv.length === 1 && argv[0] === '--help') {
-    process.stdout.write('oracle: init | domain add | ontology validate | ontology show | doctor | codex\n');
+    process.stdout.write('oracle: init | domain add | ontology validate | ontology show | doctor | code base | agy\n');
     return 0;
   }
 
@@ -50,9 +52,13 @@ export async function main(argv: string[]): Promise<number> {
       process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
       return report.ready ? 0 : 1;
     }
-    if (command.length === 1 && command[0] === 'codex') {
+    if ((command.length === 1 && command[0] === 'codex') || (command.length === 2 && command[0] === 'code' && command[1] === 'base')) {
       const report = await diagnoseCodex(projectRoot);
       process.stderr.write(`Sessão governada indisponível: ${report.reasons.join('; ')}\n`);
+      return 1;
+    }
+    if (command.length === 1 && command[0] === 'agy') {
+      process.stderr.write('Adaptador Agy ainda não disponível: mediação de ações do Google Antigravity CLI não verificada.\n');
       return 1;
     }
   } catch (error) {
@@ -63,6 +69,6 @@ export async function main(argv: string[]): Promise<number> {
   return 2;
 }
 
-if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+if (process.argv[1] && fileURLToPath(import.meta.url) === realpathSync(process.argv[1])) {
   process.exitCode = await main(process.argv.slice(2));
 }

@@ -4,12 +4,13 @@
 
 | Etapa | Tarefas OpenSpec | Entrega testável | Gate de saída |
 | --- | --- | --- | --- |
-| 1. Ontologias | 1.1–2.3 | CLI cria, carrega, valida e consulta projetos JSON-LD/SHACL sem agente | Projeto com dois domínios válidos passa; domínio faltante, vazio ou com caminho externo falha |
+| 1. Ontologias | 1.1–1.4, 2.1–2.3 | CLI empacotável cria, carrega, valida e consulta projetos JSON-LD/SHACL sem agente | Projeto com dois domínios válidos passa; domínio faltante, vazio ou com caminho externo falha; binário funciona em codebase externo |
 | 2. Governança | 3.1–3.3 | Avaliador de ações, aprovação pontual e trilha local | Casos de conformidade, violação, incerteza, timeout e falha de escrita passam sem efeitos indevidos |
 | 3. Codex | 4.1–4.4 | `oracle codex` interativo com app-server, MCP e hooks | Testes de contrato e sessão local comprovam interceptação antes de mutação |
 | 4. Conhecimento | 5.1–5.3 | Propostas com evidência, revisão e recuperação | Ontologia aprovada só muda após aceitação explícita e revalidação |
 | 5. Piloto | 6.1–6.5 | Aplicação de ativos com ontologia/SHACL próprios e avaliador | Quatro casos P1–P4 rodam em modo determinístico sem alterar o original |
 | 6. Avaliação | 7.1–7.4 | Relatório comparativo A/B/C e guia de uso | OpenSpec valida; testes completos passam; relatório lista dados observados e indisponíveis |
+| 7. Agy | 4.5, 7.5 | Adaptador Google Antigravity CLI sobre a mesma ontologia e avaliação separada | Protocolo e superfícies mutáveis comprovados; sessão governada ou recusa explícita; resultados por agente identificados |
 
 ## Ordem e revisão
 
@@ -30,7 +31,8 @@ O repositório ainda não possui código, testes ou comandos de build. A etapa 1
 
 ## Riscos a verificar antes do adaptador Codex
 
-- Hooks `PreToolUse` precisam estar ativos e confiáveis na versão suportada do Codex; o comando de diagnóstico deve comprovar isso antes do primeiro turno.
+- Hooks não cobrem todas as superfícies do Codex; o comando de diagnóstico deve comprovar isolamento ou mediação antes do primeiro turno.
+- O adaptador Agy também precisa de prova de mediação na versão suportada; compartilhar ontologia não implica compartilhar o protocolo ou as garantias de interceptação.
 - Aprovação do Oracle vale para uma única ação e não substitui aprovação nativa de sandbox/rede.
 - Uma alteração de código pode ter efeito semântico não representável em RDF; nesse caso o motor pede revisão humana.
 - Resultados do piloto não devem misturar execução em árvore já alterada com execução em cópia limpa.
