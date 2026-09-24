@@ -258,4 +258,4 @@ The functional E2E test requires opening `bsh codex` in a persistent `tmux` or `
 
 ## Project status
 
-The ontology base, the decision core, the audit trail, the pilot, and the governed Codex session with Git worktree isolation are runnable. Knowledge capture for review and the A/B/C evaluation are still in progress, as tracked in [OpenSpec](openspec/changes/build-business-semantic-harness/tasks.md). The package is installed globally on this Linux host from a local tarball, but has not been published to npm.
+The ontology base, the decision core, the audit trail, the pilot, and the governed Codex session with Git worktree isolation are runnable. Knowledge capture for review and the A/B/C evaluation are still in progress, tracked locally in the `openspec/` directory (kept out of version control). The package is installed globally on this Linux host from a local tarball, but has not been published to npm.
