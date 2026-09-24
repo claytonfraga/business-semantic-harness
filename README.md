@@ -1,5 +1,7 @@
 # Business Semantic Harness
 
+[![CI](https://github.com/claytonfraga/business-semantic-harness/actions/workflows/ci.yml/badge.svg)](https://github.com/claytonfraga/business-semantic-harness/actions/workflows/ci.yml)
+
 The **Business Semantic Harness** is a wrapper for the Codex coding agent that gives it an explicit, verifiable model of your project's business domain. Instead of letting the agent change code from a prompt alone, the harness hands it a domain ontology written in JSON-LD and a set of verifiable rules written in SHACL, keeps the agent working in an isolated Git worktree, measures the tokens it spends on the domain checks, and only promotes the result to your branch after validation and any required human decision.
 
 The ontology and the SHACL rules belong to **your project**, not to this package. They live under the project's `.bsh/` directory, are versioned with the project, and are loaded every time the harness opens a session for it. The globally installed package ships the engine and the `bsh` command; it neither replaces nor shares one project's ontology with another.
@@ -26,6 +28,24 @@ bsh --help
 ```
 
 After changing the harness code, build and install a new tarball; the global installation does not track checkout changes. The package has **not been published to npm yet**. Once it is, `npm install -g business-semantic-harness` will install the executable globally.
+
+### Installing from a GitHub release
+
+Every tag `v*` runs the release workflow, which tests the project, packs the installable tarball, and attaches it to a GitHub Release together with a `SHA256SUMS` file. You can install straight from the release asset:
+
+```bash
+npm install -g https://github.com/claytonfraga/business-semantic-harness/releases/download/v0.2.0/business-semantic-harness-0.2.0.tgz
+bsh --help
+```
+
+Or download the `.tgz` from the Releases page, verify it against `SHA256SUMS`, and install it locally:
+
+```bash
+sha256sum -c SHA256SUMS
+npm install -g ./business-semantic-harness-0.2.0.tgz
+```
+
+This is the standard, professional way to distribute a Node.js CLI: continuous integration on every change, and a tagged, reproducible, installable artifact per release. Standalone per-OS executables could be produced additionally, but the npm package is the primary and most reliable artifact.
 
 ## Preparing a project
 
