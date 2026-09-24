@@ -198,7 +198,7 @@ Valide com `oracle ontology validate`. O esqueleto de `oracle domain add` não p
 - **Injeta contexto**: instruções de governança e o MCP local com `oracle_query_ontology`, `oracle_propose_patch` e `oracle_report_conflict`.
 - **Consulta antes de mudar**: o agente deve consultar a ontologia antes de implementar.
 - **Conflito**: se o pedido contrariar a ontologia, o agente chama `oracle_report_conflict`; o Oracle **registra um alerta** (`.oracle/local/alerts.jsonl`) e, ao final da sessão, pede decisão humana: aprovar a exceção ou **reverter** as alterações.
-- **Isolamento por worktree**: cada sessão cria uma branch `oracle/session/<id>` e uma Git worktree própria (fora do projeto). O Codex trabalha só nela; o checkout principal permanece intacto. Ao final, o Oracle roda os gates na worktree e **promove as alterações por Git** (fast-forward, ou rebase na worktree se a branch de origem avançou). Se você negar uma exceção de ontologia, a worktree é descartada — nada a reverter no projeto principal.
+- **Isolamento por worktree**: cada sessão cria uma branch `oracle/session/<id>` e uma Git worktree própria (fora do projeto). O Codex trabalha só nela; o checkout principal permanece intacto. Por padrão o sandbox do Codex roda em `workspace-write` com a raiz gravável na worktree (pode ser desativado com `ORACLE_CODEX_SANDBOX=danger-full-access`). Ao final, o Oracle roda os gates na worktree e **promove as alterações por Git** (fast-forward, ou rebase na worktree se a branch de origem avançou). Se você negar uma exceção de ontologia, a worktree é descartada — nada a reverter no projeto principal.
 - **Mede tokens**: ao final, imprime tokens de entrada/saída/total, consultas à ontologia e conflitos.
 
 ## 6. Checklist de prontidão
