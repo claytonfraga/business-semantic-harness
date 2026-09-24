@@ -1,0 +1,86 @@
+@prefix ex: <urn:bsh:pilot:ativos:> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:ativo-disp a ex:Ativo ;
+  ex:codigoPatrimonio "PAT-000101" ;
+  ex:estadoAtual ex:Disponivel ;
+  ex:pertenceDepartamento ex:DeptoTI .
+
+ex:ativo-uso a ex:Ativo ;
+  ex:codigoPatrimonio "PAT-000102" ;
+  ex:estadoAtual ex:EmUso ;
+  ex:temResponsavel ex:Carlos .
+
+ex:ativo-bx a ex:Ativo ;
+  ex:codigoPatrimonio "PAT-000103" ;
+  ex:estadoAtual ex:Baixado .
+
+ex:ativo-man a ex:AtivoEquipamento ;
+  ex:codigoPatrimonio "PAT-000104" ;
+  ex:estadoAtual ex:EmManutencao ;
+  ex:statusManutencao ex:EmDia ;
+  ex:numeroSerie "MAN-001" .
+
+ex:ativo-trans a ex:Ativo ;
+  ex:codigoPatrimonio "PAT-000105" ;
+  ex:estadoAtual ex:EmTransito .
+
+ex:ativo-res a ex:Ativo ;
+  ex:codigoPatrimonio "PAT-000106" ;
+  ex:estadoAtual ex:Reservado .
+
+ex:ativo-ext a ex:Ativo ;
+  ex:codigoPatrimonio "PAT-000107" ;
+  ex:estadoAtual ex:Extraviado .
+
+ex:ativo-ti a ex:AtivoTI ;
+  ex:codigoPatrimonio "PAT-000201" ;
+  ex:numeroSerie "DELL-LAT-7420-X1" ;
+  ex:nomeEquipamento "NB-CORP-042" .
+
+ex:ativo-veic a ex:AtivoVeiculo ;
+  ex:codigoPatrimonio "PAT-000301" ;
+  ex:placa "BRA2E19" ;
+  ex:renavam "12345678901" ;
+  ex:chassi "9BWCA4110FP000001" ;
+  ex:quilometragem 45000 .
+
+ex:ativo-mob a ex:AtivoMobiliario ;
+  ex:codigoPatrimonio "PAT-000401" ;
+  ex:materialPredominante "Aço e Madeira" ;
+  ex:ambienteDestino "Sala 101" .
+
+ex:equip-man a ex:AtivoEquipamento ;
+  ex:codigoPatrimonio "PAT-000501" ;
+  ex:statusManutencao ex:EmDia ;
+  ex:numeroSerie "EQ-990" .
+
+ex:inst-calib a ex:AtivoInstrumentacao ;
+  ex:codigoPatrimonio "PAT-000601" ;
+  ex:statusCalibracao ex:CalibracaoEmDia ;
+  ex:certificadoCalibracao "CERT-CAL-2026-99" .
+
+ex:ativo-alto-val a ex:Ativo ;
+  ex:codigoPatrimonio "PAT-000701" ;
+  ex:valorAquisicao 45000.00 .
+
+ex:ativo-val-resid a ex:Ativo ;
+  ex:codigoPatrimonio "PAT-000801" ;
+  ex:valorAquisicao 15000.00 ;
+  ex:valorResidual 4500.00 ;
+  ex:totalmenteDepreciado false .
+
+ex:Ana a ex:Responsavel ;
+  ex:lotadoEmDepartamento ex:DeptoTI .
+
+ex:Bruno a ex:Responsavel ;
+  ex:lotadoEmDepartamento ex:DeptoFinanceiro .
+
+ex:Carlos a ex:Pessoa .
+ex:Beatriz a ex:Pessoa .
+
+ex:DeptoTI a ex:Departamento ;
+  ex:vinculadoAUnidade ex:UnidadeTecnologia .
+
+ex:DeptoFinanceiro a ex:Departamento ;
+  ex:vinculadoAUnidade ex:UnidadeCorporativa .

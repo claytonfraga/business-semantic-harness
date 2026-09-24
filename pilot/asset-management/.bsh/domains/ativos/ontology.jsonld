@@ -3,24 +3,167 @@
     "ex": "urn:bsh:pilot:ativos:",
     "bsh": "urn:bsh:ns:v1:",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
   },
   "@graph": [
     { "@id": "ex:ontology", "@type": "bsh:Domain", "bsh:version": "1.0.0" },
+
     { "@id": "ex:Ativo", "@type": "rdfs:Class", "rdfs:label": "Ativo", "rdfs:comment": "Bem físico identificado e administrado pelo projeto." },
-    { "@id": "ex:Responsavel", "@type": "rdfs:Class", "rdfs:label": "Responsável" },
-    { "@id": "ex:TransferenciaAtivo", "@type": "rdfs:Class", "rdfs:label": "Transferência de ativo" },
-    { "@id": "ex:BaixaAtivo", "@type": "rdfs:Class", "rdfs:label": "Baixa de ativo" },
-    { "@id": "ex:AlteracaoResponsavel", "@type": "rdfs:Class", "rdfs:label": "Alteração de responsável" },
-    { "@id": "ex:AtualizacaoLocalizacao", "@type": "rdfs:Class", "rdfs:label": "Atualização de localização" },
+    { "@id": "ex:AtivoTI", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:Ativo" }, "rdfs:label": "Ativo de TI" },
+    { "@id": "ex:AtivoVeiculo", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:Ativo" }, "rdfs:label": "Ativo Veículo" },
+    { "@id": "ex:AtivoMobiliario", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:Ativo" }, "rdfs:label": "Ativo Mobiliário" },
+    { "@id": "ex:AtivoEquipamento", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:Ativo" }, "rdfs:label": "Ativo Equipamento" },
+    { "@id": "ex:AtivoInstrumentacao", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:Ativo" }, "rdfs:label": "Ativo Instrumentação" },
+
+    { "@id": "ex:Pessoa", "@type": "rdfs:Class", "rdfs:label": "Pessoa" },
+    { "@id": "ex:Responsavel", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:Pessoa" }, "rdfs:label": "Responsável" },
+    { "@id": "ex:Usuario", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:Pessoa" }, "rdfs:label": "Usuário" },
+    { "@id": "ex:Gestor", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:Pessoa" }, "rdfs:label": "Gestor" },
+    { "@id": "ex:Aprovador", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:Pessoa" }, "rdfs:label": "Aprovador" },
+
+    { "@id": "ex:Organizacao", "@type": "rdfs:Class", "rdfs:label": "Organização" },
+    { "@id": "ex:UnidadeOrganizacional", "@type": "rdfs:Class", "rdfs:label": "Unidade Organizacional" },
+    { "@id": "ex:Departamento", "@type": "rdfs:Class", "rdfs:label": "Departamento" },
+    { "@id": "ex:CentroDeCusto", "@type": "rdfs:Class", "rdfs:label": "Centro de Custo" },
+    { "@id": "ex:Filial", "@type": "rdfs:Class", "rdfs:label": "Filial" },
+    { "@id": "ex:Localizacao", "@type": "rdfs:Class", "rdfs:label": "Localização" },
+    { "@id": "ex:AlcadaAprovacao", "@type": "rdfs:Class", "rdfs:label": "Alçada de Aprovação" },
+    { "@id": "ex:Diretoria", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:AlcadaAprovacao" }, "rdfs:label": "Diretoria" },
+    { "@id": "ex:Controladoria", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:AlcadaAprovacao" }, "rdfs:label": "Controladoria" },
+
+    { "@id": "ex:Manutencao", "@type": "rdfs:Class", "rdfs:label": "Manutenção" },
+    { "@id": "ex:ManutencaoPreventiva", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:Manutencao" }, "rdfs:label": "Manutenção Preventiva" },
+    { "@id": "ex:ManutencaoCorretiva", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:Manutencao" }, "rdfs:label": "Manutenção Corretiva" },
+    { "@id": "ex:PlanoManutencao", "@type": "rdfs:Class", "rdfs:label": "Plano de Manutenção" },
+
+    { "@id": "ex:MovimentacaoAtivo", "@type": "rdfs:Class", "rdfs:label": "Movimentação de Ativo" },
+    { "@id": "ex:DocumentoMovimentacao", "@type": "rdfs:Class", "rdfs:label": "Documento de Movimentação" },
+
+    { "@id": "ex:RegistroAuditoria", "@type": "rdfs:Class", "rdfs:label": "Registro de Auditoria" },
+    { "@id": "ex:EventoPatrimonial", "@type": "rdfs:Class", "rdfs:label": "Evento Patrimonial" },
+
+    { "@id": "ex:TransferenciaAtivo", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:EventoPatrimonial" }, "rdfs:label": "Transferência de ativo" },
+    { "@id": "ex:BaixaAtivo", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:EventoPatrimonial" }, "rdfs:label": "Baixa de ativo" },
+    { "@id": "ex:AlteracaoResponsavel", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:EventoPatrimonial" }, "rdfs:label": "Alteração de responsável" },
+    { "@id": "ex:AtualizacaoLocalizacao", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:EventoPatrimonial" }, "rdfs:label": "Atualização de localização" },
+    { "@id": "ex:AlocacaoUsuario", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:EventoPatrimonial" }, "rdfs:label": "Alocação a usuário" },
+    { "@id": "ex:ReservaAtivo", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:EventoPatrimonial" }, "rdfs:label": "Reserva de ativo" },
+    { "@id": "ex:InicioManutencao", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:EventoPatrimonial" }, "rdfs:label": "Início de manutenção" },
+    { "@id": "ex:ConclusaoManutencao", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:EventoPatrimonial" }, "rdfs:label": "Conclusão de manutenção" },
+    { "@id": "ex:EnvioAtivo", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:EventoPatrimonial" }, "rdfs:label": "Envio de ativo" },
+    { "@id": "ex:RecebimentoAtivo", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:EventoPatrimonial" }, "rdfs:label": "Recebimento de ativo" },
+    { "@id": "ex:RegistroExtravio", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:EventoPatrimonial" }, "rdfs:label": "Registro de extravio" },
+    { "@id": "ex:RecuperacaoAtivo", "@type": "rdfs:Class", "rdfs:subClassOf": { "@id": "ex:EventoPatrimonial" }, "rdfs:label": "Recuperação de ativo extraviado" },
+
     { "@id": "ex:Disponivel", "rdfs:label": "Disponível" },
     { "@id": "ex:EmUso", "rdfs:label": "Em uso" },
     { "@id": "ex:Baixado", "rdfs:label": "Baixado" },
+    { "@id": "ex:EmManutencao", "rdfs:label": "Em manutenção" },
+    { "@id": "ex:EmTransito", "rdfs:label": "Em trânsito" },
+    { "@id": "ex:Reservado", "rdfs:label": "Reservado" },
+    { "@id": "ex:Extraviado", "rdfs:label": "Extraviado" },
+
+    { "@id": "ex:EmDia", "rdfs:label": "Em dia" },
+    { "@id": "ex:Vencida", "rdfs:label": "Vencida" },
+    { "@id": "ex:Isento", "rdfs:label": "Isento" },
+
+    { "@id": "ex:CalibracaoEmDia", "rdfs:label": "Calibração em dia" },
+    { "@id": "ex:CalibracaoVencida", "rdfs:label": "Calibração vencida" },
+    { "@id": "ex:CalibracaoIsenta", "rdfs:label": "Calibração isenta" },
+
+    { "@id": "ex:codigoPatrimonio", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:Ativo" }, "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:descricao", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:Ativo" }, "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:valorAquisicao", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:Ativo" }, "rdfs:range": { "@id": "xsd:decimal" } },
+    { "@id": "ex:dataAquisicao", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:Ativo" }, "rdfs:range": { "@id": "xsd:date" } },
+    { "@id": "ex:valorResidual", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:Ativo" }, "rdfs:range": { "@id": "xsd:decimal" } },
+    { "@id": "ex:percentualDepreciacao", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:Ativo" }, "rdfs:range": { "@id": "xsd:decimal" } },
+    { "@id": "ex:totalmenteDepreciado", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:Ativo" }, "rdfs:range": { "@id": "xsd:boolean" } },
+    { "@id": "ex:fabricante", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:Ativo" }, "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:modelo", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:Ativo" }, "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:numeroSerie", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:Ativo" }, "rdfs:range": { "@id": "xsd:string" } },
+
+    { "@id": "ex:termoResponsabilidadeAssinado", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:AtivoTI" }, "rdfs:range": { "@id": "xsd:boolean" } },
+    { "@id": "ex:enderecoMac", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:AtivoTI" }, "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:nomeEquipamento", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:AtivoTI" }, "rdfs:range": { "@id": "xsd:string" } },
+
+    { "@id": "ex:placa", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:AtivoVeiculo" }, "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:renavam", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:AtivoVeiculo" }, "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:chassi", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:AtivoVeiculo" }, "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:quilometragem", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:AtivoVeiculo" }, "rdfs:range": { "@id": "xsd:integer" } },
+    { "@id": "ex:validadeLicenciamento", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:AtivoVeiculo" }, "rdfs:range": { "@id": "xsd:date" } },
+
+    { "@id": "ex:materialPredominante", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:AtivoMobiliario" }, "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:ambienteDestino", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:AtivoMobiliario" }, "rdfs:range": { "@id": "xsd:string" } },
+
+    { "@id": "ex:statusManutencao", "@type": "rdf:Property" },
+    { "@id": "ex:dataUltimaManutencao", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:date" } },
+    { "@id": "ex:dataProximaManutencao", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:date" } },
+    { "@id": "ex:periodicidadeManutencao", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:prestadorManutencao", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:laudoManutencao", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:string" } },
+
+    { "@id": "ex:statusCalibracao", "@type": "rdf:Property" },
+    { "@id": "ex:dataUltimaCalibracao", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:date" } },
+    { "@id": "ex:dataProximaCalibracao", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:date" } },
+    { "@id": "ex:certificadoCalibracao", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:string" } },
+
     { "@id": "ex:temResponsavel", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:Ativo" }, "rdfs:range": { "@id": "ex:Responsavel" } },
-    { "@id": "ex:estadoAtual", "@type": "rdf:Property", "rdfs:comment": "Estado do ativo antes da ação; Baixado é terminal para as mutações do piloto." },
-    { "@id": "ex:novoResponsavel", "@type": "rdf:Property", "rdfs:comment": "Responsável exigido na transferência e na alteração de responsável." },
-    { "@id": "ex:novaLocalizacao", "@type": "rdf:Property", "rdfs:comment": "Localização exigida na transferência e na atualização de localização." },
+    { "@id": "ex:pertenceCentroDeCusto", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:Ativo" }, "rdfs:range": { "@id": "ex:CentroDeCusto" } },
+    { "@id": "ex:pertenceDepartamento", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:Ativo" }, "rdfs:range": { "@id": "ex:Departamento" } },
+    { "@id": "ex:temLocalizacao", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:Ativo" }, "rdfs:range": { "@id": "ex:Localizacao" } },
+    { "@id": "ex:lotadoEmDepartamento", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:Responsavel" }, "rdfs:range": { "@id": "ex:Departamento" } },
+    { "@id": "ex:vinculadoAUnidade", "@type": "rdf:Property", "rdfs:range": { "@id": "ex:UnidadeOrganizacional" } },
+
+    { "@id": "ex:estadoAtual", "@type": "rdf:Property", "rdfs:comment": "Estado do ativo antes da ação; Baixado é terminal para mutações normais." },
+    { "@id": "ex:estadoDestino", "@type": "rdf:Property", "rdfs:comment": "Estado resultante pretendido pela operação." },
+    { "@id": "ex:dataOperacao", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:date" } },
+    { "@id": "ex:justificativa", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:string" } },
     { "@id": "ex:motivoBaixa", "@type": "rdf:Property", "rdfs:comment": "Motivo obrigatório da baixa do ativo." },
+    { "@id": "ex:responsavelAtual", "@type": "rdf:Property", "rdfs:range": { "@id": "ex:Responsavel" } },
+    { "@id": "ex:novoResponsavel", "@type": "rdf:Property", "rdfs:comment": "Responsável exigido na transferência e na alteração de responsável." },
+    { "@id": "ex:localizacaoAtual", "@type": "rdf:Property" },
+    { "@id": "ex:novaLocalizacao", "@type": "rdf:Property", "rdfs:comment": "Localização exigida na transferência e na atualização de localização." },
+    { "@id": "ex:origem", "@type": "rdf:Property" },
+    { "@id": "ex:destino", "@type": "rdf:Property" },
+    { "@id": "ex:departamentoOrigem", "@type": "rdf:Property", "rdfs:range": { "@id": "ex:Departamento" } },
+    { "@id": "ex:departamentoDestino", "@type": "rdf:Property", "rdfs:range": { "@id": "ex:Departamento" } },
+    { "@id": "ex:centroDeCustoOrigem", "@type": "rdf:Property", "rdfs:range": { "@id": "ex:CentroDeCusto" } },
+    { "@id": "ex:centroDeCustoDestino", "@type": "rdf:Property", "rdfs:range": { "@id": "ex:CentroDeCusto" } },
+    { "@id": "ex:solicitante", "@type": "rdf:Property", "rdfs:range": { "@id": "ex:Pessoa" } },
+    { "@id": "ex:aprovador", "@type": "rdf:Property", "rdfs:range": { "@id": "ex:Pessoa" } },
+
+    { "@id": "ex:solicitanteReserva", "@type": "rdf:Property", "rdfs:range": { "@id": "ex:Pessoa" } },
+    { "@id": "ex:dataInicioReserva", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:date" } },
+    { "@id": "ex:dataFimReserva", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:date" } },
+    { "@id": "ex:motivoReserva", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:string" } },
+
+    { "@id": "ex:motivoManutencao", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:transportador", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:numeroDocumentoMovimentacao", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:movimentacaoReferenciada", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:dataSaida", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:dateTime" } },
+    { "@id": "ex:dataRecebimento", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:dateTime" } },
+
+    { "@id": "ex:protocoloSinistro", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:boletimOcorrencia", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:dataExtravio", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:date" } },
+    { "@id": "ex:localUltimaCustodia", "@type": "rdf:Property" },
+    { "@id": "ex:responsavelUltimaCustodia", "@type": "rdf:Property", "rdfs:range": { "@id": "ex:Responsavel" } },
+
+    { "@id": "ex:dataRecuperacao", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:date" } },
+    { "@id": "ex:localRecuperacao", "@type": "rdf:Property" },
+    { "@id": "ex:responsavelRecuperacao", "@type": "rdf:Property", "rdfs:range": { "@id": "ex:Responsavel" } },
+    { "@id": "ex:laudoRecuperacao", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:string" } },
+
+    { "@id": "ex:laudoTecnicoDescarte", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:dataBaixa", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:date" } },
+
+    { "@id": "ex:registradoPor", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:dataHoraRegistro", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:dateTime" } },
+    { "@id": "ex:correlationId", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:string" } },
+    { "@id": "ex:origemOperacao", "@type": "rdf:Property", "rdfs:range": { "@id": "xsd:string" } },
+
     {
       "@id": "ex:justificativa-adequada",
       "@type": "bsh:Policy",
@@ -38,6 +181,51 @@
       "bsh:scope": "Baixa de ativo",
       "bsh:reason": "A adequação do motivo da baixa exige julgamento contextual.",
       "rdfs:comment": "Toda baixa exige motivo adequado ao contexto."
+    },
+    {
+      "@id": "ex:baixa-alto-valor",
+      "@type": "bsh:Policy",
+      "bsh:governs": { "@id": "ex:BaixaAtivo" },
+      "bsh:requiresHumanReview": true,
+      "bsh:scope": "Baixa de ativo com valor de aquisição superior a R$ 10.000",
+      "bsh:reason": "Baixas de bens de alto valor patrimonial exigem alçada de Diretoria ou Controladoria.",
+      "rdfs:comment": "Baixa de ativo de alto valor (> R$ 10.000) requer aprovação formal de alçada executiva."
+    },
+    {
+      "@id": "ex:baixa-valor-residual",
+      "@type": "bsh:Policy",
+      "bsh:governs": { "@id": "ex:BaixaAtivo" },
+      "bsh:requiresHumanReview": true,
+      "bsh:scope": "Baixa de ativo com valor residual contábil positivo",
+      "bsh:reason": "O descarte de bem não totalmente depreciado exige parecer contábil e laudo técnico.",
+      "rdfs:comment": "Baixa de ativo com valor residual positivo requer revisão humana e laudo técnico de descarte."
+    },
+    {
+      "@id": "ex:recuperacao-extraviado",
+      "@type": "bsh:Policy",
+      "bsh:governs": { "@id": "ex:RecuperacaoAtivo" },
+      "bsh:requiresHumanReview": true,
+      "bsh:scope": "Recuperação de ativo previamente marcado como extraviado",
+      "bsh:reason": "A reintegração de bem extraviado exige validação física de integridade e encerramento de sinistro.",
+      "rdfs:comment": "Recuperação de ativo extraviado requer verificação humana de laudo e custódia."
+    },
+    {
+      "@id": "ex:transferencia-inter-unidades",
+      "@type": "bsh:Policy",
+      "bsh:governs": { "@id": "ex:TransferenciaAtivo" },
+      "bsh:requiresHumanReview": true,
+      "bsh:scope": "Transferência entre unidades organizacionais ou centros de custo distintos",
+      "bsh:reason": "Transferências inter-unidades envolvem realocação orçamentária e exigem concordância das lideranças.",
+      "rdfs:comment": "Transferência entre unidades distintas exige revisão de alçada gerencial."
+    },
+    {
+      "@id": "ex:aprovacao-diretoria-controladoria",
+      "@type": "bsh:Policy",
+      "bsh:governs": { "@id": "ex:BaixaAtivo" },
+      "bsh:requiresHumanReview": true,
+      "bsh:scope": "Descarte ou alienação patrimonial estratégica",
+      "bsh:reason": "Aprovação superior por órgãos de governança corporativa.",
+      "rdfs:comment": "Decisões patrimoniais estratégicas requerem alçada da Diretoria e Controladoria."
     }
   ]
 }

@@ -1,4 +1,12 @@
-export type AssetStatus = 'Disponivel' | 'EmUso' | 'Baixado';
+export type AssetStatus =
+  | 'Disponivel'
+  | 'EmUso'
+  | 'Baixado'
+  | 'EmManutencao'
+  | 'EmTransito'
+  | 'Reservado'
+  | 'Extraviado';
+
 export interface Asset {
   id: string;
   name: string;
@@ -6,6 +14,11 @@ export interface Asset {
   location: string;
   responsible: string;
   retirementReason?: string;
+  assetType?: string;
+  code?: string;
+  serialNumber?: string;
+  acquisitionValue?: number;
+  residualValue?: number;
 }
 
 export class RetiredAssetError extends Error {
@@ -51,5 +64,28 @@ export const assetOperations = {
   },
   location(asset, input) {
     return { asset: { ...asset, location: required(input.location) } };
+  },
+  allocate(asset, input) {
+    if (asset.status === 'EmManutencao' || asset.status === 'Extraviado') {
+      throw new Error('Ativo em manutenção ou extraviado não pode ser alocado');
+    }
+    const responsible = required(input.responsible);
+    return { asset: { ...asset, responsible, status: 'EmUso' } };
+  },
+  reserve(asset, input) {
+    if (asset.status !== 'Disponivel') throw new Error('Apenas ativo disponível pode ser reservado');
+    const responsible = required(input.responsible);
+    return { asset: { ...asset, responsible, status: 'Reservado' } };
+  },
+  maintenance(asset, _input) {
+    return { asset: { ...asset, status: 'EmManutencao' } };
+  },
+  reportLoss(asset, input) {
+    const protocol = required(input.protocol);
+    return { asset: { ...asset, status: 'Extraviado' }, justification: protocol };
+  },
+  recover(asset, _input) {
+    if (asset.status !== 'Extraviado') throw new Error('Apenas ativo extraviado pode ser recuperado');
+    return { asset: { ...asset, status: 'Disponivel' } };
   },
 } satisfies Record<string, AssetOperation>;
