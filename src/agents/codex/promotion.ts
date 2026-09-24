@@ -19,6 +19,12 @@ export interface ResultadoPromocao {
   arquivosConflito?: string[];
 }
 
+export interface ResultadoReconciliacao {
+  status: 'sincronizado' | 'conflitado' | 'bloqueado';
+  detalhes: string;
+  arquivosConflito?: string[];
+}
+
 export type ValidadorGates = (workspace: string) => Promise<ResultadoGates>;
 
 export async function executarGates(workspace: string): Promise<ResultadoGates> {
@@ -47,12 +53,7 @@ export async function executarGates(workspace: string): Promise<ResultadoGates> 
   return { ok: true, saida };
 }
 
-export interface OpcoesPromocao {
-  validarGates?: ValidadorGates;
-}
-
-export async function promoverSessao(sessao: SessaoWorktree, opcoes: OpcoesPromocao = {}): Promise<ResultadoPromocao> {
-  const validarGates = opcoes.validarGates ?? executarGates;
+export async function reconciliar(sessao: SessaoWorktree): Promise<ResultadoReconciliacao> {
   if (!(await estaLimpo(sessao.repositorioOrigem))) {
     return { status: 'bloqueado', detalhes: 'O checkout principal tem alteracoes locais; a promocao nao foi iniciada.' };
   }
@@ -62,15 +63,22 @@ export async function promoverSessao(sessao: SessaoWorktree, opcoes: OpcoesPromo
   }
   await commitSeNecessario(sessao);
   const referenciaOrigem = (await git(sessao.repositorioOrigem, ['rev-parse', sessao.branchOrigem])).trim();
-  if (referenciaOrigem !== sessao.commitBase) {
-    try {
-      await git(sessao.caminhoWorktree, ['rebase', sessao.branchOrigem]);
-    } catch {
-      const conflitos = (await git(sessao.caminhoWorktree, ['diff', '--name-only', '--diff-filter=U']).catch(() => ''))
-        .split('\n').filter(Boolean);
-      return { status: 'conflitado', detalhes: `A branch ${sessao.branchOrigem} avancou e o rebase gerou conflito na worktree.`, arquivosConflito: conflitos };
-    }
+  if (referenciaOrigem === sessao.commitBase) return { status: 'sincronizado', detalhes: 'Branch de origem nao avancou.' };
+  try {
+    await git(sessao.caminhoWorktree, ['rebase', sessao.branchOrigem]);
+  } catch {
+    const conflitos = (await git(sessao.caminhoWorktree, ['diff', '--name-only', '--diff-filter=U']).catch(() => '')).split('\n').filter(Boolean);
+    return { status: 'conflitado', detalhes: `A branch ${sessao.branchOrigem} avancou e o rebase gerou conflito na worktree.`, arquivosConflito: conflitos };
   }
+  return { status: 'sincronizado', detalhes: 'Worktree reconciliada com a branch de origem.' };
+}
+
+export interface OpcoesIntegracao {
+  validarGates?: ValidadorGates;
+}
+
+export async function integrar(sessao: SessaoWorktree, opcoes: OpcoesIntegracao = {}): Promise<ResultadoPromocao> {
+  const validarGates = opcoes.validarGates ?? executarGates;
   const gates = await validarGates(sessao.caminhoWorktree);
   if (!gates.ok) return { status: 'falha-validacao', detalhes: gates.saida };
   try {
@@ -79,4 +87,15 @@ export async function promoverSessao(sessao: SessaoWorktree, opcoes: OpcoesPromo
     return { status: 'bloqueado', detalhes: `Nao foi possivel integrar por fast-forward: ${error instanceof Error ? error.message : String(error)}` };
   }
   return { status: 'promovido', detalhes: `Alteracoes integradas em ${sessao.branchOrigem}.` };
+}
+
+export interface OpcoesPromocao {
+  validarGates?: ValidadorGates;
+}
+
+export async function promoverSessao(sessao: SessaoWorktree, opcoes: OpcoesPromocao = {}): Promise<ResultadoPromocao> {
+  const reconciliacao = await reconciliar(sessao);
+  if (reconciliacao.status === 'conflitado') return { status: 'conflitado', detalhes: reconciliacao.detalhes, arquivosConflito: reconciliacao.arquivosConflito };
+  if (reconciliacao.status === 'bloqueado') return { status: 'bloqueado', detalhes: reconciliacao.detalhes };
+  return integrar(sessao, opcoes);
 }
