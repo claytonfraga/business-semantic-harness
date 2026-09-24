@@ -38,9 +38,9 @@ function respondToHandshake(wire, config) {
   });
 }
 
-test('Given only the Oracle MCP in the effective config, when the instrumentation client verifies it, then the session configuration is accepted', async () => {
+test('Given only the BSH MCP in the effective config, when the instrumentation client verifies it, then the session configuration is accepted', async () => {
   const wire = createFakeWire();
-  respondToHandshake(wire, { mcp_servers: { oracle: {} }, features: featuresDisabled, web_search: 'disabled' });
+  respondToHandshake(wire, { mcp_servers: { bsh: {} }, features: featuresDisabled, web_search: 'disabled' });
   const client = new CodexRpcClient(wire);
   await client.initialize();
   await client.verifyCleanConfiguration('/tmp/copia');
@@ -50,7 +50,7 @@ test('Given only the Oracle MCP in the effective config, when the instrumentatio
 
 test('Given an external MCP in the effective config, when the instrumentation client verifies it, then the governed session is refused', async () => {
   const wire = createFakeWire();
-  respondToHandshake(wire, { mcp_servers: { oracle: {}, notion: {} }, features: featuresDisabled, web_search: 'disabled' });
+  respondToHandshake(wire, { mcp_servers: { bsh: {}, notion: {} }, features: featuresDisabled, web_search: 'disabled' });
   const client = new CodexRpcClient(wire);
   await client.initialize();
   await assert.rejects(() => client.verifyCleanConfiguration('/tmp/copia'), /MCP externo herdado: notion/);
@@ -59,7 +59,7 @@ test('Given an external MCP in the effective config, when the instrumentation cl
 
 test('Given an enabled external feature in the effective config, when the instrumentation client verifies it, then the governed session is refused', async () => {
   const wire = createFakeWire();
-  respondToHandshake(wire, { mcp_servers: { oracle: {} }, features: { ...featuresDisabled, apps: true }, web_search: 'disabled' });
+  respondToHandshake(wire, { mcp_servers: { bsh: {} }, features: { ...featuresDisabled, apps: true }, web_search: 'disabled' });
   const client = new CodexRpcClient(wire);
   await client.initialize();
   await assert.rejects(() => client.verifyCleanConfiguration('/tmp/copia'), /Recurso externo não desabilitado: apps/);
@@ -87,7 +87,7 @@ test('Given an adapter default, when a native approval arrives without an instru
 
 test('Given a running app-server, when the instrumentation client resumes, unsubscribes and lists threads, then it emits the matching RPC methods', async () => {
   const wire = createFakeWire();
-  respondToHandshake(wire, { mcp_servers: { oracle: {} }, features: featuresDisabled, web_search: 'disabled' });
+  respondToHandshake(wire, { mcp_servers: { bsh: {} }, features: featuresDisabled, web_search: 'disabled' });
   const client = new CodexRpcClient(wire);
   await client.initialize();
   await client.resumeThread('thr_1');

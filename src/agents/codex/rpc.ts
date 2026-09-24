@@ -77,7 +77,7 @@ export class CodexRpcClient extends EventEmitter {
   private emitServerRequest(message: RpcMessage): void {
     if (this.listenerCount('serverRequest') > 0) this.emit('serverRequest', message);
     else if (this.nativeApprovalMode === 'ignore') this.emit('ignoredServerRequest', message);
-    else if (message.id !== undefined) this.respondError(message.id, -32601, 'Solicitação não suportada pelo Oracle');
+    else if (message.id !== undefined) this.respondError(message.id, -32601, 'Solicitação não suportada pelo BSH');
   }
 
   private failAll(error: Error): void {
@@ -109,7 +109,7 @@ export class CodexRpcClient extends EventEmitter {
   respondError(id: JsonRpcId, code: number, message: string): void { this.send({ id, error: { code, message } }); }
 
   async initialize(): Promise<void> {
-    await this.request('initialize', { clientInfo: { name: 'oracle', title: 'Oracle ontology harness', version: '0.2.0' } });
+    await this.request('initialize', { clientInfo: { name: 'bsh', title: 'Business Semantic Harness', version: '0.2.0' } });
     this.notify('initialized');
   }
 
@@ -119,7 +119,7 @@ export class CodexRpcClient extends EventEmitter {
     const config = response.config as Record<string, unknown>;
     const servers = config.mcp_servers;
     if (servers && typeof servers === 'object') {
-      const externos = Object.keys(servers).filter((name) => name !== 'oracle');
+      const externos = Object.keys(servers).filter((name) => name !== 'bsh');
       if (externos.length > 0) throw new Error(`MCP externo herdado: ${externos.join(', ')}`);
     }
     const features = config.features as Record<string, unknown> | undefined;
@@ -138,16 +138,16 @@ export class CodexRpcClient extends EventEmitter {
   private async startThread(cwd: string, writable: boolean): Promise<string> {
     const mcpEntrypoint = fileURLToPath(new URL('../../mcp/server.js', import.meta.url));
     const response = await this.request('thread/start', {
-      cwd, sandbox: writable ? 'workspace-write' : 'read-only', approvalPolicy: 'on-request', serviceName: 'oracle',
+      cwd, sandbox: writable ? 'workspace-write' : 'read-only', approvalPolicy: 'on-request', serviceName: 'bsh',
       developerInstructions: writable
-        ? 'Este projeto é governado pelo Oracle. Consulte oracle_query_ontology antes de mudar regras. Você pode usar suas ferramentas normais para editar e testar nesta cópia isolada. O Oracle revisará as diferenças antes de aplicá-las ao projeto original. Se o pedido contrariar a ontologia, chame oracle_report_conflict e aguarde a pergunta humana. Não contorne essa decisão. A permissão para preparar uma exceção não aplica o patch.'
-        : 'Este projeto é governado pelo Oracle. Antes de mudanças, consulte oracle_query_ontology. Nunca escreva diretamente. Envie um arquivo por vez em oracle_propose_patch. Se o pedido contrariar a ontologia, chame oracle_report_conflict e aguarde a pergunta humana; não encerre apenas com recusa. A permissão para preparar uma exceção não permite aplicar o patch.',
-      config: { mcp_servers: { oracle: {
+        ? 'Este projeto é governado pelo BSH. Consulte bsh_query_ontology antes de mudar regras. Você pode usar suas ferramentas normais para editar e testar nesta cópia isolada. O BSH revisará as diferenças antes de aplicá-las ao projeto original. Se o pedido contrariar a ontologia, chame bsh_report_conflict e aguarde a pergunta humana. Não contorne essa decisão. A permissão para preparar uma exceção não aplica o patch.'
+        : 'Este projeto é governado pelo BSH. Antes de mudanças, consulte bsh_query_ontology. Nunca escreva diretamente. Envie um arquivo por vez em bsh_propose_patch. Se o pedido contrariar a ontologia, chame bsh_report_conflict e aguarde a pergunta humana; não encerre apenas com recusa. A permissão para preparar uma exceção não permite aplicar o patch.',
+      config: { mcp_servers: { bsh: {
         command: process.execPath, args: [mcpEntrypoint, cwd, 'governed'], required: true, enabled: true,
         tools: {
-          oracle_query_ontology: { approval_mode: 'auto' },
-          oracle_propose_patch: { approval_mode: 'auto' },
-          oracle_report_conflict: { approval_mode: 'auto' },
+          bsh_query_ontology: { approval_mode: 'auto' },
+          bsh_propose_patch: { approval_mode: 'auto' },
+          bsh_report_conflict: { approval_mode: 'auto' },
         },
       } } },
     });
@@ -157,18 +157,18 @@ export class CodexRpcClient extends EventEmitter {
     return thread.id;
   }
 
-  async verifyOracleMcp(threadId: string): Promise<void> {
+  async verifyBSHMcp(threadId: string): Promise<void> {
     const response = await this.request('mcpServerStatus/list', { threadId });
     if (!response || typeof response !== 'object' || !('data' in response) || !Array.isArray(response.data)) {
       throw new Error('Inventário MCP indisponível');
     }
     const names = response.data.map((entry: unknown) => entry && typeof entry === 'object' && 'name' in entry ? entry.name : undefined);
-    if (names.length !== 1 || names[0] !== 'oracle') throw new Error(`Inventário MCP inesperado: ${names.join(', ')}`);
-    const oracle = response.data[0] as Record<string, unknown>;
-    if (oracle.runtimeStatus !== 'connected') throw new Error(`MCP Oracle não conectado: ${String(oracle.runtimeStatus)}`);
-    const tools = oracle.tools;
-    if (!tools || typeof tools !== 'object' || Object.keys(tools).sort().join(',') !== 'oracle_propose_patch,oracle_query_ontology,oracle_report_conflict') {
-      throw new Error(`Ferramentas Oracle inesperadas: ${tools && typeof tools === 'object' ? Object.keys(tools).join(', ') : 'indisponíveis'}`);
+    if (names.length !== 1 || names[0] !== 'bsh') throw new Error(`Inventário MCP inesperado: ${names.join(', ')}`);
+    const bsh = response.data[0] as Record<string, unknown>;
+    if (bsh.runtimeStatus !== 'connected') throw new Error(`MCP BSH não conectado: ${String(bsh.runtimeStatus)}`);
+    const tools = bsh.tools;
+    if (!tools || typeof tools !== 'object' || Object.keys(tools).sort().join(',') !== 'bsh_propose_patch,bsh_query_ontology,bsh_report_conflict') {
+      throw new Error(`Ferramentas BSH inesperadas: ${tools && typeof tools === 'object' ? Object.keys(tools).join(', ') : 'indisponíveis'}`);
     }
   }
 

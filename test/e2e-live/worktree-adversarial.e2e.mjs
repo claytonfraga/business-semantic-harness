@@ -11,7 +11,7 @@ import { promoverSessao } from '../../dist/agents/codex/promotion.js';
 import { gravarSessao } from '../../dist/agents/codex/sessionState.js';
 import { limparSessao, listarSessoesDoProjeto } from '../../dist/agents/codex/sessions.js';
 
-const raiz = mkdtempSync(join(tmpdir(), 'oracle-adversarial-'));
+const raiz = mkdtempSync(join(tmpdir(), 'bsh-adversarial-'));
 const worktrees = join(raiz, 'worktrees');
 const gatesOk = async () => ({ ok: true, saida: 'ok' });
 
@@ -26,8 +26,8 @@ function novoProjeto(caminho) {
   git(repo, ['config', 'user.name', 'Teste']);
   git(repo, ['config', 'user.email', 'teste@example.com']);
   git(repo, ['config', 'commit.gpgsign', 'false']);
-  mkdirSync(join(repo, '.oracle', 'domains', 'ativos'), { recursive: true });
-  writeFileSync(join(repo, '.oracle', 'project.json'), '{}\n');
+  mkdirSync(join(repo, '.bsh', 'domains', 'ativos'), { recursive: true });
+  writeFileSync(join(repo, '.bsh', 'project.json'), '{}\n');
   writeFileSync(join(repo, 'server.ts'), '// base\n');
   git(repo, ['add', '-A']);
   git(repo, ['commit', '-q', '-m', 'A']);
@@ -124,7 +124,7 @@ test('Adversarial orfa: a manually created worktree is listed as orphan and can 
   const repo = novoProjeto('orfa');
   const caminhoOrfa = join(worktrees, 'manual', 'orfa');
   mkdirSync(join(worktrees, 'manual'), { recursive: true });
-  git(repo, ['worktree', 'add', '-b', 'oracle/session/manual', caminhoOrfa, 'HEAD']);
+  git(repo, ['worktree', 'add', '-b', 'bsh/session/manual', caminhoOrfa, 'HEAD']);
   const listadas = await listarSessoesDoProjeto(repo);
   const orfa = listadas.find((item) => item.id === 'manual');
   assert.ok(orfa);
@@ -166,9 +166,9 @@ test('Adversarial sem mudancas: promoting a session with no changes is a no-op t
   assert.equal(git(repo, ['rev-parse', 'HEAD']).trim(), referencia);
 });
 
-test('Adversarial sem gitignore: Oracle local state does not dirty the origin and promotion still works', async () => {
+test('Adversarial sem gitignore: BSH local state does not dirty the origin and promotion still works', async () => {
   const repo = novoProjeto('sem-gitignore');
-  writeFileSync(join(repo, '.gitignore'), ''); // projeto sem regra para .oracle/local
+  writeFileSync(join(repo, '.gitignore'), ''); // projeto sem regra para .bsh/local
   git(repo, ['add', '.gitignore']);
   git(repo, ['commit', '-q', '-m', 'gitignore']);
   const s = await sessao(repo);
@@ -186,10 +186,10 @@ test('Adversarial index sujo: staged changes in the origin block promotion', asy
   assert.equal((await promoverSessao(s, { validarGates: gatesOk })).status, 'bloqueado');
 });
 
-test('Adversarial .oracle/local: Oracle local state is not shared into the session worktree', async () => {
+test('Adversarial .bsh/local: BSH local state is not shared into the session worktree', async () => {
   const repo = novoProjeto('local-nao-compartilhado');
-  mkdirSync(join(repo, '.oracle', 'local'), { recursive: true });
-  writeFileSync(join(repo, '.oracle', 'local', 'segredo.json'), '{}\n');
+  mkdirSync(join(repo, '.bsh', 'local'), { recursive: true });
+  writeFileSync(join(repo, '.bsh', 'local', 'segredo.json'), '{}\n');
   const s = await sessao(repo);
-  assert.equal(existsSync(join(s.caminhoWorktree, '.oracle', 'local')), false);
+  assert.equal(existsSync(join(s.caminhoWorktree, '.bsh', 'local')), false);
 });

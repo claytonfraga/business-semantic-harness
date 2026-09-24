@@ -88,15 +88,15 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
     }
   }
   const alteracoes = await alteracoesNaWorktree(sessao);
-  process.stdout.write(`Oracle: worktree da sessao ${sessao.id} em ${sessao.caminhoWorktree}; branch ${sessao.branchSessao}.\n`);
+  process.stdout.write(`BSH: worktree da sessao ${sessao.id} em ${sessao.caminhoWorktree}; branch ${sessao.branchSessao}.\n`);
   if (alteracoes.length === 0 && alerts.length === 0) {
-    process.stdout.write('Oracle: nenhuma alteracao do Codex na worktree; nada a promover.\n');
+    process.stdout.write('BSH: nenhuma alteracao do Codex na worktree; nada a promover.\n');
     await gravarSessao(root, sessao, 'CLEANED');
     await removerSessaoWorktree(sessao, false);
     return { status: 'sem-alteracoes', promovido: false };
   }
   if (alteracoes.length > 0) {
-    process.stdout.write(`Oracle: ${alteracoes.length} arquivo(s) alterado(s): ${alteracoes.map((change) => change.path).join(', ')}\n`);
+    process.stdout.write(`BSH: ${alteracoes.length} arquivo(s) alterado(s): ${alteracoes.map((change) => change.path).join(', ')}\n`);
   }
 
   if (alerts.length > 0) {
@@ -105,39 +105,39 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
       for (const change of alteracoes) await auditChange(root, domain, change, snapshot, 'deny', 'local-user', 'Excecao negada pelo usuario');
       await gravarSessao(root, sessao, 'DISCARDED');
       await removerSessaoWorktree(sessao, true);
-      process.stdout.write('Oracle: excecao negada; worktree e branch da sessao removidas. O checkout principal nao foi alterado.\n');
+      process.stdout.write('BSH: excecao negada; worktree e branch da sessao removidas. O checkout principal nao foi alterado.\n');
       return { status: 'descartado', promovido: false };
     }
   }
 
-  process.stdout.write('Oracle: validando gates na worktree e promovendo por Git...\n');
+  process.stdout.write('BSH: validando gates na worktree e promovendo por Git...\n');
   await gravarSessao(root, sessao, 'VALIDATING');
   const resultado = await promoverSessao(sessao, { validarGates });
   if (resultado.status === 'promovido') {
-    for (const change of alteracoes) await auditChange(root, domain, change, snapshot, 'allow', 'oracle-harness', alerts.length > 0 ? 'Excecao aprovada pelo usuario' : 'Ontologia respeitada na sessao');
+    for (const change of alteracoes) await auditChange(root, domain, change, snapshot, 'allow', 'bsh-harness', alerts.length > 0 ? 'Excecao aprovada pelo usuario' : 'Ontologia respeitada na sessao');
     await gravarSessao(root, sessao, 'PROMOTED');
     await removerSessaoWorktree(sessao, true);
     await gravarSessao(root, sessao, 'CLEANED');
-    process.stdout.write(`Oracle: ${resultado.detalhes} Worktree temporaria removida.\n`);
+    process.stdout.write(`BSH: ${resultado.detalhes} Worktree temporaria removida.\n`);
     return { status: 'promovido', promovido: true };
   }
   if (resultado.status === 'falha-validacao') {
     await gravarSessao(root, sessao, 'VALIDATION_FAILED');
-    process.stdout.write('Oracle: a validacao falhou na worktree; nada foi promovido. A branch principal permanece intacta.\n');
+    process.stdout.write('BSH: a validacao falhou na worktree; nada foi promovido. A branch principal permanece intacta.\n');
     process.stdout.write(`${resultado.detalhes}\n`);
-    process.stdout.write('Oracle: a worktree foi preservada para correcao; a sessao pode ser retomada ou descartada.\n');
+    process.stdout.write('BSH: a worktree foi preservada para correcao; a sessao pode ser retomada ou descartada.\n');
     return { status: 'falha-validacao', promovido: false };
   }
   if (resultado.status === 'conflitado') {
     await gravarSessao(root, sessao, 'CONFLICTED');
-    process.stdout.write(`Oracle: ${resultado.detalhes}\n`);
+    process.stdout.write(`BSH: ${resultado.detalhes}\n`);
     if (resultado.arquivosConflito && resultado.arquivosConflito.length > 0) {
-      process.stdout.write(`Oracle: arquivos em conflito: ${resultado.arquivosConflito.join(', ')}\n`);
+      process.stdout.write(`BSH: arquivos em conflito: ${resultado.arquivosConflito.join(', ')}\n`);
     }
-    process.stdout.write('Oracle: o conflito permanece somente na worktree; a branch principal nao foi alterada.\n');
+    process.stdout.write('BSH: o conflito permanece somente na worktree; a branch principal nao foi alterada.\n');
     return { status: 'conflitado', promovido: false };
   }
   await gravarSessao(root, sessao, 'PROMOTION_FAILED');
-  process.stdout.write(`Oracle: promocao nao realizada; a branch principal permanece intacta. ${resultado.detalhes}\n`);
+  process.stdout.write(`BSH: promocao nao realizada; a branch principal permanece intacta. ${resultado.detalhes}\n`);
   return { status: 'bloqueado', promovido: false };
 }

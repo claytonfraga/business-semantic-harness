@@ -2,7 +2,7 @@ node_modules/
 dist/
 .superpowers/
 .worktrees/
-**/.oracle/local/
+**/.bsh/local/
 benchmark/.venv/
 benchmark/results/
 __pycache__/

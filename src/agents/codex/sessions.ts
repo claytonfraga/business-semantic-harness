@@ -22,9 +22,9 @@ export async function listarSessoesDoProjeto(repositorioOrigem: string): Promise
   }));
   const branchesRegistradas = new Set(registros.map((registro) => registro.branchSessao));
   for (const worktree of worktrees) {
-    if (worktree.branch.startsWith('oracle/session/') && !branchesRegistradas.has(worktree.branch)) {
+    if (worktree.branch.startsWith('bsh/session/') && !branchesRegistradas.has(worktree.branch)) {
       listadas.push({
-        id: worktree.branch.slice('oracle/session/'.length),
+        id: worktree.branch.slice('bsh/session/'.length),
         estado: 'ABORTED',
         branch: worktree.branch,
         worktree: worktree.caminho,
@@ -44,7 +44,7 @@ export async function limparSessao(repositorioOrigem: string, id: string): Promi
     return { removida: true, detalhes: `Sessao ${id} removida (worktree e branch).` };
   }
   const worktrees = await listarWorktrees(repositorioOrigem);
-  const worktree = worktrees.find((item) => item.branch === `oracle/session/${id}`);
+  const worktree = worktrees.find((item) => item.branch === `bsh/session/${id}`);
   if (worktree) {
     const sessao: SessaoWorktree = {
       id, repositorioOrigem, branchOrigem: '', commitBase: '', branchSessao: worktree.branch,

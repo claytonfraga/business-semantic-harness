@@ -13,7 +13,7 @@ import { limparSessao, listarSessoesDoProjeto } from './agents/codex/sessions.js
 
 export async function main(argv: string[]): Promise<number> {
   if (argv.length === 1 && argv[0] === '--help') {
-    process.stdout.write('oracle: init | domain add | ontology validate | ontology show | doctor | code base | sessions list|clean | agy\n');
+    process.stdout.write('bsh: init | domain add | ontology validate | ontology show | doctor | code base | sessions list|clean | agy\n');
     return 0;
   }
 
@@ -27,7 +27,7 @@ export async function main(argv: string[]): Promise<number> {
   try {
     if (command.length === 1 && command[0] === 'init') {
       await initProject(projectRoot);
-      process.stdout.write(`Projeto Oracle criado em ${projectRoot}. Adicione ao menos um domínio.\n`);
+      process.stdout.write(`Projeto BSH criado em ${projectRoot}. Adicione ao menos um domínio.\n`);
       return 0;
     }
     if (command.length === 3 && command[0] === 'domain' && command[1] === 'add') {
@@ -91,7 +91,7 @@ export async function main(argv: string[]): Promise<number> {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
     return 1;
   }
-  process.stderr.write('Comando desconhecido. Use oracle --help.\n');
+  process.stderr.write('Comando desconhecido. Use bsh --help.\n');
   return 2;
 }
 

@@ -12,12 +12,12 @@ const source = new URL('../fixtures/ativos/', import.meta.url);
 const cli = resolve('dist/cli.js');
 
 async function fixtureProject() {
-  const root = await mkdtemp(join(tmpdir(), 'oracle-spec-contract-'));
-  const directory = join(root, '.oracle/domains/ativos');
+  const root = await mkdtemp(join(tmpdir(), 'bsh-spec-contract-'));
+  const directory = join(root, '.bsh/domains/ativos');
   await mkdir(directory, { recursive: true });
   await copyFile(new URL('ontology.jsonld', source), join(directory, 'ontology.jsonld'));
   await copyFile(new URL('shapes.ttl', source), join(directory, 'shapes.ttl'));
-  await writeFile(join(root, '.oracle/project.json'), JSON.stringify({
+  await writeFile(join(root, '.bsh/project.json'), JSON.stringify({
     schemaVersion: 1,
     projectId: 'pilot',
     domains: [{ id: 'ativos', version: '1.0.0', baseIri: 'urn:pilot:ativos:', ontology: 'domains/ativos/ontology.jsonld', shapes: 'domains/ativos/shapes.ttl' }],
@@ -32,9 +32,9 @@ test('Given malformed JSON-LD, when parsed, then it fails with a format diagnosi
 test('Given a local policy reference without a target, when validated, then readiness is denied', async () => {
   const root = await fixtureProject();
   try {
-    const file = join(root, '.oracle/domains/ativos/ontology.jsonld');
+    const file = join(root, '.bsh/domains/ativos/ontology.jsonld');
     const graph = JSON.parse(await readFile(file, 'utf8'));
-    graph['@graph'].find(item => item['@type'] === 'oracle:Policy')['oracle:governs'] = { '@id': 'ex:Ausente' };
+    graph['@graph'].find(item => item['@type'] === 'bsh:Policy')['bsh:governs'] = { '@id': 'ex:Ausente' };
     await writeFile(file, JSON.stringify(graph));
     const report = await validateProject(root);
     assert.equal(report.ready, false);
@@ -45,7 +45,7 @@ test('Given a local policy reference without a target, when validated, then read
 test('Given a human review policy without SHACL restrictions, when validated, then the domain is ready', async () => {
   const root = await fixtureProject();
   try {
-    await writeFile(join(root, '.oracle/domains/ativos/shapes.ttl'), '@prefix sh: <http://www.w3.org/ns/shacl#> .');
+    await writeFile(join(root, '.bsh/domains/ativos/shapes.ttl'), '@prefix sh: <http://www.w3.org/ns/shacl#> .');
     const report = await validateProject(root);
     assert.equal(report.ready, true, JSON.stringify(report.issues));
   } finally { await rm(root, { recursive: true, force: true }); }
@@ -54,7 +54,7 @@ test('Given a human review policy without SHACL restrictions, when validated, th
 test('Given a malformed shape graph, when validated, then the shape file is identified', async () => {
   const root = await fixtureProject();
   try {
-    await writeFile(join(root, '.oracle/domains/ativos/shapes.ttl'), 'this is not Turtle !!!');
+    await writeFile(join(root, '.bsh/domains/ativos/shapes.ttl'), 'this is not Turtle !!!');
     const report = await validateProject(root);
     assert.equal(report.ready, false);
     assert.ok(report.issues.some(issue => issue.rule === 'shapes-load' && issue.file.endsWith('shapes.ttl')));
@@ -64,7 +64,7 @@ test('Given a malformed shape graph, when validated, then the shape file is iden
 test('Given a parseable shape without a path, when validated, then it is rejected as invalid', async () => {
   const root = await fixtureProject();
   try {
-    await writeFile(join(root, '.oracle/domains/ativos/shapes.ttl'), '@prefix ex: <urn:pilot:ativos:> . @prefix sh: <http://www.w3.org/ns/shacl#> . ex:S a sh:NodeShape ; sh:targetClass ex:Ativo ; sh:property [ sh:minCount 1 ] .');
+    await writeFile(join(root, '.bsh/domains/ativos/shapes.ttl'), '@prefix ex: <urn:pilot:ativos:> . @prefix sh: <http://www.w3.org/ns/shacl#> . ex:S a sh:NodeShape ; sh:targetClass ex:Ativo ; sh:property [ sh:minCount 1 ] .');
     const report = await validateProject(root);
     assert.equal(report.ready, false);
     assert.ok(report.issues.some(issue => issue.rule === 'invalid-shape'));
@@ -74,7 +74,7 @@ test('Given a parseable shape without a path, when validated, then it is rejecte
 test('Given domains sharing a base IRI, when validated, then their namespace conflict is reported', async () => {
   const root = await fixtureProject();
   try {
-    const manifestPath = join(root, '.oracle/project.json');
+    const manifestPath = join(root, '.bsh/project.json');
     const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
     manifest.domains.push({ ...manifest.domains[0], id: 'contratos' });
     await writeFile(manifestPath, JSON.stringify(manifest));
@@ -83,11 +83,11 @@ test('Given domains sharing a base IRI, when validated, then their namespace con
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given an external symlink at the Oracle directory, when initializing, then no external manifest is written', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'oracle-boundary-'));
-  const outside = await mkdtemp(join(tmpdir(), 'oracle-external-'));
+test('Given an external symlink at the BSH directory, when initializing, then no external manifest is written', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'bsh-boundary-'));
+  const outside = await mkdtemp(join(tmpdir(), 'bsh-external-'));
   try {
-    await symlink(outside, join(root, '.oracle'));
+    await symlink(outside, join(root, '.bsh'));
     const run = spawnSync(process.execPath, [cli, 'init', '--project', root], { encoding: 'utf8' });
     assert.equal(run.status, 1);
     assert.match(run.stderr, /fora do projeto/);
@@ -122,7 +122,7 @@ test('Given an ontology snapshot, when an approved file changes, then stale deci
   try {
     const snapshot = await createOntologySnapshot(root);
     await assertOntologySnapshot(root, snapshot);
-    const file = join(root, '.oracle/domains/ativos/shapes.ttl');
+    const file = join(root, '.bsh/domains/ativos/shapes.ttl');
     await writeFile(file, (await readFile(file, 'utf8')) + '\n# changed\n');
     await assert.rejects(assertOntologySnapshot(root, snapshot), /Retrato ontológico alterado/);
   } finally { await rm(root, { recursive: true, force: true }); }
@@ -141,7 +141,7 @@ test('Given a complete project, when CLI validates and shows an IRI, then comman
 });
 
 test('Given a draft project, when CLI validates it, then it exits with a nonzero code and a reason', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'oracle-spec-draft-'));
+  const root = await mkdtemp(join(tmpdir(), 'bsh-spec-draft-'));
   try {
     assert.equal(spawnSync(process.execPath, [cli, 'init', '--project', root], { encoding: 'utf8' }).status, 0);
     const report = spawnSync(process.execPath, [cli, 'ontology', 'validate', '--project', root], { encoding: 'utf8' });

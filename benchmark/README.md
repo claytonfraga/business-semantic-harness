@@ -1,6 +1,6 @@
-# Benchmark: Codex com e sem Oracle harness
+# Benchmark: Codex com e sem BSH harness
 
-Mede, em tokens, o custo e o efeito de governança do Oracle harness frente ao Codex direto, executando o **mesmo pedido** em cópias limpas do projeto.
+Mede, em tokens, o custo e o efeito de governança do BSH harness frente ao Codex direto, executando o **mesmo pedido** em cópias limpas do projeto.
 
 ## Como rodar
 
@@ -29,7 +29,7 @@ benchmark/
   results/
     <data-hora-segundos>/       um benchmark (lote)
       1/ ... n/                 execucoes individuais (prompt.txt, metadata.json,
-                                result.json, sem-oracle/ e com-oracle/)
+                                result.json, sem-bsh/ e com-bsh/)
       aquecimento/              execucoes descartadas
       charts/                   graficos 300 dpi
       stats.md / stats.json     analise agregada do lote

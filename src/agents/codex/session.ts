@@ -12,7 +12,7 @@ import { gravarSessao } from './sessionState.js';
 async function verifyGovernedMcp(client: CodexRpcClient, repositorioOrigem: string): Promise<void> {
   const threadId = await client.startReadOnlyThread(repositorioOrigem);
   try {
-    await client.verifyOracleMcp(threadId);
+    await client.verifyBSHMcp(threadId);
   } finally {
     await client.unsubscribeThread(threadId).catch(() => undefined);
   }
@@ -33,7 +33,7 @@ export async function runCodexSession(root: string): Promise<void> {
   const repositorioOrigem = await resolverRepositorio(root);
   const branchOrigem = await branchAtual(repositorioOrigem);
   const commitBase = await commitAtual(repositorioOrigem);
-  const incluirEstadoLocal = process.env.ORACLE_WORKTREE_INCLUDE_LOCAL === '1';
+  const incluirEstadoLocal = process.env.BSH_WORKTREE_INCLUDE_LOCAL === '1';
   const sessao = await criarSessaoWorktree({ repositorioOrigem, branchOrigem, commitBase, incluirEstadoLocal });
   await gravarSessao(repositorioOrigem, sessao, 'WORKTREE_READY');
   const manifest = await loadManifest(repositorioOrigem);
@@ -44,9 +44,9 @@ export async function runCodexSession(root: string): Promise<void> {
   control.nativeApprovalMode = 'ignore';
   control.on('stderr', (text: string) => process.stderr.write(text));
   control.on('ignoredServerRequest', (message: { method?: string }) => {
-    process.stderr.write(`Oracle: solicitação nativa do Codex fora do fluxo mediado: ${String(message.method)}\n`);
+    process.stderr.write(`BSH: solicitação nativa do Codex fora do fluxo mediado: ${String(message.method)}\n`);
   });
-  control.on('protocolError', (error: Error) => process.stderr.write(`Oracle: ${error.message}\n`));
+  control.on('protocolError', (error: Error) => process.stderr.write(`BSH: ${error.message}\n`));
   let instrumentation: SessionInstrumentation | undefined;
   let cleaning = false;
   let terminalUiRunning = false;
@@ -69,12 +69,12 @@ export async function runCodexSession(root: string): Promise<void> {
     await verifyGovernedMcp(control, repositorioOrigem);
     instrumentation = await instrumentSession(control, repositorioOrigem, sessao.caminhoWorktree);
     await gravarSessao(repositorioOrigem, sessao, 'AGENT_RUNNING');
-    process.stdout.write(`Oracle pronto. Sessao isolada: branch ${sessao.branchSessao} a partir de ${branchOrigem}@${commitBase.slice(0, 7)}; worktree ${sessao.caminhoWorktree}.\n`);
-    process.stdout.write(`O Codex trabalha apenas na worktree; o Oracle promove as alteracoes ao final. Dominios: ${domains.join(', ')}.\n`);
+    process.stdout.write(`BSH pronto. Sessao isolada: branch ${sessao.branchSessao} a partir de ${branchOrigem}@${commitBase.slice(0, 7)}; worktree ${sessao.caminhoWorktree}.\n`);
+    process.stdout.write(`O Codex trabalha apenas na worktree; o BSH promove as alteracoes ao final. Dominios: ${domains.join(', ')}.\n`);
     terminalUiRunning = true;
     const code = await launchTerminalUi(server);
     terminalUiRunning = false;
-    process.stdout.write(`\nOracle: a TUI do Codex encerrou (código ${code}). Consolidando a sessão.\n`);
+    process.stdout.write(`\nBSH: a TUI do Codex encerrou (código ${code}). Consolidando a sessão.\n`);
     await finalizeSession({
       sessao,
       domain: manifest.domains.length === 1 ? manifest.domains[0].id : 'nao-classificado',

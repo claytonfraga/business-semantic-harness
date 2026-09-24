@@ -8,28 +8,28 @@ import { parseShapes } from '../../dist/ontology/rdf.js';
 
 const fixture = new URL('../fixtures/ativos/', import.meta.url);
 async function project(ids = ['ativos']) {
-  const root = await mkdtemp(join(tmpdir(), 'oracle-validate-'));
-  await mkdir(join(root, '.oracle'), { recursive: true });
+  const root = await mkdtemp(join(tmpdir(), 'bsh-validate-'));
+  await mkdir(join(root, '.bsh'), { recursive: true });
   const domains = [];
   for (const id of ids) {
-    const dir = join(root, '.oracle', 'domains', id);
+    const dir = join(root, '.bsh', 'domains', id);
     await mkdir(dir, { recursive: true });
     await copyFile(new URL('ontology.jsonld', fixture), join(dir, 'ontology.jsonld'));
     await copyFile(new URL('shapes.ttl', fixture), join(dir, 'shapes.ttl'));
     domains.push({ id, version: '1.0.0', baseIri: 'urn:pilot:ativos:', ontology: `domains/${id}/ontology.jsonld`, shapes: `domains/${id}/shapes.ttl` });
   }
-  await writeFile(join(root, '.oracle', 'project.json'), JSON.stringify({ schemaVersion: 1, projectId: 'pilot', domains }));
+  await writeFile(join(root, '.bsh', 'project.json'), JSON.stringify({ schemaVersion: 1, projectId: 'pilot', domains }));
   return root;
 }
 
 test('Given two complete domains, when validated, then the project is ready', async () => {
   const root = await project(['ativos', 'contratos']);
   try {
-    const second = join(root, '.oracle/domains/contratos/ontology.jsonld');
+    const second = join(root, '.bsh/domains/contratos/ontology.jsonld');
     await writeFile(second, (await readFile(second, 'utf8')).replaceAll('urn:pilot:ativos:', 'urn:pilot:contratos:'));
-    const shape = join(root, '.oracle/domains/contratos/shapes.ttl');
+    const shape = join(root, '.bsh/domains/contratos/shapes.ttl');
     await writeFile(shape, (await readFile(shape, 'utf8')).replaceAll('urn:pilot:ativos:', 'urn:pilot:contratos:'));
-    const manifestPath = join(root, '.oracle/project.json');
+    const manifestPath = join(root, '.bsh/project.json');
     const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
     manifest.domains[1].baseIri = 'urn:pilot:contratos:';
     await writeFile(manifestPath, JSON.stringify(manifest));
@@ -42,7 +42,7 @@ test('Given two complete domains, when validated, then the project is ready', as
 test('Given a missing domain file, when validated, then its domain and path are reported', async () => {
   const root = await project();
   try {
-    await rm(join(root, '.oracle/domains/ativos/shapes.ttl'));
+    await rm(join(root, '.bsh/domains/ativos/shapes.ttl'));
     const result = await validateProject(root);
     assert.equal(result.ok, false);
     assert.equal(result.ready, false);
@@ -53,9 +53,9 @@ test('Given a missing domain file, when validated, then its domain and path are 
 test('Given a draft without concept or rule, when validated, then it is not ready', async () => {
   const root = await project();
   try {
-    const file = join(root, '.oracle/domains/ativos/ontology.jsonld');
-    await writeFile(file, JSON.stringify({ '@context': { oracle: 'urn:oracle:ns:v1:' }, '@graph': [{ '@id': 'urn:draft:ontology', '@type': 'oracle:Domain', 'oracle:version': '1.0.0' }] }));
-    await writeFile(join(root, '.oracle/domains/ativos/shapes.ttl'), '@prefix sh: <http://www.w3.org/ns/shacl#> .');
+    const file = join(root, '.bsh/domains/ativos/ontology.jsonld');
+    await writeFile(file, JSON.stringify({ '@context': { bsh: 'urn:bsh:ns:v1:' }, '@graph': [{ '@id': 'urn:draft:ontology', '@type': 'bsh:Domain', 'bsh:version': '1.0.0' }] }));
+    await writeFile(join(root, '.bsh/domains/ativos/shapes.ttl'), '@prefix sh: <http://www.w3.org/ns/shacl#> .');
     const result = await validateProject(root);
     assert.equal(result.ok, true);
     assert.equal(result.ready, false);
@@ -67,7 +67,7 @@ test('Given a draft without concept or rule, when validated, then it is not read
 test('Given conflicting IRI definitions, when validated, then both origins are reported', async () => {
   const root = await project(['ativos', 'contratos']);
   try {
-    const file = join(root, '.oracle/domains/contratos/ontology.jsonld');
+    const file = join(root, '.bsh/domains/contratos/ontology.jsonld');
     await writeFile(file, (await readFile(file, 'utf8')).replace('"Ativo"', '"Ativo divergente"'));
     const result = await validateProject(root);
     assert.equal(result.ok, false);
@@ -78,8 +78,8 @@ test('Given conflicting IRI definitions, when validated, then both origins are r
 test('Given a future ontology version, when validated, then it fails without rewriting the file', async () => {
   const root = await project();
   try {
-    const file = join(root, '.oracle/domains/ativos/ontology.jsonld');
-    const source = (await readFile(file, 'utf8')).replace('"oracle:version": "1.0.0"', '"oracle:version": "99.0.0"');
+    const file = join(root, '.bsh/domains/ativos/ontology.jsonld');
+    const source = (await readFile(file, 'utf8')).replace('"bsh:version": "1.0.0"', '"bsh:version": "99.0.0"');
     await writeFile(file, source);
     const result = await validateProject(root);
     assert.equal(result.ready, false);

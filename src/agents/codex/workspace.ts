@@ -23,7 +23,7 @@ async function collectFiles(root: string, relative = '', result = new Set<string
   if (!info.isDirectory()) { result.add(relative); return result; }
   for (const name of await readdir(directory)) {
     if (!relative && SKIP.has(name)) continue;
-    if (relative === '.oracle' && name === 'local') continue;
+    if (relative === '.bsh' && name === 'local') continue;
     await collectFiles(root, relative ? `${relative}/${name}` : name, result);
   }
   return result;

@@ -3,7 +3,7 @@ import { DataFactory, type Store } from 'n3';
 import SHACLValidator from 'rdf-validate-shacl';
 import { loadManifest } from '../project/manifest.js';
 import { resolveProjectFile } from '../project/paths.js';
-import { ORACLE_TERMS } from '../vocabulary/oracle.js';
+import { BSH_TERMS } from '../vocabulary/bsh.js';
 import { parseOntology, parseShapes } from './rdf.js';
 
 const { namedNode } = DataFactory;
@@ -71,38 +71,38 @@ export async function validateProject(root: string): Promise<ValidationReport> {
   try {
     manifest = await loadManifest(root);
   } catch (error) {
-    add(issues, 'project', '.oracle/project.json', 'manifest', error instanceof Error ? error.message : String(error));
+    add(issues, 'project', '.bsh/project.json', 'manifest', error instanceof Error ? error.message : String(error));
     return { ok: false, ready: false, issues };
   }
   if (manifest.domains.length === 0) {
-    add(issues, 'project', '.oracle/project.json', 'no-domains', 'Projeto sem domínios declarados');
+    add(issues, 'project', '.bsh/project.json', 'no-domains', 'Projeto sem domínios declarados');
   }
   const seen = new Map<string, { definition: string; domain: string; file: string }>();
   const baseIris = new Map<string, string>();
   for (const domain of manifest.domains) {
     const priorDomain = baseIris.get(domain.baseIri);
     if (priorDomain) {
-      add(issues, domain.id, '.oracle/project.json', 'duplicate-base-iri', `IRI base ${domain.baseIri} compartilhado por ${priorDomain} e ${domain.id}`);
+      add(issues, domain.id, '.bsh/project.json', 'duplicate-base-iri', `IRI base ${domain.baseIri} compartilhado por ${priorDomain} e ${domain.id}`);
     } else {
       baseIris.set(domain.baseIri, domain.id);
     }
     let ontology: Store;
     let shapes: Store;
     try {
-      ontology = await parseOntology(await readFile(await resolveProjectFile(root, `.oracle/${domain.ontology}`), 'utf8'));
+      ontology = await parseOntology(await readFile(await resolveProjectFile(root, `.bsh/${domain.ontology}`), 'utf8'));
     } catch (error) {
       add(issues, domain.id, domain.ontology, 'ontology-load', error instanceof Error ? error.message : String(error));
       continue;
     }
     try {
-      shapes = parseShapes(await readFile(await resolveProjectFile(root, `.oracle/${domain.shapes}`), 'utf8'));
+      shapes = parseShapes(await readFile(await resolveProjectFile(root, `.bsh/${domain.shapes}`), 'utf8'));
     } catch (error) {
       add(issues, domain.id, domain.shapes, 'shapes-load', error instanceof Error ? error.message : String(error));
       continue;
     }
 
-    const domainNodes = ontology.getQuads(null, RDF_TYPE, namedNode(ORACLE_TERMS.Domain), null);
-    const versions = domainNodes.flatMap((q) => ontology.getQuads(q.subject, namedNode(ORACLE_TERMS.version), null, null).map((v) => v.object.value));
+    const domainNodes = ontology.getQuads(null, RDF_TYPE, namedNode(BSH_TERMS.Domain), null);
+    const versions = domainNodes.flatMap((q) => ontology.getQuads(q.subject, namedNode(BSH_TERMS.version), null, null).map((v) => v.object.value));
     if (versions.length !== 1 || versions[0] !== domain.version || !/^1\./.test(versions[0])) {
       add(issues, domain.id, domain.ontology, 'ontology-version', `Versão da ontologia incompatível: esperado ${domain.version}, encontrado ${versions.join(', ') || 'ausente'}`);
     }
@@ -126,13 +126,13 @@ export async function validateProject(root: string): Promise<ValidationReport> {
     const activeShapes = shapeNodes.filter((q) => shapes.countQuads(q.subject, SH_TARGET_CLASS, null, null) > 0 && shapes.getQuads(q.subject, SH_PROPERTY, null, null)
       .some((property) => shapes.countQuads(property.object, SH_PATH, null, null) === 1 &&
         SH_CONSTRAINTS.some((constraint) => shapes.countQuads(property.object, constraint, null, null) > 0)));
-    const humanPolicies = ontology.getQuads(null, RDF_TYPE, namedNode(ORACLE_TERMS.Policy), null)
-      .filter((q) => ontology.getQuads(q.subject, namedNode(ORACLE_TERMS.requiresHumanReview), null, null).some((review) => review.object.value === 'true') &&
-        ontology.countQuads(q.subject, namedNode(ORACLE_TERMS.governs), null, null) > 0);
+    const humanPolicies = ontology.getQuads(null, RDF_TYPE, namedNode(BSH_TERMS.Policy), null)
+      .filter((q) => ontology.getQuads(q.subject, namedNode(BSH_TERMS.requiresHumanReview), null, null).some((review) => review.object.value === 'true') &&
+        ontology.countQuads(q.subject, namedNode(BSH_TERMS.governs), null, null) > 0);
     if (activeShapes.length === 0 && humanPolicies.length === 0) {
       add(issues, domain.id, domain.shapes, 'active-rule', 'Domínio sem restrição SHACL ou política de revisão humana ativa');
     }
-    for (const q of ontology.getQuads(null, namedNode(ORACLE_TERMS.governs), null, null)) {
+    for (const q of ontology.getQuads(null, namedNode(BSH_TERMS.governs), null, null)) {
       if (q.object.termType === 'NamedNode' && q.object.value.startsWith(domain.baseIri) && ontology.countQuads(q.object, null, null, null) === 0) {
         add(issues, domain.id, domain.ontology, 'unresolved-reference', `Referência local sem definição: ${q.object.value}`);
       }

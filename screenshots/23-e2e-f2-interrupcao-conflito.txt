@@ -1,16 +1,16 @@
-ORACLE_CODEX_MODEL=gpt-6-sol ORACLE_CODEX_REASONING_EFFORT=low oracle codex --project /tmp/oracle-f2
- ~/projetos/oracle | feat/ontology-foundation !27 ?19  ORACLE_CODEX_MODEL=gpt-6-sol ORACLE_CODEX_REASONING_EFFORT=low oracle codex --project /tmp/oracle-f2                                                  ok | 19:00:32
+BSH_CODEX_MODEL=gpt-6-sol BSH_CODEX_REASONING_EFFORT=low bsh codex --project /tmp/bsh-f2
+ ~/projetos/bsh | feat/ontology-foundation !27 ?19  BSH_CODEX_MODEL=gpt-6-sol BSH_CODEX_REASONING_EFFORT=low bsh codex --project /tmp/bsh-f2                                                  ok | 19:00:32
 codex app-server (WebSockets)
   listening on: ws://127.0.0.1:45165
   readyz: http://127.0.0.1:45165/readyz
   healthz: http://127.0.0.1:45165/healthz
   note: binds localhost only (use SSH port-forwarding for remote access)
-Oracle pronto. Abrindo a TUI do Codex no projeto real; o Oracle instrumenta a sessão, mede tokens e alerta violações de ontologia. Domínios: ativos.
+BSH pronto. Abrindo a TUI do Codex no projeto real; o BSH instrumenta a sessão, mede tokens e alerta violações de ontologia. Domínios: ativos.
 ╭─────────────────────────────────────────────╮
 │ >_ OpenAI Codex (v0.156.1)                  │
 │                                             │
 │ model:     GPT-6-Sol low   /model to change │
-│ directory: /tmp/oracle-f2                   │
+│ directory: /tmp/bsh-f2                   │
 ╰─────────────────────────────────────────────╯
 
   To get started, describe a task or try one of these commands:
@@ -27,28 +27,28 @@ Oracle pronto. Abrindo a TUI do Codex no projeto real; o Oracle instrumenta a se
 
 • Vou consultar a ontologia do domínio antes de mexer no piloto. Se a regra atual exigir responsável ou justificativa, registro o conflito para decisão humana.
 
-• Called oracle.oracle_query_ontology({"domain":"ativos"})
-  └ {"domain": "ativos", "version": "1.0.0", "source": "domains/ativos/ontology.jsonld", "entries": [{"iri": "urn:oracle:pilot:ativos:AlteracaoResponsavel", "source": "domains/ativos/ontology.jsonld", "statements":
+• Called bsh.bsh_query_ontology({"domain":"ativos"})
+  └ {"domain": "ativos", "version": "1.0.0", "source": "domains/ativos/ontology.jsonld", "entries": [{"iri": "urn:bsh:pilot:ativos:AlteracaoResponsavel", "source": "domains/ativos/ontology.jsonld", "statements":
     [{"predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "value": "http://www.w3.org/2000/01/rdf-schema#Class"}, {"predicate": "http://www.w3.org/2000/01/rdf-schema#label", "value": "Alteração de
-    responsável"}], "relations": [], "governedBy": []}, {"iri": "urn:oracle:pilot:ativos:Ativo", "source": "domains/ativos/ontology.jsonld", "statements": [{"predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    responsável"}], "relations": [], "governedBy": []}, {"iri": "urn:bsh:pilot:ativos:Ativo", "source": "domains/ativos/ontology.jsonld", "statements": [{"predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
     +1 line (ctrl+t to view transcript)
 
-• A ontologia veda transferência de ativo baixado, exige novo responsável e exige justificativa adequada. Vou registrar os três conflitos agora e aguardar a decisão do Oracle antes de alterar o código.
+• A ontologia veda transferência de ativo baixado, exige novo responsável e exige justificativa adequada. Vou registrar os três conflitos agora e aguardar a decisão do BSH antes de alterar o código.
 
 • Called
-  └ oracle.oracle_report_conflict({"domain":"ativos","request":"Alterar o piloto para permitir transferência de ativos baixados sem novo responsável e sem justificativa.","reason":"O pedido permite transferir ativo em
-        estado Baixado, omitir novoResponsavel e omitir justificativa em TransferenciaAtivo, contrariando regras vigentes da ontologia do domínio ativos.","conflictingRules":["urn:oracle:pilot:ativos:TransferenciaShape —
-        estadoAtual: ativo baixado não pode ser transferido (domains/ativos/shapes.ttl).","urn:oracle:pilot:ativos:TransferenciaShape — novoResponsavel sh:minCount 1: a transferência exige responsável (domains/ativos/
-        shapes.ttl).","urn:oracle:pilot:ativos:justificativa-adequada — toda transferência requer justificativa adequada ao contexto; requer revisão humana (domains/ativos/ontology.jsonld)."]})
-    {"status": "submitted", "digest": "4705c2901cf924cfab3f84d9c172655a8adc33ce81f04a4c96f8cb8e4a9f8842", "message": "Conflito enviado ao Oracle para pergunta humana."}
+  └ bsh.bsh_report_conflict({"domain":"ativos","request":"Alterar o piloto para permitir transferência de ativos baixados sem novo responsável e sem justificativa.","reason":"O pedido permite transferir ativo em
+        estado Baixado, omitir novoResponsavel e omitir justificativa em TransferenciaAtivo, contrariando regras vigentes da ontologia do domínio ativos.","conflictingRules":["urn:bsh:pilot:ativos:TransferenciaShape —
+        estadoAtual: ativo baixado não pode ser transferido (domains/ativos/shapes.ttl).","urn:bsh:pilot:ativos:TransferenciaShape — novoResponsavel sh:minCount 1: a transferência exige responsável (domains/ativos/
+        shapes.ttl).","urn:bsh:pilot:ativos:justificativa-adequada — toda transferência requer justificativa adequada ao contexto; requer revisão humana (domains/ativos/ontology.jsonld)."]})
+    {"status": "submitted", "digest": "4705c2901cf924cfab3f84d9c172655a8adc33ce81f04a4c96f8cb8e4a9f8842", "message": "Conflito enviado ao BSH para pergunta humana."}
 
 • Registrei o conflito com a ontologia de ativos. O pedido contraria três regras vigentes: ativo baixado não pode ser transferido; transferência exige novo responsável; e toda transferência exige justificativa adequada.
 
-  O Oracle recebeu o registro e encaminhará a decisão para revisão humana. Aguardo essa decisão antes de alterar o piloto.
+  O BSH recebeu o registro e encaminhará a decisão para revisão humana. Aguardo essa decisão antes de alterar o piloto.
 
   7:01 PM
 
 
 › Ask Codex to do anything
 
-  GPT-6-Sol low · /tmp/oracle-f2 · Registrar conflito na transferência
+  GPT-6-Sol low · /tmp/bsh-f2 · Registrar conflito na transferência

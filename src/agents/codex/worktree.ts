@@ -52,15 +52,15 @@ export async function garantirExclusaoLocal(repositorioOrigem: string): Promise<
   } catch {
     await mkdir(dirname(caminho), { recursive: true });
   }
-  const linha = '.oracle/local/';
+  const linha = '.bsh/local/';
   if (!conteudo.split('\n').some((item) => item.trim() === linha)) {
     await appendFile(caminho, `${conteudo === '' || conteudo.endsWith('\n') ? '' : '\n'}${linha}\n`);
   }
 }
 
 export function diretorioWorktrees(): string {
-  if (process.env.ORACLE_WORKTREES_DIR) return process.env.ORACLE_WORKTREES_DIR;
-  return join(homedir(), '.local', 'state', 'oracle', 'worktrees');
+  if (process.env.BSH_WORKTREES_DIR) return process.env.BSH_WORKTREES_DIR;
+  return join(homedir(), '.local', 'state', 'bsh', 'worktrees');
 }
 
 export async function identificadorRepositorio(repositorio: string): Promise<string> {
@@ -103,7 +103,7 @@ export async function criarSessaoWorktree(opcoes: OpcoesCriarSessao): Promise<Se
   let id = base;
   let sufixo = 0;
   for (;;) {
-    const branch = `oracle/session/${id}`;
+    const branch = `bsh/session/${id}`;
     const caminho = join(diretorioRepo, id);
     const existeWorktree = existsSync(caminho);
     const existeBranch = (await git(repositorioOrigem, ['branch', '--list', branch]).catch(() => '')).trim().length > 0;
@@ -112,7 +112,7 @@ export async function criarSessaoWorktree(opcoes: OpcoesCriarSessao): Promise<Se
     id = `${base}-${sufixo}`;
   }
   const caminhoWorktree = join(diretorioRepo, id);
-  const branchSessao = `oracle/session/${id}`;
+  const branchSessao = `bsh/session/${id}`;
   await git(repositorioOrigem, ['worktree', 'add', '-b', branchSessao, caminhoWorktree, commitBase]);
   const sessao: SessaoWorktree = {
     id, repositorioOrigem, branchOrigem, commitBase, branchSessao, caminhoWorktree, criadaEm: new Date().toISOString(),
@@ -124,7 +124,7 @@ export async function criarSessaoWorktree(opcoes: OpcoesCriarSessao): Promise<Se
 async function transferirEstadoLocal(sessao: SessaoWorktree): Promise<void> {
   const diff = await git(sessao.repositorioOrigem, ['diff', 'HEAD']).catch(() => '');
   if (diff.trim()) {
-    const patch = join(tmpdir(), `oracle-session-${sessao.id}.patch`);
+    const patch = join(tmpdir(), `bsh-session-${sessao.id}.patch`);
     await writeFile(patch, diff, { mode: 0o600 });
     try {
       await git(sessao.caminhoWorktree, ['apply', patch]);
@@ -170,7 +170,7 @@ export async function alteracoesNaWorktree(sessao: SessaoWorktree): Promise<File
     const caminho = linha.slice(3);
     if (codigo.includes('R') || codigo.includes('C')) indice += 1;
     if (!caminho) continue;
-    if (caminho.startsWith('.oracle/local')) continue;
+    if (caminho.startsWith('.bsh/local')) continue;
     const ehNovo = codigo.includes('?') || codigo.includes('A');
     alteracoes.push({ path: caminho, existedBefore: !ehNovo });
   }
@@ -182,8 +182,8 @@ export async function commitSeNecessario(sessao: SessaoWorktree): Promise<boolea
   if (!estado) return false;
   await git(sessao.caminhoWorktree, ['add', '-A']);
   await git(sessao.caminhoWorktree, [
-    '-c', 'user.name=Oracle harness', '-c', 'user.email=oracle@localhost',
-    'commit', '-m', `oracle: sessao ${sessao.id}`,
+    '-c', 'user.name=BSH harness', '-c', 'user.email=bsh@localhost',
+    'commit', '-m', `bsh: sessao ${sessao.id}`,
   ]);
   return true;
 }

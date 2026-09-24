@@ -1,16 +1,16 @@
-ORACLE_CODEX_MODEL=gpt-6-sol ORACLE_CODEX_REASONING_EFFORT=low oracle codex --project /home/clayton/projetos/oracle/pilot/asset-management
- ~/projetos/oracle | feat/ontology-foundation !27 ?21  ORACLE_CODEX_MODEL=gpt-6-sol ORACLE_CODEX_REASONING_EFFORT=low oracle codex --project /home/clayton/projetos/oracle/pilot/asset-management            ok | 19:13:09
+BSH_CODEX_MODEL=gpt-6-sol BSH_CODEX_REASONING_EFFORT=low bsh codex --project /home/clayton/projetos/bsh/pilot/asset-management
+ ~/projetos/bsh | feat/ontology-foundation !27 ?21  BSH_CODEX_MODEL=gpt-6-sol BSH_CODEX_REASONING_EFFORT=low bsh codex --project /home/clayton/projetos/bsh/pilot/asset-management            ok | 19:13:09
 codex app-server (WebSockets)
   listening on: ws://127.0.0.1:39697
   readyz: http://127.0.0.1:39697/readyz
   healthz: http://127.0.0.1:39697/healthz
   note: binds localhost only (use SSH port-forwarding for remote access)
-Oracle pronto. Abrindo a TUI do Codex no projeto real; o Oracle instrumenta a sessão, mede tokens e alerta violações de ontologia. Domínios: ativos.
+BSH pronto. Abrindo a TUI do Codex no projeto real; o BSH instrumenta a sessão, mede tokens e alerta violações de ontologia. Domínios: ativos.
 ╭─────────────────────────────────────────────────────╮
 │ >_ OpenAI Codex (v0.156.1)                          │
 │                                                     │
 │ model:     GPT-6-Sol low   /model to change         │
-│ directory: ~/projetos/oracle/pilot/asset-management │
+│ directory: ~/projetos/bsh/pilot/asset-management │
 ╰─────────────────────────────────────────────────────╯
 
   To get started, describe a task or try one of these commands:
@@ -26,4 +26,4 @@ Oracle pronto. Abrindo a TUI do Codex no projeto real; o Oracle instrumenta a se
 
 › Ask Codex to do anything
 
-  GPT-6-Sol low · ~/projetos/oracle/pilot/asset-management                                                                                                                                         ⚠ 1 warning · f2 to view
+  GPT-6-Sol low · ~/projetos/bsh/pilot/asset-management                                                                                                                                         ⚠ 1 warning · f2 to view

@@ -12,7 +12,7 @@ import { promoverSessao } from '../../dist/agents/codex/promotion.js';
 import { gravarSessao } from '../../dist/agents/codex/sessionState.js';
 import { limparSessao, listarSessoesDoProjeto } from '../../dist/agents/codex/sessions.js';
 
-const raiz = mkdtempSync(join(tmpdir(), 'oracle-e2e-worktree-'));
+const raiz = mkdtempSync(join(tmpdir(), 'bsh-e2e-worktree-'));
 
 function git(cwd, args) {
   return execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8' });
@@ -25,8 +25,8 @@ function novoProjeto(nome) {
   git(repo, ['config', 'user.name', 'Teste']);
   git(repo, ['config', 'user.email', 'teste@example.com']);
   git(repo, ['config', 'commit.gpgsign', 'false']);
-  mkdirSync(join(repo, '.oracle', 'domains', 'ativos'), { recursive: true });
-  writeFileSync(join(repo, '.oracle', 'project.json'), '{"schemaVersion":1,"projectId":"t","domains":[]}\n');
+  mkdirSync(join(repo, '.bsh', 'domains', 'ativos'), { recursive: true });
+  writeFileSync(join(repo, '.bsh', 'project.json'), '{"schemaVersion":1,"projectId":"t","domains":[]}\n');
   writeFileSync(join(repo, 'server.ts'), '// base\n');
   git(repo, ['add', '-A']);
   git(repo, ['commit', '-q', '-m', 'A']);
@@ -50,10 +50,10 @@ test('E2E Isolamento: Given a session, when the agent edits, creates and removes
   const s = await sessao(repo);
   writeFileSync(join(s.caminhoWorktree, 'server.ts'), '// alterado\n');
   writeFileSync(join(s.caminhoWorktree, 'novo.ts'), '// novo\n');
-  rmSync(join(s.caminhoWorktree, '.oracle', 'project.json'));
+  rmSync(join(s.caminhoWorktree, '.bsh', 'project.json'));
   assert.equal(readFileSync(join(repo, 'server.ts'), 'utf8'), antes);
   assert.equal(existsSync(join(repo, 'novo.ts')), false);
-  assert.ok(existsSync(join(repo, '.oracle', 'project.json')));
+  assert.ok(existsSync(join(repo, '.bsh', 'project.json')));
 });
 
 test('E2E Promocao: Given the origin branch did not move, when promoted, then the change reaches the origin branch', async () => {

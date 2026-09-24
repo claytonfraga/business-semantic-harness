@@ -44,10 +44,10 @@ export function formatUsageReport(
   harnessTokens: number,
 ): string {
   if (!totals) {
-    return `Oracle: tokens indisponiveis nesta sessao; consultas a ontologia: ${ontologyQueries}; conflitos: ${conflicts}.`;
+    return `BSH: tokens indisponiveis nesta sessao; consultas a ontologia: ${ontologyQueries}; conflitos: ${conflicts}.`;
   }
   return [
-    'Oracle: custo da verificacao ontologica nesta sessao',
+    'BSH: custo da verificacao ontologica nesta sessao',
     `  tokens de entrada: ${totals.inputTokens} (cache: ${totals.cachedInputTokens})`,
     `  tokens de saida: ${totals.outputTokens} (raciocinio: ${totals.reasoningOutputTokens})`,
     `  tokens totais: ${totals.totalTokens}`,
@@ -58,21 +58,21 @@ export function formatUsageReport(
 
 export interface SavingsReport {
   baselineTokens: number;
-  oracleTokens: number;
+  bshTokens: number;
   savedTokens: number;
   savedPercent: string;
 }
 
-export function savingsReport(baselineTokens: number, oracleTokens: number): SavingsReport {
-  const savedTokens = baselineTokens - oracleTokens;
+export function savingsReport(baselineTokens: number, bshTokens: number): SavingsReport {
+  const savedTokens = baselineTokens - bshTokens;
   return {
     baselineTokens,
-    oracleTokens,
+    bshTokens,
     savedTokens,
     savedPercent: baselineTokens > 0 ? percent(savedTokens, baselineTokens) : '0%',
   };
 }
 
 export function formatSavingsReport(savings: SavingsReport): string {
-  return `Oracle: economia com o harness — Codex direto: ${savings.baselineTokens} tokens; com Oracle: ${savings.oracleTokens} tokens; economia: ${savings.savedTokens} tokens (${savings.savedPercent}).`;
+  return `BSH: economia com o harness — Codex direto: ${savings.baselineTokens} tokens; com BSH: ${savings.bshTokens} tokens; economia: ${savings.savedTokens} tokens (${savings.savedPercent}).`;
 }

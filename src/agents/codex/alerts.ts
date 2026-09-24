@@ -51,7 +51,7 @@ export async function countLines(file: string): Promise<number> {
 }
 
 export async function writeAlerts(root: string, sessionId: string, alerts: ConflictAlert[]): Promise<string> {
-  const directory = join(root, '.oracle', 'local');
+  const directory = join(root, '.bsh', 'local');
   await mkdir(directory, { recursive: true });
   const file = join(directory, 'alerts.jsonl');
   const lines = alerts

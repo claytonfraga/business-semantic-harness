@@ -10,12 +10,12 @@ import { readAudit } from '../../dist/decision/audit.js';
 
 const source = new URL('../fixtures/ativos/', import.meta.url);
 async function project() {
-  const root = await mkdtemp(join(tmpdir(), 'oracle-decision-'));
-  const directory = join(root, '.oracle/domains/ativos');
+  const root = await mkdtemp(join(tmpdir(), 'bsh-decision-'));
+  const directory = join(root, '.bsh/domains/ativos');
   await mkdir(directory, { recursive: true });
   await copyFile(new URL('ontology.jsonld', source), join(directory, 'ontology.jsonld'));
   await copyFile(new URL('shapes.ttl', source), join(directory, 'shapes.ttl'));
-  await writeFile(join(root, '.oracle/project.json'), JSON.stringify({ schemaVersion: 1, projectId: 'pilot', domains: [{ id: 'ativos', version: '1.0.0', baseIri: 'urn:pilot:ativos:', ontology: 'domains/ativos/ontology.jsonld', shapes: 'domains/ativos/shapes.ttl' }] }));
+  await writeFile(join(root, '.bsh/project.json'), JSON.stringify({ schemaVersion: 1, projectId: 'pilot', domains: [{ id: 'ativos', version: '1.0.0', baseIri: 'urn:pilot:ativos:', ontology: 'domains/ativos/ontology.jsonld', shapes: 'domains/ativos/shapes.ttl' }] }));
   return root;
 }
 const action = (factsTurtle = '@prefix ex: <urn:pilot:ativos:> . ex:transferencia-1 a ex:TransferenciaAtivo ; ex:estadoAtual ex:EmUso .') => ({
@@ -26,9 +26,9 @@ const action = (factsTurtle = '@prefix ex: <urn:pilot:ativos:> . ex:transferenci
 test('Given a conforming represented action without human policy, when evaluated, then it is allowed with a matched rule', async () => {
   const root = await project();
   try {
-    const file = join(root, '.oracle/domains/ativos/ontology.jsonld');
+    const file = join(root, '.bsh/domains/ativos/ontology.jsonld');
     const graph = JSON.parse(await readFile(file, 'utf8'));
-    graph['@graph'] = graph['@graph'].filter(item => item['@type'] !== 'oracle:Policy');
+    graph['@graph'] = graph['@graph'].filter(item => item['@type'] !== 'bsh:Policy');
     await writeFile(file, JSON.stringify(graph));
     const snapshot = await createOntologySnapshot(root);
     const evaluation = await evaluateAction(root, action(), snapshot);
@@ -101,7 +101,7 @@ test('Given a reviewed action, when allowed once, then the grant is bound and co
     assert.equal(await broker.consume(authorization.token, proposed, snapshot), true);
     assert.equal(await broker.consume(authorization.token, proposed, snapshot), false);
     assert.equal((await broker.authorize(proposed, evaluation, snapshot)).allowed, false);
-    const audit = await readFile(join(root, '.oracle/local/events.jsonl'), 'utf8');
+    const audit = await readFile(join(root, '.bsh/local/events.jsonl'), 'utf8');
     assert.ok(audit.includes('"actor":"tester"'));
     assert.equal((await readAudit(root, 'a1')).at(-1).decision, 'deny');
   } finally { await rm(root, { recursive: true, force: true }); }
@@ -128,7 +128,7 @@ test('Given a changed ontology after authorization, when consuming the one-time 
     const broker = new ApprovalBroker(root, async () => ({ choice: 'allow-once', actor: 'tester', reason: 'okay' }));
     const grant = await broker.authorize(proposed, evaluation, snapshot);
     assert.equal(grant.allowed, true);
-    const file = join(root, '.oracle/domains/ativos/shapes.ttl');
+    const file = join(root, '.bsh/domains/ativos/shapes.ttl');
     await writeFile(file, (await readFile(file, 'utf8')) + '\n# altered\n');
     assert.equal(await broker.consume(grant.token, proposed, snapshot), false);
   } finally { await rm(root, { recursive: true, force: true }); }
@@ -144,7 +144,7 @@ test('Given no human answer, when the deadline expires, then the action is denie
     const decision = await broker.authorize(proposed, evaluation, snapshot);
     assert.equal(decision.allowed, false);
     assert.match(decision.reason, /Tempo limite/);
-    assert.match(await readFile(join(root, '.oracle/local/events.jsonl'), 'utf8'), /"decision":"deny"/);
+    assert.match(await readFile(join(root, '.bsh/local/events.jsonl'), 'utf8'), /"decision":"deny"/);
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
@@ -154,8 +154,8 @@ test('Given an unavailable audit path, when approval is granted, then no executi
     const snapshot = await createOntologySnapshot(root);
     const proposed = action();
     const evaluation = await evaluateAction(root, proposed, snapshot);
-    await mkdir(join(root, '.oracle/local'), { recursive: true });
-    await mkdir(join(root, '.oracle/local/events.jsonl'));
+    await mkdir(join(root, '.bsh/local'), { recursive: true });
+    await mkdir(join(root, '.bsh/local/events.jsonl'));
     const broker = new ApprovalBroker(root, async () => ({ choice: 'allow-once', actor: 'tester', reason: 'okay' }));
     const decision = await broker.authorize(proposed, evaluation, snapshot);
     assert.equal(decision.allowed, false);
@@ -171,7 +171,7 @@ test('Given a known secret in a review reason, when audited, then the secret is 
     const evaluation = await evaluateAction(root, proposed, snapshot);
     const broker = new ApprovalBroker(root, async () => ({ choice: 'deny', actor: 'tester', reason: 'token abc"123 denied' }), 100, ['abc"123']);
     await broker.authorize(proposed, evaluation, snapshot);
-    const audit = await readFile(join(root, '.oracle/local/events.jsonl'), 'utf8');
+    const audit = await readFile(join(root, '.bsh/local/events.jsonl'), 'utf8');
     assert.ok(!audit.includes('abc'));
     assert.ok(audit.includes('[REDACTED]'));
   } finally { await rm(root, { recursive: true, force: true }); }

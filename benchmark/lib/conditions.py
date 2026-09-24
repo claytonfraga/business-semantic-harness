@@ -23,11 +23,11 @@ def _prepare_project(execution_dir, pilot):
     shutil.rmtree(project, ignore_errors=True)
     os.makedirs(project, exist_ok=True)
     shutil.copytree(pilot, project, dirs_exist_ok=True)
-    shutil.rmtree(os.path.join(project, ".oracle", "local"), ignore_errors=True)
+    shutil.rmtree(os.path.join(project, ".bsh", "local"), ignore_errors=True)
     return project
 
 
-def run_sem_oracle(execution_dir, pilot, prompt, model, effort):
+def run_sem_bsh(execution_dir, pilot, prompt, model, effort):
     project = _prepare_project(execution_dir, pilot)
     started = time.time()
     result = subprocess.run(
@@ -48,19 +48,19 @@ def run_sem_oracle(execution_dir, pilot, prompt, model, effort):
     entrada = usage.get("input_tokens", 0)
     saida = usage.get("output_tokens", 0)
     return {
-        "condicao": "sem-oracle", "entrada": entrada, "cache": usage.get("cached_input_tokens", 0),
+        "condicao": "sem-bsh", "entrada": entrada, "cache": usage.get("cached_input_tokens", 0),
         "saida": saida, "raciocinio": usage.get("reasoning_output_tokens", 0), "totais": entrada + saida,
         "consultas": 0, "conflitos": 0, "bloqueado": False, "erro": False,
         "duracao": int(time.time() - started),
     }
 
 
-def run_com_oracle(execution_dir, pilot, prompt, model, effort, session):
+def run_com_bsh(execution_dir, pilot, prompt, model, effort, session):
     project = _prepare_project(execution_dir, pilot)
     _kill(session)
     started = time.time()
     tmux.tmux(["new-session", "-d", "-s", session, "-x", "220", "-y", "55"])
-    tmux.tmux(["send-keys", "-t", session, f"ORACLE_CODEX_MODEL={model} ORACLE_CODEX_REASONING_EFFORT={effort} oracle codex --project {project}", "Enter"])
+    tmux.tmux(["send-keys", "-t", session, f"BSH_CODEX_MODEL={model} BSH_CODEX_REASONING_EFFORT={effort} bsh codex --project {project}", "Enter"])
     if not tmux.wait_for_pane(session, r"Ask Codex to do anything", TUI_OPEN_S):
         _kill(session)
         raise RuntimeError("TUI do Codex nao abriu")
@@ -69,7 +69,7 @@ def run_com_oracle(execution_dir, pilot, prompt, model, effort, session):
     tmux.tmux(["send-keys", "-t", session, "Enter"])
     if not tmux.wait_for_log(project, tokens.turn_completed, TURN_S):
         _kill(session)
-        raise RuntimeError("Turno do Oracle nao concluiu no tempo esperado")
+        raise RuntimeError("Turno do BSH nao concluiu no tempo esperado")
     log_file = tokens.newest_session_log(project)
     tmux.tmux(["send-keys", "-t", session, "C-c"])
     asked = tmux.wait_for_pane(session, r"Aprovar excecao", FINALIZE_S)
@@ -84,10 +84,10 @@ def run_com_oracle(execution_dir, pilot, prompt, model, effort, session):
         handle.write(tmux.pane(session))
     usage = tokens.last_token_usage(log_file) or {}
     row = {
-        "condicao": "com-oracle", "entrada": usage.get("inputTokens", 0), "cache": usage.get("cachedInputTokens", 0),
+        "condicao": "com-bsh", "entrada": usage.get("inputTokens", 0), "cache": usage.get("cachedInputTokens", 0),
         "saida": usage.get("outputTokens", 0), "raciocinio": usage.get("reasoningOutputTokens", 0),
         "totais": usage.get("totalTokens", 0),
-        "consultas": tokens.count_occurrences(log_file, '"tool":"oracle_query_ontology"'),
+        "consultas": tokens.count_occurrences(log_file, '"tool":"bsh_query_ontology"'),
         "conflitos": tokens.count_occurrences(log_file, '"conflict":true'),
         "bloqueado": asked, "erro": False, "duracao": int(time.time() - started),
     }

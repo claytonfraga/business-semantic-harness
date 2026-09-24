@@ -24,14 +24,14 @@ export interface GovernedAppServer {
 function buildGovernedInstructions(domains: string[]): string {
   const list = domains.length > 0 ? domains.join(', ') : 'nao declarados';
   return [
-    '# Sessao governada pelo Oracle',
+    '# Sessao governada pelo BSH',
     '',
-    'Este projeto e governado pelo Oracle. Voce trabalha em uma worktree Git isolada da sessao.',
-    'Sempre comece consultando a ontologia do dominio com a ferramenta MCP `oracle_query_ontology`, mesmo que o pedido pareca simples, e antes de implementar qualquer mudanca.',
+    'Este projeto e governado pelo BSH. Voce trabalha em uma worktree Git isolada da sessao.',
+    'Sempre comece consultando a ontologia do dominio com a ferramenta MCP `bsh_query_ontology`, mesmo que o pedido pareca simples, e antes de implementar qualquer mudanca.',
     `Dominios declarados: ${list}.`,
-    'Se um pedido contrariar a ontologia, chame `oracle_report_conflict` e aguarde a decisao humana; nao contorne essa decisao.',
-    'O Oracle mede os tokens gastos na verificacao ontologica e alerta o humano em caso de violacao.',
-    'O checkout principal permanece intacto; o Oracle promove as alteracoes apos a validacao.',
+    'Se um pedido contrariar a ontologia, chame `bsh_report_conflict` e aguarde a decisao humana; nao contorne essa decisao.',
+    'O BSH mede os tokens gastos na verificacao ontologica e alerta o humano em caso de violacao.',
+    'O checkout principal permanece intacto; o BSH promove as alteracoes apos a validacao.',
     '',
   ].join('\n');
 }
@@ -53,7 +53,7 @@ function tomlString(value: string): string {
 }
 
 export function buildConfig(repositorioOrigem: string, workspaceSessao: string, mcpEntrypoint: string, model?: string, reasoningEffort?: string): string {
-  const sandbox = process.env.ORACLE_CODEX_SANDBOX === 'danger-full-access' ? 'danger-full-access' : 'workspace-write';
+  const sandbox = process.env.BSH_CODEX_SANDBOX === 'danger-full-access' ? 'danger-full-access' : 'workspace-write';
   const lines = [
     'web_search = "disabled"',
     'approval_policy = "on-request"',
@@ -66,17 +66,17 @@ export function buildConfig(repositorioOrigem: string, workspaceSessao: string, 
   if (reasoningEffort) lines.push(`model_reasoning_effort = ${tomlString(reasoningEffort)}`);
   lines.push(
     '',
-    '[mcp_servers.oracle]',
+    '[mcp_servers.bsh]',
     `command = ${tomlString(process.execPath)}`,
     `args = [${tomlString(mcpEntrypoint)}, ${tomlString(repositorioOrigem)}, "governed"]`,
     'required = true',
     'enabled = true',
     '',
-    '[mcp_servers.oracle.tools.oracle_query_ontology]',
+    '[mcp_servers.bsh.tools.bsh_query_ontology]',
     'approval_mode = "auto"',
-    '[mcp_servers.oracle.tools.oracle_propose_patch]',
+    '[mcp_servers.bsh.tools.bsh_propose_patch]',
     'approval_mode = "auto"',
-    '[mcp_servers.oracle.tools.oracle_report_conflict]',
+    '[mcp_servers.bsh.tools.bsh_report_conflict]',
     'approval_mode = "auto"',
     '',
     '[features]',
@@ -108,7 +108,7 @@ export interface OpcoesAppServer {
 
 export async function startGovernedAppServer(opcoes: OpcoesAppServer): Promise<GovernedAppServer> {
   const { repositorioOrigem, workspaceSessao, domains } = opcoes;
-  const stateDirectory = await mkdtemp(join(homedir(), '.oracle-codex-state-'));
+  const stateDirectory = await mkdtemp(join(homedir(), '.bsh-codex-state-'));
   await chmod(stateDirectory, 0o700);
   const mcpEntrypoint = fileURLToPath(new URL('../../mcp/server.js', import.meta.url));
   try {
@@ -120,7 +120,7 @@ export async function startGovernedAppServer(opcoes: OpcoesAppServer): Promise<G
         if (typeof error !== 'object' || error === null || !('code' in error) || error.code !== 'ENOENT') throw error;
       }
     }
-    await writeFile(join(stateDirectory, 'config.toml'), buildConfig(repositorioOrigem, workspaceSessao, mcpEntrypoint, process.env.ORACLE_CODEX_MODEL, process.env.ORACLE_CODEX_REASONING_EFFORT), { mode: 0o600 });
+    await writeFile(join(stateDirectory, 'config.toml'), buildConfig(repositorioOrigem, workspaceSessao, mcpEntrypoint, process.env.BSH_CODEX_MODEL, process.env.BSH_CODEX_REASONING_EFFORT), { mode: 0o600 });
     await writeFile(join(stateDirectory, 'AGENTS.md'), buildGovernedInstructions(domains), { mode: 0o600 });
 
     const port = await freePort();
@@ -130,7 +130,7 @@ export async function startGovernedAppServer(opcoes: OpcoesAppServer): Promise<G
       '-c', 'web_search="disabled"',
       'app-server', '--listen', url,
     ];
-    const environment = { ...process.env, CODEX_HOME: stateDirectory, ORACLE_SESSION_DIR: stateDirectory };
+    const environment = { ...process.env, CODEX_HOME: stateDirectory, BSH_SESSION_DIR: stateDirectory };
     const child = spawn('codex', args, { cwd: workspaceSessao, env: environment, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
     child.stderr.on('data', (chunk: Buffer) => process.stderr.write(chunk.toString('utf8')));
     await waitUntilReady(port, child);

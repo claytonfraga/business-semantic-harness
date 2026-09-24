@@ -10,7 +10,7 @@ import {
 } from '../../dist/agents/codex/worktree.js';
 import { promoverSessao } from '../../dist/agents/codex/promotion.js';
 
-const raiz = mkdtempSync(join(tmpdir(), 'oracle-worktree-test-'));
+const raiz = mkdtempSync(join(tmpdir(), 'bsh-worktree-test-'));
 const worktrees = join(raiz, 'worktrees');
 
 function git(cwd, args) {
@@ -50,7 +50,7 @@ test('Given a repository on main, when a session starts, then a dedicated branch
   const base = await commitAtual(repo);
   const sessao = await novaSessao(repo);
   assert.equal(sessao.commitBase, base);
-  assert.ok(sessao.branchSessao.startsWith('oracle/session/'));
+  assert.ok(sessao.branchSessao.startsWith('bsh/session/'));
   assert.ok(existsSync(sessao.caminhoWorktree));
   const worktreesListadas = await listarWorktrees(repo);
   assert.ok(worktreesListadas.some((item) => item.branch === sessao.branchSessao));

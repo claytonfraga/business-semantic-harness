@@ -20,7 +20,7 @@ async function listFiles(root: string, current = root, result = new Map<string, 
     if (SKIP.has(entry.name)) continue;
     const absolute = join(current, entry.name);
     const key = relative(root, absolute).split(sep).join('/');
-    if (key === '.oracle/local' || key.startsWith('.oracle/local/')) continue;
+    if (key === '.bsh/local' || key.startsWith('.bsh/local/')) continue;
     if (entry.isDirectory()) {
       await listFiles(root, absolute, result);
     } else if (entry.isFile()) {

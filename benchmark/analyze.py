@@ -21,8 +21,8 @@ from lib import statistics as stats
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent
 RESULTS = HERE / "results"
-ROTULOS = {"sem-oracle": "Codex sem Oracle", "com-oracle": "Codex com Oracle harness"}
-CORES = {"sem-oracle": "#D55E00", "com-oracle": "#0072B2"}
+ROTULOS = {"sem-bsh": "Codex sem BSH", "com-bsh": "Codex com BSH harness"}
+CORES = {"sem-bsh": "#D55E00", "com-bsh": "#0072B2"}
 
 plt.rcParams.update({
     "figure.dpi": 300, "savefig.dpi": 300, "font.size": 11, "axes.titlesize": 12,
@@ -37,12 +37,12 @@ def _normalizado(registro):
 
 def carregar(lote_dir):
     execucoes = {}
-    erros = {"sem-oracle": 0, "com-oracle": 0}
+    erros = {"sem-bsh": 0, "com-bsh": 0}
     for pasta in sorted(lote_dir.iterdir()):
         if not pasta.is_dir() or pasta.name == "aquecimento":
             continue
         registro = {}
-        for condicao in ("sem-oracle", "com-oracle"):
+        for condicao in ("sem-bsh", "com-bsh"):
             arquivo = pasta / condicao / "result.json"
             if not arquivo.is_file():
                 continue
@@ -65,9 +65,9 @@ def valores(execucoes, condicao, campo):
 def pares(execucoes, campo):
     sem, com = [], []
     for registro in execucoes.values():
-        if "sem-oracle" in registro and "com-oracle" in registro:
-            sem.append(registro["sem-oracle"][campo])
-            com.append(registro["com-oracle"][campo])
+        if "sem-bsh" in registro and "com-bsh" in registro:
+            sem.append(registro["sem-bsh"][campo])
+            com.append(registro["com-bsh"][campo])
     return sem, com
 
 
@@ -94,8 +94,8 @@ def agrupar_por_prompt(execucoes):
 
 
 def resumo_prompt(registros):
-    sem = [r["sem-oracle"]["totais"] for r in registros if "sem-oracle" in r]
-    com = [r["com-oracle"]["totais"] for r in registros if "com-oracle" in r]
+    sem = [r["sem-bsh"]["totais"] for r in registros if "sem-bsh" in r]
+    com = [r["com-bsh"]["totais"] for r in registros if "com-bsh" in r]
     sem_media, com_media = stats.describe(sem)["media"], stats.describe(com)["media"]
     reducao = ((com_media - sem_media) / sem_media * 100) if sem_media else 0.0
     pvalor = None
@@ -106,19 +106,19 @@ def resumo_prompt(registros):
             pvalor = None
     return {
         "n": min(len(sem), len(com)), "sem_media": sem_media, "com_media": com_media, "reducao": reducao,
-        "sem_bloqueados": sum(1 for r in registros if "sem-oracle" in r and r["sem-oracle"].get("bloqueado")),
-        "com_bloqueados": sum(1 for r in registros if "com-oracle" in r and r["com-oracle"].get("bloqueado")),
+        "sem_bloqueados": sum(1 for r in registros if "sem-bsh" in r and r["sem-bsh"].get("bloqueado")),
+        "com_bloqueados": sum(1 for r in registros if "com-bsh" in r and r["com-bsh"].get("bloqueado")),
         "p": pvalor,
     }
 
 
 def _boxplot(execucoes, charts):
     figura, eixo = plt.subplots(figsize=(6.2, 4.4))
-    dados = [valores(execucoes, c, "totais") for c in ("sem-oracle", "com-oracle")]
-    caixas = eixo.boxplot(dados, tick_labels=[ROTULOS["sem-oracle"], ROTULOS["com-oracle"]], patch_artist=True, widths=0.5, showfliers=False)
-    for caixa, c in zip(caixas["boxes"], ("sem-oracle", "com-oracle")):
+    dados = [valores(execucoes, c, "totais") for c in ("sem-bsh", "com-bsh")]
+    caixas = eixo.boxplot(dados, tick_labels=[ROTULOS["sem-bsh"], ROTULOS["com-bsh"]], patch_artist=True, widths=0.5, showfliers=False)
+    for caixa, c in zip(caixas["boxes"], ("sem-bsh", "com-bsh")):
         caixa.set_facecolor(CORES[c]); caixa.set_alpha(0.35)
-    for indice, c in enumerate(("sem-oracle", "com-oracle")):
+    for indice, c in enumerate(("sem-bsh", "com-bsh")):
         jitter = [((i % 5) - 2) * 0.03 for i in range(len(dados[indice]))]
         eixo.scatter([indice + 1 + j for j in jitter], dados[indice], color=CORES[c], s=26, zorder=3, edgecolor="white", linewidth=0.5)
     eixo.set_ylabel("Tokens totais por execucao"); eixo.set_title("Distribuicao de tokens por condicao")
@@ -127,7 +127,7 @@ def _boxplot(execucoes, charts):
 
 def _media_ic(execucoes, charts):
     figura, eixo = plt.subplots(figsize=(6.2, 4.4))
-    condicoes = ["sem-oracle", "com-oracle"]
+    condicoes = ["sem-bsh", "com-bsh"]
     resumos = [stats.describe(valores(execucoes, c, "totais")) for c in condicoes]
     barras = eixo.bar([ROTULOS[c] for c in condicoes], [r["media"] for r in resumos], yerr=[r["ic95"] for r in resumos], capsize=6, color=[CORES[c] for c in condicoes], alpha=0.85)
     for barra, r in zip(barras, resumos):
@@ -141,16 +141,16 @@ def _pareado(execucoes, charts):
     sem, com = pares(execucoes, "totais")
     limite = max(sem + com + [1]) * 1.05
     eixo.plot([0, limite], [0, limite], linestyle="--", color="#9e9e9e", linewidth=1, label="mesmo custo (y = x)")
-    eixo.scatter(sem, com, color=CORES["com-oracle"], s=45, edgecolor="white", linewidth=0.6, zorder=3, label="1 execucao")
+    eixo.scatter(sem, com, color=CORES["com-bsh"], s=45, edgecolor="white", linewidth=0.6, zorder=3, label="1 execucao")
     eixo.set_xlim(0, limite); eixo.set_ylim(0, limite)
-    eixo.set_xlabel("Tokens sem Oracle"); eixo.set_ylabel("Tokens com Oracle")
+    eixo.set_xlabel("Tokens sem BSH"); eixo.set_ylabel("Tokens com BSH")
     eixo.set_title("Custo pareado por execucao (cada ponto = 1 execucao)"); eixo.legend()
     figura.tight_layout(); figura.savefig(charts / "03-pareado.png"); plt.close(figura)
 
 
 def _distribuicao(execucoes, charts):
     figura, eixo = plt.subplots(figsize=(6.4, 4.4))
-    for c in ("sem-oracle", "com-oracle"):
+    for c in ("sem-bsh", "com-bsh"):
         amostra = valores(execucoes, c, "totais")
         if len(amostra) > 1:
             eixo.hist(amostra, bins=min(8, len(amostra)), density=True, alpha=0.35, color=CORES[c], label=ROTULOS[c], edgecolor="white")
@@ -162,7 +162,7 @@ def _distribuicao(execucoes, charts):
 
 def _governanca(execucoes, charts):
     figura, eixo = plt.subplots(figsize=(6.2, 4.4))
-    condicoes = ["sem-oracle", "com-oracle"]
+    condicoes = ["sem-bsh", "com-bsh"]
     taxas = []
     for c in condicoes:
         registros = [r[c] for r in execucoes.values() if c in r]
@@ -176,7 +176,7 @@ def _governanca(execucoes, charts):
 
 def _normalizado_chart(execucoes, charts):
     figura, eixo = plt.subplots(figsize=(6.2, 4.4))
-    condicoes = ["sem-oracle", "com-oracle"]
+    condicoes = ["sem-bsh", "com-bsh"]
     resumos = [stats.describe([_normalizado(r[c]) for r in execucoes.values() if c in r]) for c in condicoes]
     barras = eixo.bar([ROTULOS[c] for c in condicoes], [r["media"] for r in resumos], yerr=[r["ic95"] for r in resumos], capsize=6, color=[CORES[c] for c in condicoes], alpha=0.85)
     for barra, r in zip(barras, resumos):
@@ -191,8 +191,8 @@ def _por_prompt_chart(grupos, charts):
     x = list(range(len(rotulos)))
     largura = 0.38
     figura, eixo = plt.subplots(figsize=(max(7.5, 2.4 * len(rotulos)), 4.9))
-    eixo.bar([i - largura / 2 for i in x], [r["sem_media"] for r in resumos.values()], largura, label=ROTULOS["sem-oracle"], color=CORES["sem-oracle"], alpha=0.85)
-    eixo.bar([i + largura / 2 for i in x], [r["com_media"] for r in resumos.values()], largura, label=ROTULOS["com-oracle"], color=CORES["com-oracle"], alpha=0.85)
+    eixo.bar([i - largura / 2 for i in x], [r["sem_media"] for r in resumos.values()], largura, label=ROTULOS["sem-bsh"], color=CORES["sem-bsh"], alpha=0.85)
+    eixo.bar([i + largura / 2 for i in x], [r["com_media"] for r in resumos.values()], largura, label=ROTULOS["com-bsh"], color=CORES["com-bsh"], alpha=0.85)
     eixo.set_xticks(x); eixo.set_xticklabels(rotulos, rotation=12, ha="right", fontsize=9)
     eixo.set_ylabel("Tokens totais (media)"); eixo.set_title("Custo medio por prompt e condicao"); eixo.legend()
     figura.tight_layout(); figura.savefig(charts / "07-por-prompt.png"); plt.close(figura)
@@ -201,7 +201,7 @@ def _por_prompt_chart(grupos, charts):
 
 def _principal(execucoes, charts):
     figura, eixos = plt.subplots(2, 2, figsize=(11, 8.5))
-    condicoes = ["sem-oracle", "com-oracle"]
+    condicoes = ["sem-bsh", "com-bsh"]
     dados = [valores(execucoes, c, "totais") for c in condicoes]
     caixas = eixos[0][0].boxplot(dados, tick_labels=[ROTULOS[c] for c in condicoes], patch_artist=True, widths=0.5, showfliers=False)
     for caixa, c in zip(caixas["boxes"], condicoes):
@@ -213,16 +213,16 @@ def _principal(execucoes, charts):
     sem, com = pares(execucoes, "totais")
     limite = max(sem + com + [1]) * 1.05
     eixos[1][0].plot([0, limite], [0, limite], linestyle="--", color="#9e9e9e", linewidth=1)
-    eixos[1][0].scatter(sem, com, color=CORES["com-oracle"], s=34, edgecolor="white", linewidth=0.5, zorder=3)
+    eixos[1][0].scatter(sem, com, color=CORES["com-bsh"], s=34, edgecolor="white", linewidth=0.5, zorder=3)
     eixos[1][0].set_xlim(0, limite); eixos[1][0].set_ylim(0, limite)
-    eixos[1][0].set_xlabel("Sem Oracle"); eixos[1][0].set_ylabel("Com Oracle"); eixos[1][0].set_title("(c) Custo pareado (1 ponto = 1 execucao)")
+    eixos[1][0].set_xlabel("Sem BSH"); eixos[1][0].set_ylabel("Com BSH"); eixos[1][0].set_title("(c) Custo pareado (1 ponto = 1 execucao)")
     taxas = []
     for c in condicoes:
         registros = [r[c] for r in execucoes.values() if c in r]
         taxas.append((sum(1 for r in registros if r.get("bloqueado")) / len(registros) * 100) if registros else 0.0)
     eixos[1][1].bar([ROTULOS[c] for c in condicoes], taxas, color=[CORES[c] for c in condicoes], alpha=0.85)
     eixos[1][1].set_ylim(0, 105); eixos[1][1].set_ylabel("Bloqueios (%)"); eixos[1][1].set_title("(d) Governanca")
-    figura.suptitle("Benchmark: Codex sem Oracle vs Codex com Oracle harness", fontsize=13)
+    figura.suptitle("Benchmark: Codex sem BSH vs Codex com BSH harness", fontsize=13)
     figura.tight_layout(rect=[0, 0, 1, 0.97]); figura.savefig(charts / "00-figura-principal.png"); plt.close(figura)
 
 
@@ -235,7 +235,7 @@ def analisar(lote_dir):
     meta = metadados(lote_dir)
     ambiente = meta.get("ambiente", {})
     prompt = meta.get("prompt", "")
-    condicoes = ["sem-oracle", "com-oracle"]
+    condicoes = ["sem-bsh", "com-bsh"]
 
     resumo = {}
     for c in condicoes:
@@ -291,18 +291,18 @@ def analisar(lote_dir):
         f"**O que mostra:** {o_que}", "", f"**Como interpretar:** {como}", "",
     ]
     linhas = [
-        f"# Benchmark: Codex com e sem Oracle harness — lote `{lote_dir.name}`", "",
+        f"# Benchmark: Codex com e sem BSH harness — lote `{lote_dir.name}`", "",
         "## Objetivo", "",
-        "Medir o custo em tokens e o efeito de governanca do Oracle harness frente ao Codex direto, executando o mesmo pedido em copias limpas do projeto.", "",
+        "Medir o custo em tokens e o efeito de governanca do BSH harness frente ao Codex direto, executando o mesmo pedido em copias limpas do projeto.", "",
         "## Desenho experimental", "",
         f"- Execucoes por condicao: **{len(execucoes)}** (aquecimento descartado; ordem das condicoes randomizada por execucao).",
         f"- Modelo: `{meta.get('modelo', '?')}` (esforco `{meta.get('esforco', '?')}`), identico nas duas condicoes.",
-        "- Condicoes: `sem-oracle` (Codex direto) e `com-oracle` (`oracle codex`, harness).",
+        "- Condicoes: `sem-bsh` (Codex direto) e `com-bsh` (`bsh codex`, harness).",
         "- Isolamento: copia limpa e independente por execucao.",
         f"- Pedido principal: \"{prompt}\"", "",
         "## Ambiente e proveniencia", "",
         f"- Codex: `{ambiente.get('codex', '?')}`",
-        f"- Oracle: `{ambiente.get('oracle', '?')}`",
+        f"- BSH: `{ambiente.get('bsh', '?')}`",
         f"- Python: `{ambiente.get('python', '?')}`",
         f"- Plataforma: `{ambiente.get('plataforma', '?')}`",
         f"- Commit do harness: `{commit_harness()}`",
@@ -325,10 +325,10 @@ def analisar(lote_dir):
     linhas += [
         "- Interpretacao: com p < 0,05, a diferenca e improvavel sob a hipotese nula; com n pequeno, leia junto com o IC e o tamanho de efeito.", "",
         "## Governanca", "",
-        f"- Sem Oracle: {resumo['sem-oracle']['bloqueados']}/{resumo['sem-oracle']['n']} execucoes bloqueadas pela ontologia.",
-        f"- Com Oracle: {resumo['com-oracle']['bloqueados']}/{resumo['com-oracle']['n']} execucoes bloqueadas pela ontologia.", "",
+        f"- Sem BSH: {resumo['sem-bsh']['bloqueados']}/{resumo['sem-bsh']['n']} execucoes bloqueadas pela ontologia.",
+        f"- Com BSH: {resumo['com-bsh']['bloqueados']}/{resumo['com-bsh']['n']} execucoes bloqueadas pela ontologia.", "",
         "## Por prompt", "",
-        "| Prompt | n | Media sem Oracle | Media com Oracle | Reducao (%) | Bloqueios sem/com | p (Wilcoxon) |",
+        "| Prompt | n | Media sem BSH | Media com BSH | Reducao (%) | Bloqueios sem/com | p (Wilcoxon) |",
         "| --- | --- | --- | --- | --- | --- | --- |",
     ]
     for prompt, r in resumos_prompt.items():
@@ -346,14 +346,14 @@ def analisar(lote_dir):
         "media de tokens por condicao com barra de erro do IC 95%.",
         "se os intervalos nao se sobrepoem, ha indicio de diferenca; sobreposicao pede cautela.")
     linhas += figura("03-pareado.png", "Custo pareado por execucao",
-        "cada ponto e uma execucao: x = tokens sem Oracle, y = tokens com Oracle; a diagonal tracejada e y = x (mesmo custo).",
+        "cada ponto e uma execucao: x = tokens sem BSH, y = tokens com BSH; a diagonal tracejada e y = x (mesmo custo).",
         "pontos abaixo da diagonal significam que o harness gastou menos naquela mesma execucao; a distancia vertical e a economia.")
     linhas += figura("04-distribuicao.png", "Distribuicao dos tokens",
         "histograma de densidade por condicao; linhas tracejadas marcam as medias.",
         "distribuicoes separadas indicam efeito consistente; sobreposicao indica custo parecido.")
     linhas += figura("05-governanca.png", "Governanca da ontologia",
         "percentual de execucoes bloqueadas pelo harness em cada condicao.",
-        "0% sem Oracle e 100% com Oracle indica que so o harness aplicou a regra da ontologia.")
+        "0% sem BSH e 100% com BSH indica que so o harness aplicou a regra da ontologia.")
     linhas += figura("06-tokens-nao-cacheados.png", "Custo sem cache",
         "tokens nao cacheados = (entrada - cache) + saida, removendo o efeito de cache de prompt.",
         "metrica mais justa quando o cache varia entre condicoes; deve contar a mesma historia do total para ser robusta.")
@@ -365,7 +365,7 @@ def analisar(lote_dir):
         "- Amostra pequena: IC largos; nao se afirma significancia sem olhar o IC e o tamanho de efeito.",
         "- Variabilidade do modelo entre execucoes.",
         "- O efeito do harness depende do pedido; pedidos que exigem correcao de rumo tendem a favorece-lo.",
-        "- O Codex direto nao recebe contexto ontologico nem o MCP Oracle, parte do efeito medido.", "",
+        "- O Codex direto nao recebe contexto ontologico nem o MCP BSH, parte do efeito medido.", "",
         "## Reproducao", "", "```bash",
         "BENCH_RUNS=10 BENCH_WARMUP=1 BENCH_PROMPT=benchmark/prompts/bloqueado.txt \\",
         "  benchmark/.venv/bin/python benchmark/run_benchmark.py",

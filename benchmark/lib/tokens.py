@@ -17,7 +17,7 @@ def usage_from_exec_output(output):
 
 
 def newest_session_log(project):
-    directory = os.path.join(project, ".oracle", "local")
+    directory = os.path.join(project, ".bsh", "local")
     if not os.path.isdir(directory):
         return None
     files = sorted(name for name in os.listdir(directory) if name.startswith("session-") and name.endswith(".jsonl"))

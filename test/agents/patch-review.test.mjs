@@ -10,8 +10,8 @@ import { preparePatch, reviewAndApplyPatch } from '../../dist/agents/codex/patch
 
 const hash = (text) => createHash('sha256').update(text).digest('hex');
 async function project() {
-  const root = await mkdtemp(join(tmpdir(), 'oracle-patch-test-'));
-  await cp(resolve('pilot/asset-management/.oracle'), join(root, '.oracle'), { recursive: true });
+  const root = await mkdtemp(join(tmpdir(), 'bsh-patch-test-'));
+  await cp(resolve('pilot/asset-management/.bsh'), join(root, '.bsh'), { recursive: true });
   await mkdir(join(root, 'src'));
   await writeFile(join(root, 'src', 'asset.ts'), 'old\n');
   return root;
@@ -56,7 +56,7 @@ test('Given a path escaping the codebase, when a patch is prepared, then it is r
 
 test('Given a symlink to an external file, when a patch is prepared, then the link target stays untouched', async () => {
   const root = await project();
-  const outside = join(tmpdir(), `oracle-patch-outside-${process.pid}`);
+  const outside = join(tmpdir(), `bsh-patch-outside-${process.pid}`);
   try {
     await writeFile(outside, 'outside\n');
     await symlink(outside, join(root, 'src', 'link.txt'));
@@ -78,7 +78,7 @@ test('Given an ontology change during review, when approval is answered, then th
   try {
     const snapshot = await createOntologySnapshot(root);
     const result = await reviewAndApplyPatch(root, proposal(), snapshot, async () => {
-      const ontology = join(root, '.oracle', 'domains', 'ativos', 'ontology.jsonld');
+      const ontology = join(root, '.bsh', 'domains', 'ativos', 'ontology.jsonld');
       await writeFile(ontology, (await readFile(ontology, 'utf8')) + '\n');
       return { choice: 'allow-once', actor: 'qa', reason: 'Aceito' };
     });
