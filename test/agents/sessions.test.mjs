@@ -9,7 +9,7 @@ import { gravarSessao } from '../../dist/agents/codex/sessionState.js';
 import { limparSessao, listarSessoesDoProjeto } from '../../dist/agents/codex/sessions.js';
 
 const raiz = mkdtempSync(join(tmpdir(), 'oracle-sessions-test-'));
-process.env.ORACLE_WORKTREES_DIR = join(raiz, 'worktrees');
+const worktrees = join(raiz, 'worktrees');
 
 function novoRepositorio(nome) {
   const repo = join(raiz, nome);
@@ -28,7 +28,7 @@ after(() => rmSync(raiz, { recursive: true, force: true }));
 
 test('Given a registered session, when listing, then it reports state, branch and worktree', async () => {
   const repo = novoRepositorio('listar');
-  const sessao = await criarSessaoWorktree({ repositorioOrigem: repo, branchOrigem: await branchAtual(repo), commitBase: await commitAtual(repo) });
+  const sessao = await criarSessaoWorktree({ repositorioOrigem: repo, branchOrigem: await branchAtual(repo), commitBase: await commitAtual(repo), diretorioBase: worktrees });
   await gravarSessao(repo, sessao, 'WORKTREE_READY');
   const sessoes = await listarSessoesDoProjeto(repo);
   const encontrada = sessoes.find((item) => item.id === sessao.id);
@@ -40,7 +40,7 @@ test('Given a registered session, when listing, then it reports state, branch an
 
 test('Given a registered session, when cleaned, then the worktree and branch are removed', async () => {
   const repo = novoRepositorio('limpar');
-  const sessao = await criarSessaoWorktree({ repositorioOrigem: repo, branchOrigem: await branchAtual(repo), commitBase: await commitAtual(repo) });
+  const sessao = await criarSessaoWorktree({ repositorioOrigem: repo, branchOrigem: await branchAtual(repo), commitBase: await commitAtual(repo), diretorioBase: worktrees });
   await gravarSessao(repo, sessao, 'CONFLICTED');
   const resultado = await limparSessao(repo, sessao.id);
   assert.equal(resultado.removida, true);
