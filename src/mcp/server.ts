@@ -13,18 +13,18 @@ import { validateProject } from '../ontology/validate.js';
 import { createProposal } from '../proposals/store.js';
 
 function recordSessionEvent(fileName: string, entry: Record<string, unknown>): void {
-  const directory = process.env.ORACLE_SESSION_DIR;
+  const directory = process.env.BSH_SESSION_DIR;
   if (!directory) return;
   const line = JSON.stringify({ time: new Date().toISOString(), ...entry }) + '\n';
   appendFile(join(directory, fileName), line, { mode: 0o600 }).catch(() => undefined);
 }
 
-export function createOracleMcpServer(root: string, governed = false): McpServer {
+export function createBSHMcpServer(root: string, governed = false): McpServer {
   const server = new McpServer(
-    { name: 'oracle', version: '0.2.0' },
+    { name: 'bsh', version: '0.2.0' },
     { instructions: 'Consulte a ontologia do domínio antes de propor alterações. Declare descobertas como propostas com evidência. As propostas não alteram a ontologia aprovada.' },
   );
-  server.registerTool('oracle_query_ontology', {
+  server.registerTool('bsh_query_ontology', {
     description: 'Consulta conceitos, relações, shapes e regras de um domínio com origem verificável.',
     annotations: { readOnlyHint: true, destructiveHint: false },
     inputSchema: { domain: z.string(), iri: z.string().optional() },
@@ -38,17 +38,17 @@ export function createOracleMcpServer(root: string, governed = false): McpServer
     }
   });
   if (governed) {
-    server.registerTool('oracle_report_conflict', {
-      description: 'Quando o pedido conflita com a ontologia, relate as regras e aguarde o Oracle perguntar ao usuário se deve preparar uma proposta de exceção. Não aplica nem autoriza mudança.',
+    server.registerTool('bsh_report_conflict', {
+      description: 'Quando o pedido conflita com a ontologia, relate as regras e aguarde o BSH perguntar ao usuário se deve preparar uma proposta de exceção. Não aplica nem autoriza mudança.',
       annotations: { readOnlyHint: true, destructiveHint: false },
       inputSchema: { domain: z.string(), request: z.string(), conflictingRules: z.array(z.string()).min(1), reason: z.string() },
     }, async ({ domain, request, conflictingRules, reason }) => {
       const digest = createHash('sha256').update(JSON.stringify({ domain, request, conflictingRules, reason })).digest('hex');
       recordSessionEvent('alerts.jsonl', { severity: 'ALERTA', domain, request, conflictingRules, reason, digest });
-      return { content: [{ type: 'text', text: JSON.stringify({ status: 'submitted', digest, message: 'Conflito enviado ao Oracle para pergunta humana.' }) }] };
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'submitted', digest, message: 'Conflito enviado ao BSH para pergunta humana.' }) }] };
     });
-    server.registerTool('oracle_propose_patch', {
-      description: 'Propõe alterações de arquivos ao Oracle. Esta ferramenta não escreve no projeto. Cada arquivo informa seu hash anterior ou null para criação.',
+    server.registerTool('bsh_propose_patch', {
+      description: 'Propõe alterações de arquivos ao BSH. Esta ferramenta não escreve no projeto. Cada arquivo informa seu hash anterior ou null para criação.',
       annotations: { readOnlyHint: true, destructiveHint: false },
       inputSchema: {
         domain: z.string(), summary: z.string(), factsTurtle: z.string().optional(),
@@ -56,11 +56,11 @@ export function createOracleMcpServer(root: string, governed = false): McpServer
       },
     }, async ({ domain, summary, factsTurtle, files }) => {
       const digest = createHash('sha256').update(JSON.stringify({ domain, summary, factsTurtle, files })).digest('hex');
-      return { content: [{ type: 'text', text: JSON.stringify({ status: 'submitted', digest, message: 'Proposta enviada ao Oracle. Aguarde a revisão fora deste turno.' }) }] };
+      return { content: [{ type: 'text', text: JSON.stringify({ status: 'submitted', digest, message: 'Proposta enviada ao BSH. Aguarde a revisão fora deste turno.' }) }] };
     });
     return server;
   }
-  server.registerTool('oracle_propose_observation', {
+  server.registerTool('bsh_propose_observation', {
     description: 'Registra uma proposta pendente com evidência em arquivo do projeto; não altera ontologias aprovadas.',
     inputSchema: {
       domain: z.string(), iri: z.string(), candidate: z.record(z.string(), z.unknown()),
@@ -80,7 +80,7 @@ export function createOracleMcpServer(root: string, governed = false): McpServer
 export async function main(root: string, governed = false): Promise<void> {
   const report = await validateProject(root);
   if (!report.ready) throw new Error(`Ontologia não pronta: ${report.issues.map((issue) => issue.message).join('; ')}`);
-  await createOracleMcpServer(root, governed).connect(new StdioServerTransport());
+  await createBSHMcpServer(root, governed).connect(new StdioServerTransport());
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === realpathSync(process.argv[1])) {

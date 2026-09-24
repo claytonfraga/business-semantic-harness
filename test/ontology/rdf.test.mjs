@@ -11,7 +11,7 @@ test('Given a domain JSON-LD graph, when parsed, then classes and policy relatio
   const text = await readFile(new URL('ontology.jsonld', fixture), 'utf8');
   const store = await parseOntology(text);
   assert.equal(store.getQuads(namedNode('urn:pilot:ativos:Ativo'), namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'), namedNode('http://www.w3.org/2000/01/rdf-schema#Class'), null).length, 1);
-  assert.equal(store.getQuads(namedNode('urn:pilot:ativos:justificativa-adequada'), namedNode('urn:oracle:ns:v1:governs'), namedNode('urn:pilot:ativos:TransferenciaAtivo'), null).length, 1);
+  assert.equal(store.getQuads(namedNode('urn:pilot:ativos:justificativa-adequada'), namedNode('urn:bsh:ns:v1:governs'), namedNode('urn:pilot:ativos:TransferenciaAtivo'), null).length, 1);
 });
 
 test('Given a Turtle shape, when parsed, then its transfer target is preserved', async () => {

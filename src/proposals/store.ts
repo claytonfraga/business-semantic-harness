@@ -31,7 +31,7 @@ export async function createProposal(root: string, input: ProposalInput): Promis
     ...input,
     id: randomUUID(), status: 'pending', ontologyDigest: snapshot.digest, createdAt: new Date().toISOString(),
   };
-  const directory = join(root, '.oracle', 'local', 'proposals');
+  const directory = join(root, '.bsh', 'local', 'proposals');
   await mkdir(directory, { recursive: true, mode: 0o700 });
   await assertProjectDirectory(root, directory);
   await writeFile(join(directory, `${proposal.id}.json`), JSON.stringify(proposal, null, 2) + '\n', { flag: 'wx', mode: 0o600 });

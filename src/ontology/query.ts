@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { DataFactory } from 'n3';
 import { loadManifest } from '../project/manifest.js';
 import { resolveProjectFile } from '../project/paths.js';
-import { ORACLE_TERMS } from '../vocabulary/oracle.js';
+import { BSH_TERMS } from '../vocabulary/bsh.js';
 import { parseOntology, parseShapes } from './rdf.js';
 
 const { namedNode } = DataFactory;
@@ -33,17 +33,17 @@ export async function queryOntology(root: string, domainId: string, iri?: string
   const manifest = await loadManifest(root);
   const domain = manifest.domains.find((candidate) => candidate.id === domainId);
   if (!domain) throw new Error(`Domínio não declarado: ${domainId}`);
-  const store = await parseOntology(await readFile(await resolveProjectFile(root, `.oracle/${domain.ontology}`), 'utf8'));
-  const shapeStore = parseShapes(await readFile(await resolveProjectFile(root, `.oracle/${domain.shapes}`), 'utf8'));
+  const store = await parseOntology(await readFile(await resolveProjectFile(root, `.bsh/${domain.ontology}`), 'utf8'));
+  const shapeStore = parseShapes(await readFile(await resolveProjectFile(root, `.bsh/${domain.shapes}`), 'utf8'));
   const subjects = iri
     ? [iri]
     : [...new Set(store.getQuads(null, null, null, null).filter((q) => q.subject.termType === 'NamedNode').map((q) => q.subject.value))].sort();
   const entries = subjects.map((subject): QueryEntry => {
     const statements = store.getQuads(namedNode(subject), null, null, null).map((q) => ({ predicate: q.predicate.value, value: q.object.value }));
-    const governedBy = store.getQuads(null, namedNode(ORACLE_TERMS.governs), namedNode(subject), null).map((q) => ({
+    const governedBy = store.getQuads(null, namedNode(BSH_TERMS.governs), namedNode(subject), null).map((q) => ({
       iri: q.subject.value,
       description: store.getQuads(q.subject, namedNode('http://www.w3.org/2000/01/rdf-schema#comment'), null, null).map((item) => item.object.value).join('; '),
-      requiresHumanReview: store.getQuads(q.subject, namedNode(ORACLE_TERMS.requiresHumanReview), null, null).some((item) => item.object.value === 'true'),
+      requiresHumanReview: store.getQuads(q.subject, namedNode(BSH_TERMS.requiresHumanReview), null, null).some((item) => item.object.value === 'true'),
     }));
     const relations = store.getQuads(null, null, namedNode(subject), null).map((q) => ({ subject: q.subject.value, predicate: q.predicate.value }));
     return { iri: subject, source: domain.ontology, statements, relations, governedBy };
@@ -81,7 +81,7 @@ export async function createOntologySnapshot(root: string): Promise<OntologySnap
   const files = ['project.json', ...manifest.domains.flatMap((domain) => [domain.ontology, domain.shapes])].sort();
   const hash = createHash('sha256');
   for (const file of files) {
-    const bytes = await readFile(await resolveProjectFile(root, `.oracle/${file}`));
+    const bytes = await readFile(await resolveProjectFile(root, `.bsh/${file}`));
     hash.update(file).update('\0').update(String(bytes.length)).update('\0').update(bytes);
   }
   return Object.freeze({ projectId: manifest.projectId, digest: hash.digest('hex'), files: Object.freeze(files) });

@@ -26,10 +26,10 @@ function requiredString(value: unknown, name: string): string {
 export async function loadManifest(projectRoot: string): Promise<ProjectManifest> {
   let manifestPath: string;
   try {
-    manifestPath = await resolveProjectFile(projectRoot, join('.oracle', 'project.json'));
+    manifestPath = await resolveProjectFile(projectRoot, join('.bsh', 'project.json'));
   } catch (error) {
     if (isRecord(error) && error.code === 'ENOENT') {
-      throw new Error('Manifesto do Oracle ausente: .oracle/project.json');
+      throw new Error('Manifesto do BSH ausente: .bsh/project.json');
     }
     throw error;
   }

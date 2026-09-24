@@ -1,4 +1,4 @@
-@prefix ex: <urn:oracle:pilot:ativos:> .
+@prefix ex: <urn:bsh:pilot:ativos:> .
 ex:transfer-1 a ex:TransferenciaAtivo ;
   ex:estadoAtual ex:Disponivel ;
   ex:novaLocalizacao "Recife" .

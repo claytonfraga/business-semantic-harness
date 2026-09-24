@@ -6,7 +6,7 @@ import { resolveProjectFile } from '../project/paths.js';
 import { parseOntology, parseShapes } from '../ontology/rdf.js';
 import { assertOntologySnapshot, type OntologySnapshot } from '../ontology/query.js';
 import { validateData, validateProject, type DataValidationResult } from '../ontology/validate.js';
-import { ORACLE_TERMS } from '../vocabulary/oracle.js';
+import { BSH_TERMS } from '../vocabulary/bsh.js';
 
 const { namedNode } = DataFactory;
 const RDF_TYPE = namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
@@ -106,14 +106,14 @@ export async function evaluateAction(root: string, action: ProposedAction, snaps
     base.reasons.push('Fatos RDF da ação ilegíveis');
     return base;
   }
-  const ontology = await parseOntology(await readFile(await resolveProjectFile(root, `.oracle/${domain.ontology}`), 'utf8'));
-  const shapes = parseShapes(await readFile(await resolveProjectFile(root, `.oracle/${domain.shapes}`), 'utf8'));
+  const ontology = await parseOntology(await readFile(await resolveProjectFile(root, `.bsh/${domain.ontology}`), 'utf8'));
+  const shapes = parseShapes(await readFile(await resolveProjectFile(root, `.bsh/${domain.shapes}`), 'utf8'));
   const classes = new Set(facts.getQuads(null, RDF_TYPE, null, null).filter((q) => q.object.termType === 'NamedNode').map((q) => q.object.value));
   const matchingShapes = shapes.getQuads(null, SH_TARGET_CLASS, null, null).filter((q) => classes.has(q.object.value));
   base.rules.push(...matchingShapes.map((q) => q.subject.value));
-  const humanPolicies = ontology.getQuads(null, RDF_TYPE, namedNode(ORACLE_TERMS.Policy), null)
-    .filter((q) => ontology.getQuads(q.subject, namedNode(ORACLE_TERMS.governs), null, null).some((governs) => classes.has(governs.object.value)))
-    .filter((q) => ontology.getQuads(q.subject, namedNode(ORACLE_TERMS.requiresHumanReview), null, null).some((review) => review.object.value === 'true'));
+  const humanPolicies = ontology.getQuads(null, RDF_TYPE, namedNode(BSH_TERMS.Policy), null)
+    .filter((q) => ontology.getQuads(q.subject, namedNode(BSH_TERMS.governs), null, null).some((governs) => classes.has(governs.object.value)))
+    .filter((q) => ontology.getQuads(q.subject, namedNode(BSH_TERMS.requiresHumanReview), null, null).some((review) => review.object.value === 'true'));
   base.rules.push(...humanPolicies.map((q) => q.subject.value));
   if (classes.size === 0 || matchingShapes.length === 0 && humanPolicies.length === 0) {
     base.status = 'needs-human';

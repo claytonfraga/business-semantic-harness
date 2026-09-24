@@ -1,0 +1,177 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[brazilian]{babel}
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue}
+\setlength{\emergencystretch}{3em}
+\graphicspath{{../../../benchmark/results/2026-09-23T20-32-48/charts/}}
+
+\title{O harness BSH para agentes de código\\\large Ontologia, governança e avaliação no projeto \emph{asset-management}}
+\author{Avaliação técnica}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Este relatório descreve o que é o harness BSH, o que ele faz, qual projeto está sendo avaliado, como é a sua ontologia e quais regras ela impõe; em seguida apresenta os resultados medidos. A conclusão é que a abordagem é relevante e alinhada à IA neuro-simbólica e à governança de agentes, mas a evidência atual tem baixa validade externa (um projeto, um modelo e uma classe de tarefa).
+\end{abstract}
+
+\section{Introdução: o que é o BSH e o que ele faz}
+O \textbf{BSH} é um \emph{harness} (envoltório orquestrador) para agentes de código. Ele não substitui o agente: abre a interface nativa do Codex (a TUI real, via \texttt{codex --remote}) conectada a um servidor \texttt{codex app-server} iniciado pelo próprio BSH, e atua como um segundo cliente de instrumentação no mesmo servidor. A instalação global do Codex não é alterada: o BSH usa um \texttt{CODEX\_HOME} privado com cópia das credenciais.
+
+O que o BSH faz, em resumo:
+\begin{itemize}[leftmargin=1.4em]
+\item \textbf{Entrega contexto de domínio.} Cada projeto declara uma ontologia em JSON-LD~\cite{w3c-jsonld} e regras verificáveis em SHACL~\cite{w3c-shacl}. O BSH injeta instruções de governança e expõe um MCP local para consulta da ontologia.
+\item \textbf{Media conflitos.} Se o pedido contraria a ontologia, o agente relata o conflito; o BSH registra um alerta e exige decisão humana (aprovar a exceção ou reverter as alterações).
+\item \textbf{Mede o custo.} Registra tokens de entrada, saída, cache e raciocínio, além de consultas à ontologia e conflitos, para comparar o custo com e sem o harness.
+\end{itemize}
+
+\section{Projeto avaliado: \emph{asset-management}}
+O projeto avaliado é o \emph{asset-management}, um servidor web mínimo em TypeScript para gestão de ativos. Ele mantém ativos em memória e expõe: \texttt{GET /assets} (lista), \texttt{POST /assets/\{id\}/transfer} (transferência), \texttt{/retire} (baixa), \texttt{/responsible} (troca de responsável) e \texttt{/location} (mudança de localização), com testes automatizados. O domínio de negócio é governado por um domínio BSH chamado \texttt{ativos} (manifesto em \texttt{.bsh/project.json}, \texttt{baseIri} \texttt{urn:bsh:pilot:ativos:}).
+
+\section{A ontologia do domínio \texttt{ativos}}
+A ontologia define conceitos, estados, propriedades e políticas. As \textbf{classes} são \texttt{Ativo}, \texttt{Responsavel} e quatro ações: \texttt{TransferenciaAtivo}, \texttt{BaixaAtivo}, \texttt{AlteracaoResponsavel} e \texttt{AtualizacaoLocalizacao}. Os \textbf{estados} de um ativo são \texttt{Disponivel}, \texttt{EmUso} e \texttt{Baixado}. As \textbf{propriedades} ligam ações a fatos: \texttt{estadoAtual}, \texttt{novoResponsavel}, \texttt{novaLocalizacao} e \texttt{motivoBaixa}; \texttt{temResponsavel} liga \texttt{Ativo} a \texttt{Responsavel}. As \textbf{políticas} (\texttt{bsh:Policy}) \texttt{justificativa-adequada} (governa \texttt{TransferenciaAtivo}) e \texttt{motivo-baixa-adequado} (governa \texttt{BaixaAtivo}) exigem revisão humana por envolverem julgamento contextual.
+
+A Figura~\ref{fig:ontologia} representa a ontologia. As caixas azuis são classes, as verdes são estados, as laranjas tracejadas são políticas e as arestas nomeadas são propriedades (\texttt{estadoAtual}, \texttt{novoResponsavel}, etc.); as arestas tracejadas indicam quais ações cada política governa.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    scale=0.9, every node/.style={transform shape},
+    classe/.style={rectangle, draw=blue!55!black, fill=blue!8, thick, rounded corners=2mm,
+                   minimum height=1.15cm, minimum width=3.9cm, align=center, font=\bfseries\scriptsize},
+    politica/.style={rectangle, draw=orange!70!black, fill=orange!12, thick, dashed, rounded corners=2mm,
+                     minimum height=0.72cm, minimum width=3.3cm, align=center, font=\scriptsize},
+    nota/.style={rectangle, draw=gray!60!black, fill=gray!8, rounded corners=2mm,
+                 minimum height=1.0cm, minimum width=4.8cm, align=center, font=\scriptsize},
+    rel/.style={-{Latex[length=2.0mm,width=1.6mm]}, draw=blue!55!black, thick},
+    gov/.style={-{Latex[length=2.0mm,width=1.6mm]}, draw=orange!70!black, thick, dashed},
+    lab/.style={fill=white, inner sep=1.2pt, rounded corners=1pt, draw=gray!40, thin,
+                font=\fontsize{5.6pt}{6.4pt}\selectfont\ttfamily}
+]
+
+% Classes de negocio
+\node[classe] (ativo) at (-6.3,3.2) {Ativo};
+\node[classe] (resp)  at (6.3,3.2) {Responsavel};
+
+% Acoes (cada uma lista os campos exigidos)
+\node[classe] (transf) at (-6.3,0.8) {TransferenciaAtivo\\{\fontsize{4.4pt}{5.2pt}\selectfont estadoAtual, novoResponsavel, novaLocalizacao}};
+\node[classe] (baixa)  at (-2.1,0.8) {BaixaAtivo\\{\fontsize{4.4pt}{5.2pt}\selectfont estadoAtual, motivoBaixa}};
+\node[classe] (alter)  at (2.1,0.8)  {AlteracaoResponsavel\\{\fontsize{4.4pt}{5.2pt}\selectfont estadoAtual, novoResponsavel}};
+\node[classe] (loc)    at (6.3,0.8)  {AtualizacaoLocalizacao\\{\fontsize{4.4pt}{5.2pt}\selectfont estadoAtual, novaLocalizacao}};
+
+% Politicas e nota de estados
+\node[politica] (polj) at (-6.3,-1.5) {justificativa-adequada\\{\tiny revisao humana}};
+\node[politica] (polm) at (-2.1,-1.5) {motivo-baixa-adequado\\{\tiny revisao humana}};
+\node[nota] (estados) at (4.2,-1.5) {estadoAtual $\in$ \{Disponivel, EmUso\}\\{\tiny Baixado e terminal para as mutacoes}};
+
+% Relacoes
+\draw[rel] (ativo.east) -- node[lab, above, pos=0.5] {temResponsavel} (resp.west);
+\draw[gov] (polj.north) -- node[lab, right, pos=0.5] {governs} (transf.south);
+\draw[gov] (polm.north) -- node[lab, right, pos=0.5] {governs} (baixa.south);
+
+\end{tikzpicture}
+\caption{Ontologia do domínio \texttt{ativos}: classes (azul), estados (verde), políticas (laranja tracejado) e propriedades nomeadas.}
+\label{fig:ontologia}
+\end{figure}
+
+As regras verificáveis estão em SHACL e são resumidas na Tabela~\ref{tab:regras}. Todas exigem \texttt{estadoAtual} em $\{$Disponivel, EmUso$\}$, ou seja, \textbf{ativo baixado é terminal} para as mutações do piloto; além disso, cada ação exige os campos indicados.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Regras SHACL do domínio \texttt{ativos} (arquivo \texttt{shapes.ttl}).}
+\label{tab:regras}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash\ttfamily\scriptsize}p{4.2cm} >{\raggedright\arraybackslash\scriptsize}X}
+\toprule
+\textbf{Shape (alvo)} & \textbf{Restrições e mensagem} \\
+\midrule
+TransferenciaShape (TransferenciaAtivo) & \texttt{estadoAtual} $\in\{$Disponivel, EmUso$\}$ ("ativo baixado não pode ser transferido"); \texttt{novoResponsavel} minCount 1; \texttt{novaLocalizacao} minCount 1. \\
+BaixaShape (BaixaAtivo) & \texttt{estadoAtual} $\in\{$Disponivel, EmUso$\}$ ("ativo baixado não pode sofrer nova baixa"); \texttt{motivoBaixa} minCount 1. \\
+ResponsavelShape (AlteracaoResponsavel) & \texttt{estadoAtual} $\in\{$Disponivel, EmUso$\}$ ("ativo baixado não pode trocar de responsável"); \texttt{novoResponsavel} minCount 1. \\
+LocalizacaoShape (AtualizacaoLocalizacao) & \texttt{estadoAtual} $\in\{$Disponivel, EmUso$\}$ ("ativo baixado não pode mudar de localização"); \texttt{novaLocalizacao} minCount 1. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Desenho do benchmark}
+Duas condições com o mesmo prompt, modelo (\texttt{gpt-6-sol}, esforço \texttt{low}) e código \texttt{codex-cli 0.156.1}, em cópias limpas do projeto: \texttt{sem-bsh} (Codex direto) e \texttt{com-bsh} (\texttt{bsh codex}). Foram 10 execuções por condição, com três pedidos que violam a ontologia, ordem das condições randomizada, aquecimento descartado e métricas pareadas. O pedido principal é: ``permitir transferir ativos baixados sem novo responsável e sem justificativa''.
+
+\section{Resultados}
+A Tabela~\ref{tab:resultados} e a Figura~\ref{fig:principal} resumem o custo. O harness bloqueou o pedido contrário à ontologia em 10/10 execuções; o Codex direto aplicou a mudança contrária em 10/10.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Tokens totais por execução e bloqueios pela ontologia (n=10 por condição).}
+\label{tab:resultados}
+\begin{tabular}{lrrrr}
+\toprule
+Condição & Média & Desvio padrão & IC 95\% & Bloqueios \\
+\midrule
+Codex sem BSH         & 256.673 & 103.601 & $\pm$74.106 & 0/10 \\
+Codex com BSH harness & 85.804  & 10.894  & $\pm$7.792  & 10/10 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A diferença média pareada foi de $-170.869$ tokens ($-66{,}57\%$), IC 95\% de $\pm 70.289$, Cohen's $d_z = 1{,}74$ e Wilcoxon \emph{signed-rank} $W=0{,}0$, $p=0{,}00195$. A métrica normalizada por cache (tokens não cacheados) confirma a direção. No pedido aderente a diferença é pequena, e o harness gasta tokens extras na consulta ontológica: o ganho grande vem de \emph{interromper cedo} um caminho incorreto, não de ``falar menos''.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{00-figura-principal.png}
+\caption{Figura principal: (a) distribuição, (b) média com IC 95\%, (c) custo pareado por execução e (d) governança.}
+\label{fig:principal}
+\end{figure}
+
+\section{Discussão: faz sentido medir tarefas inválidas sem a ontologia?}
+Uma condição ``tarefa inválida sem ontologia'' é exatamente a nossa \texttt{sem-bsh}: o Codex recebe um pedido que contraria as regras e, sem o harness, aplica a mudança (10/10 no experimento). \textbf{Isoladamente, isso não tem valor de engenharia}: produz um artefato que contradiz a ontologia e não há contrato de regra para verificar que ele está errado. Por isso não deve ser uma entrega nem um objetivo.
+
+Ela faz sentido, porém, como \textbf{controle experimental}. Três usos justificam mantê-la:
+\begin{itemize}[leftmargin=1.4em]
+\item \textbf{Contrafactual.} Sem a condição sem ontologia não há como quantificar o efeito do harness (diferença pareada, intervalo de confiança, tamanho de efeito).
+\item \textbf{Validação do prompt.} Se o Codex direto não alterasse o comportamento, o pedido não seria de fato violador; a condição sem ontologia confirma que a tarefa é inválida.
+\item \textbf{Custo do fracasso.} Mede os tokens gastos para produzir a mudança indevida e, por extensão, o custo provável de corrigi-la depois --- exatamente o custo que o harness evita.
+\end{itemize}
+Há um limite nessa leitura: a condição sem ontologia mistura dois efeitos, \emph{contexto} (o agente não recebe a ontologia) e \emph{fiscalização} (o agente não é bloqueado). Um refinamento é uma terceira condição ``direto com contexto ontológico, sem enforcement'', que separaria os dois. Sem ela, atribuímos ao harness tanto o contexto quanto o bloqueio; a decomposição fica como trabalho futuro.
+
+\section{Limitações}
+\begin{itemize}[leftmargin=1.4em]
+\item \textbf{Validade externa:} um projeto, uma ontologia pequena, um modelo e uma versão do Codex; não generaliza sozinho.
+\item \textbf{Constructo:} tokens são proxy de custo, não de tempo nem de correção; ``bloqueado'' mede governança.
+\item \textbf{Dependência do agente:} a detecção de conflito depende de o agente chamar \texttt{bsh\_report\_conflict}; SHACL valida fatos modelados, não a semântica de um diff de código, então revisão humana continua necessária.
+\item \textbf{Interna/estatística:} LLM não determinístico; $n=10$ dá poder limitado; o $p$ por prompt isolado é alto (n=3--4), e a evidência forte está no agregado pareado.
+\item \textbf{Reprodutibilidade:} versões de modelo e provedor mudam; o benchmark grava ambiente, commit do harness e hash do prompt.
+\end{itemize}
+
+\section{Conclusão}
+O BSH é um harness relevante: governa agentes de código com uma ontologia de domínio explícita e verificável, mede o custo e media conflitos. No projeto \emph{asset-management}, o efeito é grande justamente quando o pedido viola as regras. As limitações são sérias e pedem ampliação para vários projetos, modelos e tarefas, com pré-registro de hipóteses e correção estatística, separando o efeito de governança do efeito de custo.
+
+\begin{thebibliography}{99}
+\bibitem{jimenez2024swebench} C. E. Jimenez et al. \emph{SWE-bench: Can Language Models Resolve Real-World GitHub Issues?} ICLR, 2024.
+\bibitem{w3c-shacl} W3C. \emph{Shapes Constraint Language (SHACL)}. W3C Recommendation, 2017.
+\bibitem{w3c-jsonld} W3C. \emph{JSON-LD 1.1}. W3C Recommendation, 2020.
+\bibitem{garcez2020neurosymbolic} A. d'Avila Garcez, L. C. Lamb. \emph{Neurosymbolic AI: The 3rd Wave}. arXiv:2012.05876, 2020.
+\bibitem{chang2024survey} Y. Chang et al. \emph{A Survey on Evaluation of Large Language Models}. ACM TIST, 2024.
+\bibitem{liu2024lost} N. F. Liu et al. \emph{Lost in the Middle: How Language Models Use Long Contexts}. TACL, 2024.
+\bibitem{wohlin2012experimentation} C. Wohlin et al. \emph{Experimentation in Software Engineering}. Springer, 2012.
+\bibitem{cohen1988statistical} J. Cohen. \emph{Statistical Power Analysis for the Behavioral Sciences}. Lawrence Erlbaum, 1988.
+\bibitem{pineau2020reproducibility} J. Pineau et al. \emph{Improving Reproducibility in Machine Learning Research}. JMLR, 2021.
+\end{thebibliography}
+
+\end{document}

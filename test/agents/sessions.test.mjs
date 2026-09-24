@@ -8,7 +8,7 @@ import { branchAtual, commitAtual, criarSessaoWorktree } from '../../dist/agents
 import { gravarSessao } from '../../dist/agents/codex/sessionState.js';
 import { limparSessao, listarSessoesDoProjeto } from '../../dist/agents/codex/sessions.js';
 
-const raiz = mkdtempSync(join(tmpdir(), 'oracle-sessions-test-'));
+const raiz = mkdtempSync(join(tmpdir(), 'bsh-sessions-test-'));
 const worktrees = join(raiz, 'worktrees');
 
 function novoRepositorio(nome) {

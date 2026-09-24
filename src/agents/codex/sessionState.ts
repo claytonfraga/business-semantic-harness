@@ -16,7 +16,7 @@ export interface RegistroSessao extends SessaoWorktree {
 }
 
 function diretorioSessoes(repositorioOrigem: string): string {
-  return join(repositorioOrigem, '.oracle', 'local', 'sessions');
+  return join(repositorioOrigem, '.bsh', 'local', 'sessions');
 }
 
 export async function gravarSessao(repositorioOrigem: string, sessao: SessaoWorktree, estado: EstadoSessao): Promise<string> {

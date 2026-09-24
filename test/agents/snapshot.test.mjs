@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import { collectChangedPaths, createProjectBackup, restoreFile } from '../../dist/agents/codex/snapshot.js';
 
 async function projectWith(files) {
-  const root = await mkdtemp(join(tmpdir(), 'oracle-snapshot-'));
+  const root = await mkdtemp(join(tmpdir(), 'bsh-snapshot-'));
   for (const [path, content] of Object.entries(files)) {
     const target = join(root, path);
     await mkdir(join(target, '..'), { recursive: true });
@@ -17,7 +17,7 @@ async function projectWith(files) {
 
 test('Given a project backup, when a file is added, edited and removed, then all three changes are detected', async () => {
   const root = await projectWith({ 'src/keep.ts': 'export const keep = 1;\n', 'src/edit.ts': 'versao original\n', 'src/remove.ts': 'para remover\n' });
-  const backup = await mkdtemp(join(tmpdir(), 'oracle-backup-'));
+  const backup = await mkdtemp(join(tmpdir(), 'bsh-backup-'));
   try {
     await createProjectBackup(root, backup);
     await writeFile(join(root, 'src/keep.ts'), 'export const keep = 2;\n');
@@ -38,7 +38,7 @@ test('Given a project backup, when a file is added, edited and removed, then all
 
 test('Given changes against a backup, when reverted, then the project returns to the backed up content', async () => {
   const root = await projectWith({ 'src/edit.ts': 'versao original\n' });
-  const backup = await mkdtemp(join(tmpdir(), 'oracle-backup-'));
+  const backup = await mkdtemp(join(tmpdir(), 'bsh-backup-'));
   try {
     await createProjectBackup(root, backup);
     await writeFile(join(root, 'src/edit.ts'), 'versao alterada\n');

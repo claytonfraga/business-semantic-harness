@@ -6,7 +6,7 @@ lines.on('line', line => {
   const message = JSON.parse(line);
   if (message.method === 'initialize') send({ id: message.id, result: { userAgent: 'fake' } });
   if (message.method === 'thread/start') {
-    if (message.params?.sandbox !== 'read-only' || message.params?.config?.mcp_servers?.oracle?.required !== true) {
+    if (message.params?.sandbox !== 'read-only' || message.params?.config?.mcp_servers?.bsh?.required !== true) {
       send({ id: message.id, error: { code: -1, message: 'unsafe thread config' } });
     } else send({ id: message.id, result: { thread: { id: 'thread-1' } } });
     send({ id: 'approval-1', method: 'item/commandExecution/requestApproval', params: { command: 'echo unsafe' } });

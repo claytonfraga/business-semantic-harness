@@ -27,7 +27,7 @@ function redact(value: string, secrets: readonly string[]): string {
 }
 
 export async function appendAudit(root: string, event: AuditEvent, secrets: readonly string[] = []): Promise<void> {
-  const directory = join(root, '.oracle', 'local');
+  const directory = join(root, '.bsh', 'local');
   await mkdir(directory, { recursive: true, mode: 0o700 });
   await assertProjectDirectory(root, directory);
   await chmod(directory, 0o700);
@@ -55,7 +55,7 @@ export async function appendAudit(root: string, event: AuditEvent, secrets: read
 export async function readAudit(root: string, actionId?: string): Promise<AuditEvent[]> {
   let content: string;
   try {
-    content = await readFile(await resolveProjectFile(root, '.oracle/local/events.jsonl'), 'utf8');
+    content = await readFile(await resolveProjectFile(root, '.bsh/local/events.jsonl'), 'utf8');
   } catch (error) {
     if (typeof error === 'object' && error !== null && 'code' in error && error.code === 'ENOENT') return [];
     throw error;

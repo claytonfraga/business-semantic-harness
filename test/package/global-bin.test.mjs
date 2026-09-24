@@ -5,11 +5,11 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { test } from 'node:test';
 
-test('Given a Linux bin symlink and an external codebase, when Oracle runs there, then it initializes that project', () => {
-  const temp = mkdtempSync(join(tmpdir(), 'oracle-installed-'));
+test('Given a Linux bin symlink and an external codebase, when BSH runs there, then it initializes that project', () => {
+  const temp = mkdtempSync(join(tmpdir(), 'bsh-installed-'));
   const project = join(temp, 'codebase');
   mkdirSync(project);
-  const executable = join(temp, 'oracle');
+  const executable = join(temp, 'bsh');
   symlinkSync(resolve('dist/cli.js'), executable);
   try {
     const help = spawnSync(executable, ['--help'], { cwd: project, encoding: 'utf8' });

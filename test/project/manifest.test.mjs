@@ -6,9 +6,9 @@ import { test } from 'node:test';
 import { loadManifest } from '../../dist/project/manifest.js';
 
 async function projectWith(manifest) {
-  const root = await mkdtemp(join(tmpdir(), 'oracle-manifest-'));
-  await mkdir(join(root, '.oracle'));
-  await writeFile(join(root, '.oracle', 'project.json'), JSON.stringify(manifest));
+  const root = await mkdtemp(join(tmpdir(), 'bsh-manifest-'));
+  await mkdir(join(root, '.bsh'));
+  await writeFile(join(root, '.bsh', 'project.json'), JSON.stringify(manifest));
   return root;
 }
 
@@ -33,7 +33,7 @@ test('Given two declared domains, when loading the manifest, then both distinct 
 });
 
 test('Given no manifest, when loading the project, then an explicit error is reported', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'oracle-manifest-'));
+  const root = await mkdtemp(join(tmpdir(), 'bsh-manifest-'));
   try {
     await assert.rejects(loadManifest(root), /Manifesto.*ausente/);
   } finally {

@@ -14,7 +14,7 @@ const DISABLED_FEATURES = [
 ];
 
 export async function verifyReadOnlyMount(): Promise<void> {
-  const directory = await mkdtemp(join(tmpdir(), 'oracle-isolation-'));
+  const directory = await mkdtemp(join(tmpdir(), 'bsh-isolation-'));
   const probe = join(directory, 'write-check');
   const mounts = [
     '--ro-bind', '/', '/', '--dev-bind', '/dev', '/dev', '--proc', '/proc',
@@ -43,8 +43,8 @@ export interface IsolatedCodex {
 }
 
 export async function verifyWorkspaceMount(project: string, workspace: string): Promise<void> {
-  const originalProbe = join(project, `.oracle-readonly-probe-${randomUUID()}`);
-  const workspaceProbe = join(workspace, `.oracle-workspace-probe-${randomUUID()}`);
+  const originalProbe = join(project, `.bsh-readonly-probe-${randomUUID()}`);
+  const workspaceProbe = join(workspace, `.bsh-workspace-probe-${randomUUID()}`);
   const mounts = [
     '--ro-bind', '/', '/', '--dev-bind', '/dev', '/dev', '--proc', '/proc', '--tmpfs', '/tmp',
     '--ro-bind', project, project, '--bind', workspace, workspace,
@@ -66,8 +66,8 @@ export async function verifyWorkspaceMount(project: string, workspace: string): 
 export async function createIsolatedCodex(cwd: string, writableWorkspace = false): Promise<IsolatedCodex> {
   await access(CODEX_DIRECTORY);
   const project = await realpath(cwd);
-  const state = await mkdtemp(join(tmpdir(), 'oracle-codex-state-'));
-  const workspace = writableWorkspace ? await mkdtemp(join(tmpdir(), 'oracle-codex-workspace-')) : project;
+  const state = await mkdtemp(join(tmpdir(), 'bsh-codex-state-'));
+  const workspace = writableWorkspace ? await mkdtemp(join(tmpdir(), 'bsh-codex-workspace-')) : project;
   await chmod(state, 0o700);
   try {
     if (writableWorkspace) {

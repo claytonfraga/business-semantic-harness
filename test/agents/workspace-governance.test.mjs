@@ -9,9 +9,9 @@ import { reviewAndApplyPatch } from '../../dist/agents/codex/patch.js';
 import { collectWorkspaceChanges, synchronizeWorkspaceFile } from '../../dist/agents/codex/workspace.js';
 
 async function fixture() {
-  const root = await mkdtemp(join(tmpdir(), 'oracle-native-root-'));
-  const workspace = await mkdtemp(join(tmpdir(), 'oracle-native-copy-'));
-  await cp(resolve('pilot/asset-management/.oracle'), join(root, '.oracle'), { recursive: true });
+  const root = await mkdtemp(join(tmpdir(), 'bsh-native-root-'));
+  const workspace = await mkdtemp(join(tmpdir(), 'bsh-native-copy-'));
+  await cp(resolve('pilot/asset-management/.bsh'), join(root, '.bsh'), { recursive: true });
   await mkdir(join(root, 'src'));
   await writeFile(join(root, 'src', 'asset.ts'), 'before\n');
   await cp(root, workspace, { recursive: true, force: true });
@@ -77,7 +77,7 @@ test('Given a governed copy, when Codex deletes a source file and the user denie
 test('Given a governed copy, when Codex changes approved ontology files, then the broker refuses direct promotion', async () => {
   const { root, workspace, cleanup } = await fixture();
   try {
-    const path = '.oracle/domains/ativos/ontology.jsonld';
+    const path = '.bsh/domains/ativos/ontology.jsonld';
     await writeFile(join(workspace, path), (await readFile(join(workspace, path), 'utf8')) + '\n');
     const [change] = await collectWorkspaceChanges(root, workspace, 'ativos');
     await assert.rejects(reviewAndApplyPatch(root, change, await createOntologySnapshot(root), async () => ({ choice: 'allow-once', actor: 'qa', reason: 'Tentativa' })), /Caminho reservado/);

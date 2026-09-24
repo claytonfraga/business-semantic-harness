@@ -29,7 +29,7 @@ async function safeTarget(root: string, path: string): Promise<string> {
   if (isAbsolute(path) || path.includes('\\') || path.split('/').some((part) => !part || part === '.' || part === '..')) {
     throw new Error(`Caminho inválido no patch: ${path}`);
   }
-  if (['.oracle', '.git', 'node_modules'].includes(path.split('/')[0])) throw new Error(`Caminho reservado no patch: ${path}`);
+  if (['.bsh', '.git', 'node_modules'].includes(path.split('/')[0])) throw new Error(`Caminho reservado no patch: ${path}`);
   const target = resolve(root, path);
   if (!target.startsWith(resolve(root) + sep)) throw new Error(`Caminho fora do projeto: ${path}`);
   const parts = relative(root, dirname(target)).split(sep).filter(Boolean);
@@ -58,7 +58,7 @@ async function safeTarget(root: string, path: string): Promise<string> {
 export async function preparePatch(root: string, raw: unknown): Promise<PreparedPatch> {
   const proposal = PatchSchema.parse(raw);
   const paths = new Set<string>();
-  const stage = await mkdtemp(join(tmpdir(), 'oracle-patch-'));
+  const stage = await mkdtemp(join(tmpdir(), 'bsh-patch-'));
   const files: StagedFile[] = [];
   const diffs: string[] = [];
   try {
@@ -102,7 +102,7 @@ export async function reviewAndApplyPatch(
   const prepared = await preparePatch(root, proposal);
   try {
     const action: ProposedAction = {
-      id: randomUUID(), tool: 'oracle_propose_patch', domain: proposal.domain,
+      id: randomUUID(), tool: 'bsh_propose_patch', domain: proposal.domain,
       arguments: { summary: proposal.summary, files: proposal.files.map((file) => ({ path: file.path, beforeSha256: file.beforeSha256, afterSha256: file.content === null ? null : sha(Buffer.from(file.content)) })) },
       mutates: true, intercepted: true, representation: 'partial', factsTurtle: proposal.factsTurtle,
     };
@@ -125,7 +125,7 @@ export async function reviewAndApplyPatch(
       if (file.staged === null) { await unlink(file.target); continue; }
       await mkdir(dirname(file.target), { recursive: true });
       await safeTarget(root, file.path);
-      const adjacent = join(dirname(file.target), `.oracle-patch-${randomUUID()}`);
+      const adjacent = join(dirname(file.target), `.bsh-patch-${randomUUID()}`);
       try {
         const mode = file.beforeSha256 ? (await stat(file.target)).mode & 0o777 : 0o600;
         await writeFile(adjacent, await readFile(file.staged), { flag: 'wx', mode });

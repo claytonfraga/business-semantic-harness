@@ -37,7 +37,7 @@ export async function diagnoseCodexRuntime(root: string): Promise<RuntimeReport>
   try {
     await access(fileURLToPath(new URL('../../mcp/server.js', import.meta.url)));
   } catch {
-    reasons.push('Servidor MCP Oracle não compilado');
+    reasons.push('Servidor MCP BSH não compilado');
   }
   return { ready: reasons.length === 0, codexVersion, reasons };
 }
@@ -59,7 +59,7 @@ export async function diagnoseCodex(root: string): Promise<DoctorReport> {
     await access(fileURLToPath(new URL('../../mcp/server.js', import.meta.url)));
     mcpEntrypointReady = true;
   } catch {
-    reasons.push('Servidor MCP Oracle não compilado');
+    reasons.push('Servidor MCP BSH não compilado');
   }
   let isolationVerified = false;
   if (reasons.length === 0) {
@@ -72,7 +72,7 @@ export async function diagnoseCodex(root: string): Promise<DoctorReport> {
         await client.initialize();
         await client.verifyCleanConfiguration(workspace);
         const threadId = await client.startWorkspaceThread(workspace);
-        await client.verifyOracleMcp(threadId);
+        await client.verifyBSHMcp(threadId);
         isolationVerified = true;
       } finally {
         await isolated.dispose();

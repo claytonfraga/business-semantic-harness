@@ -39,14 +39,14 @@ export async function instrumentSession(
   root: string,
   project: string,
 ): Promise<SessionInstrumentation> {
-  const directory = join(root, '.oracle', 'local');
+  const directory = join(root, '.bsh', 'local');
   await mkdir(directory, { recursive: true });
   const logPath = join(directory, `session-${timestampName()}.jsonl`);
   let subscribedThreadId: string | undefined;
   let totals: TokenTotals | undefined;
   let queries = 0;
   let harnessTokens = 0;
-  let turnUsesOracle = false;
+  let turnUsesBSH = false;
   let lastTurnTokens = 0;
   let currentTurnId: string | undefined;
   const conflicts: ConflictAlert[] = [];
@@ -90,15 +90,15 @@ export async function instrumentSession(
     if (message.method === 'turn/started') {
       const turn = params.turn as Record<string, unknown> | undefined;
       if (typeof turn?.id === 'string') currentTurnId = turn.id;
-      turnUsesOracle = false;
+      turnUsesBSH = false;
     } else if (message.method === 'thread/tokenUsage/updated') {
       const parsed = parseTokenTotals(params.tokenUsage);
       if (parsed) { totals = parsed; record({ event: 'token-usage', threadId: params.threadId, ...parsed }); }
       lastTurnTokens = parseLastTotalTokens(params.tokenUsage);
     } else if (message.method === 'turn/completed') {
       const turn = params.turn as Record<string, unknown> | undefined;
-      if (turnUsesOracle) harnessTokens += lastTurnTokens;
-      turnUsesOracle = false;
+      if (turnUsesBSH) harnessTokens += lastTurnTokens;
+      turnUsesBSH = false;
       currentTurnId = undefined;
       record({ event: 'turn-completed', threadId: params.threadId, turnId: turn?.id, status: turn?.status });
     } else if (message.method === 'item/completed') {
@@ -111,9 +111,9 @@ export async function instrumentSession(
       if (itemType === 'mcpToolCall') {
         const tool = item?.tool;
         entry.tool = tool;
-        if (tool === 'oracle_query_ontology') queries += 1;
-        if (typeof tool === 'string' && tool.startsWith('oracle_')) turnUsesOracle = true;
-        if (tool === 'oracle_report_conflict' && item?.status === 'completed') {
+        if (tool === 'bsh_query_ontology') queries += 1;
+        if (typeof tool === 'string' && tool.startsWith('bsh_')) turnUsesBSH = true;
+        if (tool === 'bsh_report_conflict' && item?.status === 'completed') {
           const conflict = parseConflict(item?.arguments);
           if (conflict) {
             conflicts.push(conflict);
