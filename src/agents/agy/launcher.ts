@@ -1,7 +1,8 @@
 import { spawn } from 'node:child_process';
-import { copyFile, mkdir, mkdtemp, chmod } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, chmod, rm } from 'node:fs/promises';
 import { homedir, tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const GEMINI_DIRECTORY = join(homedir(), '.gemini');
 const AGY_DIRECTORY = join(GEMINI_DIRECTORY, 'antigravity-cli');
@@ -25,7 +26,19 @@ export async function criarEstadoAgy(): Promise<EstadoAgy> {
       // ausente
     }
   }
-  return { diretorio, async dispose() { await import('node:fs/promises').then((fs) => fs.rm(diretorio, { recursive: true, force: true })); } };
+  return { diretorio, async dispose() { await rm(diretorio, { recursive: true, force: true }); } };
+}
+
+/** Configura o MCP de ontologia do BSH no config isolado do agy (nao toca na instalacao do agy). */
+export async function configurarMcp(estado: EstadoAgy, root: string): Promise<void> {
+  const mcpEntrypoint = fileURLToPath(new URL('../../mcp/server.js', import.meta.url));
+  const args = ['mcp', 'add', '--env', `BSH_SESSION_DIR=${estado.diretorio}`, 'bsh', process.execPath, mcpEntrypoint, root, 'governed'];
+  const environment: NodeJS.ProcessEnv = { ...process.env, GEMINI_DIR: estado.diretorio };
+  await new Promise<void>((resolve, reject) => {
+    const filho = spawn('agy', args, { env: environment, stdio: 'ignore' });
+    filho.on('error', reject);
+    filho.on('exit', () => resolve());
+  });
 }
 
 export interface ResultadoAgy {

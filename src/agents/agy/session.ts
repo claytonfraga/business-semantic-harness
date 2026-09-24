@@ -2,7 +2,7 @@ import { loadManifest } from '../../project/manifest.js';
 import { createOntologySnapshot } from '../../ontology/query.js';
 import { validateProject } from '../../ontology/validate.js';
 import { branchAtual, commitAtual, criarSessaoWorktree, finalizeSession, gravarSessao, resolverRepositorio } from '../../harness/index.js';
-import { criarEstadoAgy, executarAgy } from './launcher.js';
+import { criarEstadoAgy, configurarMcp, executarAgy } from './launcher.js';
 
 function contextoOntologico(dominio: string): string {
   return `Projeto governado pelo Business Semantic Harness. Dominio: ${dominio}. Respeite as restricoes SHACL do projeto; se um pedido contrariar uma regra, nao implemente. Pedido do usuario: `;
@@ -21,6 +21,7 @@ export async function runAgySession(root: string, prompt: string, modelo?: strin
   await gravarSessao(repositorioOrigem, sessao, 'WORKTREE_READY');
   const estado = await criarEstadoAgy();
   try {
+    await configurarMcp(estado, repositorioOrigem);
     const textoTarefa = contextoOntologico(dominio) + prompt;
     process.stdout.write(`BSH/Agy: sessao ${sessao.id} na worktree ${sessao.caminhoWorktree}.\n`);
     const resultado = await executarAgy(estado, sessao.caminhoWorktree, textoTarefa, modelo, esforco);
