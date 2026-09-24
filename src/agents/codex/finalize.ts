@@ -12,7 +12,7 @@ import { avaliarOperacoes } from '../../enforcement/motorEnforcement.js';
 import type { ResultadoEnforcementLote } from '../../enforcement/operacaoSemantica.js';
 import { writeAlerts, type ConflictAlert } from './alerts.js';
 import { alteracoesNaWorktree, removerSessaoWorktree, type SessaoWorktree } from './worktree.js';
-import { promoverSessao, type StatusPromocao, type ValidadorGates } from './promotion.js';
+import { integrar, reconciliar, type StatusPromocao, type ValidadorGates } from './promotion.js';
 import { gravarSessao } from './sessionState.js';
 import type { FileChange } from './snapshot.js';
 import { formatSavingsReport, formatUsageReport, type SavingsReport, type TokenTotals } from './usage.js';
@@ -108,6 +108,22 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
     process.stdout.write(`BSH: ${alteracoes.length} arquivo(s) alterado(s): ${alteracoes.map((change) => change.path).join(', ')}\n`);
   }
 
+  const reconciliacao = await reconciliar(sessao);
+  if (reconciliacao.status === 'conflitado') {
+    await gravarSessao(root, sessao, 'CONFLICTED');
+    process.stdout.write(`BSH: ${reconciliacao.detalhes}\n`);
+    if (reconciliacao.arquivosConflito && reconciliacao.arquivosConflito.length > 0) {
+      process.stdout.write(`BSH: arquivos em conflito: ${reconciliacao.arquivosConflito.join(', ')}\n`);
+    }
+    process.stdout.write('BSH: o conflito permanece somente na worktree; a branch principal nao foi alterada.\n');
+    return { status: 'conflitado', promovido: false };
+  }
+  if (reconciliacao.status === 'bloqueado') {
+    await gravarSessao(root, sessao, 'PROMOTION_FAILED');
+    process.stdout.write(`BSH: promocao nao realizada; a branch principal permanece intacta. ${reconciliacao.detalhes}\n`);
+    return { status: 'bloqueado', promovido: false };
+  }
+
   let enforcement: ResultadoEnforcementLote = { status: 'conforme', bloquear: false, resultados: [] };
   if (process.env.BSH_ENFORCEMENT !== 'off' && alteracoes.length > 0) {
     const regras = await carregarRegrasGovernanca(root);
@@ -149,7 +165,7 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
 
   process.stdout.write('BSH: validando gates na worktree e promovendo por Git...\n');
   await gravarSessao(root, sessao, 'VALIDATING');
-  const resultado = await promoverSessao(sessao, { validarGates });
+  const resultado = await integrar(sessao, { validarGates });
   if (resultado.status === 'promovido') {
     for (const change of alteracoes) await auditChange(root, domain, change, snapshot, 'allow', 'bsh-harness', exigirDecisao ? 'Excecao aprovada pelo usuario' : 'Ontologia respeitada na sessao');
     await gravarSessao(root, sessao, 'PROMOTED');

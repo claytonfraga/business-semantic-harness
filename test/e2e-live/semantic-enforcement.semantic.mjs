@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { join, relative, resolve } from 'node:path';
 import { after, test } from 'node:test';
 import { criarSessaoWorktree, removerSessaoWorktree } from '../../dist/agents/codex/worktree.js';
 import { finalizeSession } from '../../dist/agents/codex/finalize.js';
@@ -65,6 +65,11 @@ test('E2E semantico: Given a governed violation with zero bsh_report_conflict, w
   assert.equal(r.resultado.status, 'descartado');
   assert.equal(r.depois, r.antes);
   assert.equal(r.statusOrigem, '');
+  const evidencia = join(r.repo, '.bsh', 'local', 'enforcement', `${r.sessao.id}.json`);
+  assert.ok(existsSync(evidencia), 'registro de enforcement ausente');
+  const registro = JSON.parse(readFileSync(evidencia, 'utf8'));
+  assert.equal(registro.status, 'violacao');
+  assert.ok(registro.resultados.some((item) => item.status === 'violacao' && item.shape));
 });
 
 test('E2E semantico: Given an operation under a human-review policy, when refused, then nothing is promoted', async () => {
@@ -111,4 +116,53 @@ test('E2E semantico: Given a semantically valid change that fails a technical ga
   }, true);
   assert.equal(r.resultado.status, 'falha-validacao');
   assert.equal(r.depois, r.antes);
+});
+test('E2E semantico 9: Given the origin branch advances during the session, when finalized, then enforcement is valid on the reconciled state and no origin commit is lost', async () => {
+  const repo = prepararProjeto('origem-avanca');
+  const commitBase = git(repo, ['rev-parse', 'HEAD']).trim();
+  const sessao = await criarSessaoWorktree({ repositorioOrigem: repo, branchOrigem: 'master', commitBase, diretorioBase: worktrees });
+  writeFileSync(join(sessao.caminhoWorktree, 'src', 'asset.js'), readFileSync(join(sessao.caminhoWorktree, 'src', 'asset.js'), 'utf8') + '\n// melhoria valida\n');
+  writeFileSync(join(repo, 'origem.txt'), 'B\n');
+  git(repo, ['add', 'origem.txt']); git(repo, ['commit', '-q', '-m', 'B']);
+  const snapshot = await createOntologySnapshot(repo);
+  const resultado = await finalizeSession({ sessao, domain: 'ativos', snapshot, alerts: [], tokenTotals: undefined, ontologyQueries: 0, harnessTokens: 0, confirmar: async () => true });
+  assert.equal(resultado.status, 'promovido');
+  assert.ok(existsSync(join(repo, 'origem.txt')), 'commit da origem perdido');
+  assert.match(readFileSync(join(repo, 'src', 'asset.js'), 'utf8'), /melhoria valida/);
+  assert.equal(git(repo, ['status', '--porcelain']).trim(), '');
+});
+
+test('E2E semantico 10: Given a git conflict during reconciliation, then the origin stays intact and the conflict stays in the worktree', async () => {
+  const repo = prepararProjeto('conflito-semantico');
+  const commitBase = git(repo, ['rev-parse', 'HEAD']).trim();
+  const sessao = await criarSessaoWorktree({ repositorioOrigem: repo, branchOrigem: 'master', commitBase, diretorioBase: worktrees });
+  writeFileSync(join(sessao.caminhoWorktree, 'src', 'asset.js'), readFileSync(join(sessao.caminhoWorktree, 'src', 'asset.js'), 'utf8').replace('Baixado', 'BaixadoSessao'));
+  writeFileSync(join(repo, 'src', 'asset.js'), readFileSync(join(repo, 'src', 'asset.js'), 'utf8').replace('Baixado', 'BaixadoOrigem'));
+  git(repo, ['add', 'src/asset.js']); git(repo, ['commit', '-q', '-m', 'B']);
+  const referenciaAntes = git(repo, ['rev-parse', 'HEAD']).trim();
+  const snapshot = await createOntologySnapshot(repo);
+  const resultado = await finalizeSession({ sessao, domain: 'ativos', snapshot, alerts: [], tokenTotals: undefined, ontologyQueries: 0, harnessTokens: 0, confirmar: async () => true });
+  assert.equal(resultado.status, 'conflitado');
+  assert.equal(git(repo, ['rev-parse', 'HEAD']).trim(), referenciaAntes);
+  assert.match(readFileSync(join(repo, 'src', 'asset.js'), 'utf8'), /BaixadoOrigem/);
+  git(sessao.caminhoWorktree, ['rebase', '--abort']);
+  await removerSessaoWorktree(sessao);
+});
+
+test('E2E semantico: no public path promotes without going through the enforcement gate', () => {
+  const src = resolve('src');
+  const arquivos = [];
+  const percorrer = (dir) => {
+    for (const nome of readdirSync(dir)) {
+      const caminho = join(dir, nome);
+      if (statSync(caminho).isDirectory()) percorrer(caminho);
+      else if (nome.endsWith('.ts')) arquivos.push(caminho);
+    }
+  };
+  percorrer(src);
+  const comPromocao = arquivos
+    .filter((arquivo) => /promoverSessao\(|integrar\(|reconciliar\(/.test(readFileSync(arquivo, 'utf8')))
+    .map((arquivo) => relative(src, arquivo).split('\\').join('/'))
+    .sort();
+  assert.deepEqual(comPromocao, ['agents/codex/finalize.ts', 'agents/codex/promotion.ts']);
 });
