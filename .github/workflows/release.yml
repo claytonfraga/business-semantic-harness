@@ -27,7 +27,9 @@ jobs:
           mkdir -p release-assets
           npm pack --pack-destination release-assets
       - name: Compute checksums
-        run: sha256sum release-assets/*.tgz > release-assets/SHA256SUMS
+        run: |
+          cd release-assets
+          sha256sum *.tgz > SHA256SUMS
       - name: Publish GitHub Release with the tarball
         uses: softprops/action-gh-release@v2
         with:
