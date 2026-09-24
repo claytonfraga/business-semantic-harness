@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "projectId": "enforcement-project",
+  "domains": [
+    { "id": "ativos", "version": "1.0.0", "baseIri": "urn:enforcement:ativos:",
+      "ontology": "domains/ativos/ontology.jsonld", "shapes": "domains/ativos/shapes.ttl" }
+  ]
+}
