@@ -1,9 +1,7 @@
 import { loadManifest } from '../../project/manifest.js';
 import { createOntologySnapshot } from '../../ontology/query.js';
 import { validateProject } from '../../ontology/validate.js';
-import { branchAtual, commitAtual, criarSessaoWorktree, resolverRepositorio } from '../codex/worktree.js';
-import { finalizeSession } from '../codex/finalize.js';
-import { gravarSessao } from '../codex/sessionState.js';
+import { branchAtual, commitAtual, criarSessaoWorktree, finalizeSession, gravarSessao, resolverRepositorio } from '../../harness/index.js';
 import { criarEstadoAgy, executarAgy } from './launcher.js';
 
 function contextoOntologico(dominio: string): string {
