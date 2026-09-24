@@ -1,4 +1,0 @@
-BSH_CODEX_MODEL=gpt-6-sol BSH_CODEX_REASONING_EFFORT=low bsh codex --project /tmp/bsh-e2e-pos
- ~/projetos/oracle | master ?1  BSH_CODEX_MODEL=gpt-6-sol BSH_CODEX_REASONING_EFFORT=low bsh codex --project /tmp/bsh-e2e-pos                                                                                ok | 09:53:43
-O projeto nao e um repositorio Git: /tmp/bsh-e2e-pos. O isolamento por worktree exige Git.
- ~/projetos/oracle | master ?1                                                                                                                                                                            1 err | 09:53:44
