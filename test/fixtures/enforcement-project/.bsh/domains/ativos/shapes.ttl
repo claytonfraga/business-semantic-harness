@@ -1,0 +1,7 @@
+@prefix ex: <urn:enforcement:ativos:> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+ex:TransferenciaShape a sh:NodeShape ;
+  sh:targetClass ex:TransferenciaAtivo ;
+  sh:property [ sh:path ex:estadoAtual ; sh:minCount 1 ; sh:in ( ex:Disponivel ex:EmUso ) ;
+    sh:message "Ativo baixado nao pode ser transferido." ] .

@@ -1,0 +1,16 @@
+{
+  "regras": [
+    { "id": "violacao-baixado", "operacao": "TransferenciaAtivo",
+      "quando": { "caminho": "src/**", "removeu": "status === 'Baixado'" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": "Baixado", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "novoResponsavel", "valor": "x", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "novaLocalizacao", "valor": "y", "determinacao": "observado", "origem": "diff" } ] },
+    { "id": "politica-justificativa", "operacao": "TransferenciaAtivo",
+      "quando": { "caminho": "src/**", "adicionou": "GOV-JUSTIFICATIVA" },
+      "fatos": [ { "propriedade": "estadoAtual", "valor": "Disponivel", "determinacao": "observado", "origem": "diff" } ] },
+    { "id": "fato-indeterminado", "operacao": "TransferenciaAtivo",
+      "quando": { "caminho": "src/**", "adicionou": "GOV-PENDENTE" },
+      "fatos": [ { "propriedade": "estadoAtual", "valor": null, "determinacao": "indeterminado", "origem": "diff" } ] }
+  ]
+}

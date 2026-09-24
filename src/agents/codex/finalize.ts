@@ -27,6 +27,7 @@ export interface FinalizeOptions {
   harnessTokens: number;
   savings?: SavingsReport;
   validarGates?: ValidadorGates;
+  confirmar?: (branchOrigem: string) => Promise<boolean>;
 }
 
 export interface ResultadoFinalizacao {
@@ -84,6 +85,7 @@ async function confirmException(branchOrigem: string): Promise<boolean> {
 
 export async function finalizeSession(options: FinalizeOptions): Promise<ResultadoFinalizacao> {
   const { sessao, domain, snapshot, alerts, tokenTotals, ontologyQueries, harnessTokens, savings, validarGates } = options;
+  const confirmar = options.confirmar ?? confirmException;
   const root = sessao.repositorioOrigem;
   process.stdout.write(`\n${formatUsageReport(tokenTotals, ontologyQueries, alerts.length, harnessTokens)}\n`);
   if (savings) process.stdout.write(`${formatSavingsReport(savings)}\n`);
@@ -135,7 +137,7 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
     if (enforcement.bloquear || enforcement.status === 'revisao_humana') {
       process.stdout.write(`\nBSH interceptou a alteracao (enforcement ${enforcement.status}); a promocao exige decisao humana.\n`);
     }
-    const aprovado = await confirmException(sessao.branchOrigem);
+    const aprovado = await confirmar(sessao.branchOrigem);
     if (!aprovado) {
       for (const change of alteracoes) await auditChange(root, domain, change, snapshot, 'deny', 'local-user', 'Excecao negada pelo usuario');
       await gravarSessao(root, sessao, 'DISCARDED');
