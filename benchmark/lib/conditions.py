@@ -48,7 +48,7 @@ def run_sem_bsh(execution_dir, pilot, prompt, model, effort):
     entrada = usage.get("input_tokens", 0)
     saida = usage.get("output_tokens", 0)
     return {
-        "condicao": "sem-bsh", "entrada": entrada, "cache": usage.get("cached_input_tokens", 0),
+        "condicao": "sem-harness", "entrada": entrada, "cache": usage.get("cached_input_tokens", 0),
         "saida": saida, "raciocinio": usage.get("reasoning_output_tokens", 0), "totais": entrada + saida,
         "consultas": 0, "conflitos": 0, "bloqueado": False, "erro": False,
         "duracao": int(time.time() - started),
@@ -84,7 +84,7 @@ def run_com_bsh(execution_dir, pilot, prompt, model, effort, session):
         handle.write(tmux.pane(session))
     usage = tokens.last_token_usage(log_file) or {}
     row = {
-        "condicao": "com-bsh", "entrada": usage.get("inputTokens", 0), "cache": usage.get("cachedInputTokens", 0),
+        "condicao": "com-harness", "entrada": usage.get("inputTokens", 0), "cache": usage.get("cachedInputTokens", 0),
         "saida": usage.get("outputTokens", 0), "raciocinio": usage.get("reasoningOutputTokens", 0),
         "totais": usage.get("totalTokens", 0),
         "consultas": tokens.count_occurrences(log_file, '"tool":"bsh_query_ontology"'),

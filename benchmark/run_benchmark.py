@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Benchmark: Codex sem BSH vs Codex com BSH harness.
+"""Benchmark: Codex sem harness vs Codex com harness.
 
 Boas praticas:
 - mesmo prompt, modelo e esforco nas duas condicoes;
@@ -75,7 +75,7 @@ def escrever_metadados(diretorio, dados):
 
 def executar_condicao(condicao, execucao, condition_dir, prompt):
     try:
-        if condicao == "sem-bsh":
+        if condicao == "sem-harness":
             return conditions.run_sem_bsh(condition_dir, PILOT, prompt, MODEL, EFFORT)
         return conditions.run_com_bsh(condition_dir, PILOT, prompt, MODEL, EFFORT, f"bench-{condicao}-{LOTE}-{execucao}")
     except Exception as error:  # noqa: BLE001
@@ -91,7 +91,7 @@ def executar_execucao(execucao, lista_prompts):
     with open(os.path.join(execution_dir, "prompt.txt"), "w", encoding="utf-8") as handle:
         handle.write(prompt["texto"] + "\n")
     rng = random.Random(f"{LOTE}-{execucao}")
-    ordem = ["sem-bsh", "com-bsh"]
+    ordem = ["sem-harness", "com-harness"]
     rng.shuffle(ordem)
     escrever_metadados(execution_dir, {
         "lote": LOTE, "execucao": execucao, "prompt_arquivo": prompt["arquivo"], "prompt": prompt["texto"],
@@ -118,7 +118,7 @@ def executar_aquecimento(lista_prompts):
         return
     prompt = lista_prompts[0]
     for indice in range(1, WARMUP + 1):
-        for condicao in ("sem-bsh", "com-bsh"):
+        for condicao in ("sem-harness", "com-harness"):
             directory = os.path.join(RESULTS, LOTE, "aquecimento", str(indice), condicao)
             os.makedirs(directory, exist_ok=True)
             print(f"[{LOTE}] aquecimento {indice} {condicao}", flush=True)
