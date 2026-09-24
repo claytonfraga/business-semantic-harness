@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { DataFactory, type Store } from 'n3';
-import SHACLValidator from 'rdf-validate-shacl';
+import { Validator as ShaclEngineValidator } from 'shacl-engine';
+import { targetResolvers, validations } from 'shacl-engine/sparql.js';
 import { loadManifest } from '../project/manifest.js';
 import { resolveProjectFile } from '../project/paths.js';
 import { BSH_TERMS } from '../vocabulary/bsh.js';
@@ -15,7 +16,8 @@ const SH_TARGET_CLASS = namedNode('http://www.w3.org/ns/shacl#targetClass');
 const SH_PROPERTY = namedNode('http://www.w3.org/ns/shacl#property');
 const SH_PATH = namedNode('http://www.w3.org/ns/shacl#path');
 const SH_MIN_COUNT = namedNode('http://www.w3.org/ns/shacl#minCount');
-const SH_CONSTRAINTS = ['minCount', 'maxCount', 'in', 'datatype', 'class', 'pattern', 'nodeKind', 'hasValue'].map((term) => namedNode(`http://www.w3.org/ns/shacl#${term}`));
+const SH_SPARQL = namedNode('http://www.w3.org/ns/shacl#sparql');
+const SH_CONSTRAINTS = ['minCount', 'maxCount', 'in', 'datatype', 'class', 'pattern', 'nodeKind', 'hasValue', 'disjoint', 'sparql'].map((term) => namedNode(`http://www.w3.org/ns/shacl#${term}`));
 
 export interface ValidationIssue {
   domain: string;
@@ -37,13 +39,20 @@ export interface DataValidationResult {
 }
 
 export async function validateData(shapes: Store, data: Store): Promise<DataValidationResult> {
-  const report = await new SHACLValidator(shapes).validate(data);
+  const validator = new ShaclEngineValidator(shapes, {
+    factory: DataFactory,
+    targetResolvers,
+    validations,
+  });
+  const report = await validator.validate({ dataset: data });
   return {
     conforms: report.conforms,
     results: report.results.map((item) => ({
-      shape: item.sourceShape?.value ?? '',
-      focusNode: item.focusNode?.value ?? '',
-      message: item.message.map((term) => term.value).join('; '),
+      shape: item.shape?.ptr?.term?.value ?? '',
+      focusNode: item.focusNode?.term?.value ?? item.focusNode?.values?.[0] ?? '',
+      message: (item.message && item.message.length > 0)
+        ? item.message.map((term) => term.value).join('; ')
+        : (item.constraintComponent?.value ? `Violação de ${item.constraintComponent.value}` : 'Violação SHACL'),
       severity: item.severity?.value ?? '',
     })),
   };
@@ -123,9 +132,10 @@ export async function validateProject(root: string): Promise<ValidationReport> {
         }
       }
     }
-    const activeShapes = shapeNodes.filter((q) => shapes.countQuads(q.subject, SH_TARGET_CLASS, null, null) > 0 && shapes.getQuads(q.subject, SH_PROPERTY, null, null)
-      .some((property) => shapes.countQuads(property.object, SH_PATH, null, null) === 1 &&
-        SH_CONSTRAINTS.some((constraint) => shapes.countQuads(property.object, constraint, null, null) > 0)));
+    const activeShapes = shapeNodes.filter((q) => shapes.countQuads(q.subject, SH_TARGET_CLASS, null, null) > 0 &&
+      (shapes.getQuads(q.subject, SH_PROPERTY, null, null).some((property) => shapes.countQuads(property.object, SH_PATH, null, null) === 1 &&
+        SH_CONSTRAINTS.some((constraint) => shapes.countQuads(property.object, constraint, null, null) > 0)) ||
+       shapes.countQuads(q.subject, SH_SPARQL, null, null) > 0));
     const humanPolicies = ontology.getQuads(null, RDF_TYPE, namedNode(BSH_TERMS.Policy), null)
       .filter((q) => ontology.getQuads(q.subject, namedNode(BSH_TERMS.requiresHumanReview), null, null).some((review) => review.object.value === 'true') &&
         ontology.countQuads(q.subject, namedNode(BSH_TERMS.governs), null, null) > 0);

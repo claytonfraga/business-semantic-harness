@@ -1,0 +1,178 @@
+{
+  "regras": [
+    {
+      "id": "transf-baixado",
+      "operacao": "TransferenciaAtivo",
+      "quando": { "caminho": "src/**", "removeu": "nao pode ser transferido" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": "Baixado", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "novoResponsavel", "valor": "x", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "novaLocalizacao", "valor": "Recife", "determinacao": "observado", "origem": "diff" }
+      ]
+    },
+    {
+      "id": "transf-sem-responsavel",
+      "operacao": "TransferenciaAtivo",
+      "quando": { "caminho": "src/**", "removeu": "responsavel obrigatorio" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": "Disponivel", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "novaLocalizacao", "valor": "Recife", "determinacao": "observado", "origem": "diff" }
+      ]
+    },
+    {
+      "id": "transf-valida",
+      "operacao": "TransferenciaAtivo",
+      "quando": { "caminho": "src/**", "adicionou": "OP_TRANSFERENCIA_VALIDA" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": "EmUso", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "novoResponsavel", "valor": "Ana", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "novaLocalizacao", "valor": "Recife", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "solicitante", "valor": "Carlos", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "aprovador", "valor": "Beatriz", "determinacao": "observado", "origem": "diff" }
+      ]
+    },
+    {
+      "id": "transf-segregacao-violada",
+      "operacao": "TransferenciaAtivo",
+      "quando": { "caminho": "src/**", "adicionou": "OP_TRANSFERENCIA_MESMO_APROVADOR" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": "EmUso", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "novoResponsavel", "valor": "Ana", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "novaLocalizacao", "valor": "Recife", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "solicitante", "valor": "Ana", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "aprovador", "valor": "Ana", "determinacao": "observado", "origem": "diff" }
+      ]
+    },
+    {
+      "id": "baixa-sem-motivo",
+      "operacao": "BaixaAtivo",
+      "quando": { "caminho": "src/**", "removeu": "motivo obrigatorio" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": "EmUso", "determinacao": "observado", "origem": "diff" }
+      ]
+    },
+    {
+      "id": "baixa-valida",
+      "operacao": "BaixaAtivo",
+      "quando": { "caminho": "src/**", "adicionou": "OP_BAIXA_VALIDA" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": "EmUso", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "motivoBaixa", "valor": "Sucateamento irremediável", "determinacao": "observado", "origem": "diff" }
+      ]
+    },
+    {
+      "id": "resp-baixado",
+      "operacao": "AlteracaoResponsavel",
+      "quando": { "caminho": "src/**", "removeu": "nao pode mudar de responsavel" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": "Baixado", "determinacao": "observado", "origem": "diff" }
+      ]
+    },
+    {
+      "id": "loc-baixado",
+      "operacao": "AtualizacaoLocalizacao",
+      "quando": { "caminho": "src/**", "removeu": "nao pode mudar de localizacao" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": "Baixado", "determinacao": "observado", "origem": "diff" }
+      ]
+    },
+    {
+      "id": "alocacao-valida",
+      "operacao": "AlocacaoUsuario",
+      "quando": { "caminho": "src/**", "adicionou": "OP_ALOCACAO_VALIDA" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": "Disponivel", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "novoResponsavel", "valor": "Lucas", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "termoResponsabilidadeAssinado", "valor": true, "determinacao": "observado", "origem": "diff" }
+      ]
+    },
+    {
+      "id": "alocacao-em-manutencao",
+      "operacao": "AlocacaoUsuario",
+      "quando": { "caminho": "src/**", "adicionou": "OP_ALOCACAO_EM_MANUTENCAO" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": "EmManutencao", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "novoResponsavel", "valor": "Lucas", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "termoResponsabilidadeAssinado", "valor": true, "determinacao": "observado", "origem": "diff" }
+      ]
+    },
+    {
+      "id": "reserva-valida",
+      "operacao": "ReservaAtivo",
+      "quando": { "caminho": "src/**", "adicionou": "OP_RESERVA_VALIDA" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": "Disponivel", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "solicitanteReserva", "valor": "Carla", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "dataInicioReserva", "valor": "2026-10-01", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "dataFimReserva", "valor": "2026-10-15", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "motivoReserva", "valor": "Treinamento corporativo", "determinacao": "observado", "origem": "diff" }
+      ]
+    },
+    {
+      "id": "manutencao-inicio-valido",
+      "operacao": "InicioManutencao",
+      "quando": { "caminho": "src/**", "adicionou": "OP_INICIO_MANUTENCAO" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": "EmUso", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "motivoManutencao", "valor": "Substituição de bateria", "determinacao": "observado", "origem": "diff" }
+      ]
+    },
+    {
+      "id": "manutencao-conclusao-valida",
+      "operacao": "ConclusaoManutencao",
+      "quando": { "caminho": "src/**", "adicionou": "OP_CONCLUSAO_MANUTENCAO" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": "EmManutencao", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "laudoManutencao", "valor": "Bateria substituída e testada", "determinacao": "observado", "origem": "diff" }
+      ]
+    },
+    {
+      "id": "envio-valido",
+      "operacao": "EnvioAtivo",
+      "quando": { "caminho": "src/**", "adicionou": "OP_ENVIO_VALIDO" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": "Disponivel", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "origem", "valor": "Matriz-SP", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "destino", "valor": "Filial-RJ", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "transportador", "valor": "Logistica Rapida Ltda", "determinacao": "observado", "origem": "diff" }
+      ]
+    },
+    {
+      "id": "recebimento-valido",
+      "operacao": "RecebimentoAtivo",
+      "quando": { "caminho": "src/**", "adicionou": "OP_RECEBIMENTO_VALIDO" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": "EmTransito", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "movimentacaoReferenciada", "valor": "DOC-MOV-2026-0901", "determinacao": "observado", "origem": "diff" }
+      ]
+    },
+    {
+      "id": "extravio-valido",
+      "operacao": "RegistroExtravio",
+      "quando": { "caminho": "src/**", "adicionou": "OP_EXTRAVIO_VALIDO" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": "EmUso", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "protocoloSinistro", "valor": "SIN-2026/001234", "determinacao": "observado", "origem": "diff" }
+      ]
+    },
+    {
+      "id": "recuperacao-valida",
+      "operacao": "RecuperacaoAtivo",
+      "quando": { "caminho": "src/**", "adicionou": "OP_RECUPERACAO_VALIDA" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": "Extraviado", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "laudoRecuperacao", "valor": "Equipamento recuperado pela segurança patrimonial", "determinacao": "observado", "origem": "diff" }
+      ]
+    },
+    {
+      "id": "operacao-indeterminada",
+      "operacao": "TransferenciaAtivo",
+      "quando": { "caminho": "src/**", "adicionou": "OP_INDETERMINADA" },
+      "fatos": [
+        { "propriedade": "estadoAtual", "valor": null, "determinacao": "indeterminado", "origem": "diff" },
+        { "propriedade": "novoResponsavel", "valor": "Ana", "determinacao": "observado", "origem": "diff" },
+        { "propriedade": "novaLocalizacao", "valor": "Recife", "determinacao": "observado", "origem": "diff" }
+      ]
+    }
+  ]
+}
