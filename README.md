@@ -35,13 +35,13 @@ The harness supports both **Codex** and **Agy** (Antigravity CLI).
 
 ## Installing the CLI
 
-On this machine, version `0.2.0` was packed and installed globally into the nvm-managed Node.js 22. The `bsh` executable is on that environment's `PATH` and can be called from any directory. The installation uses a copy of the package, independent of this checkout. To reproduce it, or to install your local changes:
+On this machine, version `0.0.2-beta` was packed and installed globally into the nvm-managed Node.js 22. The `bsh` executable is on that environment's `PATH` and can be called from any directory. The installation uses a copy of the package, independent of this checkout. To reproduce it, or to install your local changes:
 
 ```bash
 cd /path/to/business-semantic-harness
 npm install
 npm pack --pack-destination /tmp
-npm install -g /tmp/business-semantic-harness-0.2.0.tgz
+npm install -g /tmp/business-semantic-harness-0.0.2-beta.tgz
 bsh --help
 ```
 
@@ -52,7 +52,7 @@ After changing the harness code, build and install a new tarball; the global ins
 Every tag `v*` runs the release workflow, which tests the project, packs the installable tarball, and attaches it to a GitHub Release together with a `SHA256SUMS` file. You can install straight from the release asset:
 
 ```bash
-npm install -g https://github.com/claytonfraga/business-semantic-harness/releases/download/v0.2.0/business-semantic-harness-0.2.0.tgz
+npm install -g https://github.com/claytonfraga/business-semantic-harness/releases/download/v0.0.2-beta/business-semantic-harness-0.0.2-beta.tgz
 bsh --help
 ```
 
@@ -60,7 +60,7 @@ Or download the `.tgz` from the Releases page, verify it against `SHA256SUMS`, a
 
 ```bash
 sha256sum -c SHA256SUMS
-npm install -g ./business-semantic-harness-0.2.0.tgz
+npm install -g ./business-semantic-harness-0.0.2-beta.tgz
 ```
 
 This is the standard, professional way to distribute a Node.js CLI: continuous integration on every change, and a tagged, reproducible, installable artifact per release. Standalone per-OS executables could be produced additionally, but the npm package is the primary and most reliable artifact.

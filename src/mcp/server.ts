@@ -21,7 +21,7 @@ function recordSessionEvent(fileName: string, entry: Record<string, unknown>): v
 
 export function createBSHMcpServer(root: string, governed = false): McpServer {
   const server = new McpServer(
-    { name: 'bsh', version: '0.2.0' },
+    { name: 'bsh', version: '0.0.2-beta' },
     { instructions: 'Consulte a ontologia do domínio antes de propor alterações. Declare descobertas como propostas com evidência. As propostas não alteram a ontologia aprovada.' },
   );
   server.registerTool('bsh_query_ontology', {
