@@ -2,7 +2,7 @@
 
 Data: 2026-09-24
 Projeto-fixture: `test/fixtures/enforcement-project/` (Git real, `.bsh/` com domínio `ativos`, `ontology.jsonld`, `shapes.ttl`, `enforcement.json`, código e testes). Declarado pelos mecanismos normais do BSH — nenhuma configuração artificial no produto.
-Suíte: `npm run test:e2e:semantic` → **10/10 passaram**.
+Suíte: `npm run test:e2e:semantic` → **11/11 passaram**.
 Gate testado: o **mesmo `finalizeSession`** usado por `bsh codex` (enforcement → gates técnicos → promoção Git). O agente não é chamado; a alteração é colocada na worktree pelo fluxo normal (arquivos), sem `bsh_report_conflict`.
 
 ## Resultado por cenário
@@ -10,6 +10,7 @@ Gate testado: o **mesmo `finalizeSession`** usado por `bsh codex` (enforcement �
 | # | Cenário | Propriedade testada | `bsh_report_conflict` | Enforcement | Gates | Promoção | Principal | Evidência |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | Alteração válida | promoção de mudança aderente | 0 | conforme | passou | **promovida** | contém a mudança; `git status` limpo | hash do arquivo mudou; status `promovido` |
+| 2 | Violação relatada pelo agente (cooperativo) | integração com o relato do agente | 1 (alerta) | via conflito | — | não promovida | intacta | confirmação negada; `git status` limpo |
 | 2 | **Violação sem report** | **enforcement independente do agente** | **0** | **violacao** (TransferenciaShape) | — | **bloqueada** | **byte a byte intacta** | `descartado`; `depois == antes`; worktree removida |
 | 3 | Política de revisão humana | suspensão sem aprovação | 0 | revisao_humana | — | não promovida | intacta | `descartado`; `depois == antes` |
 | 4 | Fato indeterminado | ausência de fato ≠ permissão | 0 | indeterminado | — | não promovida | intacta | `descartado`; `depois == antes` |
@@ -60,5 +61,5 @@ Complementos: o cenário 8 comprova o enforcement sobre o estado reconciliado (`
 npm run quality
 npm test                 # 112 (inclui A–H determinísticos)
 npm run test:e2e         # 27 (infra Git/worktree)
-npm run test:e2e:semantic  # 7 (semântico real, gate de promoção)
+npm run test:e2e:semantic  # 11 (semântico real, gate de promoção)
 ```
