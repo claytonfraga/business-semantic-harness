@@ -13,7 +13,7 @@ import { limparSessao, listarSessoesDoProjeto } from './agents/codex/sessions.js
 
 export async function main(argv: string[]): Promise<number> {
   if (argv.length === 1 && argv[0] === '--help') {
-    process.stdout.write('bsh: init | domain add | ontology validate | ontology show | doctor | code base | sessions list|clean | agy\n');
+    process.stdout.write('bsh: init | domain add | ontology validate | ontology show | doctor | code base | sessions list|clean\n');
     return 0;
   }
 
@@ -82,10 +82,6 @@ export async function main(argv: string[]): Promise<number> {
       const resultado = await limparSessao(repositorio, command[2]);
       process.stdout.write(`${resultado.detalhes}\n`);
       return resultado.removida ? 0 : 1;
-    }
-    if (command.length === 1 && command[0] === 'agy') {
-      process.stderr.write('Adaptador Agy ainda não disponível: mediação de ações do Google Antigravity CLI não verificada.\n');
-      return 1;
     }
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);

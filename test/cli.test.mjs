@@ -47,9 +47,3 @@ test('Given a project without ontology, when doctor and codex run, then the gove
     assert.match(codex.stderr, /Sessão governada indisponível/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
-
-test('Given an unverified Agy adapter, when requested, then BSH reports its missing mediation', () => {
-  const run = spawnSync(process.execPath, [resolve('dist/cli.js'), 'agy'], { encoding: 'utf8' });
-  assert.equal(run.status, 1);
-  assert.match(run.stderr, /Adaptador Agy.*não disponível/);
-});
