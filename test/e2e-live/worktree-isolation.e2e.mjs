@@ -13,7 +13,6 @@ import { gravarSessao } from '../../dist/agents/codex/sessionState.js';
 import { limparSessao, listarSessoesDoProjeto } from '../../dist/agents/codex/sessions.js';
 
 const raiz = mkdtempSync(join(tmpdir(), 'oracle-e2e-worktree-'));
-process.env.ORACLE_WORKTREES_DIR = join(raiz, 'worktrees');
 
 function git(cwd, args) {
   return execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8' });
@@ -35,7 +34,7 @@ function novoProjeto(nome) {
 }
 
 async function sessao(repo, incluirEstadoLocal = false) {
-  const criada = await criarSessaoWorktree({ repositorioOrigem: repo, branchOrigem: await branchAtual(repo), commitBase: await commitAtual(repo), incluirEstadoLocal });
+  const criada = await criarSessaoWorktree({ repositorioOrigem: repo, branchOrigem: await branchAtual(repo), commitBase: await commitAtual(repo), incluirEstadoLocal, diretorioBase: join(raiz, 'worktrees') });
   await gravarSessao(repo, criada, 'WORKTREE_READY');
   return criada;
 }

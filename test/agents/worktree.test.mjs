@@ -12,7 +12,6 @@ import { promoverSessao } from '../../dist/agents/codex/promotion.js';
 
 const raiz = mkdtempSync(join(tmpdir(), 'oracle-worktree-test-'));
 const worktrees = join(raiz, 'worktrees');
-process.env.ORACLE_WORKTREES_DIR = worktrees;
 
 function git(cwd, args) {
   return execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8' });
@@ -37,6 +36,7 @@ async function novaSessao(repo, incluirEstadoLocal = false) {
     branchOrigem: await branchAtual(repo),
     commitBase: await commitAtual(repo),
     incluirEstadoLocal,
+    diretorioBase: worktrees,
   });
 }
 

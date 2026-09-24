@@ -56,6 +56,10 @@ export async function promoverSessao(sessao: SessaoWorktree, opcoes: OpcoesPromo
   if (!(await estaLimpo(sessao.repositorioOrigem))) {
     return { status: 'bloqueado', detalhes: 'O checkout principal tem alteracoes locais; a promocao nao foi iniciada.' };
   }
+  const branchAtual = (await git(sessao.repositorioOrigem, ['symbolic-ref', '--quiet', '--short', 'HEAD']).catch(() => '')).trim();
+  if (branchAtual !== sessao.branchOrigem) {
+    return { status: 'bloqueado', detalhes: `O checkout principal nao esta na branch de origem '${sessao.branchOrigem}' (atual: ${branchAtual || 'detached HEAD'}).` };
+  }
   await commitSeNecessario(sessao);
   const referenciaOrigem = (await git(sessao.repositorioOrigem, ['rev-parse', sessao.branchOrigem])).trim();
   if (referenciaOrigem !== sessao.commitBase) {

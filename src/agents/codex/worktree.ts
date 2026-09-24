@@ -1,5 +1,6 @@
 import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { existsSync } from 'node:fs';
 import { cp, mkdir, readFile, realpath, rm, writeFile, appendFile } from 'node:fs/promises';
 import { homedir, tmpdir } from 'node:os';
 import { dirname, isAbsolute, join } from 'node:path';
@@ -89,23 +90,29 @@ export interface OpcoesCriarSessao {
   branchOrigem: string;
   commitBase: string;
   incluirEstadoLocal?: boolean;
+  diretorioBase?: string;
 }
 
 export async function criarSessaoWorktree(opcoes: OpcoesCriarSessao): Promise<SessaoWorktree> {
-  const { repositorioOrigem, branchOrigem, commitBase, incluirEstadoLocal = false } = opcoes;
+  const { repositorioOrigem, branchOrigem, commitBase, incluirEstadoLocal = false, diretorioBase } = opcoes;
   await garantirExclusaoLocal(repositorioOrigem);
   const repoId = await identificadorRepositorio(repositorioOrigem);
-  const diretorioRepo = join(diretorioWorktrees(), repoId);
+  const diretorioRepo = join(diretorioBase ?? diretorioWorktrees(), repoId);
   await mkdir(diretorioRepo, { recursive: true });
-  let id = identificadorSessao();
-  let caminhoWorktree = join(diretorioRepo, id);
-  let branchSessao = `oracle/session/${id}`;
-  const existentes = await git(repositorioOrigem, ['worktree', 'list', '--porcelain']).catch(() => '');
-  if (existentes.includes(caminhoWorktree) || existentes.includes(`branch refs/heads/${branchSessao}\n`)) {
-    id = `${id}-1`;
-    caminhoWorktree = join(diretorioRepo, id);
-    branchSessao = `oracle/session/${id}`;
+  const base = identificadorSessao();
+  let id = base;
+  let sufixo = 0;
+  for (;;) {
+    const branch = `oracle/session/${id}`;
+    const caminho = join(diretorioRepo, id);
+    const existeWorktree = existsSync(caminho);
+    const existeBranch = (await git(repositorioOrigem, ['branch', '--list', branch]).catch(() => '')).trim().length > 0;
+    if (!existeWorktree && !existeBranch) break;
+    sufixo += 1;
+    id = `${base}-${sufixo}`;
   }
+  const caminhoWorktree = join(diretorioRepo, id);
+  const branchSessao = `oracle/session/${id}`;
   await git(repositorioOrigem, ['worktree', 'add', '-b', branchSessao, caminhoWorktree, commitBase]);
   const sessao: SessaoWorktree = {
     id, repositorioOrigem, branchOrigem, commitBase, branchSessao, caminhoWorktree, criadaEm: new Date().toISOString(),
@@ -154,16 +161,16 @@ export async function listarWorktrees(repositorio: string): Promise<{ caminho: s
 }
 
 export async function alteracoesNaWorktree(sessao: SessaoWorktree): Promise<FileChange[]> {
-  const saida = await git(sessao.caminhoWorktree, ['status', '--porcelain']);
+  const saida = await git(sessao.caminhoWorktree, ['status', '--porcelain', '-z']);
+  const campos = saida.split('\0').filter((item) => item.length > 0);
   const alteracoes: FileChange[] = [];
-  for (const linha of saida.split('\n')) {
-    if (!linha.trim()) continue;
+  for (let indice = 0; indice < campos.length; indice += 1) {
+    const linha = campos[indice];
     const codigo = linha.slice(0, 2);
-    const resto = linha.slice(3).trim();
-    const partes = resto.split(' -> ');
-    const caminho = (partes.length > 1 ? partes[partes.length - 1] : partes[0]).trim();
+    const caminho = linha.slice(3);
+    if (codigo.includes('R') || codigo.includes('C')) indice += 1;
     if (!caminho) continue;
-    if (caminho.startsWith('.oracle/local') || codigo === '!!') continue;
+    if (caminho.startsWith('.oracle/local')) continue;
     const ehNovo = codigo.includes('?') || codigo.includes('A');
     alteracoes.push({ path: caminho, existedBefore: !ehNovo });
   }
