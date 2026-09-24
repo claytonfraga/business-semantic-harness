@@ -16,7 +16,7 @@ JSON-LD descreve dados interligados; SHACL valida grafos RDF contra shapes. Uma 
 **Non-Goals:**
 
 - Provar automaticamente que todo código gerado preserva qualquer regra de negócio em linguagem natural.
-- Entregar adaptadores Claude ou Agy, interface web, armazenamento remoto ou edição colaborativa na primeira versão.
+- Entregar adaptador Claude, interface web do Oracle, armazenamento remoto ou edição colaborativa na primeira versão. Agy vem após o gate do adaptador Codex.
 - Tratar uma aprovação pontual como alteração permanente da ontologia.
 
 ## Decisions
@@ -55,13 +55,25 @@ O estado local é gravado por projeto sob `.oracle/local/`, com escrita atômica
 
 ### 4. Integração Codex
 
-O adaptador usa `codex app-server` por stdio para iniciar threads, mostrar eventos, encaminhar solicitações nativas de aprovação e manter a conversa interativa. Um servidor MCP local obrigatório expõe consulta de ontologia e envio explícito de propostas; o contexto inicial identifica os domínios e orienta o agente a consultar essas ferramentas. A inicialização falha se o servidor MCP obrigatório não carregar.
+**Estado da implementação inicial (2026-09-23).** No Linux, `oracle doctor` verifica versão Codex 0.156.1, prontidão da ontologia, capacidade `bwrap` de impedir escrita, configuração efetiva sem MCPs/hooks herdados, recursos externos desabilitados e conexão exclusiva do MCP Oracle. O launcher cria estado Codex privado temporário, passa opções efêmeras `-c` e monta o projeto somente leitura para o processo agente. O MCP oferece consulta, relato de conflito e proposta de conteúdo para um arquivo por chamada; essas ferramentas não escrevem. O broker externo apresenta o diff, exige decisão humana para código com representação RDF parcial, audita, compara hashes e só então troca o arquivo. A avaliação é por arquivo e não oferece transação para vários arquivos. A leitura de outros caminhos do host ainda é permitida pelo isolamento atual. Falhas de capacidade recusam a sessão.
 
-Hooks `PreToolUse` e `PostToolUse` entregam ao Oracle as ações de ferramentas. Um pequeno processo de hook se comunica com o `approval-broker` por socket local autenticado e aguarda sua decisão. Em conflito ou incerteza, o broker mostra a pergunta na interface Oracle; o hook só devolve `allow` após resposta explícita. Negativa, timeout ou perda de IPC devolvem `deny`. O hook não usa `permissionDecision: "ask"`, que a documentação atual não suporta. Aprovações nativas do Codex continuam valendo; uma permissão Oracle não substitui uma permissão de sandbox ou rede.
+**Correção de fluxo solicitada pelo usuário (2026-09-23).** `oracle codex` deve abrir a **TUI nativa do Codex**, não um terminal próprio do Oracle, e o Codex deve operar **normalmente no projeto real, sem sandbox adicional**. O Oracle sobe um único `codex app-server` no projeto com `--listen ws://127.0.0.1:<porta>`, abre a TUI real com `codex --remote <url>` herdando o terminal e mantém um segundo cliente JSON-RPC no mesmo servidor como camada de instrumentação. O Oracle não altera a instalação do Codex: usa um `CODEX_HOME` privado com cópia do `auth.json`. O Oracle injeta o contexto de governança, mede tokens, registra alertas de violação de ontologia e, ao final da sessão, mantém as alterações quando a ontologia foi respeitada ou reverte os arquivos quando uma exceção é negada.
 
-Antes do primeiro turno, o adaptador verifica versão/protocolo, configuração e confiança dos hooks, capacidade de interceptação e caminho do projeto. Opções que desabilitam hooks ou sandbox são recusadas. A implementação deve testar com a versão do Codex instalada e gerar bindings do protocolo para a versão suportada. Se uma ferramenta não passar pelo hook, ela não é habilitada para mutação na sessão governada. Não se usa `codex exec --json` como sessão principal porque é voltado a execução não interativa.
+Os testes funcionais em `tmux` cobriram um patch aderente aprovado e um conflito relatado e negado, em cópias separadas do piloto. Ainda faltam a matriz adversarial completa, cancelamento, observação opcional por hooks e avaliação A/B/C; esses itens continuam abertos em `tasks.md`. O resultado não estabelece uma prova automática de semântica de código por SHACL.
+
+O Codex roda no projeto real com `sandbox_mode = "danger-full-access"` e `approval_policy = "on-request"`: o Oracle não impõe sandbox adicional e as aprovações nativas (como executar testes) permanecem na TUI, decididas pelo humano. O Oracle mantém um backup privado do projeto no início da sessão. Ao encerrar a TUI, o Oracle compara o projeto com o backup, reporta tokens e consultas à ontologia e, se houve conflito relatado, grava alerta e exige decisão de exceção; a negativa reverte os arquivos alterados a partir do backup. O adaptador usa um `CODEX_HOME` privado e não modifica a instalação global do Codex.
+
+Antes do primeiro turno, o adaptador verifica versão/protocolo, configuração, MCP obrigatório, isolamento `readOnly` e caminho do projeto. Opções que desabilitam o sandbox ou habilitam elevação nativa são recusadas. A implementação deve testar com a versão do Codex instalada e gerar bindings do protocolo para a versão suportada. Não se usa `codex exec --json` como sessão principal porque é voltado a execução não interativa.
 
 Alternativas consideradas: `codex exec --json` (captura simples, interação insuficiente) e apenas instruções em prompt (sem fiscalização prévia).
+
+**Referência `jev-gateway`.** O projeto inicia o Codex com opções `-c` efêmeras de provedor de modelo e stdio herdado; esse padrão de configuração transitória ajudou a definir o launcher Oracle. O gateway intercepta respostas do modelo por proxy e pode encaminhá-las sem intervenção em caso de erro. Isso não intercepta a execução local de ferramentas e, portanto, não é uma fronteira de mutação para o Oracle. A implementação não usa proxy de modelo; o isolamento do processo e o broker local cumprem papéis distintos. Ver [código dos clientes](https://github.com/vinilana/jev-gateway/blob/main/bin/clients.mjs) e [repositório](https://github.com/vinilana/jev-gateway).
+
+### 4A. Integração Agy
+
+O segundo adaptador usa o executável `agy` do Google Antigravity CLI, que pode usar modelos Gemini. Ele implementa o mesmo contrato de eventos, ações, decisões e cancelamento do Codex e aponta para os mesmos arquivos `.oracle/` do projeto; não cria uma segunda ontologia. O protocolo e as superfícies de ferramenta do Agy devem ser inspecionados na versão instalada antes da implementação. O modo headless estruturado é candidato para captura, mas só pode ser usado em sessão governada se houver mediação comprovada antes de qualquer efeito. `oracle agy` falha com diagnóstico quando a capacidade faltar. O piloto de ativos e a avaliação devem incluir Agy em uma rodada separada, com versão, modelo e condições registrados, sem misturar seus resultados com a comparação A/B/C do Codex.
+
+O desbloqueio concreto do primeiro adaptador está em [codex-unblock-proposal.md](codex-unblock-proposal.md): Codex somente leitura, proposta de patch em cópia isolada, broker Oracle para avaliação e promoção, e diagnóstico baseado em capacidades observadas.
 
 ### 5. Captura, auditoria e revisão
 
@@ -77,6 +89,8 @@ oracle domain add <id>
 oracle ontology validate
 oracle ontology show <domain> [iri]
 oracle codex [--project <path>]
+oracle code base [--project <path>]
+oracle agy [--project <path>]
 oracle proposals list|show|accept|reject
 oracle sessions list|show
 oracle eval run|report
@@ -84,6 +98,8 @@ oracle doctor
 ```
 
 `oracle init` prepara manifesto vazio e orienta a criação de ao menos um domínio. Isso não autoriza `oracle codex`: a sessão só começa quando há domínio declarado e todas as ontologias estão íntegras e prontas. `oracle doctor` examina Codex, protocolo, hooks, MCP e permissões locais antes da primeira sessão.
+
+O pacote npm expõe `dist/cli.js` como binário `oracle` com shebang e modo executável gerados em `prepack`. O CLI assume `process.cwd()` como raiz do codebase e aceita `--project`. A distribuição é testada como tarball em um prefixo npm temporário e via `npx --package=<tarball> oracle`, sem instalar no sistema do desenvolvedor ou publicar sem autorização.
 
 ### 7. Exemplo mínimo do domínio `ativos`
 
@@ -173,7 +189,7 @@ O relatório permite comparar A→B (efeito de contexto) e B→C (efeito adicion
 
 ## Risks / Trade-offs
 
-- **Cobertura incompleta de ferramentas Codex** → iniciar apenas com superfícies interceptadas e testadas; ferramenta desconhecida que possa mutar recebe negativa até ser suportada.
+- **Cobertura incompleta de hooks e sandbox Codex** → combinar `readOnly`, elevação nativa negada, superfícies externas desabilitadas/mediadas e ferramenta Oracle; sem comprovação da fronteira na versão instalada, não iniciar sessão governada.
 - **Comandos shell opacos** → classificar como incertos e perguntar ao usuário; não alegar conformidade automática.
 - **Hooks dependem de confiança e versão do Codex** → checagem de prontidão, versão suportada e testes de contrato; falhar sem iniciar sessão se não estiverem ativos.
 - **SHACL valida um grafo, não intenção de negócio implícita em código** → explicitar fatos usados na avaliação e consultar o usuário quando faltar representação.
@@ -189,3 +205,6 @@ Como não existe implementação anterior, não há migração de dados. A entre
 - [JSON-LD 1.1](https://www.w3.org/TR/json-ld11/) e [SHACL](https://www.w3.org/TR/shacl/).
 - [Codex app-server](https://developers.openai.com/codex/app-server), incluindo eventos, aprovações e geração de bindings TypeScript.
 - [Hooks do Codex](https://learn.chatgpt.com/docs/hooks), incluindo `PreToolUse` e limitações de `permissionDecision`.
+- [Cobertura e limitações dos hooks](https://learn.chatgpt.com/docs/hooks#tool-coverage) e [política `readOnly` do app-server](https://learn.chatgpt.com/docs/app-server#sandbox-read-access-readonlyaccess), verificadas para Codex CLI 0.156.1.
+- [Superfícies fora do sandbox Codex](https://learn.chatgpt.com/docs/agent-approvals-security), incluindo MCP, apps, navegador e Computer Use.
+- [Antigravity CLI e executável `agy`](https://antigravity.google/docs/getting-started?tab=cli) e [modo headless](https://antigravity.google/docs/cli/headless/), consultados antes do desenho do segundo adaptador.

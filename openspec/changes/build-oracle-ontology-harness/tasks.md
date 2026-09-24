@@ -1,27 +1,31 @@
 ## 1. Base do projeto e formato
 
-- [ ] 1.1 Criar pacote TypeScript para Node.js 22, CLI `oracle` e testes; verificar compilação, execução de `oracle --help` e testes básicos.
-- [ ] 1.2 Publicar vocabulário Oracle versionado e exemplos JSON-LD/SHACL de `ativos`; verificar parsing RDF e validação SHACL do exemplo válido e de um exemplo inválido.
-- [ ] 1.3 Implementar `oracle init` e `oracle domain add`; verificar geração sem sobrescrita e falha de `oracle codex` enquanto o projeto não tem domínios válidos.
+- [x] 1.1 Criar pacote TypeScript para Node.js 22, CLI `oracle` e testes; verificar compilação, execução de `oracle --help` e testes básicos.
+- [x] 1.2 Publicar vocabulário Oracle versionado e exemplos JSON-LD/SHACL de `ativos`; verificar parsing RDF e validação SHACL do exemplo válido e de um exemplo inválido.
+- [x] 1.3 Implementar `oracle init` e `oracle domain add`; verificar geração sem sobrescrita. A recusa de `oracle codex` enquanto o projeto não tem domínios válidos é coberta por 4.4.
+- [x] 1.4 Empacotar o executável Linux `oracle` com shebang e modo executável para `npm install -g` e `npx`; verificar tarball, instalação em prefixo temporário, execução por npx e uso em codebase externo.
 
 ## 2. Carregamento e consulta
 
-- [ ] 2.1 Implementar descoberta do projeto, manifesto, caminhos canônicos e verificação de todos os domínios; testar ausência, duplicidade, escape por caminho e domínio faltante.
-- [ ] 2.2 Implementar carregamento JSON-LD, SHACL, versões, integridade e prontidão; testar grafos malformados, IRI duplicado, referência local inválida, domínio vazio e violação de shape.
-- [ ] 2.3 Implementar `oracle ontology validate/show` e retrato imutável por sessão; verificar saída com fonte/IRI e detecção de alteração do retrato.
+- [x] 2.1 Implementar descoberta do projeto, manifesto e caminhos canônicos; testar ausência, duplicidade e escape por caminho.
+- [x] 2.2 Implementar verificação de todos os domínios, carregamento JSON-LD, SHACL, versões, integridade e prontidão; testar domínio faltante, grafo malformado, IRI duplicado, referência local inválida, domínio vazio e violação de shape.
+- [x] 2.3 Implementar `oracle ontology validate/show` e retrato imutável por sessão; verificar saída com fonte/IRI e detecção de alteração do retrato.
 
 ## 3. Decisão e registro
 
-- [ ] 3.1 Implementar representação RDF de ações e avaliador SHACL; testar conformidade, violação, falta de fatos e ação opaca contra cenários dos specs.
-- [ ] 3.2 Implementar broker de aprovação vinculado a hash de ação e ontologia; testar permitir uma vez, negar, timeout e mudança de argumentos.
-- [ ] 3.3 Implementar trilha JSONL local, redação de segredos e falha fechada de gravação; testar consulta de decisão, segredo redigido e armazenamento indisponível.
+- [x] 3.1 Implementar representação RDF de ações e avaliador SHACL; testar conformidade, violação, falta de fatos e ação opaca contra cenários dos specs.
+- [x] 3.2 Implementar broker de aprovação vinculado a hash de ação e ontologia; testar permitir uma vez, negar, timeout e mudança de argumentos.
+- [x] 3.3 Implementar trilha JSONL local, redação de segredos e falha fechada de gravação; testar consulta de decisão, segredo redigido e armazenamento indisponível.
 
 ## 4. Adaptador Codex
 
 - [ ] 4.1 Implementar contrato de adaptador e cliente `codex app-server` por stdio; verificar handshake, thread, eventos, solicitações nativas e cancelamento com testes de protocolo.
 - [ ] 4.2 Implementar servidor MCP local obrigatório para consulta ontológica e proposta explícita; verificar respostas por domínio/IRI e falha de abertura de sessão quando o MCP não inicia.
-- [ ] 4.3 Implementar hooks `PreToolUse`/`PostToolUse` e ponte IPC com o broker; testar permissão após resposta, negativa, timeout, perda de IPC e ferramenta mutável não suportada antes de efeitos.
-- [ ] 4.4 Implementar `oracle codex` e `oracle doctor`; verificar contexto inicial, prontidão de hooks/MCP, recusa de bypass e diagnóstico de Codex indisponível.
+- [ ] 4.3 Implementar ferramentas MCP Oracle para mutações mediadas pelo broker, além de hooks `PreToolUse`/`PostToolUse` para observação; testar permissão após resposta, negativa, timeout, perda de IPC, elevação nativa negada e ferramenta mutável não suportada antes de efeitos.
+- [ ] 4.4 Implementar `oracle codex` e `oracle doctor`; verificar contexto inicial, MCP obrigatório, isolamento `readOnly`, recusa de bypass e diagnóstico de Codex indisponível. Só iniciar sessão governada após comprovar a fronteira de mutação na versão instalada.
+- [ ] 4.5 Implementar `oracle agy` para Google Antigravity CLI (executável `agy`) sobre o mesmo núcleo e ontologias; verificar protocolo, contexto, eventos, decisões, cancelamento e recusa de sessão quando uma superfície mutável não puder ser mediada.
+- [ ] 4.6 Permitir ferramentas nativas de desenvolvimento do Codex em cópia gravável isolada; recolher diferenças por turno, revisar e auditar antes de promover ao projeto original, sincronizar alterações negadas e testar aprovação/negativa com Given/When/Then.
+- [ ] 4.7 Substituir o REPL próprio do Oracle pela TUI nativa do Codex: iniciar `codex app-server --listen` isolado, abrir `codex --remote` e manter um cliente de instrumentação; verificar abertura da TUI, verificação de configuração efetiva e inventário MCP Oracle antes do primeiro turno, e não resposta às aprovações nativas destinadas à TUI.
 
 ## 5. Conhecimento e revisão
 
@@ -31,11 +35,12 @@
 
 ## 6. Projeto piloto e medição
 
-- [ ] 6.1 Criar `pilot/asset-management/` como aplicação web mínima independente com testes de transferência, baixa e responsável; verificar que seus testes passam sem Oracle.
-- [ ] 6.2 Criar manifesto, JSON-LD e SHACL próprios do piloto, incluindo regra de transferência e política textual; verificar com `oracle ontology validate --project pilot/asset-management` e casos RDF válidos/inválidos.
+- [x] 6.1 Criar `pilot/asset-management/` como aplicação web mínima independente com testes de transferência, baixa e responsável; verificar que seus testes passam sem Oracle.
+- [x] 6.2 Criar manifesto, JSON-LD e SHACL próprios do piloto, incluindo regra de transferência e política textual; verificar com `oracle ontology validate --project pilot/asset-management` e casos RDF válidos/inválidos.
 - [ ] 6.3 Versionar quatro casos P1–P4 com estado inicial, prompt, gabarito e verificadores de efeito/evento; verificar que cada caso falha diante de uma saída deliberadamente errada.
 - [ ] 6.4 Implementar `oracle eval run --mode contract` em cópias isoladas; verificar que não chama o modelo, não altera o piloto original e produz métricas para permissão, bloqueio, pergunta e proposta.
 - [ ] 6.5 Implementar `oracle eval run --mode live` nas condições A/B/C e `oracle eval report`; verificar registro de versões, hashes, três repetições, interrupções e métricas indisponíveis com causa.
+- [ ] 6.6 Ampliar JSON-LD, SHACL e comportamento do piloto para baixa, responsável e localização; depois da implementação, testar grafos conformes/inválidos e operações HTTP conforme os cenários Given/When/Then.
 
 ## 7. Verificação ponta a ponta
 
@@ -43,3 +48,7 @@
 - [ ] 7.2 Executar matriz de falha com ontologia ausente, hook não confiável, ferramenta desconhecida, IPC interrompido e disco indisponível; verificar que nenhuma ação mutável avança sem decisão válida.
 - [ ] 7.3 Executar avaliação de contrato e, quando Codex estiver autenticado, a avaliação real; publicar relatório JSON/Markdown com contagens, denominadores, casos individuais e limitações observadas.
 - [ ] 7.4 Documentar instalação, criação de ontologia por domínio, limites da análise semântica e atualização de versão do Codex; verificar comandos do guia em ambiente limpo.
+- [ ] 7.5 Executar os casos do piloto com Agy em uma rodada separada e registrar versão, modelo, resultados e limitações sem misturá-los ao relatório A/B/C do Codex.
+- [x] 7.6 Definir a regra de teste funcional E2E em `tmux` ou `herdr`, especificar casos aderente e contrário à ontologia e registrar a tentativa inicial de `oracle codex` com seu bloqueio antes do primeiro turno.
+- [x] 7.7 Após comprovar a fronteira de mutação, executar os dois casos funcionais com `oracle codex` em cópias limpas do piloto; verificar ações, decisões humanas, arquivos finais e auditoria com evidência reproduzível. Ver `pilot/asset-management/evaluation/functional-e2e-2026-09-23-run.md`; o teste de patch contrário submetido ao broker permanece na matriz adversarial 7.2.
+- [ ] 7.8 Executar ensaio adversarial em `tmux` ou `herdr` com ontologia ampliada, pedidos de contorno e alegação de conformidade; registrar falhas, corrigir o Oracle e repetir os casos afetados com hashes e auditoria.

@@ -3,3 +3,14 @@ dist/
 .superpowers/
 .worktrees/
 **/.oracle/local/
+benchmark/.venv/
+benchmark/results/
+__pycache__/
+*.pyc
+*.aux
+*.log
+*.out
+
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md

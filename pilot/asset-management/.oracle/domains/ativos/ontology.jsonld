@@ -1,0 +1,43 @@
+{
+  "@context": {
+    "ex": "urn:oracle:pilot:ativos:",
+    "oracle": "urn:oracle:ns:v1:",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  },
+  "@graph": [
+    { "@id": "ex:ontology", "@type": "oracle:Domain", "oracle:version": "1.0.0" },
+    { "@id": "ex:Ativo", "@type": "rdfs:Class", "rdfs:label": "Ativo", "rdfs:comment": "Bem físico identificado e administrado pelo projeto." },
+    { "@id": "ex:Responsavel", "@type": "rdfs:Class", "rdfs:label": "Responsável" },
+    { "@id": "ex:TransferenciaAtivo", "@type": "rdfs:Class", "rdfs:label": "Transferência de ativo" },
+    { "@id": "ex:BaixaAtivo", "@type": "rdfs:Class", "rdfs:label": "Baixa de ativo" },
+    { "@id": "ex:AlteracaoResponsavel", "@type": "rdfs:Class", "rdfs:label": "Alteração de responsável" },
+    { "@id": "ex:AtualizacaoLocalizacao", "@type": "rdfs:Class", "rdfs:label": "Atualização de localização" },
+    { "@id": "ex:Disponivel", "rdfs:label": "Disponível" },
+    { "@id": "ex:EmUso", "rdfs:label": "Em uso" },
+    { "@id": "ex:Baixado", "rdfs:label": "Baixado" },
+    { "@id": "ex:temResponsavel", "@type": "rdf:Property", "rdfs:domain": { "@id": "ex:Ativo" }, "rdfs:range": { "@id": "ex:Responsavel" } },
+    { "@id": "ex:estadoAtual", "@type": "rdf:Property", "rdfs:comment": "Estado do ativo antes da ação; Baixado é terminal para as mutações do piloto." },
+    { "@id": "ex:novoResponsavel", "@type": "rdf:Property", "rdfs:comment": "Responsável exigido na transferência e na alteração de responsável." },
+    { "@id": "ex:novaLocalizacao", "@type": "rdf:Property", "rdfs:comment": "Localização exigida na transferência e na atualização de localização." },
+    { "@id": "ex:motivoBaixa", "@type": "rdf:Property", "rdfs:comment": "Motivo obrigatório da baixa do ativo." },
+    {
+      "@id": "ex:justificativa-adequada",
+      "@type": "oracle:Policy",
+      "oracle:governs": { "@id": "ex:TransferenciaAtivo" },
+      "oracle:requiresHumanReview": true,
+      "oracle:scope": "Transferência de ativo entre pessoas ou locais",
+      "oracle:reason": "A adequação da justificativa exige julgamento contextual.",
+      "rdfs:comment": "Toda transferência requer justificativa adequada ao contexto."
+    },
+    {
+      "@id": "ex:motivo-baixa-adequado",
+      "@type": "oracle:Policy",
+      "oracle:governs": { "@id": "ex:BaixaAtivo" },
+      "oracle:requiresHumanReview": true,
+      "oracle:scope": "Baixa de ativo",
+      "oracle:reason": "A adequação do motivo da baixa exige julgamento contextual.",
+      "rdfs:comment": "Toda baixa exige motivo adequado ao contexto."
+    }
+  ]
+}

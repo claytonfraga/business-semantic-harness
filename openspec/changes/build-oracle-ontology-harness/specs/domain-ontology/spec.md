@@ -46,3 +46,14 @@ O Oracle SHALL registrar a versão do formato e da ontologia carregada e SHALL r
 #### Scenario: Versão futura
 - **WHEN** a ontologia declara uma versão de formato não suportada
 - **THEN** o Oracle interrompe o uso dela sem reescrever os arquivos
+
+### Requirement: Ontologia vive no projeto de origem
+Cada ontologia de domínio SHALL residir dentro do projeto a que se refere, em `<projeto>/.oracle/domains/<dominio>/`. A ontologia SHALL NOT ser copiada para o pacote Oracle, para outro projeto ou para um diretório global. Fixtures sintéticas do pacote Oracle para testes unitários SHALL NOT ser tratadas como ontologias de projeto. Uma sessão SHALL exigir a ontologia própria do projeto selecionado, inclusive quando ele for uma cópia de trabalho de teste.
+
+#### Scenario: Projeto sem ontologia própria
+- **WHEN** uma sessão é aberta para um projeto cuja ontologia de domínio não está em seu próprio `.oracle/`
+- **THEN** o Oracle recusa a sessão e aponta o domínio ausente
+
+#### Scenario: Cópia de trabalho
+- **WHEN** o projeto é uma cópia limpa usada em teste E2E
+- **THEN** a cópia carrega a ontologia do próprio projeto copiado, sem depender do pacote Oracle nem de outro projeto
