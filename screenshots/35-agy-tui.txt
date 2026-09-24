@@ -1,0 +1,2 @@
+bsh agy --project /tmp/bsh-agy
+ /tmp/bsh-agy | master  bsh agy --project /tmp/bsh-agy                                                                                                                                                       ok | 14:56:29

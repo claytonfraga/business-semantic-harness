@@ -23,12 +23,13 @@ In short, it turns "I hope the agent respects my rules" into "the agent can prop
 - Human judgement is reserved for genuine judgement calls, with evidence and an audit trail.
 - It sits **on top of** your existing quality tools (TypeScript, Biome, unit and E2E tests, Git, code review), which keep checking everything else.
 
-The harness is currently built for **Codex only**. There is no support for other agents or models yet.
+The harness supports both **Codex** and **Agy** (Antigravity CLI).
 
 ## Requirements
 
 - Linux with Node.js 22 or later and npm.
-- Codex CLI installed and authenticated. The current integration was verified with `codex-cli 0.156.1`.
+- **For Codex**: Codex CLI installed and authenticated (verified with `codex-cli 0.156.1`).
+- **For Agy**: Antigravity CLI (`agy`) installed and authenticated (verified with `agy 1.2.10`).
 - `git` available on Linux. Every session runs in an isolated Git worktree, so the project must be a Git repository.
 - A project directory you can read and write.
 
@@ -86,7 +87,7 @@ This creates, **inside the project itself**:
         shapes.ttl                            # verifiable rules (SHACL, Turtle)
 ```
 
-**One rule to remember:** a domain ontology belongs to the project it refers to and lives in `<project>/.bsh/domains/<domain>/`. Never place a project's ontology inside this package, in another project, or in a global directory. When you run `bsh codex`, the selected project must contain its own validated ontology — including when it is a working copy used in tests. The fixtures under `test/fixtures/` are synthetic ontologies for this package's unit tests, not project ontologies.
+**One rule to remember:** a domain ontology belongs to the project it refers to and lives in `<project>/.bsh/domains/<domain>/`. Never place a project's ontology inside this package, in another project, or in a global directory. When you run `bsh codex` or `bsh agy`, the selected project must contain its own validated ontology — including when it is a working copy used in tests. The fixtures under `test/fixtures/` are synthetic ontologies for this package's unit tests, not project ontologies.
 
 `bsh domain add` produces a skeleton that is structurally valid but **not ready**: you must describe the business concepts and write at least one rule or policy. The next two subsections show how.
 
@@ -179,23 +180,67 @@ bsh ontology show assets urn:bsh:pilot:ativos:Ativo
 
 `validate` must print `Ontologia válida e pronta.` before a session can start; otherwise it reports the domain, file, and rule that block readiness. `show` returns JSON with concepts, relations, policies, shapes, and source paths. To operate from another directory, add `--project /path/to/my-project`.
 
-## Using with Codex
+## Running an Agent Session (Codex and Agy)
 
-From the prepared project, run:
+The harness supports both **Codex** and **Agy** (Antigravity CLI).
+
+For both agents, running a governed session is direct and straightforward: **simply navigate to your project directory (which must contain `.bsh/` with its ontology, shapes, and project files) and type the command**:
+
+```bash
+cd /path/to/my-project
+
+# For Codex:
+bsh codex         # or: bsh code base
+
+# For Agy:
+bsh agy           # or with a specific model: bsh agy --model <model-name>
+```
+
+You can also run from any other directory by passing `--project /path/to/my-project`.
+
+---
+
+### Using with Codex
+
+From the prepared project:
 
 ```bash
 bsh doctor
-bsh code base   # or the alias: bsh codex
+bsh codex         # alias: bsh code base
 ```
 
 On startup, the harness **opens the real Codex TUI** — the same interface you already use — connected to a `codex app-server` that it starts in an **isolated Git worktree** of the project. It sits around Codex as a wrapper: it injects the governance instructions, delivers the ontology context through a local MCP server, follows the session, measures the tokens spent on the domain checks, and raises alerts on violations.
 
 The harness **does not modify your Codex installation**: it uses a private `CODEX_HOME` with a copy of `auth.json` and never touches `~/.codex`. By default it runs Codex with its sandbox in `workspace-write` mode rooted at the session worktree, so the agent cannot write to your main checkout; set `BSH_CODEX_SANDBOX=danger-full-access` to opt out. Type your requests in the TUI as usual, and exit with `/quit` or `Ctrl+C` so the harness can finalize the session.
 
-**Isolation and promotion.** The harness identifies the current branch and its HEAD, creates a session branch `bsh/session/<id>` and a real `git worktree` (outside your project, in a private state directory), and starts Codex there. Your main checkout stays untouched while the agent works, so you can keep using it. When the session ends, the harness runs the project's gates in the worktree and **promotes the changes with Git** — fast-forward when the origin branch has not moved, or a rebase inside the worktree when it has. Promoted commits reach the origin branch; the temporary worktree and branch are then removed. The harness never resets, cleans, or force-pushes your main checkout, and never runs `stash`/`reset`/`restore`/`clean` to make room for a session.
+---
+
+### Using with Agy
+
+From the prepared project:
+
+```bash
+bsh doctor agy
+bsh agy                                  # uses your environment's default model
+bsh agy --model gemini-3.7-flash-low     # or any specific model
+```
+
+On startup, the harness **opens the real Agy TUI** attached to your terminal, running inside an **isolated Git worktree** of the project under BSH governance:
+
+- **Isolated private environment**: Agy runs with a private `$HOME` (`bsh-agy-home-*`, mode `0700`) with a selective copy of credentials (`oauth_creds.json`, token and client IDs), never modifying or polluting your global `~/.gemini`.
+- **Zero interactive friction**: Automatically pre-trusts the session worktree in `trustedFolders.json` and `settings.json`, marks onboarding as completed in `cache/onboarding.json` (bypassing the initial theme/welcome wizard), and sets `--dangerously-skip-permissions` scoped strictly to the session worktree so MCP tools execute seamlessly.
+- **Ontology MCP injection**: Automatically configures the BSH MCP server in `.gemini/config/mcp_config.json`, allowing Agy to call `bsh_query_ontology` and `bsh_report_conflict`.
+- **Exit & Enforcement**: When you exit the Agy TUI, the harness inspects recorded ontology queries and alerts, runs independent SHACL semantic enforcement, evaluates project gates (`npm test`), and promotes changes with Git (or cleanly discards the worktree if an exception is rejected).
+
+---
+
+### Isolation, Promotion, and Exceptions (Common to Codex and Agy)
+
+**Isolation and promotion.** The harness identifies the current branch and its HEAD, creates a session branch `bsh/session/<id>` and a real `git worktree` (outside your project, in a private state directory), and starts the agent there. Your main checkout stays untouched while the agent works, so you can keep using it. When the session ends, the harness runs the project's gates in the worktree and **promotes the changes with Git** — fast-forward when the origin branch has not moved, or a rebase inside the worktree when it has. Promoted commits reach the origin branch; the temporary worktree and branch are then removed. The harness never resets, cleans, or force-pushes your main checkout, and never runs `stash`/`reset`/`restore`/`clean` to make room for a session.
 
 ```bash
 bsh codex --project /path/to/my-project
+bsh agy --project /path/to/my-project
 ```
 
 Each project needs its own `.bsh/project.json`, JSON-LD, and SHACL; a freshly initialized project is only ready after you define its concepts and rules and `bsh ontology validate` passes.
@@ -205,7 +250,7 @@ Each project needs its own `.bsh/project.json`, JSON-LD, and SHACL; a freshly in
 - **Ontology respected** (no conflict reported): the changes are promoted to the origin branch.
 - **Violation or uncertainty**: you can **approve the exception** (the changes are promoted) or **deny it**. If you deny it, the harness **discards the session worktree and branch**; your main checkout never needed a rollback.
 
-The harness **does not answer** Codex's native approvals (for example, running `npm test`); those remain your decisions in the TUI.
+The harness **does not answer** native approvals in the agent (for example, running `npm test`); those remain your decisions in the TUI.
 
 **Session recovery.** Each session records its metadata under `.bsh/local/sessions/` (not versioned). You can list sessions and orphan worktrees, and remove a discarded one:
 
@@ -271,8 +316,8 @@ bsh ontology validate --project pilot/asset-management
 
 The pilot server builds with `npm run build --prefix pilot/asset-management` and runs with `node pilot/asset-management/dist/server.js`. The API lists assets at `GET /assets` and accepts operations at `POST /assets/{id}/transfer`, `/retire`, `/responsible`, and `/location`.
 
-The functional E2E test requires opening `bsh codex` in a persistent `tmux` or `herdr` session and asking the agent for code changes that are adherent and contrary to the ontology. The rule is defined in [AGENTS.md](AGENTS.md). The [first functional attempt](pilot/asset-management/evaluation/functional-e2e-2026-09-23.md) records the refusal before the first turn; the [round after unblocking](pilot/asset-management/evaluation/functional-e2e-2026-09-23-run.md) records both cases on clean copies. Direct HTTP tests of the pilot do not prove the harness's governance.
+The functional E2E test requires opening `bsh codex` or `bsh agy` in a persistent `tmux` or `herdr` session and asking the agent for code changes that are adherent and contrary to the ontology. The rule is defined in [AGENTS.md](AGENTS.md). Evaluation reports are available for [Codex](pilot/asset-management/evaluation/functional-e2e-2026-09-23-run.md) and for [Agy](pilot/asset-management/evaluation/functional-e2e-agy-2026-09-24-run.md). Direct HTTP tests of the pilot do not prove the harness's governance.
 
 ## Project status
 
-The ontology base, the decision core, the audit trail, the pilot, and the governed Codex session with Git worktree isolation are runnable. Knowledge capture for review and the A/B/C evaluation are still in progress, tracked locally in the `openspec/` directory (kept out of version control). The package is installed globally on this Linux host from a local tarball, but has not been published to npm.
+The ontology base, the decision core, the audit trail, the pilot, and the governed sessions with Git worktree isolation for both **Codex** and **Agy** are runnable. Knowledge capture for review and the A/B/C evaluation are still in progress, tracked locally in the `openspec/` directory (kept out of version control). The package is installed globally on this Linux host from a local tarball, but has not been published to npm.
