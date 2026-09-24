@@ -1,5 +1,5 @@
-import { randomUUID } from 'node:crypto';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { randomUUID, createHash } from 'node:crypto';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { appendAudit } from '../../decision/audit.js';
@@ -11,7 +11,7 @@ import { aplicarRegras, lerDiff } from '../../enforcement/extratorOperacoes.js';
 import { avaliarOperacoes } from '../../enforcement/motorEnforcement.js';
 import type { ResultadoEnforcementLote } from '../../enforcement/operacaoSemantica.js';
 import { writeAlerts, type ConflictAlert } from './alerts.js';
-import { alteracoesNaWorktree, removerSessaoWorktree, type SessaoWorktree } from './worktree.js';
+import { alteracoesNaWorktree, git, removerSessaoWorktree, type SessaoWorktree } from './worktree.js';
 import { integrar, reconciliar, type StatusPromocao, type ValidadorGates } from './promotion.js';
 import { gravarSessao } from './sessionState.js';
 import type { FileChange } from './snapshot.js';
@@ -83,6 +83,15 @@ async function confirmException(branchOrigem: string): Promise<boolean> {
   }
 }
 
+async function gravarRelatorioSessao(root: string, sessao: SessaoWorktree, dados: Record<string, unknown>): Promise<void> {
+  const diretorio = join(root, '.bsh', 'local', 'sessions');
+  await mkdir(diretorio, { recursive: true });
+  const arquivo = join(diretorio, `${sessao.id}.report.json`);
+  let existente: Record<string, unknown> = {};
+  try { existente = JSON.parse(await readFile(arquivo, 'utf8')) as Record<string, unknown>; } catch { /* primeiro registro */ }
+  await writeFile(arquivo, JSON.stringify({ ...existente, ...dados, atualizadoEm: new Date().toISOString() }, null, 2), { mode: 0o600 });
+}
+
 export async function finalizeSession(options: FinalizeOptions): Promise<ResultadoFinalizacao> {
   const { sessao, domain, snapshot, alerts, tokenTotals, ontologyQueries, harnessTokens, savings, validarGates } = options;
   const confirmar = options.confirmar ?? confirmException;
@@ -98,6 +107,21 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
   }
   const alteracoes = await alteracoesNaWorktree(sessao);
   process.stdout.write(`BSH: worktree da sessao ${sessao.id} em ${sessao.caminhoWorktree}; branch ${sessao.branchSessao}.\n`);
+  {
+    const numstatInicial = await git(sessao.caminhoWorktree, ['diff', sessao.commitBase, '--numstat']).catch(() => '');
+    let mod = 0; let add = 0; let rem = 0;
+    for (const linha of numstatInicial.split('\n')) {
+      const partes = linha.split('\t');
+      if (partes.length === 3) { mod += 1; if (/^\d+$/.test(partes[0])) add += Number(partes[0]); if (/^\d+$/.test(partes[1])) rem += Number(partes[1]); }
+    }
+    await gravarRelatorioSessao(root, sessao, {
+      alteracaoNaWorktree: alteracoes.length > 0 || mod > 0,
+      arquivosModificados: mod, linhasAdicionadas: add, linhasRemovidas: rem,
+      worktreeHead: (await git(sessao.caminhoWorktree, ['rev-parse', 'HEAD']).catch(() => '')).trim(),
+      origemHeadAntes: (await git(root, ['rev-parse', sessao.branchOrigem]).catch(() => '')).trim(),
+      promovido: false, origemAlterada: false, bloqueado: false,
+    });
+  }
   if (alteracoes.length === 0 && alerts.length === 0) {
     process.stdout.write('BSH: nenhuma alteracao do Codex na worktree; nada a promover.\n');
     await gravarSessao(root, sessao, 'CLEANED');
@@ -147,6 +171,28 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
       }
     }
   }
+  const numstat = await git(sessao.caminhoWorktree, ['diff', sessao.commitBase, '--numstat']).catch(() => '');
+  let arquivosModificados = 0; let linhasAdicionadas = 0; let linhasRemovidas = 0;
+  for (const linha of numstat.split('\n')) {
+    const partes = linha.split('\t');
+    if (partes.length === 3) {
+      arquivosModificados += 1;
+      if (/^\d+$/.test(partes[0])) linhasAdicionadas += Number(partes[0]);
+      if (/^\d+$/.test(partes[1])) linhasRemovidas += Number(partes[1]);
+    }
+  }
+  const diffTexto = await git(sessao.caminhoWorktree, ['diff', sessao.commitBase]).catch(() => '');
+  await gravarRelatorioSessao(root, sessao, {
+    alteracaoNaWorktree: alteracoes.length > 0 || arquivosModificados > 0,
+    arquivosModificados, linhasAdicionadas, linhasRemovidas,
+    hashDiff: createHash('sha256').update(diffTexto).digest('hex'),
+    worktreeHead: (await git(sessao.caminhoWorktree, ['rev-parse', 'HEAD']).catch(() => '')).trim(),
+    origemHeadAntes: (await git(root, ['rev-parse', sessao.branchOrigem]).catch(() => '')).trim(),
+    enforcementExecutado: process.env.BSH_ENFORCEMENT !== 'off' && alteracoes.length > 0,
+    statusEnforcement: enforcement.status,
+    enforcement: enforcement.resultados,
+  });
+
   const exigirDecisao = alerts.length > 0 || enforcement.bloquear || enforcement.status === 'revisao_humana';
 
   if (exigirDecisao) {
@@ -158,6 +204,7 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
       for (const change of alteracoes) await auditChange(root, domain, change, snapshot, 'deny', 'local-user', 'Excecao negada pelo usuario');
       await gravarSessao(root, sessao, 'DISCARDED');
       await removerSessaoWorktree(sessao, true);
+      await gravarRelatorioSessao(root, sessao, { bloqueado: true, promovido: false, origemAlterada: false });
       process.stdout.write('BSH: excecao negada; worktree e branch da sessao removidas. O checkout principal nao foi alterado.\n');
       return { status: 'descartado', promovido: false };
     }
@@ -171,11 +218,13 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
     await gravarSessao(root, sessao, 'PROMOTED');
     await removerSessaoWorktree(sessao, true);
     await gravarSessao(root, sessao, 'CLEANED');
+    await gravarRelatorioSessao(root, sessao, { promovido: true, origemAlterada: true, gatesAprovados: true, origemHeadDepois: (await git(root, ['rev-parse', sessao.branchOrigem]).catch(() => '')).trim() });
     process.stdout.write(`BSH: ${resultado.detalhes} Worktree temporaria removida.\n`);
     return { status: 'promovido', promovido: true };
   }
   if (resultado.status === 'falha-validacao') {
     await gravarSessao(root, sessao, 'VALIDATION_FAILED');
+    await gravarRelatorioSessao(root, sessao, { gatesAprovados: false, promovido: false, origemAlterada: false });
     process.stdout.write('BSH: a validacao falhou na worktree; nada foi promovido. A branch principal permanece intacta.\n');
     process.stdout.write(`${resultado.detalhes}\n`);
     process.stdout.write('BSH: a worktree foi preservada para correcao; a sessao pode ser retomada ou descartada.\n');
