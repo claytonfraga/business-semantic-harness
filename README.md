@@ -108,7 +108,7 @@ oracle doctor
 oracle code base
 ```
 
-`oracle codex` is an alias for `oracle code base`. On startup, Oracle **opens the real Codex TUI** — the same interface you already use — connected to a `codex app-server` that Oracle starts in the project itself. Oracle is a **harness that wraps Codex**: it injects the governance instructions, delivers the ontology context through the local MCP server, follows the session, measures the tokens spent on ontology verification, and raises alerts on violations. Codex runs normally in your project, with no extra sandbox imposed by Oracle.
+`oracle codex` is an alias for `oracle code base`. On startup, Oracle **opens the real Codex TUI** — the same interface you already use — connected to a `codex app-server` that Oracle starts in an isolated Git worktree of the project. Oracle is a **harness that wraps Codex**: it injects the governance instructions, delivers the ontology context through the local MCP server, follows the session, measures the tokens spent on ontology verification, and raises alerts on violations. By default Oracle runs Codex with its sandbox in `workspace-write` mode rooted at the session worktree, so the agent cannot write to your main checkout; set `ORACLE_CODEX_SANDBOX=danger-full-access` to opt out.
 
 Oracle **does not modify your Codex installation**: it uses a private `CODEX_HOME` with a copy of `auth.json` and never touches `~/.codex`. Type your requests in the TUI as usual, and exit with `/quit` or `Ctrl+C` so Oracle can finalize the session.
 

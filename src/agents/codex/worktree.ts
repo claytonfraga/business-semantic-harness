@@ -1,8 +1,8 @@
 import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { cp, mkdir, realpath, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, realpath, rm, writeFile, appendFile } from 'node:fs/promises';
 import { homedir, tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { dirname, isAbsolute, join } from 'node:path';
 import { promisify } from 'node:util';
 import type { FileChange } from './snapshot.js';
 
@@ -42,6 +42,21 @@ export async function estaLimpo(repositorio: string): Promise<boolean> {
   return (await git(repositorio, ['status', '--porcelain'])).trim().length === 0;
 }
 
+export async function garantirExclusaoLocal(repositorioOrigem: string): Promise<void> {
+  const caminhoRelativo = (await git(repositorioOrigem, ['rev-parse', '--git-path', 'info/exclude'])).trim();
+  const caminho = isAbsolute(caminhoRelativo) ? caminhoRelativo : join(repositorioOrigem, caminhoRelativo);
+  let conteudo = '';
+  try {
+    conteudo = await readFile(caminho, 'utf8');
+  } catch {
+    await mkdir(dirname(caminho), { recursive: true });
+  }
+  const linha = '.oracle/local/';
+  if (!conteudo.split('\n').some((item) => item.trim() === linha)) {
+    await appendFile(caminho, `${conteudo === '' || conteudo.endsWith('\n') ? '' : '\n'}${linha}\n`);
+  }
+}
+
 export function diretorioWorktrees(): string {
   if (process.env.ORACLE_WORKTREES_DIR) return process.env.ORACLE_WORKTREES_DIR;
   return join(homedir(), '.local', 'state', 'oracle', 'worktrees');
@@ -78,6 +93,7 @@ export interface OpcoesCriarSessao {
 
 export async function criarSessaoWorktree(opcoes: OpcoesCriarSessao): Promise<SessaoWorktree> {
   const { repositorioOrigem, branchOrigem, commitBase, incluirEstadoLocal = false } = opcoes;
+  await garantirExclusaoLocal(repositorioOrigem);
   const repoId = await identificadorRepositorio(repositorioOrigem);
   const diretorioRepo = join(diretorioWorktrees(), repoId);
   await mkdir(diretorioRepo, { recursive: true });

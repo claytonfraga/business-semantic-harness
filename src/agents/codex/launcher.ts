@@ -52,19 +52,23 @@ function tomlString(value: string): string {
   return JSON.stringify(value);
 }
 
-function buildConfig(project: string, mcpEntrypoint: string, model?: string, reasoningEffort?: string): string {
+export function buildConfig(repositorioOrigem: string, workspaceSessao: string, mcpEntrypoint: string, model?: string, reasoningEffort?: string): string {
+  const sandbox = process.env.ORACLE_CODEX_SANDBOX === 'danger-full-access' ? 'danger-full-access' : 'workspace-write';
   const lines = [
     'web_search = "disabled"',
     'approval_policy = "on-request"',
-    'sandbox_mode = "danger-full-access"',
+    `sandbox_mode = "${sandbox}"`,
   ];
+  if (sandbox === 'workspace-write') {
+    lines.push('', '[sandbox_workspace_write]', `writable_roots = [${tomlString(workspaceSessao)}]`, 'network_access = true');
+  }
   if (model) lines.push(`model = ${tomlString(model)}`);
   if (reasoningEffort) lines.push(`model_reasoning_effort = ${tomlString(reasoningEffort)}`);
   lines.push(
     '',
     '[mcp_servers.oracle]',
     `command = ${tomlString(process.execPath)}`,
-    `args = [${tomlString(mcpEntrypoint)}, ${tomlString(project)}, "governed"]`,
+    `args = [${tomlString(mcpEntrypoint)}, ${tomlString(repositorioOrigem)}, "governed"]`,
     'required = true',
     'enabled = true',
     '',
@@ -116,7 +120,7 @@ export async function startGovernedAppServer(opcoes: OpcoesAppServer): Promise<G
         if (typeof error !== 'object' || error === null || !('code' in error) || error.code !== 'ENOENT') throw error;
       }
     }
-    await writeFile(join(stateDirectory, 'config.toml'), buildConfig(repositorioOrigem, mcpEntrypoint, process.env.ORACLE_CODEX_MODEL, process.env.ORACLE_CODEX_REASONING_EFFORT), { mode: 0o600 });
+    await writeFile(join(stateDirectory, 'config.toml'), buildConfig(repositorioOrigem, workspaceSessao, mcpEntrypoint, process.env.ORACLE_CODEX_MODEL, process.env.ORACLE_CODEX_REASONING_EFFORT), { mode: 0o600 });
     await writeFile(join(stateDirectory, 'AGENTS.md'), buildGovernedInstructions(domains), { mode: 0o600 });
 
     const port = await freePort();

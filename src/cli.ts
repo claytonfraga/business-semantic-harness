@@ -6,12 +6,14 @@ import { resolve } from 'node:path';
 import { addDomain, initProject } from './project/scaffold.js';
 import { queryOntology } from './ontology/query.js';
 import { validateProject } from './ontology/validate.js';
-import { diagnoseCodex } from './agents/codex/doctor.js';
+import { diagnoseCodex, diagnoseCodexRuntime } from './agents/codex/doctor.js';
 import { runCodexSession } from './agents/codex/session.js';
+import { resolverRepositorio } from './agents/codex/worktree.js';
+import { limparSessao, listarSessoesDoProjeto } from './agents/codex/sessions.js';
 
 export async function main(argv: string[]): Promise<number> {
   if (argv.length === 1 && argv[0] === '--help') {
-    process.stdout.write('oracle: init | domain add | ontology validate | ontology show | doctor | code base | agy\n');
+    process.stdout.write('oracle: init | domain add | ontology validate | ontology show | doctor | code base | sessions list|clean | agy\n');
     return 0;
   }
 
@@ -55,13 +57,31 @@ export async function main(argv: string[]): Promise<number> {
       return report.ready ? 0 : 1;
     }
     if ((command.length === 1 && command[0] === 'codex') || (command.length === 2 && command[0] === 'code' && command[1] === 'base')) {
-      const report = await diagnoseCodex(projectRoot);
+      const report = await diagnoseCodexRuntime(projectRoot);
       if (!report.ready) {
         process.stderr.write(`Sessão governada indisponível: ${report.reasons.join('; ')}\n`);
         return 1;
       }
       await runCodexSession(projectRoot);
       return 0;
+    }
+    if (command.length === 2 && command[0] === 'sessions' && command[1] === 'list') {
+      const repositorio = await resolverRepositorio(projectRoot);
+      const sessoes = await listarSessoesDoProjeto(repositorio);
+      if (sessoes.length === 0) {
+        process.stdout.write('Nenhuma sessao registrada.\n');
+        return 0;
+      }
+      for (const sessao of sessoes) {
+        process.stdout.write(`${sessao.id}\testado=${sessao.estado}\tbranch=${sessao.branch}\tworktree=${sessao.worktree}${sessao.orfa ? '\t[ORFA]' : ''}\n`);
+      }
+      return 0;
+    }
+    if (command.length === 3 && command[0] === 'sessions' && command[1] === 'clean') {
+      const repositorio = await resolverRepositorio(projectRoot);
+      const resultado = await limparSessao(repositorio, command[2]);
+      process.stdout.write(`${resultado.detalhes}\n`);
+      return resultado.removida ? 0 : 1;
     }
     if (command.length === 1 && command[0] === 'agy') {
       process.stderr.write('Adaptador Agy ainda não disponível: mediação de ações do Google Antigravity CLI não verificada.\n');

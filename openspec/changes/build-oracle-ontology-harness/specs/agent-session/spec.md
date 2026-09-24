@@ -75,7 +75,7 @@ O Oracle SHALL preservar as políticas de autenticação, sandbox e aprovação 
 - **THEN** o Oracle recusa a inicialização e explica o controle incompatível
 
 ### Requirement: Isolamento por Git worktree
-Toda sessão iniciada por `oracle codex` ou `oracle code base` SHALL trabalhar em uma Git worktree paralela e isolada, criada para aquela sessão a partir de uma branch própria. O Codex SHALL ler, editar, compilar, testar e executar comandos somente nessa worktree; o checkout principal SHALL permanecer intacto durante o trabalho do agente. O Oracle SHALL diferenciar o repositório de origem do workspace da sessão e SHALL usar `git worktree` real, sem cópia comum do diretório. Cada sessão SHALL ter branch e worktree próprias, com estado próprio, permitindo sessões paralelas sem colisão.
+Toda sessão iniciada por `oracle codex` ou `oracle code base` SHALL trabalhar em uma Git worktree paralela e isolada, criada para aquela sessão a partir de uma branch própria. O Codex SHALL ler, editar, compilar, testar e executar comandos somente nessa worktree; o checkout principal SHALL permanecer intacto durante o trabalho do agente. O Oracle SHALL diferenciar o repositório de origem do workspace da sessão e SHALL usar `git worktree` real, sem cópia comum do diretório. Por padrão, o Oracle SHALL restringir a área gravável do sandbox do agente à worktree da sessão, admitindo desativação explícita apenas por opção do usuário. Cada sessão SHALL ter branch e worktree próprias, com estado próprio, permitindo sessões paralelas sem colisão.
 
 #### Scenario: Sessão em worktree
 - **GIVEN** um repositório Git na branch `main`
@@ -123,3 +123,26 @@ Ao final da sessão, o Oracle SHALL executar os gates do projeto na worktree e S
 #### Scenario: Limpeza
 - **WHEN** a promoção termina com sucesso
 - **THEN** a worktree temporária é removida sem perder nenhum commit promovido
+
+### Requirement: Ciclo de vida e recuperação de sessão
+O Oracle SHALL modelar o ciclo de vida da sessão com estados explícitos e SHALL persistir metadados locais (branch de origem, commit base, identificador da sessão, caminho da worktree, data de criação e estado), sem versioná-los. O Oracle SHALL oferecer comandos ou serviços para listar sessões, identificar worktrees órfãs e remover sessões explicitamente descartadas, sem garbage collection destrutivo automático. Ao abortar, o Oracle SHALL parar o processo associado, preservar o checkout principal e não promover alterações. Uma nova execução SHALL conseguir identificar worktrees existentes e retomar ou remover quando possível.
+
+#### Scenario: Listar sessões
+- **WHEN** o usuário executa `oracle sessions list`
+- **THEN** o Oracle mostra, por sessão, estado, branch, worktree e se está órfã
+
+#### Scenario: Remover sessão descartada
+- **WHEN** o usuário executa `oracle sessions clean <id>`
+- **THEN** a worktree e a branch da sessão são removidas sem tocar no checkout principal
+
+#### Scenario: Abortamento
+- **WHEN** a sessão é cancelada durante o trabalho do agente
+- **THEN** o processo é interrompido, o checkout principal é preservado e nenhuma alteração é promovida
+
+### Requirement: Base da sessão congelada
+Depois de iniciada a sessão, o commit base SHALL permanecer conhecido e o Oracle SHALL NOT atualizar silenciosamente a base da worktree enquanto o agente trabalha. A reconciliação com avanços da branch de origem SHALL ocorrer somente na promoção.
+
+#### Scenario: Origem avança durante a sessão
+- **GIVEN** que a branch de origem avança enquanto o Codex trabalha
+- **WHEN** a sessão continua
+- **THEN** a worktree permanece na base original e a reconciliação acontece apenas na promoção
