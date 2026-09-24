@@ -166,3 +166,17 @@ test('E2E semantico: no public path promotes without going through the enforceme
     .sort();
   assert.deepEqual(comPromocao, ['agents/codex/finalize.ts', 'agents/codex/promotion.ts']);
 });
+
+test('E2E semantico 2: Given the agent reports a conflict, when finalized, then human review is requested and nothing is promoted', async () => {
+  const repo = prepararProjeto('relato-agente');
+  const commitBase = git(repo, ['rev-parse', 'HEAD']).trim();
+  const sessao = await criarSessaoWorktree({ repositorioOrigem: repo, branchOrigem: 'master', commitBase, diretorioBase: worktrees });
+  const snapshot = await createOntologySnapshot(repo);
+  const alertas = [
+    { domain: 'ativos', request: 'permitir transferir ativo baixado', reason: 'ativo baixado nao pode ser transferido', conflictingRules: ['urn:enforcement:ativos:TransferenciaShape'] },
+  ];
+  const resultado = await finalizeSession({ sessao, domain: 'ativos', snapshot, alerts: alertas, tokenTotals: undefined, ontologyQueries: 0, harnessTokens: 0, confirmar: async () => false });
+  assert.equal(resultado.status, 'descartado');
+  assert.equal(git(repo, ['status', '--porcelain']).trim(), '');
+  await removerSessaoWorktree(sessao);
+});
