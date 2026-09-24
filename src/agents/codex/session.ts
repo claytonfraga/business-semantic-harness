@@ -1,16 +1,16 @@
 import { spawn } from 'node:child_process';
-import { join } from 'node:path';
 import { loadManifest } from '../../project/manifest.js';
 import { createOntologySnapshot } from '../../ontology/query.js';
 import { diagnoseCodexRuntime } from './doctor.js';
 import { startGovernedAppServer } from './launcher.js';
-import { createProjectBackup } from './snapshot.js';
 import { finalizeSession } from './finalize.js';
 import { instrumentSession, type SessionInstrumentation } from './instrumenter.js';
 import { CodexRpcClient } from './rpc.js';
+import { branchAtual, commitAtual, criarSessaoWorktree, resolverRepositorio } from './worktree.js';
+import { gravarSessao } from './sessionState.js';
 
-async function verifyGovernedMcp(client: CodexRpcClient, project: string): Promise<void> {
-  const threadId = await client.startReadOnlyThread(project);
+async function verifyGovernedMcp(client: CodexRpcClient, repositorioOrigem: string): Promise<void> {
+  const threadId = await client.startReadOnlyThread(repositorioOrigem);
   try {
     await client.verifyOracleMcp(threadId);
   } finally {
@@ -18,9 +18,9 @@ async function verifyGovernedMcp(client: CodexRpcClient, project: string): Promi
   }
 }
 
-function launchTerminalUi(server: { url: string; project: string; stateDirectory: string }): Promise<number> {
+function launchTerminalUi(server: { url: string; workspaceSessao: string; stateDirectory: string }): Promise<number> {
   const environment = { ...process.env, CODEX_HOME: server.stateDirectory };
-  const child = spawn('codex', ['--remote', server.url], { cwd: server.project, env: environment, stdio: 'inherit' });
+  const child = spawn('codex', ['--remote', server.url], { cwd: server.workspaceSessao, env: environment, stdio: 'inherit' });
   return new Promise((resolve, reject) => {
     child.once('error', reject);
     child.once('exit', (code) => resolve(code ?? 0));
@@ -30,12 +30,16 @@ function launchTerminalUi(server: { url: string; project: string; stateDirectory
 export async function runCodexSession(root: string): Promise<void> {
   const report = await diagnoseCodexRuntime(root);
   if (!report.ready) throw new Error(`Sessão governada indisponível: ${report.reasons.join('; ')}`);
-  const manifest = await loadManifest(root);
-  const snapshot = await createOntologySnapshot(root);
+  const repositorioOrigem = await resolverRepositorio(root);
+  const branchOrigem = await branchAtual(repositorioOrigem);
+  const commitBase = await commitAtual(repositorioOrigem);
+  const incluirEstadoLocal = process.env.ORACLE_WORKTREE_INCLUDE_LOCAL === '1';
+  const sessao = await criarSessaoWorktree({ repositorioOrigem, branchOrigem, commitBase, incluirEstadoLocal });
+  await gravarSessao(repositorioOrigem, sessao, 'WORKTREE_READY');
+  const manifest = await loadManifest(repositorioOrigem);
+  const snapshot = await createOntologySnapshot(repositorioOrigem);
   const domains = manifest.domains.map((domain) => domain.id);
-  const server = await startGovernedAppServer(root, domains);
-  const backupDirectory = join(server.stateDirectory, 'backup');
-  await createProjectBackup(root, backupDirectory);
+  const server = await startGovernedAppServer({ repositorioOrigem, workspaceSessao: sessao.caminhoWorktree, domains });
   const control = CodexRpcClient.connectWebSocket(server.url);
   control.nativeApprovalMode = 'ignore';
   control.on('stderr', (text: string) => process.stderr.write(text));
@@ -61,17 +65,18 @@ export async function runCodexSession(root: string): Promise<void> {
   process.on('SIGTERM', () => onSignal(143));
   try {
     await control.initialize();
-    await control.verifyCleanConfiguration(server.project);
-    await verifyGovernedMcp(control, server.project);
-    instrumentation = await instrumentSession(control, root, server.project);
-    process.stdout.write(`Oracle pronto. Abrindo a TUI do Codex no projeto real; o Oracle instrumenta a sessão, mede tokens e alerta violações de ontologia. Domínios: ${domains.join(', ')}.\n`);
+    await control.verifyCleanConfiguration(sessao.caminhoWorktree);
+    await verifyGovernedMcp(control, repositorioOrigem);
+    instrumentation = await instrumentSession(control, repositorioOrigem, sessao.caminhoWorktree);
+    await gravarSessao(repositorioOrigem, sessao, 'AGENT_RUNNING');
+    process.stdout.write(`Oracle pronto. Sessao isolada: branch ${sessao.branchSessao} a partir de ${branchOrigem}@${commitBase.slice(0, 7)}; worktree ${sessao.caminhoWorktree}.\n`);
+    process.stdout.write(`O Codex trabalha apenas na worktree; o Oracle promove as alteracoes ao final. Dominios: ${domains.join(', ')}.\n`);
     terminalUiRunning = true;
     const code = await launchTerminalUi(server);
     terminalUiRunning = false;
     process.stdout.write(`\nOracle: a TUI do Codex encerrou (código ${code}). Consolidando a sessão.\n`);
     await finalizeSession({
-      root,
-      backupDirectory,
+      sessao,
       domain: manifest.domains.length === 1 ? manifest.domains[0].id : 'nao-classificado',
       snapshot,
       alerts: instrumentation.conflicts(),

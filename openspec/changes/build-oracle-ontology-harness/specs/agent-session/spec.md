@@ -74,20 +74,52 @@ O Oracle SHALL preservar as políticas de autenticação, sandbox e aprovação 
 - **WHEN** a sessão solicita desativar hooks ou contornar o sandbox necessário à fiscalização
 - **THEN** o Oracle recusa a inicialização e explica o controle incompatível
 
-### Requirement: Desenvolvimento normal no projeto real
-O Oracle SHALL permitir que o Codex use suas ferramentas nativas para ler, editar arquivos e executar verificações no próprio projeto, sem sandbox adicional imposto pelo Oracle. Antes da implementação, o Oracle SHALL injetar o contexto de governança e a ontologia para orientar o agente. Ao final da sessão, se a ontologia tiver sido respeitada, as alterações SHALL permanecer no projeto; se houver violação ou incerteza relatada, o Oracle SHALL exigir decisão humana de exceção e, em caso de negativa, SHALL reverter os arquivos alterados na sessão. Ontologia e SHACL do projeto SHALL ser a base da decisão.
+### Requirement: Isolamento por Git worktree
+Toda sessão iniciada por `oracle codex` ou `oracle code base` SHALL trabalhar em uma Git worktree paralela e isolada, criada para aquela sessão a partir de uma branch própria. O Codex SHALL ler, editar, compilar, testar e executar comandos somente nessa worktree; o checkout principal SHALL permanecer intacto durante o trabalho do agente. O Oracle SHALL diferenciar o repositório de origem do workspace da sessão e SHALL usar `git worktree` real, sem cópia comum do diretório. Cada sessão SHALL ter branch e worktree próprias, com estado próprio, permitindo sessões paralelas sem colisão.
 
-#### Scenario: Alteração aderente mantida
-- **GIVEN** um projeto com ontologia válida
-- **WHEN** o Codex altera código no projeto sem relatar conflito de ontologia
-- **THEN** as alterações permanecem no projeto e a decisão é auditada
+#### Scenario: Sessão em worktree
+- **GIVEN** um repositório Git na branch `main`
+- **WHEN** `oracle codex` inicia uma sessão
+- **THEN** uma branch `oracle/session/<id>` e uma worktree exclusiva são criadas a partir do HEAD de `main`
 
-#### Scenario: Alteração contrária negociada
-- **GIVEN** um projeto com ontologia válida
-- **WHEN** o Codex relata conflito de ontologia e o usuário nega a exceção
-- **THEN** o Oracle grava o alerta e reverte os arquivos alterados na sessão, e a decisão é auditada
+#### Scenario: Checkout principal intacto
+- **WHEN** o agente modifica, cria ou remove arquivos
+- **THEN** as mudanças ocorrem apenas na worktree e o checkout principal permanece byte a byte inalterado
 
-#### Scenario: Exceção aprovada
-- **GIVEN** um projeto com ontologia válida
-- **WHEN** o Codex relata conflito de ontologia e o usuário aprova a exceção
-- **THEN** as alterações permanecem no projeto e a aprovação é auditada
+#### Scenario: Sessões paralelas
+- **WHEN** duas sessões são iniciadas sobre o mesmo projeto
+- **THEN** cada uma usa branch e worktree próprias e não escreve na worktree da outra
+
+#### Scenario: Estado local preservado
+- **GIVEN** que o checkout principal tem alterações não commitadas
+- **WHEN** uma sessão é criada
+- **THEN** o Oracle não executa stash, reset, restore nem clean sobre elas
+
+### Requirement: Promoção por Git após validação
+Ao final da sessão, o Oracle SHALL executar os gates do projeto na worktree e SHALL promover as alterações à branch de origem por operações Git, somente após validação e decisão humana aplicável. A promoção SHALL usar fast-forward quando a branch de origem não avançou e SHALL reconciliar por rebase dentro da worktree quando tiver avançado. Conflitos SHALL permanecer somente na worktree. O Oracle SHALL NOT sobrescrever commits, resetar, limpar ou forçar a branch principal, e SHALL remover a worktree temporária após a promoção.
+
+#### Scenario: Promoção sem concorrência
+- **GIVEN** que a branch original não avançou e as validações passaram
+- **WHEN** a sessão é promovida
+- **THEN** as alterações aparecem na branch original por operação Git
+
+#### Scenario: Branch original avançou
+- **GIVEN** que a branch original avançou
+- **WHEN** a promoção é iniciada
+- **THEN** o Oracle reconcilia a branch da sessão com a base atual dentro da worktree, revalida os gates e promove sem perder os commits da origem
+
+#### Scenario: Conflito
+- **WHEN** a reconciliação produz conflito
+- **THEN** a branch principal permanece inalterada e o conflito permanece somente na worktree da sessão
+
+#### Scenario: Falha nos gates
+- **WHEN** os gates falham
+- **THEN** nenhuma alteração é promovida e a branch original permanece intacta
+
+#### Scenario: Rejeição
+- **WHEN** o usuário nega a exceção de ontologia
+- **THEN** a worktree e a branch da sessão são descartadas sem que o checkout principal precise de rollback
+
+#### Scenario: Limpeza
+- **WHEN** a promoção termina com sucesso
+- **THEN** a worktree temporária é removida sem perder nenhum commit promovido
