@@ -1,0 +1,15 @@
+BSH pronto. Sessao isolada: branch bsh/session/20260924-163833 a partir de master@34dbe45; worktree /home/clayton/.local
+/state/bsh/worktrees/b4177c863e48/20260924-163833.
+O Agy trabalha apenas na worktree; o BSH promove as alteracoes ao final. Dominios: ativos.
+BSH/Agy: abrindo a TUI real do agy (modelo: gemini-3.7-flash-low); o BSH revisa as mudancas ao sair.
+
+      ▄▀▀▄        Antigravity CLI 1.2.10
+     ▀▀▀▀▀▀       claytonfraga@gmail.com (Google AI Pro)
+    ▀▀▀▀▀▀▀▀      Gemini 3.7 Flash (Low)
+   ▄▀▀    ▀▀▄     /home/clayton/.local/state/bsh/worktrees/b4177c863e48/20260924-163833
+  ▄▀▀      ▀▀▄
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+>
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+? for shortcuts                                                                                   Gemini 3.7 Flash · low

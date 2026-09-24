@@ -13,7 +13,7 @@ export {
 export { integrar, reconciliar, type ResultadoPromocao, type StatusPromocao, type ValidadorGates } from '../agents/codex/promotion.js';
 export { finalizeSession, type FinalizeOptions } from '../agents/codex/finalize.js';
 export { gravarSessao, listarSessoes, type RegistroSessao } from '../agents/codex/sessionState.js';
-export { writeAlerts, type ConflictAlert } from '../agents/codex/alerts.js';
+export { writeAlerts, readConflictAlerts, countLines, type ConflictAlert } from '../agents/codex/alerts.js';
 export { formatUsageReport, type TokenTotals } from '../agents/codex/usage.js';
 export { avaliarOperacoes } from '../enforcement/motorEnforcement.js';
 export { validarOperacao } from '../enforcement/validadorSemantico.js';
