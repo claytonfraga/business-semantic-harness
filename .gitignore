@@ -11,6 +11,8 @@ __pycache__/
 *.log
 *.out
 openspec/
+screenshots/
+/evaluation/
 
 
 #Ignore vscode AI rules
