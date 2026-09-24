@@ -14,7 +14,8 @@ const DISABLED_FEATURES = [
 export interface GovernedAppServer {
   url: string;
   port: number;
-  project: string;
+  repositorioOrigem: string;
+  workspaceSessao: string;
   stateDirectory: string;
   process: ChildProcess;
   dispose(): Promise<void>;
@@ -25,11 +26,12 @@ function buildGovernedInstructions(domains: string[]): string {
   return [
     '# Sessao governada pelo Oracle',
     '',
-    'Este projeto e governado pelo Oracle. O Codex opera normalmente no projeto real.',
+    'Este projeto e governado pelo Oracle. Voce trabalha em uma worktree Git isolada da sessao.',
     'Sempre comece consultando a ontologia do dominio com a ferramenta MCP `oracle_query_ontology`, mesmo que o pedido pareca simples, e antes de implementar qualquer mudanca.',
     `Dominios declarados: ${list}.`,
     'Se um pedido contrariar a ontologia, chame `oracle_report_conflict` e aguarde a decisao humana; nao contorne essa decisao.',
     'O Oracle mede os tokens gastos na verificacao ontologica e alerta o humano em caso de violacao.',
+    'O checkout principal permanece intacto; o Oracle promove as alteracoes apos a validacao.',
     '',
   ].join('\n');
 }
@@ -94,8 +96,14 @@ async function waitUntilReady(port: number, child: ChildProcess): Promise<void> 
   }
 }
 
-export async function startGovernedAppServer(root: string, domains: string[]): Promise<GovernedAppServer> {
-  const project = root;
+export interface OpcoesAppServer {
+  repositorioOrigem: string;
+  workspaceSessao: string;
+  domains: string[];
+}
+
+export async function startGovernedAppServer(opcoes: OpcoesAppServer): Promise<GovernedAppServer> {
+  const { repositorioOrigem, workspaceSessao, domains } = opcoes;
   const stateDirectory = await mkdtemp(join(homedir(), '.oracle-codex-state-'));
   await chmod(stateDirectory, 0o700);
   const mcpEntrypoint = fileURLToPath(new URL('../../mcp/server.js', import.meta.url));
@@ -108,7 +116,7 @@ export async function startGovernedAppServer(root: string, domains: string[]): P
         if (typeof error !== 'object' || error === null || !('code' in error) || error.code !== 'ENOENT') throw error;
       }
     }
-    await writeFile(join(stateDirectory, 'config.toml'), buildConfig(project, mcpEntrypoint, process.env.ORACLE_CODEX_MODEL, process.env.ORACLE_CODEX_REASONING_EFFORT), { mode: 0o600 });
+    await writeFile(join(stateDirectory, 'config.toml'), buildConfig(repositorioOrigem, mcpEntrypoint, process.env.ORACLE_CODEX_MODEL, process.env.ORACLE_CODEX_REASONING_EFFORT), { mode: 0o600 });
     await writeFile(join(stateDirectory, 'AGENTS.md'), buildGovernedInstructions(domains), { mode: 0o600 });
 
     const port = await freePort();
@@ -119,7 +127,7 @@ export async function startGovernedAppServer(root: string, domains: string[]): P
       'app-server', '--listen', url,
     ];
     const environment = { ...process.env, CODEX_HOME: stateDirectory, ORACLE_SESSION_DIR: stateDirectory };
-    const child = spawn('codex', args, { cwd: project, env: environment, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
+    const child = spawn('codex', args, { cwd: workspaceSessao, env: environment, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
     child.stderr.on('data', (chunk: Buffer) => process.stderr.write(chunk.toString('utf8')));
     await waitUntilReady(port, child);
 
@@ -130,7 +138,7 @@ export async function startGovernedAppServer(root: string, domains: string[]): P
       catch { try { child.kill(signal); } catch { /* já encerrado */ } }
     };
     return {
-      url, port, project, stateDirectory, process: child,
+      url, port, repositorioOrigem, workspaceSessao, stateDirectory, process: child,
       async dispose() {
         if (disposed) return;
         disposed = true;

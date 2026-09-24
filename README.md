@@ -112,6 +112,8 @@ oracle code base
 
 Oracle **does not modify your Codex installation**: it uses a private `CODEX_HOME` with a copy of `auth.json` and never touches `~/.codex`. Type your requests in the TUI as usual, and exit with `/quit` or `Ctrl+C` so Oracle can finalize the session.
 
+Each session runs in an **isolated Git worktree**. Oracle identifies the current branch and its HEAD, creates a session branch `oracle/session/<id>` and a real `git worktree` (under a private Oracle state directory, outside your project), and starts Codex there. Your main checkout stays untouched while the agent works, so you can keep using it. When the session ends, Oracle runs the project's gates in the worktree and **promotes the changes with Git** — fast-forward when the origin branch has not moved, or a rebase inside the worktree when it has. Promoted commits reach the origin branch; the temporary worktree and branch are then removed. Oracle never resets, cleans, or force-pushes your main checkout, and never runs `stash`/`reset`/`restore`/`clean` to make room for a session.
+
 You can also use the alias and point at the project without entering its directory:
 
 ```bash
@@ -122,8 +124,8 @@ The command always uses the ontology from the selected directory. Each project n
 
 When the agent reports a conflict with the ontology (through the `oracle_report_conflict` tool), Oracle records an **ALERT** in `.oracle/local/alerts.jsonl` and, at the end of the session, asks for your decision:
 
-- **Ontology respected** (no conflict reported): the changes stay in the project.
-- **Violation or uncertainty**: you can **approve the exception** (the changes stay) or **deny it**. If you deny it, Oracle **reverts** the files changed during the session, from a private backup taken at startup.
+- **Ontology respected** (no conflict reported): the changes are promoted to the origin branch.
+- **Violation or uncertainty**: you can **approve the exception** (the changes are promoted) or **deny it**. If you deny it, Oracle **discards the session worktree and branch**; your main checkout never needed a rollback.
 
 Oracle **does not answer** Codex's native approvals (for example, running `npm test`); those remain your decisions in the TUI.
 
@@ -138,7 +140,7 @@ At the end of the session, Oracle prints a summary with:
 
 The summary is also written to `.oracle/local/`, alongside the audit trail. Codex shows live token usage in its own TUI.
 
-For source code, the link between a diff and RDF facts is partial: Oracle **does not claim that SHACL proved the code's behavior**. Review the diff and run your project's tests. Changes under `.oracle/` require their own editing and validation. Because Codex runs in the real project with no extra sandbox, treat the session the way you would treat Codex normally — with Oracle measuring, alerting, and able to revert at the end.
+For source code, the link between a diff and RDF facts is partial: Oracle **does not claim that SHACL proved the code's behavior**. Review the diff and run your project's tests. Changes under `.oracle/` require their own editing and validation. Because Codex works in an isolated worktree, an intermediate or rejected change never reaches your main checkout; Oracle validates and promotes only after the session ends.
 
 ## Code quality
 

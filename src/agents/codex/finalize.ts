@@ -4,12 +4,14 @@ import { appendAudit } from '../../decision/audit.js';
 import { actionDigest, evaluateAction, type ProposedAction } from '../../decision/evaluate.js';
 import type { OntologySnapshot } from '../../ontology/query.js';
 import { writeAlerts, type ConflictAlert } from './alerts.js';
-import { collectChangedPaths, restoreFile, type FileChange } from './snapshot.js';
+import { alteracoesNaWorktree, removerSessaoWorktree, type SessaoWorktree } from './worktree.js';
+import { promoverSessao, type StatusPromocao, type ValidadorGates } from './promotion.js';
+import { gravarSessao } from './sessionState.js';
+import type { FileChange } from './snapshot.js';
 import { formatSavingsReport, formatUsageReport, type SavingsReport, type TokenTotals } from './usage.js';
 
 export interface FinalizeOptions {
-  root: string;
-  backupDirectory: string;
+  sessao: SessaoWorktree;
   domain: string;
   snapshot: OntologySnapshot;
   alerts: ConflictAlert[];
@@ -17,6 +19,12 @@ export interface FinalizeOptions {
   ontologyQueries: number;
   harnessTokens: number;
   savings?: SavingsReport;
+  validarGates?: ValidadorGates;
+}
+
+export interface ResultadoFinalizacao {
+  status: StatusPromocao | 'sem-alteracoes' | 'descartado';
+  promovido: boolean;
 }
 
 function buildAction(domain: string, change: FileChange): ProposedAction {
@@ -57,58 +65,79 @@ async function auditChange(
   });
 }
 
-async function confirmException(): Promise<boolean> {
+async function confirmException(branchOrigem: string): Promise<boolean> {
   const terminal = createInterface({ input: process.stdin, output: process.stdout });
   try {
-    const answer = (await terminal.question('Aprovar excecao e manter as alteracoes no projeto? [s/N] ')).trim().toLowerCase();
+    const answer = (await terminal.question(`Aprovar excecao e promover as alteracoes da worktree para ${branchOrigem}? [s/N] `)).trim().toLowerCase();
     return answer === 's' || answer === 'sim';
   } finally {
     terminal.close();
   }
 }
 
-export async function finalizeSession(options: FinalizeOptions): Promise<{ kept: number; reverted: number }> {
-  const { root, backupDirectory, domain, snapshot, alerts, tokenTotals, ontologyQueries, harnessTokens, savings } = options;
+export async function finalizeSession(options: FinalizeOptions): Promise<ResultadoFinalizacao> {
+  const { sessao, domain, snapshot, alerts, tokenTotals, ontologyQueries, harnessTokens, savings, validarGates } = options;
+  const root = sessao.repositorioOrigem;
   process.stdout.write(`\n${formatUsageReport(tokenTotals, ontologyQueries, alerts.length, harnessTokens)}\n`);
   if (savings) process.stdout.write(`${formatSavingsReport(savings)}\n`);
   if (alerts.length > 0) {
-    const sessionId = randomUUID();
-    const alertsFile = await writeAlerts(root, sessionId, alerts);
+    const alertsFile = await writeAlerts(root, randomUUID(), alerts);
     process.stdout.write(`\nALERTA: a sessao contrariou ou nao confirmou a ontologia. Registrado em ${alertsFile}.\n`);
     for (const alert of alerts) {
       process.stdout.write(`  - [${alert.domain}] ${alert.reason} | regras: ${alert.conflictingRules.join('; ')}\n`);
     }
   }
-  const changes = await collectChangedPaths(root, backupDirectory);
-  if (changes.length === 0 && alerts.length === 0) {
-    process.stdout.write('Oracle: nenhuma alteracao do Codex no projeto.\n');
-    return { kept: 0, reverted: 0 };
+  const alteracoes = await alteracoesNaWorktree(sessao);
+  process.stdout.write(`Oracle: worktree da sessao ${sessao.id} em ${sessao.caminhoWorktree}; branch ${sessao.branchSessao}.\n`);
+  if (alteracoes.length === 0 && alerts.length === 0) {
+    process.stdout.write('Oracle: nenhuma alteracao do Codex na worktree; nada a promover.\n');
+    await gravarSessao(root, sessao, 'CLEANED');
+    await removerSessaoWorktree(sessao, false);
+    return { status: 'sem-alteracoes', promovido: false };
   }
-  if (changes.length > 0) {
-    process.stdout.write(`Oracle: ${changes.length} arquivo(s) alterado(s): ${changes.map((change) => change.path).join(', ')}\n`);
+  if (alteracoes.length > 0) {
+    process.stdout.write(`Oracle: ${alteracoes.length} arquivo(s) alterado(s): ${alteracoes.map((change) => change.path).join(', ')}\n`);
   }
-  if (alerts.length === 0) {
-    process.stdout.write('Oracle: ontologia respeitada na sessao (sem conflitos relatados); alteracoes mantidas.\n');
-    for (const change of changes) {
-      await auditChange(root, domain, change, snapshot, 'allow', 'oracle-harness', 'Ontologia respeitada: nenhum conflito relatado na sessao');
+
+  if (alerts.length > 0) {
+    const aprovado = await confirmException(sessao.branchOrigem);
+    if (!aprovado) {
+      for (const change of alteracoes) await auditChange(root, domain, change, snapshot, 'deny', 'local-user', 'Excecao negada pelo usuario');
+      await gravarSessao(root, sessao, 'DISCARDED');
+      await removerSessaoWorktree(sessao, true);
+      process.stdout.write('Oracle: excecao negada; worktree e branch da sessao removidas. O checkout principal nao foi alterado.\n');
+      return { status: 'descartado', promovido: false };
     }
-    return { kept: changes.length, reverted: 0 };
   }
-  const approved = await confirmException();
-  if (approved) {
-    for (const change of changes) {
-      await auditChange(root, domain, change, snapshot, 'allow', 'local-user', 'Excecao aprovada pelo usuario');
+
+  process.stdout.write('Oracle: validando gates na worktree e promovendo por Git...\n');
+  await gravarSessao(root, sessao, 'VALIDATING');
+  const resultado = await promoverSessao(sessao, { validarGates });
+  if (resultado.status === 'promovido') {
+    for (const change of alteracoes) await auditChange(root, domain, change, snapshot, 'allow', 'oracle-harness', alerts.length > 0 ? 'Excecao aprovada pelo usuario' : 'Ontologia respeitada na sessao');
+    await gravarSessao(root, sessao, 'PROMOTED');
+    await removerSessaoWorktree(sessao, true);
+    await gravarSessao(root, sessao, 'CLEANED');
+    process.stdout.write(`Oracle: ${resultado.detalhes} Worktree temporaria removida.\n`);
+    return { status: 'promovido', promovido: true };
+  }
+  if (resultado.status === 'falha-validacao') {
+    await gravarSessao(root, sessao, 'VALIDATION_FAILED');
+    process.stdout.write('Oracle: a validacao falhou na worktree; nada foi promovido. A branch principal permanece intacta.\n');
+    process.stdout.write(`${resultado.detalhes}\n`);
+    process.stdout.write('Oracle: a worktree foi preservada para correcao; a sessao pode ser retomada ou descartada.\n');
+    return { status: 'falha-validacao', promovido: false };
+  }
+  if (resultado.status === 'conflitado') {
+    await gravarSessao(root, sessao, 'CONFLICTED');
+    process.stdout.write(`Oracle: ${resultado.detalhes}\n`);
+    if (resultado.arquivosConflito && resultado.arquivosConflito.length > 0) {
+      process.stdout.write(`Oracle: arquivos em conflito: ${resultado.arquivosConflito.join(', ')}\n`);
     }
-    process.stdout.write('Oracle: excecao aprovada; alteracoes mantidas.\n');
-    return { kept: changes.length, reverted: 0 };
+    process.stdout.write('Oracle: o conflito permanece somente na worktree; a branch principal nao foi alterada.\n');
+    return { status: 'conflitado', promovido: false };
   }
-  for (const change of changes) {
-    await restoreFile(root, backupDirectory, change);
-    await auditChange(root, domain, change, snapshot, 'deny', 'local-user', 'Excecao negada pelo usuario');
-  }
-  process.stdout.write(`Oracle: excecao negada; ${changes.length} alteracao(oes) revertida(s) no projeto.\n`);
-  process.stdout.write('Oracle: aguardando a resposta do Codex e encerrando o teste E2E em 10 segundos...\n');
-  await new Promise((resolve) => setTimeout(resolve, 10_000));
-  process.stdout.write('Oracle: teste E2E encerrado.\n');
-  return { kept: 0, reverted: changes.length };
+  await gravarSessao(root, sessao, 'PROMOTION_FAILED');
+  process.stdout.write(`Oracle: promocao nao realizada; a branch principal permanece intacta. ${resultado.detalhes}\n`);
+  return { status: 'bloqueado', promovido: false };
 }
