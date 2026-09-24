@@ -1,16 +1,21 @@
 {
   "regras": [
-    { "id": "violacao-baixado", "operacao": "TransferenciaAtivo",
-      "quando": { "caminho": "src/**", "removeu": "status === 'Baixado'" },
-      "fatos": [
-        { "propriedade": "estadoAtual", "valor": "Baixado", "determinacao": "observado", "origem": "diff" },
-        { "propriedade": "novoResponsavel", "valor": "x", "determinacao": "observado", "origem": "diff" },
-        { "propriedade": "novaLocalizacao", "valor": "y", "determinacao": "observado", "origem": "diff" } ] },
-    { "id": "politica-justificativa", "operacao": "TransferenciaAtivo",
-      "quando": { "caminho": "src/**", "adicionou": "GOV-JUSTIFICATIVA" },
+    { "id": "transf-baixado", "operacao": "TransferenciaAtivo", "quando": { "caminho": "src/**", "removeu": "nao pode ser transferido" },
+      "fatos": [ { "propriedade": "estadoAtual", "valor": "Baixado", "determinacao": "observado", "origem": "diff" },
+                 { "propriedade": "novoResponsavel", "valor": "x", "determinacao": "observado", "origem": "diff" } ] },
+    { "id": "transf-sem-responsavel", "operacao": "TransferenciaAtivo", "quando": { "caminho": "src/**", "removeu": "responsavel obrigatorio" },
       "fatos": [ { "propriedade": "estadoAtual", "valor": "Disponivel", "determinacao": "observado", "origem": "diff" } ] },
-    { "id": "fato-indeterminado", "operacao": "TransferenciaAtivo",
-      "quando": { "caminho": "src/**", "adicionou": "GOV-PENDENTE" },
-      "fatos": [ { "propriedade": "estadoAtual", "valor": null, "determinacao": "indeterminado", "origem": "diff" } ] }
+    { "id": "baixa-sem-motivo", "operacao": "BaixaAtivo", "quando": { "caminho": "src/**", "removeu": "motivo obrigatorio" },
+      "fatos": [ { "propriedade": "estadoAtual", "valor": "EmUso", "determinacao": "observado", "origem": "diff" } ] },
+    { "id": "resp-baixado", "operacao": "AlteracaoResponsavel", "quando": { "caminho": "src/**", "removeu": "nao pode mudar de responsavel" },
+      "fatos": [ { "propriedade": "estadoAtual", "valor": "Baixado", "determinacao": "observado", "origem": "diff" } ] },
+    { "id": "loc-baixado", "operacao": "AtualizacaoLocalizacao", "quando": { "caminho": "src/**", "removeu": "nao pode mudar de localizacao" },
+      "fatos": [ { "propriedade": "estadoAtual", "valor": "Baixado", "determinacao": "observado", "origem": "diff" } ] },
+    { "id": "transf-justificativa", "operacao": "TransferenciaAtivo", "quando": { "caminho": "src/**", "adicionou": "GOV-JUSTIFICATIVA" },
+      "fatos": [ { "propriedade": "estadoAtual", "valor": "Disponivel", "determinacao": "observado", "origem": "diff" },
+                 { "propriedade": "novoResponsavel", "valor": "Ana", "determinacao": "observado", "origem": "diff" } ] },
+    { "id": "transf-indeterminado", "operacao": "TransferenciaAtivo", "quando": { "caminho": "src/**", "adicionou": "GOV-PENDENTE" },
+      "fatos": [ { "propriedade": "estadoAtual", "valor": null, "determinacao": "indeterminado", "origem": "diff" },
+                 { "propriedade": "novoResponsavel", "valor": "Ana", "determinacao": "observado", "origem": "diff" } ] }
   ]
 }
