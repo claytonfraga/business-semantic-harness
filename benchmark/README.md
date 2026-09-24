@@ -29,7 +29,7 @@ benchmark/
   results/
     <data-hora-segundos>/       um benchmark (lote)
       1/ ... n/                 execucoes individuais (prompt.txt, metadata.json,
-                                result.json, sem-bsh/ e com-bsh/)
+                                result.json, sem-harness/ e com-harness/)
       aquecimento/              execucoes descartadas
       charts/                   graficos 300 dpi
       stats.md / stats.json     analise agregada do lote
