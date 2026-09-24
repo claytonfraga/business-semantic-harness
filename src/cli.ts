@@ -8,12 +8,13 @@ import { queryOntology } from './ontology/query.js';
 import { validateProject } from './ontology/validate.js';
 import { diagnoseCodex, diagnoseCodexRuntime } from './agents/codex/doctor.js';
 import { runCodexSession } from './agents/codex/session.js';
+import { runAgySession } from './agents/agy/session.js';
 import { resolverRepositorio } from './agents/codex/worktree.js';
 import { limparSessao, listarSessoesDoProjeto } from './agents/codex/sessions.js';
 
 export async function main(argv: string[]): Promise<number> {
   if (argv.length === 1 && argv[0] === '--help') {
-    process.stdout.write('bsh: init | domain add | ontology validate | ontology show | doctor | code base | sessions list|clean\n');
+    process.stdout.write('bsh: init | domain add | ontology validate | ontology show | doctor | code base | agy <pedido> | sessions list|clean\n');
     return 0;
   }
 
@@ -63,6 +64,20 @@ export async function main(argv: string[]): Promise<number> {
         return 1;
       }
       await runCodexSession(projectRoot);
+      return 0;
+    }
+    if (command.length >= 1 && command[0] === 'agy') {
+      let prompt = command.slice(1).join(' ').trim();
+      if (!prompt && !process.stdin.isTTY) {
+        const partes: Buffer[] = [];
+        for await (const bloco of process.stdin) partes.push(bloco as Buffer);
+        prompt = Buffer.concat(partes).toString('utf8').trim();
+      }
+      if (!prompt) {
+        process.stderr.write('Informe o pedido do agy como argumento ou via stdin.\n');
+        return 2;
+      }
+      await runAgySession(projectRoot, prompt, process.env.BSH_AGY_MODEL, process.env.BSH_AGY_EFFORT);
       return 0;
     }
     if (command.length === 2 && command[0] === 'sessions' && command[1] === 'list') {
