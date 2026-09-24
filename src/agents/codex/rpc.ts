@@ -109,7 +109,7 @@ export class CodexRpcClient extends EventEmitter {
   respondError(id: JsonRpcId, code: number, message: string): void { this.send({ id, error: { code, message } }); }
 
   async initialize(): Promise<void> {
-    await this.request('initialize', { clientInfo: { name: 'bsh', title: 'Business Semantic Harness', version: '0.2.0' } });
+    await this.request('initialize', { clientInfo: { name: 'bsh', title: 'Business Semantic Harness', version: '0.0.2-beta' } });
     this.notify('initialized');
   }
 
