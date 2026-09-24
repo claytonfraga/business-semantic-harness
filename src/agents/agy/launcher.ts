@@ -36,10 +36,10 @@ export interface ResultadoAgy {
 
 /** Executa um pedido headless (`agy --print`) dentro da worktree, com config isolada. */
 export function executarAgy(estado: EstadoAgy, workspace: string, prompt: string, modelo?: string, esforco?: string): Promise<ResultadoAgy> {
-  const args = ['--print', '--output-format', 'json', '--dangerously-skip-permissions'];
+  const args = ['--output-format', 'json', '--dangerously-skip-permissions'];
   if (modelo) args.push('--model', modelo);
   if (esforco) args.push('--effort', esforco);
-  args.push(prompt);
+  args.push(`--print=${prompt}`);
   const environment: NodeJS.ProcessEnv = { ...process.env, GEMINI_DIR: estado.diretorio };
   return new Promise((resolve, reject) => {
     const filho = spawn('agy', args, { cwd: workspace, env: environment, stdio: ['ignore', 'pipe', 'pipe'] });
@@ -52,18 +52,20 @@ export function executarAgy(estado: EstadoAgy, workspace: string, prompt: string
 
 function numero(valor: unknown): number { return typeof valor === 'number' && Number.isFinite(valor) ? valor : 0; }
 
-/** Extrai tokens do JSON do agy quando disponivel; retorna undefined quando o formato nao for observavel. */
+/** Extrai tokens do JSON do agy; campos observados: input_tokens, output_tokens, thinking_tokens, cache_read_tokens, total_tokens. */
 export function extrairTokens(saida: string): ResultadoAgy['tokens'] {
   for (const linha of saida.split('\n').reverse()) {
     const texto = linha.trim();
     if (!texto.startsWith('{')) continue;
     try {
       const evento = JSON.parse(texto) as Record<string, unknown>;
-      const usage = (evento.usage ?? evento.tokens ?? (evento.result as Record<string, unknown> | undefined)?.usage) as Record<string, unknown> | undefined;
+      const usage = (evento.usage ?? evento.tokens) as Record<string, unknown> | undefined;
       if (usage) {
-        const entrada = numero(usage.input_tokens ?? usage.inputTokens);
-        const saida = numero(usage.output_tokens ?? usage.outputTokens);
-        return { entrada, saida, cache: numero(usage.cached_input_tokens ?? usage.cachedInputTokens), raciocinio: numero(usage.reasoning_output_tokens ?? usage.reasoningOutputTokens), totais: entrada + saida };
+        const entrada = numero(usage.input_tokens);
+        const saidaTokens = numero(usage.output_tokens);
+        const total = numero(usage.total_tokens) || entrada + saidaTokens;
+        if (total === 0) return undefined;
+        return { entrada, saida: saidaTokens, cache: numero(usage.cache_read_tokens), raciocinio: numero(usage.thinking_tokens), totais: total };
       }
     } catch { /* linha nao-JSON */ }
   }
