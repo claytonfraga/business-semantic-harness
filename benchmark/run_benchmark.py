@@ -38,6 +38,11 @@ CONCORRENCIA = max(1, int(os.environ.get("BENCH_CONCURRENCY", "3")))
 MODEL = os.environ.get("BENCH_MODEL", "gpt-6-sol")
 EFFORT = os.environ.get("BENCH_EFFORT", "low")
 LOTE = time.strftime("%Y-%m-%dT%H-%M-%S")
+CONDICOES = [
+    ("sem-harness", ""),
+    ("com-contexto-sem-enforcement", "BSH_ENFORCEMENT=off "),
+    ("com-harness", ""),
+]
 
 
 def sha256_texto(texto):
@@ -73,11 +78,11 @@ def escrever_metadados(diretorio, dados):
         json.dump(dados, handle, indent=2, ensure_ascii=False)
 
 
-def executar_condicao(condicao, execucao, condition_dir, prompt):
+def executar_condicao(condicao, execucao, condition_dir, prompt, extra_env=""):
     try:
         if condicao == "sem-harness":
             return conditions.run_sem_bsh(condition_dir, PILOT, prompt, MODEL, EFFORT)
-        return conditions.run_com_bsh(condition_dir, PILOT, prompt, MODEL, EFFORT, f"bench-{condicao}-{LOTE}-{execucao}")
+        return conditions.run_com_bsh(condition_dir, PILOT, prompt, MODEL, EFFORT, f"bench-{condicao}-{LOTE}-{execucao}", extra_env)
     except Exception as error:  # noqa: BLE001
         print(f"[{LOTE} #{execucao}] {condicao} erro: {error}", flush=True)
         return {"condicao": condicao, "entrada": 0, "cache": 0, "saida": 0, "raciocinio": 0, "totais": 0,
@@ -91,7 +96,7 @@ def executar_execucao(execucao, lista_prompts):
     with open(os.path.join(execution_dir, "prompt.txt"), "w", encoding="utf-8") as handle:
         handle.write(prompt["texto"] + "\n")
     rng = random.Random(f"{LOTE}-{execucao}")
-    ordem = ["sem-harness", "com-harness"]
+    ordem = [nome for nome, _ in CONDICOES]
     rng.shuffle(ordem)
     escrever_metadados(execution_dir, {
         "lote": LOTE, "execucao": execucao, "prompt_arquivo": prompt["arquivo"], "prompt": prompt["texto"],
@@ -103,7 +108,7 @@ def executar_execucao(execucao, lista_prompts):
         condition_dir = os.path.join(execution_dir, condicao)
         os.makedirs(condition_dir, exist_ok=True)
         print(f"[{LOTE} #{execucao}] {condicao}", flush=True)
-        row = executar_condicao(condicao, execucao, condition_dir, prompt["texto"])
+        row = executar_condicao(condicao, execucao, condition_dir, prompt["texto"], dict(CONDICOES).get(condicao, ""))
         record = {**row, "execucao": execucao, "lote": LOTE, "modelo": MODEL, "esforco": EFFORT, "prompt_sha256": sha256_texto(prompt["texto"])}
         with open(os.path.join(condition_dir, "result.json"), "w", encoding="utf-8") as handle:
             json.dump(record, handle, indent=2)
@@ -118,11 +123,11 @@ def executar_aquecimento(lista_prompts):
         return
     prompt = lista_prompts[0]
     for indice in range(1, WARMUP + 1):
-        for condicao in ("sem-harness", "com-harness"):
+        for condicao, extra_env in CONDICOES:
             directory = os.path.join(RESULTS, LOTE, "aquecimento", str(indice), condicao)
             os.makedirs(directory, exist_ok=True)
             print(f"[{LOTE}] aquecimento {indice} {condicao}", flush=True)
-            executar_condicao(condicao, f"aquecimento-{indice}", directory, prompt["texto"])
+            executar_condicao(condicao, f"aquecimento-{indice}", directory, prompt["texto"], extra_env)
 
 
 def main():

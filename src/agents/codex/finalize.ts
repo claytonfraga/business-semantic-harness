@@ -1,8 +1,15 @@
 import { randomUUID } from 'node:crypto';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { appendAudit } from '../../decision/audit.js';
 import { actionDigest, evaluateAction, type ProposedAction } from '../../decision/evaluate.js';
 import type { OntologySnapshot } from '../../ontology/query.js';
+import { validateProject } from '../../ontology/validate.js';
+import { carregarRegrasGovernanca } from '../../enforcement/governanca.js';
+import { aplicarRegras, lerDiff } from '../../enforcement/extratorOperacoes.js';
+import { avaliarOperacoes } from '../../enforcement/motorEnforcement.js';
+import type { ResultadoEnforcementLote } from '../../enforcement/operacaoSemantica.js';
 import { writeAlerts, type ConflictAlert } from './alerts.js';
 import { alteracoesNaWorktree, removerSessaoWorktree, type SessaoWorktree } from './worktree.js';
 import { promoverSessao, type StatusPromocao, type ValidadorGates } from './promotion.js';
@@ -99,7 +106,35 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
     process.stdout.write(`BSH: ${alteracoes.length} arquivo(s) alterado(s): ${alteracoes.map((change) => change.path).join(', ')}\n`);
   }
 
-  if (alerts.length > 0) {
+  let enforcement: ResultadoEnforcementLote = { status: 'conforme', bloquear: false, resultados: [] };
+  if (process.env.BSH_ENFORCEMENT !== 'off' && alteracoes.length > 0) {
+    const regras = await carregarRegrasGovernanca(root);
+    const diffs = await lerDiff(sessao.caminhoWorktree, sessao.commitBase);
+    const operacoes = aplicarRegras(regras, diffs);
+    if (operacoes.length > 0) {
+      enforcement = await avaliarOperacoes(root, snapshot, operacoes);
+      process.stdout.write(`\nBSH enforcement independente: ${enforcement.resultados.length} operacao(oes) governada(s); status ${enforcement.status}.\n`);
+      for (const resultado of enforcement.resultados) {
+        process.stdout.write(`  - [${resultado.dominio}] ${resultado.operacao}: status=${resultado.status}${resultado.shape ? ` shape=${resultado.shape}` : ''}${resultado.regra ? ` regra=${resultado.regra}` : ''}\n`);
+      }
+      const diretorio = join(root, '.bsh', 'local', 'enforcement');
+      await mkdir(diretorio, { recursive: true });
+      await writeFile(join(diretorio, `${sessao.id}.json`), JSON.stringify(enforcement, null, 2), { mode: 0o600 });
+    }
+    if (alteracoes.some((change) => change.path.startsWith('.bsh/domains/'))) {
+      const relatorio = await validateProject(sessao.caminhoWorktree);
+      if (!relatorio.ready) {
+        enforcement = { ...enforcement, status: 'violacao', bloquear: true };
+        process.stdout.write('BSH enforcement independente: alteracao de ontologia invalida na worktree.\n');
+      }
+    }
+  }
+  const exigirDecisao = alerts.length > 0 || enforcement.bloquear || enforcement.status === 'revisao_humana';
+
+  if (exigirDecisao) {
+    if (enforcement.bloquear || enforcement.status === 'revisao_humana') {
+      process.stdout.write(`\nBSH interceptou a alteracao (enforcement ${enforcement.status}); a promocao exige decisao humana.\n`);
+    }
     const aprovado = await confirmException(sessao.branchOrigem);
     if (!aprovado) {
       for (const change of alteracoes) await auditChange(root, domain, change, snapshot, 'deny', 'local-user', 'Excecao negada pelo usuario');
@@ -114,7 +149,7 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
   await gravarSessao(root, sessao, 'VALIDATING');
   const resultado = await promoverSessao(sessao, { validarGates });
   if (resultado.status === 'promovido') {
-    for (const change of alteracoes) await auditChange(root, domain, change, snapshot, 'allow', 'bsh-harness', alerts.length > 0 ? 'Excecao aprovada pelo usuario' : 'Ontologia respeitada na sessao');
+    for (const change of alteracoes) await auditChange(root, domain, change, snapshot, 'allow', 'bsh-harness', exigirDecisao ? 'Excecao aprovada pelo usuario' : 'Ontologia respeitada na sessao');
     await gravarSessao(root, sessao, 'PROMOTED');
     await removerSessaoWorktree(sessao, true);
     await gravarSessao(root, sessao, 'CLEANED');

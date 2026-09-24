@@ -17,11 +17,12 @@ import matplotlib.pyplot as plt
 from scipy import stats as scipy_stats
 
 from lib import statistics as stats
+from report import gerar_relatorio
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent
 RESULTS = HERE / "results"
-ROTULOS = {"sem-harness": "Codex sem harness", "com-harness": "Codex com harness"}
+ROTULOS = {"sem-harness": "A - Codex direto", "com-contexto-sem-enforcement": "B - Codex com contexto, sem enforcement", "com-harness": "C - Codex com BSH e enforcement"}
 CORES = {"sem-harness": "#D55E00", "com-harness": "#0072B2"}
 
 plt.rcParams.update({
@@ -372,6 +373,7 @@ def analisar(lote_dir):
         "benchmark/.venv/bin/python benchmark/analyze.py", "```",
     ]
     (lote_dir / "stats.md").write_text("\n".join(linhas) + "\n", encoding="utf-8")
+    gerar_relatorio(lote_dir)
     return relatorio
 
 

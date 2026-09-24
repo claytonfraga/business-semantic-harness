@@ -2,9 +2,26 @@
 
 [![CI](https://github.com/claytonfraga/business-semantic-harness/actions/workflows/ci.yml/badge.svg)](https://github.com/claytonfraga/business-semantic-harness/actions/workflows/ci.yml)
 
-The **Business Semantic Harness** is a wrapper for the Codex coding agent that gives it an explicit, verifiable model of your project's business domain. Instead of letting the agent change code from a prompt alone, the harness hands it a domain ontology written in JSON-LD and a set of verifiable rules written in SHACL, keeps the agent working in an isolated Git worktree, measures the tokens it spends on the domain checks, and only promotes the result to your branch after validation and any required human decision.
+The **Business Semantic Harness** helps you let a coding agent change your project **without letting it break your business rules**. You describe your domain once — its concepts, states and rules — as a small, verifiable model that lives with your project. From then on, whenever the agent works, the harness checks its changes against that model **on its own**. It does not trust the agent to notice or report a violation: if a change would break a rule, the harness stops it and asks you; if the change is fine, it promotes it to your branch. While the agent works, it stays in a separate copy of your project, so your own files are never touched until you accept the result, and the harness tells you how much the checks cost.
 
-The ontology and the SHACL rules belong to **your project**, not to this package. They live under the project's `.bsh/` directory, are versioned with the project, and are loaded every time the harness opens a session for it. The globally installed package ships the engine and the `bsh` command; it neither replaces nor shares one project's ontology with another.
+In short, it turns "I hope the agent respects my rules" into "the agent can propose anything, but a governed change is only accepted after passing my project's rules, independently of the agent".
+
+### What it actually does
+
+- **Keeps your rules with your project.** The ontology (JSON-LD) and the rules (SHACL) live under the project's `.bsh/` directory, are versioned with the project, and are loaded every time the harness opens a session. The installed package ships the engine; it never replaces or shares one project's rules with another.
+- **Enforces independently of the agent.** Before a change is accepted, an enforcement layer reads the change, builds the relevant domain facts, evaluates them against the ontology and SHACL, and decides: conform, violation, needs human review, or undetermined. If a required fact cannot be established for a governed operation, the change is not treated as fine — it goes to a human.
+- **Isolates the work.** The agent runs in a real Git worktree, on a session branch. Your main checkout stays untouched; only after the change passes the checks (and any human decision) does the harness promote it to your branch with Git.
+- **Keeps you in control of judgement calls.** Rules that require human judgement are never decided automatically; the harness asks, records your decision, and never rewrites the rule to fit an exception.
+- **Leaves a trail.** Every decision — facts used, shapes evaluated, policies found, result and human choice — is auditable under the project's `.bsh/local/`.
+- **Keeps the model out of the loop when it can.** The ontology is processed locally; the agent only gets compact answers, so checking your rules does not mean shipping them into the prompt.
+
+### Why it can be good
+
+- Business rules stop being an unwritten expectation and become explicit, reviewable, versioned artifacts.
+- A rule violation cannot slip through just because the agent forgot to mention it.
+- Intermediate or rejected changes never pollute your working tree — no "restore after the fact".
+- Human judgement is reserved for genuine judgement calls, with evidence and an audit trail.
+- It sits **on top of** your existing quality tools (TypeScript, Biome, unit and E2E tests, Git, code review), which keep checking everything else.
 
 The harness is currently built for **Codex only**. There is no support for other agents or models yet.
 

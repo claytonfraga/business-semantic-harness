@@ -55,12 +55,12 @@ def run_sem_bsh(execution_dir, pilot, prompt, model, effort):
     }
 
 
-def run_com_bsh(execution_dir, pilot, prompt, model, effort, session):
+def run_com_bsh(execution_dir, pilot, prompt, model, effort, session, extra_env=""):
     project = _prepare_project(execution_dir, pilot)
     _kill(session)
     started = time.time()
     tmux.tmux(["new-session", "-d", "-s", session, "-x", "220", "-y", "55"])
-    tmux.tmux(["send-keys", "-t", session, f"BSH_CODEX_MODEL={model} BSH_CODEX_REASONING_EFFORT={effort} bsh codex --project {project}", "Enter"])
+    tmux.tmux(["send-keys", "-t", session, f"{extra_env}BSH_CODEX_MODEL={model} BSH_CODEX_REASONING_EFFORT={effort} bsh codex --project {project}", "Enter"])
     if not tmux.wait_for_pane(session, r"Ask Codex to do anything", TUI_OPEN_S):
         _kill(session)
         raise RuntimeError("TUI do Codex nao abriu")
