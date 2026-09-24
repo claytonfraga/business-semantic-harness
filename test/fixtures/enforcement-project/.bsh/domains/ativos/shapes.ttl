@@ -1,7 +1,16 @@
 @prefix ex: <urn:enforcement:ativos:> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 
-ex:TransferenciaShape a sh:NodeShape ;
-  sh:targetClass ex:TransferenciaAtivo ;
-  sh:property [ sh:path ex:estadoAtual ; sh:minCount 1 ; sh:in ( ex:Disponivel ex:EmUso ) ;
-    sh:message "Ativo baixado nao pode ser transferido." ] .
+ex:TransferenciaShape a sh:NodeShape ; sh:targetClass ex:TransferenciaAtivo ;
+  sh:property [ sh:path ex:estadoAtual ; sh:minCount 1 ; sh:in ( ex:Disponivel ex:EmUso ) ; sh:message "Ativo baixado nao pode ser transferido." ] ;
+  sh:property [ sh:path ex:novoResponsavel ; sh:minCount 1 ; sh:message "Transferencia exige novo responsavel." ] .
+
+ex:BaixaShape a sh:NodeShape ; sh:targetClass ex:BaixaAtivo ;
+  sh:property [ sh:path ex:estadoAtual ; sh:minCount 1 ; sh:in ( ex:Disponivel ex:EmUso ) ; sh:message "Ativo baixado nao pode sofrer nova baixa." ] ;
+  sh:property [ sh:path ex:motivoBaixa ; sh:minCount 1 ; sh:message "Baixa exige motivo." ] .
+
+ex:ResponsavelShape a sh:NodeShape ; sh:targetClass ex:AlteracaoResponsavel ;
+  sh:property [ sh:path ex:estadoAtual ; sh:minCount 1 ; sh:in ( ex:Disponivel ex:EmUso ) ; sh:message "Ativo baixado nao pode mudar de responsavel." ] .
+
+ex:LocalizacaoShape a sh:NodeShape ; sh:targetClass ex:AtualizacaoLocalizacao ;
+  sh:property [ sh:path ex:estadoAtual ; sh:minCount 1 ; sh:in ( ex:Disponivel ex:EmUso ) ; sh:message "Ativo baixado nao pode mudar de localizacao." ] .

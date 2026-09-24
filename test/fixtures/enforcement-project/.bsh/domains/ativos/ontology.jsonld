@@ -3,13 +3,17 @@
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#" },
   "@graph": [
     { "@id": "ex:ontology", "@type": "bsh:Domain", "bsh:version": "1.0.0" },
-    { "@id": "ex:TransferenciaAtivo", "@type": "rdfs:Class", "rdfs:label": "Transferencia de ativo" },
+    { "@id": "ex:TransferenciaAtivo", "@type": "rdfs:Class" },
+    { "@id": "ex:BaixaAtivo", "@type": "rdfs:Class" },
+    { "@id": "ex:AlteracaoResponsavel", "@type": "rdfs:Class" },
+    { "@id": "ex:AtualizacaoLocalizacao", "@type": "rdfs:Class" },
     { "@id": "ex:Disponivel", "rdfs:label": "Disponivel" },
     { "@id": "ex:EmUso", "rdfs:label": "Em uso" },
     { "@id": "ex:Baixado", "rdfs:label": "Baixado" },
     { "@id": "ex:estadoAtual", "@type": "rdf:Property" },
     { "@id": "ex:novoResponsavel", "@type": "rdf:Property" },
     { "@id": "ex:novaLocalizacao", "@type": "rdf:Property" },
+    { "@id": "ex:motivoBaixa", "@type": "rdf:Property" },
     { "@id": "ex:justificativa-adequada", "@type": "bsh:Policy", "bsh:governs": { "@id": "ex:TransferenciaAtivo" },
       "bsh:requiresHumanReview": true, "rdfs:comment": "A justificativa da transferencia exige revisao humana." }
   ]
