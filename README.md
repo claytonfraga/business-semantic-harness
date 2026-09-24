@@ -1,164 +1,164 @@
-# Oracle para Codex
+# Oracle for Codex
 
-O Oracle usa a ontologia **do seu próprio projeto** para dar contexto ao Codex, verificar ações representáveis e pedir sua decisão quando houver conflito ou informação insuficiente. **A ontologia JSON-LD e as regras SHACL fazem parte do harness Oracle de cada projeto e de cada domínio**: ficam no `.oracle/` do codebase, são versionadas com esse projeto e são carregadas quando o Oracle abre uma sessão nele. O pacote global fornece o motor e o comando `oracle`; ele não substitui nem compartilha a ontologia de um projeto com outro. Descobertas do agente entram como propostas pendentes; a ontologia aprovada só muda após revisão.
+Oracle uses the ontology of **your own project** to give Codex context, verify representable actions, and ask for your decision whenever there is a conflict or insufficient information. **The JSON-LD ontology and the SHACL rules are part of the Oracle harness of each project and each domain**: they live under the project's `.oracle/` directory, are versioned with that project, and are loaded whenever Oracle opens a session for it. The global package ships the engine and the `oracle` command; it neither replaces nor shares one project's ontology with another. Agent findings are recorded as pending proposals, and the approved ontology only changes after review.
 
-O mesmo núcleo também está especificado para o **Agy**, executável do Google Antigravity CLI, que pode usar modelos Gemini. O adaptador `oracle agy` está planejado no OpenSpec e ainda não está disponível nesta versão.
+The same core is also specified for **Agy**, Google Antigravity CLI's executable, which can use Gemini models. The `oracle agy` adapter is planned in OpenSpec and is not available in this version.
 
-## Requisitos
+## Requirements
 
-- Linux com Node.js 22 ou superior e npm.
-- Codex CLI instalado e autenticado. A integração atual foi verificada com `codex-cli 0.156.1`.
-- `git` disponível no Linux.
-- Um diretório de projeto ao qual você tem acesso de leitura e escrita. O Codex roda nesse projeto real, sem sandbox adicional imposto pelo Oracle.
+- Linux with Node.js 22 or later and npm.
+- Codex CLI installed and authenticated. The current integration was verified with `codex-cli 0.156.1`.
+- `git` available on Linux.
+- A project directory you can read and write. Codex runs in that real project, with no extra sandbox imposed by Oracle.
 
-## Instalação global no Linux
+## Global installation on Linux
 
-Nesta máquina, a versão `0.2.0` foi empacotada e instalada globalmente no Node.js 22 gerenciado por nvm. O executável `oracle` está no `PATH` desse ambiente e pode ser chamado de qualquer pasta. A instalação usa uma **cópia do pacote**, independente deste checkout.
+On this machine, version `0.2.0` was packed and installed globally into the nvm-managed Node.js 22. The `oracle` executable is on that environment's `PATH` and can be called from any directory. The installation uses a **copy of the package**, independent of this checkout.
 
-Para repetir a instalação a partir deste repositório ou instalar suas alterações locais:
+To reproduce the installation from this repository, or to install your local changes:
 
 ```bash
-cd /caminho/para/oracle
+cd /path/to/oracle
 npm install
 npm pack --pack-destination /tmp
 npm install -g /tmp/oracle-ontology-harness-0.2.0.tgz
 oracle --help
 ```
 
-Após alterar o código do Oracle, gere e instale outro tarball; a instalação global não acompanha mudanças do checkout. Se `oracle` não aparecer em um novo terminal, ative a mesma versão do Node.js pelo nvm e confira `npm prefix -g` e seu `PATH`.
+After changing Oracle's code, build and install a new tarball; the global installation does not track checkout changes. If `oracle` does not show up in a new terminal, activate the same Node.js version through nvm and check `npm prefix -g` and your `PATH`.
 
-O pacote **ainda não foi publicado no npm**. Quando for publicado, `npm install -g oracle-ontology-harness` instalará o executável globalmente. `npx --yes oracle-ontology-harness --help` executará o pacote publicado sob demanda, sem instalação global persistente. Para usar o tarball local sem instalá-lo globalmente, execute `npx --yes --package=/tmp/oracle-ontology-harness-0.2.0.tgz oracle --help`.
+The package has **not been published to npm yet**. Once it is, `npm install -g oracle-ontology-harness` will install the executable globally, and `npx --yes oracle-ontology-harness --help` will run the published package on demand without a persistent global install. To use the local tarball without installing it globally, run `npx --yes --package=/tmp/oracle-ontology-harness-0.2.0.tgz oracle --help`.
 
-## Preparar um codebase
+## Preparing a codebase
 
-Entre na pasta de qualquer projeto que o Codex deverá analisar:
+Enter the directory of any project Codex should work on:
 
 ```bash
-cd /caminho/para/meu-codebase
+cd /path/to/my-codebase
 oracle init
-oracle domain add ativos
+oracle domain add assets
 ```
 
-Isso cria, **dentro do próprio projeto**:
+This creates the following **inside the project itself**:
 
 ```text
-<projeto>/
+<project>/
   .oracle/
-    project.json                              # manifesto: lista os domínios
+    project.json                              # manifest: lists the domains
     domains/
-      ativos/
-        ontology.jsonld                       # ontologia do domínio (JSON-LD 1.1)
-        shapes.ttl                            # regras verificáveis (SHACL, Turtle)
+      assets/
+        ontology.jsonld                       # domain ontology (JSON-LD 1.1)
+        shapes.ttl                            # verifiable rules (SHACL, Turtle)
 ```
 
-**Onde ficam as ontologias (regra).** A ontologia de um domínio pertence ao projeto a que se refere e vive em `<projeto>/.oracle/domains/<dominio>/`. Nunca coloque a ontologia de um projeto no pacote Oracle, em outro projeto ou em um diretório global: cada projeto carrega a sua. Ao rodar `oracle codex`, o projeto selecionado precisa conter a própria ontologia validada — inclusive quando ele for uma cópia de trabalho usada em testes. As fixtures em `test/fixtures/` do pacote Oracle são apenas ontologias sintéticas para testes unitários, não ontologias de projeto.
+**Where ontologies live (rule).** A domain ontology belongs to the project it refers to and lives in `<project>/.oracle/domains/<domain>/`. Never place one project's ontology inside the Oracle package, in another project, or in a global directory: each project loads its own. When you run `oracle codex`, the selected project must contain its own validated ontology — including when it is a working copy used in tests. The fixtures under the Oracle package's `test/fixtures/` are synthetic ontologies for unit tests only, not project ontologies.
 
-**Formato.** `ontology.jsonld` é JSON-LD 1.1 com `@context` e `@graph`; `shapes.ttl` é Turtle com restrições SHACL Core. Use contextos JSON-LD locais ou embutidos — o Oracle recusa contextos remotos — e mantenha as referências de arquivo dentro do diretório do projeto. Exemplo mínimo de `ontology.jsonld`:
+**Format.** `ontology.jsonld` is JSON-LD 1.1 with `@context` and `@graph`; `shapes.ttl` is Turtle with SHACL Core constraints. Use local or embedded JSON-LD contexts — Oracle rejects remote contexts — and keep file references inside the project directory. A minimal `ontology.jsonld`:
 
 ```json
 {
   "@context": {
-    "ex": "urn:meu-projeto:ativos:",
+    "ex": "urn:my-project:assets:",
     "oracle": "urn:oracle:ns:v1:",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
   },
   "@graph": [
-    { "@id": "ex:Ativo", "@type": "rdfs:Class", "rdfs:label": "Ativo" },
-    { "@id": "ex:TransferenciaAtivo", "@type": "rdfs:Class", "rdfs:label": "Transferência de ativo" },
-    { "@id": "ex:justificativa-adequada", "@type": "oracle:Policy",
-      "oracle:governs": { "@id": "ex:TransferenciaAtivo" },
+    { "@id": "ex:Asset", "@type": "rdfs:Class", "rdfs:label": "Asset" },
+    { "@id": "ex:AssetTransfer", "@type": "rdfs:Class", "rdfs:label": "Asset transfer" },
+    { "@id": "ex:adequate-justification", "@type": "oracle:Policy",
+      "oracle:governs": { "@id": "ex:AssetTransfer" },
       "oracle:requiresHumanReview": true,
-      "rdfs:comment": "A justificativa da transferência deve ser adequada." }
+      "rdfs:comment": "A transfer requires an adequate justification." }
   ]
 }
 ```
 
-Exemplo mínimo de `shapes.ttl`:
+A minimal `shapes.ttl`:
 
 ```turtle
-@prefix ex: <urn:meu-projeto:ativos:> .
+@prefix ex: <urn:my-project:assets:> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 
-ex:TransferenciaShape a sh:NodeShape ;
-  sh:targetClass ex:TransferenciaAtivo ;
-  sh:property [ sh:path ex:estadoAtual ; sh:minCount 1 ;
-    sh:message "Ativo baixado não pode ser transferido." ] .
+ex:TransferShape a sh:NodeShape ;
+  sh:targetClass ex:AssetTransfer ;
+  sh:property [ sh:path ex:currentState ; sh:minCount 1 ;
+    sh:message "A retired asset cannot be transferred." ] .
 ```
 
-Repita `oracle domain add <dominio>` para cada domínio do projeto. O manifesto `.oracle/project.json` deve listar todos. Cada domínio precisa de conceitos de negócio identificados por IRI e de ao menos uma restrição SHACL aplicável **ou** política de revisão humana ativa. O esqueleto gerado por `domain add` ainda não está pronto para uma sessão.
+Repeat `oracle domain add <domain>` for every domain in the project. The `.oracle/project.json` manifest must list them all. Each domain needs business concepts identified by IRI and at least one applicable SHACL constraint **or** an active human-review policy. The skeleton produced by `domain add` is not ready for a session on its own.
 
-Esses arquivos **são a configuração de governança do harness para esse codebase**. O Oracle valida todos os domínios declarados antes de permitir o agente e usa o retrato aprovado da ontologia em cada decisão. Alterar o pacote Oracle não cria a ontologia de um projeto. Veja um exemplo completo em [ontologia do piloto](pilot/asset-management/.oracle/domains/ativos/ontology.jsonld) e [shapes do piloto](pilot/asset-management/.oracle/domains/ativos/shapes.ttl).
+These files **are the harness's governance configuration for that codebase**. Oracle validates every declared domain before allowing the agent, and uses the approved ontology snapshot for every decision. Changing the Oracle package does not create a project's ontology. See a complete example in the [pilot ontology](pilot/asset-management/.oracle/domains/ativos/ontology.jsonld) and [pilot shapes](pilot/asset-management/.oracle/domains/ativos/shapes.ttl).
 
-Depois valide e consulte:
+Then validate and inspect:
 
 ```bash
 oracle ontology validate
-oracle ontology show ativos
-oracle ontology show ativos urn:oracle:pilot:ativos:Ativo
+oracle ontology show assets
+oracle ontology show assets urn:oracle:pilot:ativos:Ativo
 ```
 
-Para operar a partir de outra pasta, acrescente `--project /caminho/para/meu-codebase`. A validação aponta o domínio, arquivo e regra que impedem a prontidão. O comando `show` devolve JSON com conceitos, relações, políticas, shapes e caminhos de origem.
+To operate from another directory, add `--project /path/to/my-codebase`. Validation reports the domain, file, and rule that block readiness. The `show` command returns JSON with concepts, relations, policies, shapes, and source paths.
 
-## Usar com Codex
+## Using with Codex
 
-Na pasta do codebase já preparado, execute:
+From the prepared codebase directory, run:
 
 ```bash
 oracle doctor
 oracle code base
 ```
 
-`oracle codex` é um alias de `oracle code base`. Ao iniciar, o Oracle **abre a TUI real do Codex** — a mesma interface que você já usa — conectada a um `codex app-server` iniciado pelo Oracle no próprio projeto. O Oracle é um **harness que envolve o Codex**: injeta as instruções de governança, entrega o contexto ontológico pelo MCP local, acompanha a sessão, mede os tokens gastos na verificação ontológica e alerta violações. O Codex opera normalmente no seu projeto, sem sandbox adicional imposto pelo Oracle.
+`oracle codex` is an alias for `oracle code base`. On startup, Oracle **opens the real Codex TUI** — the same interface you already use — connected to a `codex app-server` that Oracle starts in the project itself. Oracle is a **harness that wraps Codex**: it injects the governance instructions, delivers the ontology context through the local MCP server, follows the session, measures the tokens spent on ontology verification, and raises alerts on violations. Codex runs normally in your project, with no extra sandbox imposed by Oracle.
 
-O Oracle **não altera a instalação do Codex**: usa um `CODEX_HOME` privado com uma cópia do `auth.json` e não toca em `~/.codex`. Digite seus pedidos na TUI normalmente e encerre com `/quit` ou `Ctrl+C` para o Oracle consolidar a sessão.
+Oracle **does not modify your Codex installation**: it uses a private `CODEX_HOME` with a copy of `auth.json` and never touches `~/.codex`. Type your requests in the TUI as usual, and exit with `/quit` or `Ctrl+C` so Oracle can finalize the session.
 
-Você também pode usar o alias e apontar para o projeto sem entrar na pasta dele:
+You can also use the alias and point at the project without entering its directory:
 
 ```bash
-oracle codex --project /caminho/para/meu-codebase
+oracle codex --project /path/to/my-codebase
 ```
 
-O comando sempre usa a ontologia da pasta selecionada. Cada projeto precisa do seu próprio `.oracle/project.json`, JSON-LD e SHACL; um projeto recém-inicializado só fica pronto depois que você definir seus conceitos e regras e `oracle ontology validate` passar.
+The command always uses the ontology from the selected directory. Each project needs its own `.oracle/project.json`, JSON-LD, and SHACL; a freshly initialized project is only ready after you define its concepts and rules and `oracle ontology validate` passes.
 
-Quando o agente relata conflito com a ontologia (ferramenta `oracle_report_conflict`), o Oracle registra um **ALERTA** em `.oracle/local/alerts.jsonl` e, ao final da sessão, pede sua decisão:
+When the agent reports a conflict with the ontology (through the `oracle_report_conflict` tool), Oracle records an **ALERT** in `.oracle/local/alerts.jsonl` and, at the end of the session, asks for your decision:
 
-- **Ontologia respeitada** (nenhum conflito relatado): as alterações permanecem no projeto.
-- **Violação ou incerteza**: você pode **aprovar a exceção** (as alterações permanecem) ou **negar**. Se negar, o Oracle **reverte** os arquivos alterados durante a sessão, a partir de um backup privado feito no início.
+- **Ontology respected** (no conflict reported): the changes stay in the project.
+- **Violation or uncertainty**: you can **approve the exception** (the changes stay) or **deny it**. If you deny it, Oracle **reverts** the files changed during the session, from a private backup taken at startup.
 
-O Oracle **não responde** às aprovações nativas do Codex (por exemplo, rodar `npm test`); essas continuam sendo decisões suas na TUI.
+Oracle **does not answer** Codex's native approvals (for example, running `npm test`); those remain your decisions in the TUI.
 
-## Medição de tokens
+## Token accounting
 
-O harness é acionado **antes** de o agente implementar: o contexto e as ferramentas de ontologia são entregues no início, e o agente é instruído a consultar a ontologia antes de mudar regras. Consultar cedo e bloquear um caminho incorreto evita retrabalho e reduz o total de tokens gastos com o Codex.
+The harness kicks in **before** the agent implements anything: the context and the ontology tools are delivered up front, and the agent is instructed to consult the ontology before changing rules. Consulting early and blocking a wrong path avoids rework and reduces the total tokens spent with Codex.
 
-Ao final da sessão, o Oracle imprime um resumo com:
+At the end of the session, Oracle prints a summary with:
 
-- tokens de entrada, saída, cache e raciocínio, além do total;
-- número de consultas à ontologia e de conflitos relatados.
+- input, output, cache, and reasoning tokens, plus the total;
+- the number of ontology queries and reported conflicts.
 
-O resumo também é gravado em `.oracle/local/` junto da trilha de auditoria. O Codex mostra o uso de tokens em tempo real na própria TUI.
+The summary is also written to `.oracle/local/`, alongside the audit trail. Codex shows live token usage in its own TUI.
 
-Para código-fonte, a ligação entre o diff e os fatos RDF é parcial: o Oracle **não afirma que SHACL provou o comportamento do código**. Revise o diff e execute os testes do seu projeto. Mudanças em `.oracle/` exigem edição e validação próprias. Como o Codex roda no projeto real e sem sandbox adicional, trate a sessão como você trataria o Codex normalmente, com o Oracle medindo, alertando e podendo reverter ao final.
+For source code, the link between a diff and RDF facts is partial: Oracle **does not claim that SHACL proved the code's behavior**. Review the diff and run your project's tests. Changes under `.oracle/` require their own editing and validation. Because Codex runs in the real project with no extra sandbox, treat the session the way you would treat Codex normally — with Oracle measuring, alerting, and able to revert at the end.
 
-## Qualidade de código
+## Code quality
 
-Antes de rodar os testes, o projeto passa por um gate de qualidade:
+Before running the tests, the project goes through a quality gate:
 
 ```bash
 npm run quality   # tsc --noEmit + Biome (lint)
-npm test          # roda o gate (pretest) e depois os testes
+npm test          # runs the gate (pretest) and then the tests
 ```
 
-- `npm run check` — verificação de tipos com TypeScript.
-- `npm run lint` — análise estática com [Biome](https://biomejs.dev) (config em `biome.json`), equivalente ao papel do Ruff em Python.
-- `npm run quality` — os dois acima, executado automaticamente antes de `npm test`.
+- `npm run check` — type checking with TypeScript.
+- `npm run lint` — static analysis with [Biome](https://biomejs.dev) (configured in `biome.json`), the JavaScript/TypeScript counterpart to Ruff in Python.
+- `npm run quality` — both of the above, run automatically before `npm test`.
 
-## Benchmark: Oracle harness vs Codex direto
+## Benchmark: Oracle harness vs. plain Codex
 
-O diretório `benchmark/` mede tokens e governança do harness frente ao Codex direto, executando o **mesmo pedido** em cópias limpas do projeto:
+The `benchmark/` directory measures the harness's token cost and governance effect against plain Codex, running the **same prompt** on clean copies of the project:
 
-- **`sem-oracle`** — Codex direto (`codex exec --json`), sem o harness.
-- **`com-oracle`** — `oracle codex`, com o harness injetando contexto e consultando a ontologia.
+- **`sem-oracle`** — plain Codex (`codex exec --json`), without the harness.
+- **`com-oracle`** — `oracle codex`, with the harness injecting context and consulting the ontology.
 
 ```bash
 python3 -m venv --system-site-packages benchmark/.venv
@@ -167,30 +167,30 @@ BENCH_RUNS=10 BENCH_PROMPT=benchmark/prompts/bloqueado.txt \
 benchmark/.venv/bin/python benchmark/analyze.py
 ```
 
-Cada execução grava uma subpasta `benchmark/results/<data-hora-segundos>-<n>/` com prompt, metadados e artefatos. O agregado fica em `benchmark/results/stats.md`, `stats.json`, `measurements.csv` e `charts/` (gráficos 300 dpi). As boas práticas e a metodologia estão em `benchmark/README.md`.
+Each run is a **batch** under `benchmark/results/<timestamp>/` containing the numbered executions (`1..n`), the discarded warm-up, and its own artifacts: `charts/`, `stats.md`, `stats.json`, and `measurements.csv`. The methodology and best practices are documented in `benchmark/README.md`.
 
-Resultado com o pedido que a ontologia **bloqueia** (10 execuções por condição, `gpt-6-sol` com esforço `low`):
+Result with the prompt the ontology **blocks** (10 runs per condition, `gpt-6-sol` at `low` effort):
 
-| Condição | n | Média tokens | Desvio padrão | IC 95% | Bloqueios |
+| Condition | n | Mean tokens | Std. dev. | 95% CI | Blocks |
 | --- | --- | --- | --- | --- | --- |
-| Codex sem Oracle | 10 | 315.491 | 78.553 | +/- 56.190 | 0/10 |
-| Codex com Oracle harness | 10 | 81.613 | 8.889 | +/- 6.359 | 10/10 |
+| Codex without Oracle | 10 | 256,673 | 103,601 | +/- 74,106 | 0/10 |
+| Codex with Oracle harness | 10 | 85,804 | 10,894 | +/- 7,792 | 10/10 |
 
-O harness bloqueou o pedido contrário à ontologia em 10/10 execuções e reduziu a média de tokens em **233.878 tokens (-74,13%)** (Cohen's d = -4,18). O Codex direto, sem o harness, aplicou a mudança contrária em 10/10. Com o pedido **aderente**, a diferença é pequena; o ganho do harness é maior quando o pedido exige correção de rumo antes da implementação.
+The harness blocked the ontology-violating prompt in 10/10 runs and cut the mean token cost by **170,869 tokens (-66.57%)** (paired Cohen's d_z = 1.74; Wilcoxon signed-rank p = 0.00195). Plain Codex applied the violating change in 10/10 runs. With an **adherent** prompt the difference is small, and the harness spends extra tokens on the ontology query; the payoff is largest when a request needs course correction before implementation.
 
-## Projeto piloto
+## Pilot project
 
-O codebase em [pilot/asset-management](pilot/asset-management) é uma aplicação web independente para transferência, baixa, responsável e localização de ativos. Sua ontologia e SHACL são próprios. Você pode verificar ambos:
+The codebase under [pilot/asset-management](pilot/asset-management) is an independent web application for asset transfer, retirement, responsible party, and location. Its ontology and SHACL are its own. You can verify both:
 
 ```bash
 npm test --prefix pilot/asset-management
 oracle ontology validate --project pilot/asset-management
 ```
 
-O servidor do piloto usa `npm run build --prefix pilot/asset-management` e `node pilot/asset-management/dist/server.js`. A API lista ativos em `GET /assets` e recebe operações em `POST /assets/{id}/transfer`, `/retire`, `/responsible` e `/location`.
+The pilot server builds with `npm run build --prefix pilot/asset-management` and runs with `node pilot/asset-management/dist/server.js`. The API lists assets at `GET /assets` and accepts operations at `POST /assets/{id}/transfer`, `/retire`, `/responsible`, and `/location`.
 
-O teste funcional E2E exige abrir `oracle codex` em uma sessão persistente `tmux` ou `herdr` e pedir ao agente mudanças de código aderentes e contrárias à ontologia. A regra está em [AGENTS.md](AGENTS.md). A [primeira tentativa funcional](pilot/asset-management/evaluation/functional-e2e-2026-09-23.md) registra a recusa antes do primeiro turno; a [rodada após o desbloqueio](pilot/asset-management/evaluation/functional-e2e-2026-09-23-run.md) registra os dois casos em cópias limpas. Testes HTTP diretos do piloto não comprovam a governança do Oracle.
+The functional E2E test requires opening `oracle codex` in a persistent `tmux` or `herdr` session and asking the agent for code changes that are adherent and contrary to the ontology. The rule is defined in [AGENTS.md](AGENTS.md). The [first functional attempt](pilot/asset-management/evaluation/functional-e2e-2026-09-23.md) records the refusal before the first turn; the [round after unblocking](pilot/asset-management/evaluation/functional-e2e-2026-09-23-run.md) records both cases on clean copies. Direct HTTP tests of the pilot do not prove Oracle's governance.
 
-## Estado do projeto
+## Project status
 
-A base de ontologia, o núcleo de decisão, a trilha de auditoria, o piloto e a sessão governada inicial com Codex são executáveis. Captura de conhecimento para revisão, Agy e avaliação A/B/C continuam em desenvolvimento conforme [OpenSpec](openspec/changes/build-oracle-ontology-harness/tasks.md). O pacote está instalado globalmente neste Linux a partir de tarball local, mas não foi publicado no npm.
+The ontology base, the decision core, the audit trail, the pilot, and the initial governed Codex session are runnable. Knowledge capture for review, Agy, and the A/B/C evaluation are still in progress, as tracked in [OpenSpec](openspec/changes/build-oracle-ontology-harness/tasks.md). The package is installed globally on this Linux host from a local tarball, but has not been published to npm.
