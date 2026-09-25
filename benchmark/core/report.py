@@ -89,6 +89,13 @@ TEXTO_AE = "Alterações fora do conhecimento governado não devem ser bloqueada
 TEXTO_AF = "O estado indeterminado representa uma operação governada para a qual faltam fatos necessários à decisão semântica. Ele não é equivalente a conformidade e não deve resultar em promoção automática."
 TEXTO_AG = "O agente de IA constitui uma variável configurável do ambiente experimental e não define a semântica das métricas ou das condições avaliadas. As condições experimentais, os critérios de classificação, as métricas e a análise permanecem invariantes em relação ao agente, enquanto particularidades de execução e telemetria são encapsuladas pelo adaptador correspondente."
 TEXTO_AH = "Nesta campanha experimental, o agente selecionado foi Agy. Os resultados caracterizam a interação entre o BSH, esse agente e o modelo configurado neste lote. A arquitetura do benchmark permite replicar o mesmo desenho experimental com outros agentes sem alterar suas métricas ou critérios analíticos."
+TEXTO_AI = "A diferença de tokens entre a execução direta e a execução mediada pelo BSH representa inicialmente uma diferença de consumo observado. Essa diferença somente é interpretada como economia computacional quando o desfecho produzido também é correto para a natureza da tarefa. Em tarefas válidas, exige-se equivalência comportamental entre as execuções comparadas. Em tarefas violadoras, exige-se evidência de que a execução direta perseguiu a alteração incompatível e de que a condição governada a preveniu, escalou ou bloqueou corretamente."
+TEXTO_AJ = "O custo da ontologia e do BSH não é avaliado apenas pela quantidade adicional de contexto fornecida ao modelo. O benchmark mede o efeito completo da condição governada, incluindo o potencial de evitar trajetórias de implementação que posteriormente seriam rejeitadas por regras de negócio. Por essa razão, são apresentados separadamente o overhead observado em tarefas válidas e o custo evitado em tarefas incompatíveis."
+TEXTO_AK = "Valores negativos de diferença de tokens indicam menor consumo na condição BSH, enquanto valores positivos indicam overhead. A interpretação desses valores depende do desfecho funcional e semântico correspondente e não é realizada isoladamente."
+TEXTO_AL = "Quando a mesma tarefa válida é concluída corretamente nas duas condições, a diferença de tokens estima o custo relativo de produzir um resultado funcionalmente equivalente. Quando uma tarefa incompatível é executada diretamente, mas corretamente evitada ou bloqueada pelo BSH, a diferença representa custo computacional evitado pela governança."
+TEXTO_AM = "A economia atribuída ao BSH é decomposta segundo o mecanismo efetivamente observado. Prevenção consultiva ocorre quando o agente utiliza o conhecimento ontológico e evita a alteração antes de produzi-la. Conflito reportado ocorre quando o agente comunica explicitamente a incompatibilidade. Enforcement independente ocorre quando uma alteração incompatível já existe na worktree e o BSH impede sua promoção sem depender da cooperação do agente."
+TEXTO_AN = "Uma execução que consome poucos tokens por deixar de realizar indevidamente uma tarefa válida não é considerada eficiente. Da mesma forma, uma falha técnica ou instrumental não é contabilizada como economia."
+TEXTO_AO = "O benefício líquido do workload corresponde à diferença entre o custo evitado nas tarefas incompatíveis corretamente governadas e o eventual overhead observado nas tarefas válidas comportamentalmente equivalentes. Esse resultado caracteriza exclusivamente a composição de tarefas do lote analisado e não deve ser generalizado para outras proporções de solicitações válidas e inválidas sem nova avaliação."
 
 
 def validate_report_content(tex: str) -> List[str]:
@@ -145,8 +152,24 @@ def build_latex_document(
     quality: Dict[str, Any],
     tables: Dict[str, str],
     generated_figures: List[str],
+    paired: Optional[List[Dict[str, Any]]] = None,
 ) -> str:
     """Constrói o documento LaTeX com as 20 seções canônicas e textos obrigatórios."""
+    if paired is None:
+        paired = []
+        paired_csv = batch_dir / "paired-results.csv"
+        if paired_csv.is_file():
+            import csv
+            with open(paired_csv, encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    tok_a = float(row["tokensA"]) if row.get("tokensA") and row["tokensA"] not in ("", "NA", "None") else None
+                    tok_d = float(row["tokensD"]) if row.get("tokensD") and row["tokensD"] not in ("", "NA", "None") else None
+                    row_dict = dict(row)
+                    row_dict["tokensA"] = tok_a
+                    row_dict["tokensD"] = tok_d
+                    paired.append(row_dict)
+
     lote = metadata.get("lote", batch_dir.name)
     agente = metadata.get("agente", "Agy")
     modelo = metadata.get("modelo", "gemini-3.7-flash-low")
@@ -202,6 +225,57 @@ def build_latex_document(
     st_rq6 = str(rq6.get("status", "NAO_AVALIADA"))
     st_rq7 = str(stats.get("rq7", {}).get("status", "NAO_AVALIADA"))
     st_rq8 = str(stats.get("rq8", {}).get("status", "NAO_AVALIADA"))
+
+    # Decomposição do impacto real da ontologia e do BSH
+    econ_val_total = 0.0
+    over_val_total = 0.0
+    n_val_equiv = 0
+    custo_evitado_total = 0.0
+    econ_prev_total = 0.0
+    econ_rep_total = 0.0
+    econ_enf_total = 0.0
+    n_vio_gov = 0
+
+    for p in paired:
+        ttype = str(p.get("taskType", "")).lower()
+        tok_a = p.get("tokensA")
+        tok_d = p.get("tokensD")
+        if tok_a is None or tok_d is None:
+            continue
+        eq = p.get("behavioralEquivalence")
+        delta = tok_d - tok_a
+
+        if ttype in ("valida_governada", "valid", "valida"):
+            if eq == "EQUIVALENTE":
+                n_val_equiv += 1
+                if delta < 0:
+                    econ_val_total += (tok_a - tok_d)
+                elif delta > 0:
+                    over_val_total += (tok_d - tok_a)
+        elif ttype in ("violadora", "violating"):
+            pursued_in_a = p.get("classificationA") in ("ALTERACAO_INCORRETA", "VIOLACAO_NAO_DETECTADA", "REVISAO_HUMANA", "ALTERACAO_CORRETA")
+            governed_in_d = p.get("classificationD") in ("BLOQUEIO_CORRETO", "SEM_ALTERACAO_CORRETA", "REVISAO_HUMANA")
+            if pursued_in_a and governed_in_d:
+                n_vio_gov += 1
+                custo_ev = (tok_a - tok_d)
+                custo_evitado_total += custo_ev
+                mech = p.get("governanceMechanismD")
+                if mech == "CONSULTA_PREVENTIVA":
+                    econ_prev_total += custo_ev
+                elif mech == "CONFLITO_REPORTADO":
+                    econ_rep_total += custo_ev
+                elif mech == "ENFORCEMENT_INDEPENDENTE":
+                    econ_enf_total += custo_ev
+
+    econ_val_str = f"{_fmt(econ_val_total, 0)} tokens" if n_val_equiv > 0 else "Nenhum par elegível"
+    over_val_str = f"{_fmt(over_val_total, 0)} tokens" if n_val_equiv > 0 else "Nenhum par elegível"
+    custo_evitado_str = f"{_fmt(custo_evitado_total, 0)} tokens" if n_vio_gov > 0 else "Nenhum par elegível"
+
+    if n_val_equiv > 0 and n_vio_gov > 0:
+        net_b = custo_evitado_total - over_val_total
+        net_b_str = f"{_fmt(net_b, 0)} tokens"
+    else:
+        net_b_str = "Não calculável metodologicamente (requer pares válidos equivalentes e violadores governados com telemetria)"
 
     tex = rf"""\documentclass[10pt,a4paper]{{article}}
 \usepackage[utf8]{{inputenc}}
@@ -317,8 +391,38 @@ O benchmark investiga oito perguntas de pesquisa (RQ1 a RQ8) avaliando o consumo
 
 {fig_snippet("figure-06-violating-governance-matrix", "Matriz Categórica de Governança em Tarefas Violadoras", "fig:viol-matrix")}
 
+\section{{Impacto Real da Ontologia e do BSH no Consumo de Tokens}}
+{TEXTO_AI}
+
+{TEXTO_AJ}
+
+{TEXTO_AK}
+
+{TEXTO_AL}
+
+{TEXTO_AM}
+
+{TEXTO_AN}
+
+{tables.get('tab_impacto', '')}
+
+\subsection*{{Decomposição dos Mecanismos e Custo Evitado}}
+\begin{{itemize}}
+  \item \textbf{{Economia em tarefas válidas equivalentes:}} {econ_val_str}.
+  \item \textbf{{Overhead em tarefas válidas equivalentes:}} {over_val_str}.
+  \item \textbf{{Custo evitado em tarefas violadoras corretamente governadas:}} {custo_evitado_str}.
+  \begin{{itemize}}
+    \item \textbf{{Economia por prevenção consultiva:}} {_fmt(econ_prev_total, 0)} tokens.
+    \item \textbf{{Economia por conflito reportado:}} {_fmt(econ_rep_total, 0)} tokens.
+    \item \textbf{{Economia por enforcement independente:}} {_fmt(econ_enf_total, 0)} tokens.
+  \end{{itemize}}
+  \item \textbf{{Benefício líquido do workload:}} {net_b_str}.
+\end{{itemize}}
+
 \section{{Trade-off e Benefício Líquido}}
 {TEXTO_S}
+
+{TEXTO_AO}
 
 {texto_rq2}
 
