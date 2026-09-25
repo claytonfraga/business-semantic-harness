@@ -174,7 +174,7 @@ def export_paired_csvs(paired: List[Dict[str, Any]], batch_dir: Path) -> None:
     fields_paired = [
         "taskId", "baseTaskId", "replicationIndex", "taskType", "tokensA", "tokensD",
         "nonCachedTokensA", "nonCachedTokensD", "durationA", "durationD",
-        "classificationA", "classificationD", "behavioralEquivalence",
+        "classificationA", "classificationD", "behavioralEquivalence", "governanceMechanismD",
         "differenceTokens", "percentageDifference", "costFactor",
         "eligibleForTokenAnalysis", "eligibleForGovernanceAnalysis", "exclusionReason"
     ]

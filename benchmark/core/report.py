@@ -168,6 +168,7 @@ def build_latex_document(
                     row_dict = dict(row)
                     row_dict["tokensA"] = tok_a
                     row_dict["tokensD"] = tok_d
+                    row_dict["governanceMechanismD"] = row.get("governanceMechanismD")
                     paired.append(row_dict)
 
     lote = metadata.get("lote", batch_dir.name)
@@ -492,7 +493,7 @@ def generate_and_compile_report(
     (report_dir / "references.bib").write_text(REFERENCES_BIB, encoding="utf-8")
 
     # 3. Monta documento LaTeX
-    tex_content = build_latex_document(batch_dir, metadata, stats, quality, tables, generated_figures)
+    tex_content = build_latex_document(batch_dir, metadata, stats, quality, tables, generated_figures, paired=paired)
     (report_dir / "benchmark-report.tex").write_text(tex_content, encoding="utf-8")
     (batch_dir / "report.tex").write_text(tex_content, encoding="utf-8")
 
