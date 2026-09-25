@@ -1,0 +1,43 @@
+{
+  "status": "VALID",
+  "batchId": "complete_a_d",
+  "plannedTasksCount": 10,
+  "observedTasksCount": 10,
+  "observedRunsCount": 20,
+  "completeTokenPairsCount": 10,
+  "completeDurationPairsCount": 10,
+  "conditionsPlanned": [
+    "A",
+    "D"
+  ],
+  "conditionsExecuted": [
+    "A",
+    "D"
+  ],
+  "telemetryAvailability": {
+    "A": {
+      "totalRuns": 10,
+      "tokensAvailable": 10,
+      "tokensCoveragePct": 100.0,
+      "cacheAvailable": 10,
+      "reasoningAvailable": 10,
+      "durationAvailable": 10,
+      "durationCoveragePct": 100.0,
+      "changeSetAvailable": 10,
+      "enforcementAvailable": 0
+    },
+    "D": {
+      "totalRuns": 10,
+      "tokensAvailable": 10,
+      "tokensCoveragePct": 100.0,
+      "cacheAvailable": 10,
+      "reasoningAvailable": 10,
+      "durationAvailable": 10,
+      "durationCoveragePct": 100.0,
+      "changeSetAvailable": 10,
+      "enforcementAvailable": 9
+    }
+  },
+  "exclusions": [],
+  "issues": []
+}

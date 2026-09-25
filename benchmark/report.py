@@ -11,11 +11,15 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 DOWNLOADS = Path("/mnt/c/Users/clayt/Downloads")
-ROTULOS = {
-    "sem-harness": "A - Codex direto",
-    "com-contexto-sem-enforcement": "B - Codex com contexto ontologico, sem enforcement independente",
-    "com-harness": "C - Codex com BSH e enforcement independente",
-}
+def rotulos_para(agente: str = "codex") -> dict:
+    nome = "Agy" if str(agente).lower() == "agy" else "Codex"
+    return {
+        "sem-harness": f"A - {nome} direto",
+        "com-contexto-sem-enforcement": f"B - {nome} com contexto ontologico, sem enforcement independente",
+        "com-harness": f"C - {nome} com BSH e enforcement independente",
+    }
+
+ROTULOS = rotulos_para("codex")
 
 
 def _esc(texto: str) -> str:
@@ -23,10 +27,11 @@ def _esc(texto: str) -> str:
             .replace("_", "\\_").replace("#", "\\#").replace("{", "\\{").replace("}", "\\}"))
 
 
-def _tabela_condicoes(stats: dict) -> str:
+def _tabela_condicoes(stats: dict, rotulos: dict = None) -> str:
+    rot = rotulos or ROTULOS
     linhas = [r"\begin{tabular}{lrrrr}", r"\toprule",
               r"Condicao & n & Media (tokens) & Desvio & IC 95\% \\", r"\midrule"]
-    for condicao, rotulo in ROTULOS.items():
+    for condicao, rotulo in rot.items():
         resumo = (stats.get("resumo") or {}).get(condicao)
         if not resumo:
             continue
@@ -40,6 +45,8 @@ def construir_tex(pasta: str, stats: dict) -> str:
     pareado = stats.get("pareado") or {}
     comparacao = stats.get("comparacao") or {}
     prompt = stats.get("prompt", "")
+    agente = stats.get("ambiente", {}).get("agente") or ("agy" if pasta.startswith("agy-") else "codex")
+    rotulos = rotulos_para(agente)
     return rf"""\documentclass[11pt,a4paper]{{article}}
 \usepackage[utf8]{{inputenc}}
 \usepackage[T1]{{fontenc}}
@@ -57,7 +64,7 @@ def construir_tex(pasta: str, stats: dict) -> str:
 Pasta: \texttt{{{_esc(pasta)}}}.\\Prompt: {_esc(prompt)}.
 
 \section{{Condicoes}}
-{_tabela_condicoes(stats)}
+{_tabela_condicoes(stats, rotulos)}
 
 \section{{Comparacao pareada}}
 Diferenca media (sem menos com): {pareado.get('diferenca_media', 0):.0f} tokens

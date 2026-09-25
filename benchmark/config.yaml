@@ -1,0 +1,99 @@
+benchmark:
+  name: agy-bsh-benchmark
+  outputDirectory: benchmark/results
+  maximumExecutions: 50
+  randomizeExecutionOrder: true
+  failFastOnInstrumentationError: true
+
+agent:
+  id: agy
+  model: gemini-3.7-flash-low
+  reasoningEffort: low
+  adapter: agy
+  executable: agy
+
+  # Configuração alternativa para Codex
+  #
+  # id: codex
+  # model: gpt-6-sol
+  # reasoningEffort: low
+  # adapter: codex
+  # executable: codex
+
+project:
+  path: pilot/asset-management
+  branch: master
+  ontologyDomain: ativos
+
+experiment:
+  conditions:
+    - A
+    - B
+    - C
+    - D
+
+  tasks:
+    - V1
+    - V2
+    - V3
+    - V4
+    - V5
+    - G1
+    - G2
+    - G3
+    - U1
+    - I1
+
+  replications:
+    enabled: true
+    maximumAdditionalExecutions: 10
+
+  smokeTest:
+    enabled: true
+    runs:
+      - task: V1
+        condition: A
+      - task: V1
+        condition: B
+      - task: V1
+        condition: C
+      - task: V1
+        condition: D
+      - task: G1
+        condition: A
+      - task: G1
+        condition: B
+      - task: G1
+        condition: C
+      - task: G1
+        condition: D
+
+telemetry:
+  collectTokens: true
+  collectCachedTokens: true
+  collectReasoningTokens: true
+  collectDuration: true
+  collectGitChanges: true
+  collectOntologyQueries: true
+  collectReportedConflicts: true
+  collectEnforcementEvidence: true
+  preserveRawTelemetry: true
+
+statistics:
+  confidenceLevel: 0.95
+  bootstrapIterations: 10000
+  randomSeed: 20260925
+  clusterVariable: baseTaskId
+
+reports:
+  generateMarkdown: false
+  generateLatex: true
+  generatePdf: true
+  generateCharts: true
+  generateCsv: true
+  generateJson: true
+
+charts:
+  vectorFormat: pdf
+  rasterFormat: png
+  dpi: 300

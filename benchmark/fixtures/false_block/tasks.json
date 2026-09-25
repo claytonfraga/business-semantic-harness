@@ -1,0 +1,11 @@
+{
+  "tarefas": [
+    {
+      "id": "G1",
+      "tipo": "valida_governada",
+      "operacao": "AlteracaoResponsavel",
+      "shape": "urn:enforcement:ativos:ResponsavelShape",
+      "regra": "responsavel so muda se nao baixado"
+    }
+  ]
+}

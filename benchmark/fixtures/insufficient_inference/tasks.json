@@ -1,0 +1,18 @@
+{
+  "tarefas": [
+    {
+      "id": "V1",
+      "tipo": "violadora",
+      "operacao": "TransferenciaAtivo",
+      "shape": "urn:enforcement:ativos:TransferenciaShape",
+      "regra": "estadoAtual nao pode ser Baixado"
+    },
+    {
+      "id": "V2",
+      "tipo": "violadora",
+      "operacao": "BaixaAtivo",
+      "shape": "urn:enforcement:ativos:BaixaShape",
+      "regra": "baixa exige motivo"
+    }
+  ]
+}

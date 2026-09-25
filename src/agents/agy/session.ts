@@ -1,7 +1,9 @@
+import { appendFile, mkdir } from 'node:fs/promises';
+import { join } from 'node:path';
 import { loadManifest } from '../../project/manifest.js';
 import { createOntologySnapshot } from '../../ontology/query.js';
 import { branchAtual, commitAtual, criarSessaoWorktree, finalizeSession, gravarSessao, resolverRepositorio } from '../../harness/index.js';
-import { contarConsultasOntologia, criarEstadoAgy, diagnoseAgyRuntime, executarAgyTui, lerAlertasAgy } from './launcher.js';
+import { contarConsultasOntologia, criarEstadoAgy, diagnoseAgyRuntime, executarAgyTui, extrairTokensDoEstadoAgy, lerAlertasAgy } from './launcher.js';
 
 export interface AgySessionOptions {
   model?: string;
@@ -37,12 +39,36 @@ export async function runAgySession(root: string, options: AgySessionOptions = {
     process.stdout.write(`\nBSH/Agy: a TUI do agy encerrou (código ${codigo}). Consolidando a sessão.\n`);
     const alerts = await lerAlertasAgy(estado);
     const ontologyQueries = await contarConsultasOntologia(estado);
+
+    // Extrai a telemetria de tokens do banco SQLite do Agy antes da limpeza do HOME temporário
+    const agyTokens = await extrairTokensDoEstadoAgy(estado);
+    const tokenTotals = agyTokens ? {
+      inputTokens: agyTokens.entrada,
+      outputTokens: agyTokens.saida,
+      cachedInputTokens: agyTokens.cache,
+      reasoningOutputTokens: agyTokens.raciocinio,
+      totalTokens: agyTokens.totais,
+    } : undefined;
+
+    // Registra sessão no BSH em .bsh/local/session-<timestamp>.jsonl para rastreabilidade de benchmark
+    if (tokenTotals) {
+      const bshLocalDir = join(repositorioOrigem, '.bsh', 'local');
+      await mkdir(bshLocalDir, { recursive: true });
+      const logPath = join(bshLocalDir, `session-${new Date().toISOString().replace(/[:.]/g, '-')}.jsonl`);
+      const logEntry = `${JSON.stringify({
+        time: new Date().toISOString(),
+        event: 'token-usage',
+        ...tokenTotals,
+      })}\n`;
+      await appendFile(logPath, logEntry, { mode: 0o600 });
+    }
+
     await finalizeSession({
       sessao,
       domain: manifest.domains.length === 1 ? manifest.domains[0].id : 'nao-classificado',
       snapshot,
       alerts,
-      tokenTotals: undefined,
+      tokenTotals,
       ontologyQueries,
       harnessTokens: 0,
     });

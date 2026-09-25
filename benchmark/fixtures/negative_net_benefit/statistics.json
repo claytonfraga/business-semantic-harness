@@ -1,0 +1,387 @@
+{
+  "lote": "negative_net_benefit",
+  "segmentos": {
+    "todas": {
+      "n_observado": 10,
+      "n_elegivel_tokens": 10,
+      "tokens_direto": {
+        "n_observado": 10,
+        "n_elegivel": 10,
+        "media": 10000.0,
+        "mediana": 10000.0,
+        "desvio_padrao": 0.0,
+        "minimo": 10000.0,
+        "maximo": 10000.0,
+        "ic95_inferior": 10000.0,
+        "ic95_superior": 10000.0,
+        "ic95_metodo": "variancia_zero"
+      },
+      "tokens_bsh": {
+        "n_observado": 10,
+        "n_elegivel": 10,
+        "media": 14900.0,
+        "mediana": 9900.0,
+        "desvio_padrao": 10594.02347237976,
+        "minimo": 9800.0,
+        "maximo": 35000.0,
+        "ic95_inferior": 7321.492146830564,
+        "ic95_superior": 22478.507853169438,
+        "ic95_metodo": "Student-t (df=9)"
+      },
+      "diferenca_absoluta": {
+        "n_observado": 10,
+        "n_elegivel": 10,
+        "media": 4900.0,
+        "mediana": -100.0,
+        "desvio_padrao": 10594.02347237976,
+        "minimo": -200.0,
+        "maximo": 25000.0,
+        "ic95_inferior": -2678.507853169436,
+        "ic95_superior": 12478.507853169436,
+        "ic95_metodo": "Student-t (df=9)"
+      },
+      "diferenca_percentual": {
+        "n_observado": 10,
+        "n_elegivel": 10,
+        "media": 49.0,
+        "mediana": -1.0,
+        "desvio_padrao": 105.94023472379762,
+        "minimo": -2.0,
+        "maximo": 250.0,
+        "ic95_inferior": -26.785078531694367,
+        "ic95_superior": 124.78507853169437,
+        "ic95_metodo": "Student-t (df=9)"
+      },
+      "fator_custo": {
+        "n_observado": 10,
+        "n_elegivel": 10,
+        "media": 1.49,
+        "mediana": 0.99,
+        "desvio_padrao": 1.0594023472379759,
+        "minimo": 0.98,
+        "maximo": 3.5,
+        "ic95_inferior": 0.7321492146830566,
+        "ic95_superior": 2.2478507853169436,
+        "ic95_metodo": "Student-t (df=9)"
+      },
+      "tempo_direto": {
+        "n_observado": 10,
+        "n_elegivel": 10,
+        "media": 20.0,
+        "mediana": 20.0,
+        "desvio_padrao": 0.0,
+        "minimo": 20.0,
+        "maximo": 20.0,
+        "ic95_inferior": 20.0,
+        "ic95_superior": 20.0,
+        "ic95_metodo": "variancia_zero"
+      },
+      "tempo_bsh": {
+        "n_observado": 10,
+        "n_elegivel": 10,
+        "media": 27.5,
+        "mediana": 19.5,
+        "desvio_padrao": 17.135084216633167,
+        "minimo": 19.0,
+        "maximo": 60.0,
+        "ic95_inferior": 15.242299170939658,
+        "ic95_superior": 39.75770082906034,
+        "ic95_metodo": "Student-t (df=9)"
+      },
+      "diferenca_tempo": {
+        "n_observado": 10,
+        "n_elegivel": 10,
+        "media": 7.5,
+        "mediana": -0.5,
+        "desvio_padrao": 17.135084216633167,
+        "minimo": -1.0,
+        "maximo": 40.0,
+        "ic95_inferior": -4.757700829060342,
+        "ic95_superior": 19.75770082906034,
+        "ic95_metodo": "Student-t (df=9)"
+      }
+    },
+    "validas": {
+      "n_observado": 3,
+      "n_elegivel_tokens": 3,
+      "tokens_direto": {
+        "n_observado": 3,
+        "n_elegivel": 3,
+        "media": 10000.0,
+        "mediana": 10000.0,
+        "desvio_padrao": 0.0,
+        "minimo": 10000.0,
+        "maximo": 10000.0,
+        "ic95_inferior": 10000.0,
+        "ic95_superior": 10000.0,
+        "ic95_metodo": "variancia_zero"
+      },
+      "tokens_bsh": {
+        "n_observado": 3,
+        "n_elegivel": 3,
+        "media": 26666.666666666668,
+        "mediana": 35000.0,
+        "desvio_padrao": 14433.756729740644,
+        "minimo": 10000.0,
+        "maximo": 35000.0,
+        "ic95_inferior": -9188.77274746785,
+        "ic95_superior": 62522.10608080118,
+        "ic95_metodo": "Student-t (df=2)"
+      },
+      "diferenca_absoluta": {
+        "n_observado": 3,
+        "n_elegivel": 3,
+        "media": 16666.666666666668,
+        "mediana": 25000.0,
+        "desvio_padrao": 14433.756729740644,
+        "minimo": 0.0,
+        "maximo": 25000.0,
+        "ic95_inferior": -19188.77274746785,
+        "ic95_superior": 52522.10608080118,
+        "ic95_metodo": "Student-t (df=2)"
+      },
+      "diferenca_percentual": {
+        "n_observado": 3,
+        "n_elegivel": 3,
+        "media": 166.66666666666666,
+        "mediana": 250.0,
+        "desvio_padrao": 144.33756729740642,
+        "minimo": 0.0,
+        "maximo": 250.0,
+        "ic95_inferior": -191.88772747467848,
+        "ic95_superior": 525.2210608080118,
+        "ic95_metodo": "Student-t (df=2)"
+      },
+      "fator_custo": {
+        "n_observado": 3,
+        "n_elegivel": 3,
+        "media": 2.6666666666666665,
+        "mediana": 3.5,
+        "desvio_padrao": 1.4433756729740643,
+        "minimo": 1.0,
+        "maximo": 3.5,
+        "ic95_inferior": -0.918877274746785,
+        "ic95_superior": 6.252210608080118,
+        "ic95_metodo": "Student-t (df=2)"
+      },
+      "tempo_direto": {
+        "n_observado": 3,
+        "n_elegivel": 3,
+        "media": 20.0,
+        "mediana": 20.0,
+        "desvio_padrao": 0.0,
+        "minimo": 20.0,
+        "maximo": 20.0,
+        "ic95_inferior": 20.0,
+        "ic95_superior": 20.0,
+        "ic95_metodo": "variancia_zero"
+      },
+      "tempo_bsh": {
+        "n_observado": 3,
+        "n_elegivel": 3,
+        "media": 46.666666666666664,
+        "mediana": 60.0,
+        "desvio_padrao": 23.09401076758503,
+        "minimo": 20.0,
+        "maximo": 60.0,
+        "ic95_inferior": -10.70203639594856,
+        "ic95_superior": 104.03536972928188,
+        "ic95_metodo": "Student-t (df=2)"
+      },
+      "diferenca_tempo": {
+        "n_observado": 3,
+        "n_elegivel": 3,
+        "media": 26.666666666666668,
+        "mediana": 40.0,
+        "desvio_padrao": 23.094010767585033,
+        "minimo": 0.0,
+        "maximo": 40.0,
+        "ic95_inferior": -30.702036395948564,
+        "ic95_superior": 84.0353697292819,
+        "ic95_metodo": "Student-t (df=2)"
+      }
+    },
+    "violadoras": {
+      "n_observado": 5,
+      "n_elegivel_tokens": 5,
+      "tokens_direto": {
+        "n_observado": 5,
+        "n_elegivel": 5,
+        "media": 10000.0,
+        "mediana": 10000.0,
+        "desvio_padrao": 0.0,
+        "minimo": 10000.0,
+        "maximo": 10000.0,
+        "ic95_inferior": 10000.0,
+        "ic95_superior": 10000.0,
+        "ic95_metodo": "variancia_zero"
+      },
+      "tokens_bsh": {
+        "n_observado": 5,
+        "n_elegivel": 5,
+        "media": 9800.0,
+        "mediana": 9800.0,
+        "desvio_padrao": 0.0,
+        "minimo": 9800.0,
+        "maximo": 9800.0,
+        "ic95_inferior": 9800.0,
+        "ic95_superior": 9800.0,
+        "ic95_metodo": "variancia_zero"
+      },
+      "diferenca_absoluta": {
+        "n_observado": 5,
+        "n_elegivel": 5,
+        "media": -200.0,
+        "mediana": -200.0,
+        "desvio_padrao": 0.0,
+        "minimo": -200.0,
+        "maximo": -200.0,
+        "ic95_inferior": -200.0,
+        "ic95_superior": -200.0,
+        "ic95_metodo": "variancia_zero"
+      },
+      "diferenca_percentual": {
+        "n_observado": 5,
+        "n_elegivel": 5,
+        "media": -2.0,
+        "mediana": -2.0,
+        "desvio_padrao": 0.0,
+        "minimo": -2.0,
+        "maximo": -2.0,
+        "ic95_inferior": -2.0,
+        "ic95_superior": -2.0,
+        "ic95_metodo": "variancia_zero"
+      },
+      "fator_custo": {
+        "n_observado": 5,
+        "n_elegivel": 5,
+        "media": 0.9800000000000001,
+        "mediana": 0.98,
+        "desvio_padrao": 1.2412670766236366e-16,
+        "minimo": 0.98,
+        "maximo": 0.98,
+        "ic95_inferior": 0.98,
+        "ic95_superior": 0.9800000000000002,
+        "ic95_metodo": "Student-t (df=4)"
+      },
+      "tempo_direto": {
+        "n_observado": 5,
+        "n_elegivel": 5,
+        "media": 20.0,
+        "mediana": 20.0,
+        "desvio_padrao": 0.0,
+        "minimo": 20.0,
+        "maximo": 20.0,
+        "ic95_inferior": 20.0,
+        "ic95_superior": 20.0,
+        "ic95_metodo": "variancia_zero"
+      },
+      "tempo_bsh": {
+        "n_observado": 5,
+        "n_elegivel": 5,
+        "media": 19.0,
+        "mediana": 19.0,
+        "desvio_padrao": 0.0,
+        "minimo": 19.0,
+        "maximo": 19.0,
+        "ic95_inferior": 19.0,
+        "ic95_superior": 19.0,
+        "ic95_metodo": "variancia_zero"
+      },
+      "diferenca_tempo": {
+        "n_observado": 5,
+        "n_elegivel": 5,
+        "media": -1.0,
+        "mediana": -1.0,
+        "desvio_padrao": 0.0,
+        "minimo": -1.0,
+        "maximo": -1.0,
+        "ic95_inferior": -1.0,
+        "ic95_superior": -1.0,
+        "ic95_metodo": "variancia_zero"
+      }
+    }
+  },
+  "rq1": {
+    "status": "RESPONDIDA",
+    "n_elegivel": 10,
+    "diferenca_media_tokens": 4900.0,
+    "diferenca_percentual_media": 49.0,
+    "fator_custo_medio": 1.49,
+    "resumo_validas": {
+      "n_elegivel": 3,
+      "diferenca_media": 16666.666666666668,
+      "diferenca_pct": 166.66666666666666,
+      "fator_custo": 2.6666666666666665
+    },
+    "resumo_violadoras": {
+      "n_elegivel": 5,
+      "diferenca_media": -200.0,
+      "diferenca_pct": -2.0,
+      "fator_custo": 0.9800000000000001
+    }
+  },
+  "rq2": {
+    "status": "RESPONDIDA",
+    "n_violadoras_bloqueio_correto": 5,
+    "n_validas_alteracao_correta": 3,
+    "economia_total_violadoras": 1000.0,
+    "overhead_total_validas": 50000.0,
+    "beneficio_liquido": -49000.0,
+    "beneficio_liquido_percentual": -61.25000000000001,
+    "motivo_incompletude": ""
+  },
+  "rq3": {
+    "status": "NAO_AVALIADA",
+    "motivo": "Condição B (regras textuais no prompt) não foi executada neste lote."
+  },
+  "rq4": {
+    "status": "NAO_AVALIADA",
+    "motivo": "Condição C (ontologia sem enforcement) não foi executada neste lote."
+  },
+  "rq5": {
+    "status": "NAO_AVALIADA",
+    "motivo": "Condição C não foi executada; o contraste A × D avalia o efeito combinado do BSH, não isolando causalmente o enforcement independente."
+  },
+  "rq6": {
+    "status": "RESPONDIDA",
+    "recall": 1.0,
+    "precision": 1.0,
+    "motivo": ""
+  },
+  "governanca": {
+    "D": {
+      "ALTERACAO_CORRETA": 5,
+      "ALTERACAO_INCORRETA": 0,
+      "BLOQUEIO_CORRETO": 5,
+      "FALSO_BLOQUEIO": 0,
+      "VIOLACAO_NAO_DETECTADA": 0,
+      "REVISAO_HUMANA": 0,
+      "INDETERMINADO": 0,
+      "SEM_ALTERACAO": 0,
+      "FALHA_TECNICA": 0,
+      "FALHA_INSTRUMENTACAO": 0
+    },
+    "A": {
+      "ALTERACAO_CORRETA": 5,
+      "ALTERACAO_INCORRETA": 5,
+      "BLOQUEIO_CORRETO": 0,
+      "FALSO_BLOQUEIO": 0,
+      "VIOLACAO_NAO_DETECTADA": 0,
+      "REVISAO_HUMANA": 0,
+      "INDETERMINADO": 0,
+      "SEM_ALTERACAO": 0,
+      "FALHA_TECNICA": 0,
+      "FALHA_INSTRUMENTACAO": 0
+    }
+  },
+  "inferencial": {
+    "executado": true,
+    "n": 10,
+    "ttest_stat": 1.462632263863046,
+    "ttest_pvalue": 0.17759284231350247,
+    "wilcoxon_stat": 13.0,
+    "wilcoxon_pvalue": 1.0,
+    "cohens_dz": 0.4625249333055613
+  }
+}

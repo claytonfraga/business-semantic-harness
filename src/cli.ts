@@ -15,7 +15,7 @@ import { limparSessao, listarSessoesDoProjeto } from './agents/codex/sessions.js
 
 export async function main(argv: string[]): Promise<number> {
   if (argv.length === 1 && argv[0] === '--help') {
-    process.stdout.write('bsh: init | domain add | ontology validate | ontology show | doctor [agy] | code base | agy [--model <nome>] | sessions list|clean\n');
+    process.stdout.write('bsh: init | domain add | ontology validate | ontology show | doctor [agy] | code base | agy [--model <nome>] | sessions list|clean | benchmark <run|validate|smoke|analyze|report>\n');
     return 0;
   }
 
@@ -111,6 +111,13 @@ export async function main(argv: string[]): Promise<number> {
       const resultado = await limparSessao(repositorio, command[2]);
       process.stdout.write(`${resultado.detalhes}\n`);
       return resultado.removida ? 0 : 1;
+    }
+    if (command.length >= 1 && command[0] === 'benchmark') {
+      const { spawnSync } = await import('node:child_process');
+      const result = spawnSync('python3', ['-m', 'benchmark.controlled', ...command.slice(1)], {
+        stdio: 'inherit',
+      });
+      return result.status ?? 0;
     }
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
