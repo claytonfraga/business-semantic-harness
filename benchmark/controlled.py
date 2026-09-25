@@ -61,7 +61,7 @@ def resolve_config_path(arg_config: Optional[str]) -> Optional[Path]:
 
 
 def cmd_run(args):
-    cfg_p = resolve_config_path(args.config)
+    cfg_p = resolve_config_path(getattr(args, "config", None))
     orchestrator = BenchmarkExperimentOrchestrator(
         agent_id=args.agent if getattr(args, "agent", None) else None,
         model=args.model if getattr(args, "model", None) else None,
@@ -74,7 +74,7 @@ def cmd_run(args):
 
 
 def cmd_smoke(args):
-    cfg_p = resolve_config_path(args.config)
+    cfg_p = resolve_config_path(getattr(args, "config", None))
     orchestrator = BenchmarkExperimentOrchestrator(
         agent_id=args.agent if getattr(args, "agent", None) else None,
         model=args.model if getattr(args, "model", None) else None,
