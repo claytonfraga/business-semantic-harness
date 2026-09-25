@@ -1,14 +1,14 @@
 benchmark:
   name: agy-bsh-benchmark
   outputDirectory: benchmark/results
-  maximumExecutions: 50
+  maximumExecutions: 60
   randomizeExecutionOrder: true
   failFastOnInstrumentationError: true
 
 agent:
   id: agy
-  model: gemini-3.7-flash-low
-  reasoningEffort: low
+  model: gemini-3.7-flash-medium
+  reasoningEffort: medium
   adapter: agy
   executable: agy
 
@@ -33,16 +33,18 @@ experiment:
     - D
 
   tasks:
-    - V1
-    - V2
-    - V3
-    - V4
-    - V5
-    - G1
-    - G2
-    - G3
-    - U1
-    - I1
+    - G4
+    - G5
+    - G6
+    - V6
+    - V7
+    - V8
+    - V9
+    - V10
+    - V11
+    - V12
+    - V13
+    - V14
 
   replications:
     enabled: true
@@ -51,21 +53,21 @@ experiment:
   smokeTest:
     enabled: true
     runs:
-      - task: V1
+      - task: G4
         condition: A
-      - task: V1
+      - task: G4
         condition: B
-      - task: V1
+      - task: G4
         condition: C
-      - task: V1
+      - task: G4
         condition: D
-      - task: G1
+      - task: V6
         condition: A
-      - task: G1
+      - task: V6
         condition: B
-      - task: G1
+      - task: V6
         condition: C
-      - task: G1
+      - task: V6
         condition: D
 
 telemetry:

@@ -237,6 +237,96 @@ Método de Coleta & {obs} \\
 \end{{table}}"""
 
 
+def table_h_real_impact(paired: List[Dict[str, Any]]) -> str:
+    """Tabela: Impacto real da ontologia e do BSH no consumo de tokens."""
+    linhas = []
+    for p in paired:
+        tid = _esc(p.get("taskId"))
+        tipo = _esc(p.get("taskType"))
+        res_a = _esc(p.get("classificationA"))
+        res_d = _esc(p.get("classificationD"))
+        mech = _esc(p.get("governanceMechanismD"))
+        tok_a = p.get("tokensA")
+        tok_d = p.get("tokensD")
+
+        if tok_a is None or tok_d is None:
+            interp = "DADOS_INSUFICIENTES"
+            tok_a_str = "NA"
+            tok_d_str = "NA"
+            econ_str = "NA"
+            gast_str = "NA"
+            var_str = "NA"
+            fac_str = "NA"
+        else:
+            tok_a_str = _fmt(tok_a, 0)
+            tok_d_str = _fmt(tok_d, 0)
+            delta = tok_d - tok_a
+            if delta < 0:
+                econ = tok_a - tok_d
+                gast = 0
+            else:
+                econ = 0
+                gast = tok_d - tok_a
+            econ_str = _fmt(econ, 0)
+            gast_str = _fmt(gast, 0)
+            var_pct = ((tok_d - tok_a) / tok_a) * 100 if tok_a > 0 else 0
+            var_str = f"{_fmt(var_pct, 1)}\\%"
+            fac = tok_d / tok_a if tok_a > 0 else 1.0
+            fac_str = _fmt(fac, 2)
+
+            ttype = str(p.get("taskType", "")).lower()
+            eq = p.get("behavioralEquivalence")
+            if ttype in ("valida_governada", "valid"):
+                if eq == "EQUIVALENTE":
+                    if delta < 0:
+                        interp = "ECONOMIA_EM_EXECUCAO_EQUIVALENTE"
+                    elif delta > 0:
+                        interp = "OVERHEAD_EM_EXECUCAO_EQUIVALENTE"
+                    else:
+                        interp = "SEM_EVIDENCIA_DE_ECONOMIA"
+                else:
+                    interp = "NAO_COMPARAVEL"
+            elif ttype in ("violadora", "violating"):
+                pursued_in_a = p.get("classificationA") in ("ALTERACAO_INCORRETA", "VIOLACAO_NAO_DETECTADA", "REVISAO_HUMANA", "ALTERACAO_CORRETA")
+                governed_in_d = p.get("classificationD") in ("BLOQUEIO_CORRETO", "SEM_ALTERACAO_CORRETA", "REVISAO_HUMANA")
+                if pursued_in_a and governed_in_d:
+                    raw_mech = p.get("governanceMechanismD")
+                    if raw_mech == "CONSULTA_PREVENTIVA":
+                        interp = "CUSTO_EVITADO_POR_PREVENCAO_SEMANTICA"
+                    elif raw_mech == "CONFLITO_REPORTADO":
+                        interp = "CUSTO_EVITADO_POR_CONFLITO_REPORTADO"
+                    elif raw_mech == "ENFORCEMENT_INDEPENDENTE":
+                        interp = "CUSTO_EVITADO_POR_ENFORCEMENT_INDEPENDENTE"
+                    else:
+                        interp = "SEM_EVIDENCIA_DE_ECONOMIA"
+                else:
+                    interp = "SEM_EVIDENCIA_DE_ECONOMIA"
+            else:
+                interp = "NAO_COMPARAVEL"
+
+        eq_str = _esc(p.get("behavioralEquivalence", "NA"))
+        linhas.append(f"{tid} & {tipo} & {res_a} & {res_d} & {mech} & {tok_a_str} & {tok_d_str} & {econ_str} & {gast_str} & {var_str} & {fac_str} & {eq_str} & \\texttt{{{_esc(interp)}}} \\\\")
+
+    if not linhas:
+        linhas.append(r"\multicolumn{13}{c}{Nenhum par disponível para análise de impacto.} \\")
+
+    return r"""\begin{table}[ht]
+\centering
+\scriptsize
+\caption{Impacto real da ontologia e do BSH no consumo de tokens}
+\label{tab:real-impact}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lcccccccccccc}
+\toprule
+Tarefa & Tipo & Res. A & Res. D & Mecanismo & Tokens A & Tokens D & Economizados & Gastos a Mais & Variação (\%) & Fator Custo & Equiv. & Interpretação \\
+\midrule
+""" + "\n".join(linhas) + r"""
+\bottomrule
+\end{tabular}
+}
+\end{table}"""
+
+
 def generate_all_latex_tables(
     quality: Dict[str, Any],
     measurements: List[Dict[str, Any]],
@@ -245,7 +335,7 @@ def generate_all_latex_tables(
     metadata: Dict[str, Any],
     tasks: Optional[List[Dict[str, Any]]] = None,
 ) -> Dict[str, str]:
-    """Gera todas as tabelas LaTeX obrigatórias A a G."""
+    """Gera todas as tabelas LaTeX obrigatórias A a H."""
     return {
         "tab_a": table_a_data_quality(quality, measurements, paired),
         "tab_b": table_b_behavioral_equivalence(paired),
@@ -254,4 +344,5 @@ def generate_all_latex_tables(
         "tab_e": table_e_equivalent_efficiency(paired),
         "tab_f": table_f_violating_tasks(paired),
         "tab_g": table_g_agent_capabilities(capabilities, metadata),
+        "tab_impacto": table_h_real_impact(paired),
     }

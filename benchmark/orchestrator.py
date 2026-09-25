@@ -86,6 +86,13 @@ class BenchmarkExperimentOrchestrator:
         self.configured_max_runs = cfg_bench.get("maximumExecutions", 50)
         self.randomize_order = cfg_bench.get("randomizeExecutionOrder", True)
 
+        cfg_proj = self.config.get("project", {})
+        project_rel = cfg_proj.get("path")
+        if project_rel:
+            self.project_source = (REPO / project_rel).resolve()
+        else:
+            self.project_source = FIXTURE_PROJECT
+
         cfg_exp = self.config.get("experiment", {})
         self.configured_tasks = cfg_exp.get("tasks")
         self.configured_conditions = cfg_exp.get("conditions") or ["A", "B", "C", "D"]
@@ -99,11 +106,19 @@ class BenchmarkExperimentOrchestrator:
         self.adapter: BenchmarkAgentAdapter = AgentAdapterRegistry.get(self.agent_id)
 
     def prepare_workspace(self, run_id: str, condition: str) -> Tuple[Path, str]:
-        """Copia o projeto fixture limpo e inicializa o Git."""
+        """Copia o projeto fonte limpo e inicializa o Git."""
         dest = self.batch_dir / "executions" / run_id / "project"
         shutil.rmtree(dest.parent, ignore_errors=True)
         dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copytree(FIXTURE_PROJECT, dest, ignore=shutil.ignore_patterns(".git", "node_modules", "dist", "coverage"))
+        shutil.copytree(self.project_source, dest, ignore=shutil.ignore_patterns(".git", "node_modules", "dist", "coverage"))
+
+        # Cria symlink de node_modules se existir na fonte para viabilizar testes rápidos
+        src_nm = self.project_source / "node_modules"
+        if src_nm.is_dir() and not (dest / "node_modules").exists():
+            try:
+                os.symlink(src_nm, dest / "node_modules")
+            except Exception:
+                pass
 
         subprocess.run(["git", "init", "-q", str(dest)], check=True)
         for k, v in (("user.name", "Teste"), ("user.email", "teste@example.com"), ("commit.gpgsign", "false")):
@@ -191,7 +206,14 @@ class BenchmarkExperimentOrchestrator:
             reps_10 = []
             if not self.configured_replications or self.configured_replications.get("enabled", True):
                 max_add = self.configured_replications.get("maximumAdditionalExecutions", 10) if self.configured_replications else 10
-                reps_10 = list(PRE_PLANNED_REPLICATIONS)[:max_add]
+                if self.configured_tasks:
+                    rep_candidates = []
+                    for tid in [t["id"] for t in active_tasks]:
+                        rep_candidates.append({"baseTaskId": tid, "replicationIndex": 2, "condition": "D"})
+                        rep_candidates.append({"baseTaskId": tid, "replicationIndex": 2, "condition": "A"})
+                    reps_10 = rep_candidates[:max_add]
+                else:
+                    reps_10 = list(PRE_PLANNED_REPLICATIONS)[:max_add]
                 if self.randomize_order:
                     rng.shuffle(reps_10)
 
@@ -351,7 +373,7 @@ class BenchmarkExperimentOrchestrator:
         )
 
         # 4. Hashes de reprodutibilidade e metadata.json
-        hashes = compute_experiment_hashes(REPO, FIXTURE_PROJECT, self.tasks_path)
+        hashes = compute_experiment_hashes(REPO, self.project_source, self.tasks_path)
         metadata = {
             "lote": self.batch_id,
             "agente": self.agent_id,
