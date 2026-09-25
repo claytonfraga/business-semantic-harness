@@ -66,8 +66,13 @@ def gerar(base: Path):
     linhas.append("| Condicao | "+" | ".join(CLASSES)+" |"); linhas.append("| --- |"+" --- |"*len(CLASSES))
     for c in COND: linhas.append("| "+c+" | "+" | ".join(str(stats[c]["classes"][k]) for k in CLASSES)+" |")
     linhas.append(""); linhas.append("Comparacoes pareadas (tokens): "+", ".join(f"{k}: {v['media']:.0f}" for k,v in comp.items()))
-    (base/"stats.md").write_text("\n".join(linhas)+"\n", encoding="utf-8")
-    rel=["# Relatorio do benchmark controlado","",f"Lote: {base.name}","",
+    meta = {}
+    if (base / "metadata.json").is_file():
+        try: meta = json.loads((base / "metadata.json").read_text(encoding="utf-8"))
+        except Exception: pass
+    agente = meta.get("agente") or ("agy" if base.name.startswith("agy-") else "codex")
+
+    rel=["# Relatorio do benchmark controlado","",f"Lote: {base.name}",f"Agente: {agente.upper()}","",
          "## 1. Eficacia do reconhecimento semantico",f"recall={sr.get('recall',0):.2f}, precision={sr.get('precision',0):.2f} (condicao D).","",
          "## 2. Eficacia do enforcement (D, violadoras)",f"bloqueios corretos={det}, nao detectadas={nd}.","",
          "## 3. Independencia do relato do agente","Na condicao D o enforcement roda no gate; ver executions/*/enforcement.json (report_conflict nao e pre-condicao).","",

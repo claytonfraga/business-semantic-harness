@@ -1,5 +1,5 @@
 import { execFile, spawn } from 'node:child_process';
-import { access, chmod, copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { access, chmod, copyFile, mkdir, mkdtemp, readFile, readdir, realpath, rm, writeFile } from 'node:fs/promises';
 import { homedir, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -125,8 +125,23 @@ export async function criarEstadoAgy(
     }
   }
 
-  // Pré-confiança da worktree isolada para a TUI do agy não pedir confirmação
-  const trustedFolders = { [workspaceSessao]: 'TRUST_FOLDER' };
+  // Pré-confiança da worktree isolada e repositório de origem para a TUI do agy não pedir confirmação
+  const trustedFolders: Record<string, string> = {
+    [workspaceSessao]: 'TRUST_FOLDER',
+    [repositorioOrigem]: 'TRUST_FOLDER',
+  };
+  try {
+    const realWork = await realpath(workspaceSessao);
+    trustedFolders[realWork] = 'TRUST_FOLDER';
+  } catch {
+    // caminho já léxico
+  }
+  try {
+    const realOrigem = await realpath(repositorioOrigem);
+    trustedFolders[realOrigem] = 'TRUST_FOLDER';
+  } catch {
+    // caminho já léxico
+  }
   await writeFile(join(geminiDir, 'trustedFolders.json'), JSON.stringify(trustedFolders, null, 2), { mode: 0o600 });
 
   let settings: Record<string, unknown> = {};
@@ -136,12 +151,15 @@ export async function criarEstadoAgy(
     // usa padrão vazio
   }
   const confiaveis = Array.isArray(settings.trustedWorkspaces) ? (settings.trustedWorkspaces as string[]) : [];
-  if (!confiaveis.includes(workspaceSessao)) confiaveis.push(workspaceSessao);
+  for (const pasta of Object.keys(trustedFolders)) {
+    if (!confiaveis.includes(pasta)) confiaveis.push(pasta);
+  }
   settings.trustedWorkspaces = confiaveis;
   const permissions = (settings.permissions && typeof settings.permissions === 'object'
     ? settings.permissions
     : { allow: [] }) as { allow?: string[] };
   const allow = Array.isArray(permissions.allow) ? permissions.allow : [];
+  if (!allow.includes('*')) allow.push('*');
   if (!allow.includes('mcp(bsh/*)')) allow.push('mcp(bsh/*)');
   permissions.allow = allow;
   settings.permissions = permissions;
@@ -271,3 +289,151 @@ export function extrairTokens(saida: string): ResultadoAgy['tokens'] {
   }
   return undefined;
 }
+
+function parseVarint(buf: Buffer, offset: number): [number, number] {
+  let res = 0;
+  let shift = 0;
+  let curr = offset;
+  while (curr < buf.length) {
+    const b = buf[curr++];
+    res |= (b & 0x7F) << shift;
+    if (!(b & 0x80)) break;
+    shift += 7;
+  }
+  return [res, curr];
+}
+
+/** Extrai tokens do banco de dados SQLite da sessão do Agy (.gemini/antigravity-cli/conversations/*.db). */
+export async function extrairTokensDoEstadoAgy(estado: EstadoAgy): Promise<ResultadoAgy['tokens'] | undefined> {
+  const convDir = join(estado.diretorio, '.gemini', 'antigravity-cli', 'conversations');
+  let dbFiles: string[] = [];
+  try {
+    const entries = await readdir(convDir);
+    dbFiles = entries.filter((f) => f.endsWith('.db')).map((f) => join(convDir, f));
+  } catch {
+    return undefined;
+  }
+
+  if (dbFiles.length === 0) return undefined;
+
+  interface SqliteDatabase {
+    prepare(sql: string): { all(): unknown[] };
+    close(): void;
+  }
+  type SqliteDatabaseConstructor = new (path: string, options?: { open?: boolean; readOnly?: boolean }) => SqliteDatabase;
+
+  let DatabaseSyncClass: SqliteDatabaseConstructor | undefined;
+  try {
+    const sqliteMod = (await import('node:sqlite')) as unknown as { DatabaseSync?: SqliteDatabaseConstructor };
+    DatabaseSyncClass = sqliteMod.DatabaseSync;
+  } catch {
+    DatabaseSyncClass = undefined;
+  }
+
+  if (!DatabaseSyncClass) return undefined;
+
+  let totalIn = 0;
+  let totalOut = 0;
+  let totalCache = 0;
+  let totalReasoning = 0;
+  let found = false;
+
+  for (const dbPath of dbFiles) {
+    try {
+      const db = new DatabaseSyncClass(dbPath, { open: true, readOnly: true });
+      try {
+        const rows = db.prepare('SELECT idx, metadata FROM steps ORDER BY idx').all() as Array<{ idx: number; metadata: unknown }>;
+        let lastInTurn: number | null = null;
+        let sumOut = 0;
+        let sumReasoning = 0;
+        let lastCacheTurn = 0;
+
+        for (const row of rows) {
+          const meta = row.metadata ? Buffer.from(row.metadata as Uint8Array) : null;
+          if (!meta) continue;
+
+          let i = 0;
+          while (i < meta.length) {
+            const tagByte = meta[i++];
+            const tag = tagByte >> 3;
+            const wire = tagByte & 7;
+
+            if (wire === 0) {
+              const [, next] = parseVarint(meta, i);
+              i = next;
+            } else if (wire === 2) {
+              const [len, next] = parseVarint(meta, i);
+              i = next;
+              const subEnd = i + len;
+              if (subEnd > meta.length) break;
+
+              if (tag === 9) {
+                let sj = i;
+                let inp: number | null = null;
+                let out: number | null = null;
+                let cache = 0;
+                let reasoning = 0;
+                while (sj < subEnd) {
+                  const stByte = meta[sj++];
+                  const stag = stByte >> 3;
+                  const swire = stByte & 7;
+                  if (swire === 0) {
+                    const [val, nextS] = parseVarint(meta, sj);
+                    sj = nextS;
+                    if (stag === 2) inp = val;
+                    else if (stag === 3) out = val;
+                    else if (stag === 5) cache = val;
+                    else if (stag === 6) reasoning = val;
+                  } else if (swire === 2) {
+                    const [slen, nextS] = parseVarint(meta, sj);
+                    sj = nextS + slen;
+                  } else {
+                    break;
+                  }
+                }
+                if (inp !== null && out !== null) {
+                  lastInTurn = inp;
+                  sumOut += out;
+                  sumReasoning += reasoning;
+                  lastCacheTurn = cache;
+                }
+              }
+              i = subEnd;
+            } else if (wire === 1) {
+              i += 8;
+            } else if (wire === 5) {
+              i += 4;
+            } else {
+              break;
+            }
+          }
+        }
+
+        if (lastInTurn !== null) {
+          totalIn += lastInTurn;
+          totalOut += sumOut;
+          totalCache += lastCacheTurn;
+          totalReasoning += sumReasoning;
+          found = true;
+        }
+      } finally {
+        db.close();
+      }
+    } catch {
+      // Ignora erro em arquivo corrompido ou temporário
+    }
+  }
+
+  if (found && (totalIn > 0 || totalOut > 0)) {
+    return {
+      entrada: totalIn,
+      saida: totalOut,
+      cache: totalCache,
+      raciocinio: totalReasoning,
+      totais: totalIn + totalOut,
+    };
+  }
+
+  return undefined;
+}
+
