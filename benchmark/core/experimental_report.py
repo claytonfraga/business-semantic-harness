@@ -104,6 +104,58 @@ def _metric_rows(value: Any, prefix: str = "") -> list[list[Any]]:
     return [[prefix, value]]
 
 
+def _intro_paragraphs() -> list[str]:
+    return [
+        "Este relatório descreve uma avaliação experimental do Business Semantic Harness (BSH) sob "
+        "quatro condições. As condições distinguem-se pela presença de BSH e pelo tipo de governança.",
+        "A — Direta: não utiliza BSH. O agente atua sem ontologia e sem regras textuais.",
+        "B — Regras textuais: não utiliza BSH. O agente recebe apenas regras de negócio em linguagem "
+        "natural via AGENTS.md, sem ontologia e sem enforcement.",
+        "C — BSH consultivo: utiliza o BSH como camada semântica consultiva, com acesso à ontologia por "
+        "MCP, mas sem enforcement independente no gate de promoção. O agente consulta o conhecimento "
+        "semântico e decide como agir.",
+        "D — BSH completo: utiliza o mesmo BSH semântico de C e acrescenta enforcement independente no "
+        "gate de promoção. Portanto, D = BSH consultivo + controle independente da promoção.",
+        "Identidades: A = sem BSH; B = sem BSH, com regras textuais; C = BSH semântico consultivo; "
+        "D = BSH semântico consultivo + enforcement independente. Tanto C quanto D utilizam BSH; "
+        "apenas D possui enforcement independente.",
+        "Os contrastes experimentais são interpretados assim: A × B, efeito das regras textuais; "
+        "B × C, efeito da introdução do BSH semântico; C × D, efeito adicional do enforcement "
+        "independente do BSH; A × D, efeito combinado do BSH completo em relação ao agente sem governança.",
+    ]
+
+
+def _conclusion_paragraphs(stats: dict[str, Any], verdicts: dict[str, Any]) -> list[str]:
+    questions = stats.get("researchQuestions", {}) if isinstance(stats, dict) else {}
+
+    def verdict(rq_id: str) -> str:
+        try:
+            return verdicts["researchQuestions"][rq_id]["verdict"]
+        except (KeyError, TypeError):
+            return "NAO_AVALIADO"
+
+    def status(rq_id: str) -> str:
+        entry = questions.get(rq_id, {})
+        return str(entry.get("status", "NAO_AVALIADA"))
+
+    c_metric = questions.get("RQ4", {}).get("metric") or {}
+    d_metric = questions.get("RQ5", {}).get("metric") or {}
+    independent = d_metric.get("independentEnforcementActivated")
+    return [
+        "A conclusão distingue o valor do BSH consultivo do valor adicional do enforcement independente "
+        "e não trata C e D como equivalentes.",
+        "1) Regras textuais (A × B): veredito " + verdict("RQ3") + " (" + status("RQ3") + ").",
+        "2) Introdução do BSH consultivo (B × C): veredito " + verdict("RQ4") + " (" + status("RQ4") + "). "
+        "Se C já evita alterações por consulta semântica, isso representa utilidade do BSH mesmo sem o gate.",
+        "3) Enforcement independente (C × D): veredito " + verdict("RQ5") + " (" + status("RQ5") + "); "
+        "ativações independentes observadas em D: " + str(independent) + ". Se o benefício adicional de D "
+        "sobre C não aparecer claramente, isso é declarado objetivamente, sem concluir equivalência entre C e D.",
+        "4) Efeito global do BSH completo (A × D): veredito " + verdict("RQ1_A") + " (" + status("RQ1_A") + ").",
+        "Esta conclusão é construída apenas a partir dos resultados observados nesta campanha; não antecipa "
+        "superioridade de nenhuma condição.",
+    ]
+
+
 def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str, Any],
                        completion: dict[str, Any], quality: dict[str, Any], isolation: dict[str, Any],
                        usability: dict[str, Any], ground_truth: dict[str, Any], stats: dict[str, Any],
@@ -257,6 +309,8 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
             "NOT_EVALUATED; DENY não implica enforcement correto e ALLOW não implica enforcement correto.",
         ],
     })
+    sections.insert(0, {"title": "Introdução", "paragraphs": _intro_paragraphs()})
+    sections.append({"title": "Conclusão", "paragraphs": _conclusion_paragraphs(stats, verdicts)})
     model = {"title": TITLE, "subtitle": subtitle, "batchId": batch_id, "domain": domain,
              "executionDate": metadata.get("startedAt"), "dataOrigin": metadata.get("dataOrigin"),
              "provenance": provenance, "abstract": {"objective": "Avaliar governança semântica observada no BSH",
