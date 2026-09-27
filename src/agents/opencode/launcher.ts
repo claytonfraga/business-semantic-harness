@@ -201,7 +201,8 @@ export function executarOpencodeTui(
   workspace: string,
   model?: string,
 ): Promise<number> {
-  const args: string[] = [];
+  // Posicional: fixa o diretório do projeto na worktree isolada (impede o opencode de resolver para o origin).
+  const args: string[] = [workspace];
   if (model) args.push('--model', model);
   const filho = spawn('opencode', args, {
     cwd: workspace,
@@ -226,7 +227,7 @@ export function executarOpencodePrompt(
   prompt: string,
   model?: string,
 ): Promise<ResultadoOpencodeRun> {
-  const args = ['run', '--format', 'json', '--auto'];
+  const args = ['run', '--format', 'json', '--auto', '--dir', workspace];
   if (model) args.push('--model', model);
   args.push(prompt);
   return new Promise<ResultadoOpencodeRun>((resolve) => {
