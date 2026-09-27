@@ -125,7 +125,34 @@ def _intro_paragraphs() -> list[str]:
     ]
 
 
-def _conclusion_paragraphs(stats: dict[str, Any], verdicts: dict[str, Any]) -> list[str]:
+def _conflict_summary(batch_id: str) -> dict[tuple[str, str], dict[str, int]]:
+    path = Path(__file__).resolve().parents[1] / "results" / batch_id / "classified-runs.json"
+    if not path.is_file():
+        return {}
+    try:
+        runs = json.loads(path.read_text(encoding="utf-8"))
+    except (ValueError, OSError):
+        return {}
+    groups: dict[tuple[str, str], dict[str, int]] = {}
+    for run in runs:
+        condition = str(run.get("condition"))
+        ttype = str(run.get("taskType") or "").lower()
+        if ttype in ("violadora", "violating"):
+            kind = "violadora"
+        elif ttype in ("valida_governada", "valida", "valid"):
+            kind = "valida"
+        else:
+            kind = ttype or "outra"
+        group = groups.setdefault((condition, kind), {"n": 0, "conflict": 0, "queried": 0})
+        group["n"] += 1
+        if run.get("reportConflictCalled") is True:
+            group["conflict"] += 1
+        if run.get("ontologyQueried") is True:
+            group["queried"] += 1
+    return groups
+
+
+def _conclusion_paragraphs(stats: dict[str, Any], verdicts: dict[str, Any], batch_id: str = "") -> list[str]:
     questions = stats.get("researchQuestions", {}) if isinstance(stats, dict) else {}
 
     def verdict(rq_id: str) -> str:
@@ -135,10 +162,15 @@ def _conclusion_paragraphs(stats: dict[str, Any], verdicts: dict[str, Any]) -> l
             return "NAO_AVALIADO"
 
     def status(rq_id: str) -> str:
-        entry = questions.get(rq_id, {})
-        return str(entry.get("status", "NAO_AVALIADA"))
+        return str(questions.get(rq_id, {}).get("status", "NAO_AVALIADA"))
 
-    c_metric = questions.get("RQ4", {}).get("metric") or {}
+    groups = _conflict_summary(batch_id)
+
+    def line(condition: str, kind: str) -> str:
+        data = groups.get((condition, kind), {"n": 0, "conflict": 0, "queried": 0})
+        return (condition + " " + kind + ": conflitos " + str(data["conflict"]) + "/" + str(data["n"])
+                + ", consultas " + str(data["queried"]) + "/" + str(data["n"]))
+
     d_metric = questions.get("RQ5", {}).get("metric") or {}
     independent = d_metric.get("independentEnforcementActivated")
     return [
@@ -146,11 +178,19 @@ def _conclusion_paragraphs(stats: dict[str, Any], verdicts: dict[str, Any]) -> l
         "e não trata C e D como equivalentes.",
         "1) Regras textuais (A × B): veredito " + verdict("RQ3") + " (" + status("RQ3") + ").",
         "2) Introdução do BSH consultivo (B × C): veredito " + verdict("RQ4") + " (" + status("RQ4") + "). "
-        "Se C já evita alterações por consulta semântica, isso representa utilidade do BSH mesmo sem o gate.",
+        "Se C já evita alterações por consulta semântica, isso representa utilidade do BSH mesmo sem o gate. "
+        "Evidência observada de seletividade consultiva — " + line("C", "violadora") + "; " + line("C", "valida") + ".",
         "3) Enforcement independente (C × D): veredito " + verdict("RQ5") + " (" + status("RQ5") + "); "
-        "ativações independentes observadas em D: " + str(independent) + ". Se o benefício adicional de D "
-        "sobre C não aparecer claramente, isso é declarado objetivamente, sem concluir equivalência entre C e D.",
+        "ativações independentes observadas em D: " + str(independent) + ". "
+        "Evidência observada em D — " + line("D", "violadora") + "; " + line("D", "valida") + ". Se o benefício adicional "
+        "de D sobre C não aparecer claramente, isso é declarado objetivamente, sem concluir equivalência entre C e D.",
         "4) Efeito global do BSH completo (A × D): veredito " + verdict("RQ1_A") + " (" + status("RQ1_A") + ").",
+        "Limitação de proveniência: diferenças de commit/registro de origem podem aparecer com hashes de árvore "
+        "iniciais e finais iguais; isso indica mudança de histórico/proveniência sem evidência de mudança do conteúdo "
+        "relevante do código-base e é tratado como limitação de rastreabilidade, não como contaminação dos resultados.",
+        "Limitação de métrica: a cobertura de evidência semântica fina (operação e shapes reconhecidos) e a métrica de "
+        "tokens não cacheados podem ficar ausentes ou zeradas sem que isso signifique ausência de interação semântica; "
+        "há consulta ontológica e relato de conflito registrados por run.",
         "Esta conclusão é construída apenas a partir dos resultados observados nesta campanha; não antecipa "
         "superioridade de nenhuma condição.",
     ]
@@ -310,7 +350,7 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
         ],
     })
     sections.insert(0, {"title": "Introdução", "paragraphs": _intro_paragraphs()})
-    sections.append({"title": "Conclusão", "paragraphs": _conclusion_paragraphs(stats, verdicts)})
+    sections.append({"title": "Conclusão", "paragraphs": _conclusion_paragraphs(stats, verdicts, batch_id)})
     model = {"title": TITLE, "subtitle": subtitle, "batchId": batch_id, "domain": domain,
              "executionDate": metadata.get("startedAt"), "dataOrigin": metadata.get("dataOrigin"),
              "provenance": provenance, "abstract": {"objective": "Avaliar governança semântica observada no BSH",
