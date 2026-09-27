@@ -22,6 +22,7 @@ from .core.config import load_and_validate_config, save_config_to_batch
 from .core.models import CanonicalBenchmarkRun, compute_directory_tree_hash, compute_experiment_hashes
 from .core.codebase_change import (compute_change_disposition, compute_code_base_changed,
                                    compute_codebase_tree_hash, compute_enforcement_outcome_observed)
+from .core.experimental_execution import oracle_candidate_validity
 from .core.governance_observation import collect_governance_observation
 from .core.run_invariants import run_instrumentation_issues
 from .core.classification import classify_run, determine_governance_mechanism
@@ -322,7 +323,7 @@ class BenchmarkExperimentOrchestrator:
                 technical_failure=(status == "FALHA_TECNICA"),
                 instrumentation_failure=bsh_obs.get("evidenceCollectionStatus") == "INVALID",
                 candidate_enforcement_applicable=bsh_obs.get("candidateEnforcementApplicable"),
-                candidate_semantic_validity=bsh_obs.get("candidateSemanticValidity") or "INDETERMINATE",
+                candidate_semantic_validity=oracle_candidate_validity(tinfo),
                 task_id=base_tid,
             )
 
@@ -397,7 +398,7 @@ class BenchmarkExperimentOrchestrator:
                 candidateFinalTreeHash=candidate_final_tree,
                 codeBaseChanged=code_base_changed,
                 changeDisposition=change_disposition,
-                candidateSemanticValidity="INDETERMINATE",
+                candidateSemanticValidity=oracle_candidate_validity(tinfo),
                 enforcementOutcomeObserved=enforcement_outcome,
                 enforcementCorrectness="NOT_EVALUATED",
                 independentEnforcementActivated=bsh_obs.get("independentEnforcementActivated"),

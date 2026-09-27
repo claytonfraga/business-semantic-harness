@@ -7,7 +7,7 @@ Sem esse ground truth, não se infere FALSO_BLOQUEIO, VIOLACAO_NAO_DETECTADA nem
 import unittest
 
 from benchmark.core.classification import classify_run, determine_governance_mechanism
-from benchmark.core.experimental_execution import classify_observed
+from benchmark.core.experimental_execution import classify_observed, oracle_candidate_validity
 from benchmark.core.models import CanonicalBenchmarkRun
 from benchmark.core.run_invariants import run_instrumentation_issues
 
@@ -39,6 +39,12 @@ def blocked_candidate_row(**overrides):
 
 
 class ConditionSemanticsRegression(unittest.TestCase):
+    def test_Given_task_oracle_When_validity_Then_maps_independent_ground_truth(self):
+        """opencode: Given the frozen task oracle, When validity, Then it maps to an independent criterion."""
+        self.assertEqual(oracle_candidate_validity({"expectedSemanticOutcome": "violacao"}), "INVALID")
+        self.assertEqual(oracle_candidate_validity({"expectedSemanticOutcome": "conforme"}), "VALID")
+        self.assertEqual(oracle_candidate_validity({}), "INDETERMINATE")
+
     def test_Given_valid_task_without_change_When_classified_Then_voluntary_absence(self):
         """codex: Given a valid task and no change, When classified, Then it is voluntary absence."""
         cls = classify_run(task_type="valida_governada", condition="D", change_set_detected=False,

@@ -281,6 +281,16 @@ def _semantic_status(source: dict[str, Any], decision: dict[str, Any] | None) ->
     return legacy if legacy in _LEGACY_SEMANTIC_STATUS.values() or legacy == "revisao_humana" else None
 
 
+def oracle_candidate_validity(task: dict[str, Any]) -> str:
+    """Validade semântica do candidato segundo o oráculo independente da tarefa congelada."""
+    expected = str(task.get("expectedSemanticOutcome") or "").strip().lower()
+    if expected in ("violacao", "violacao_semantica", "invalid"):
+        return "INVALID"
+    if expected in ("conforme", "valid", "conforme_semantica"):
+        return "VALID"
+    return "INDETERMINATE"
+
+
 def normalize_runs(batch_id: str, runs: list[dict[str, Any]], tasks: list[dict[str, Any]]) -> list[dict[str, Any]]:
     by_task = {str(item.get("baseTaskId") or item.get("taskId") or item.get("id")): item for item in tasks}
     result = []
@@ -336,7 +346,10 @@ def normalize_runs(batch_id: str, runs: list[dict[str, Any]], tasks: list[dict[s
             "candidateFinalTreeHash": source.get("candidateFinalTreeHash"),
             "codeBaseChanged": source.get("codeBaseChanged"),
             "changeDisposition": source.get("changeDisposition"),
-            "candidateSemanticValidity": source.get("candidateSemanticValidity") or "INDETERMINATE",
+            "candidateSemanticValidity": (
+                source.get("candidateSemanticValidity")
+                if source.get("candidateSemanticValidity") not in (None, "INDETERMINATE")
+                else oracle_candidate_validity(task)),
             "enforcementOutcomeObserved": source.get("enforcementOutcomeObserved"),
             "enforcementCorrectness": source.get("enforcementCorrectness") or "NOT_EVALUATED",
             "independentEnforcementActivated": source.get("independentEnforcementActivated"),
