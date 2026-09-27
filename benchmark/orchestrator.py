@@ -296,7 +296,8 @@ class BenchmarkExperimentOrchestrator:
             change_disposition = compute_change_disposition(
                 ws_eval["changeSetDetected"], candidate_created, blocked, code_base_changed)
             enforcement_outcome = compute_enforcement_outcome_observed(
-                cond, enf_obs, bsh_obs.get("validationStatus"), bsh_obs.get("promotionDecision"))
+                cond, bsh_obs.get("candidateEnforcementApplicable"), bsh_obs.get("validationStatus"),
+                bsh_obs.get("promotionDecision"))
 
             norm_tokens = self.adapter.normalize_telemetry(raw_tel)
 

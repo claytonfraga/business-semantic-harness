@@ -44,13 +44,16 @@ def compute_change_disposition(change_set_detected: Optional[bool], candidate_cr
     return "INDETERMINATE"
 
 
-def compute_enforcement_outcome_observed(condition: str, enforcement_pipeline_observed: Optional[bool],
+def compute_enforcement_outcome_observed(condition: str, candidate_enforcement_applicable: Optional[bool],
                                          validation_status: Optional[str],
                                          promotion_decision: Optional[str]) -> str:
-    """Descreve o que ocorreu no enforcement; não decide se a decisão foi semanticamente correta."""
+    """Descreve o enforcement efetivamente aplicado a um candidato; o pipeline sem candidato não conta.
+
+    candidateEnforcementApplicable é a fonte canônica de existência/aplicabilidade do candidato.
+    """
     if condition in ("A", "B"):
         return "NOT_APPLICABLE"
-    if enforcement_pipeline_observed is not True:
+    if candidate_enforcement_applicable is not True:
         return "NOT_TRIGGERED"
     if validation_status == "VALIDATION_ERROR":
         return "VALIDATION_ERROR"

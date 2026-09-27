@@ -61,13 +61,23 @@ class CodeBaseChangeRegression(unittest.TestCase):
             self.assertTrue(compute_code_base_changed("a", "b"))
 
     def test_Given_enforcement_outcomes_When_computed_Then_observational_label(self):
-        """opencode: Given gate evidence, When computed, Then the observational outcome is labelled."""
+        """opencode: Given candidate applicability, When computed, Then the outcome is labelled."""
         self.assertEqual(compute_enforcement_outcome_observed("A", False, None, None), "NOT_APPLICABLE")
-        self.assertEqual(compute_enforcement_outcome_observed("D", False, None, None), "NOT_TRIGGERED")
-        self.assertEqual(compute_enforcement_outcome_observed("D", True, "INDETERMINATE", "DENY"), "INDETERMINATE")
-        self.assertEqual(compute_enforcement_outcome_observed("D", True, "VIOLATION", "DENY"), "DENY")
+        self.assertEqual(compute_enforcement_outcome_observed("D", False, "CONFORMING", "ALLOW"), "NOT_TRIGGERED")
+        self.assertEqual(compute_enforcement_outcome_observed("D", None, "CONFORMING", "ALLOW"), "NOT_TRIGGERED")
         self.assertEqual(compute_enforcement_outcome_observed("D", True, "CONFORMING", "ALLOW"), "ALLOW")
+        self.assertEqual(compute_enforcement_outcome_observed("D", True, "VIOLATION", "DENY"), "DENY")
+        self.assertEqual(compute_enforcement_outcome_observed("D", True, "INDETERMINATE", "DENY"), "INDETERMINATE")
         self.assertEqual(compute_enforcement_outcome_observed("D", True, "VALIDATION_ERROR", "DENY"), "VALIDATION_ERROR")
+
+    def test_Given_pipeline_without_candidate_When_outcome_Then_not_triggered(self):
+        """opencode: Given pipeline executed without candidate, When outcome, Then NOT_TRIGGERED."""
+        for agent in ("opencode", "codex", "agy"):
+            self.assertEqual(compute_enforcement_outcome_observed("D", False, "CONFORMING", "ALLOW"), "NOT_TRIGGERED")
+
+    def test_Given_candidate_commit_without_created_When_evaluated_Then_candidate_is_not_inferred(self):
+        """opencode: Given a candidateCommit without candidateCreated, When evaluated, Then no candidate is inferred."""
+        self.assertEqual(compute_enforcement_outcome_observed("D", False, "CONFORMING", "ALLOW"), "NOT_TRIGGERED")
 
 
 class CodeBaseChangeInvariantRegression(unittest.TestCase):

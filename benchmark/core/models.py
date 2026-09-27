@@ -76,6 +76,8 @@ class CanonicalBenchmarkRun:
     enforcementStatus: Optional[str] = None    # conforme, violacao, revisao_humana, indeterminado, null
     enforcementPipelineObserved: Optional[bool] = None
     candidateEnforcementApplicable: Optional[bool] = None
+    # candidateCommit é um snapshot/base técnico da worktree; NÃO é evidência de existência de candidato.
+    # As fontes canônicas são candidateCreated e candidateEnforcementApplicable.
     candidateCommit: Optional[str] = None
     candidateCreated: Optional[bool] = None
     codeBaseChanged: Optional[bool] = None

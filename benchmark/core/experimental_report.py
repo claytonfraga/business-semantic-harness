@@ -246,14 +246,17 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
                               "hash, versão ou identificador", "report-model.json", sample["nRuns"])
     provenance_table["section"] = "Reprodutibilidade"
     tables.append(provenance_table)
-    sections.append(
-        "Escopo da Avaliação do Harness e Limite do Ground Truth: esta etapa avalia o BSH como "
-        "harness ontológico por evidência observável do fluxo (consulta semântica, acionamento do "
-        "enforcement, bloqueio, promoção e mudança no código-base). Avaliar se o harness atuou não é "
-        "avaliar se cada decisão semântica estava correta: a correção de decisões específicas de "
-        "enforcement requer ground truth independente e constitui uma etapa distinta. Sem esse ground "
-        "truth, candidateSemanticValidity = INDETERMINATE e enforcementCorrectness = NOT_EVALUATED; "
-        "DENY não implica enforcement correto e ALLOW não implica enforcement correto.")
+    sections.append({
+        "title": "Escopo da Avaliação do Harness e Limite do Ground Truth",
+        "paragraphs": [
+            "Esta etapa avalia o BSH como harness ontológico por evidência observável do fluxo "
+            "(consulta semântica, acionamento do enforcement, bloqueio, promoção e mudança no código-base). "
+            "Avaliar se o harness atuou não é avaliar se cada decisão semântica estava correta: a correção de "
+            "decisões específicas de enforcement requer ground truth independente e constitui uma etapa distinta. "
+            "Sem esse ground truth, candidateSemanticValidity = INDETERMINATE e enforcementCorrectness = "
+            "NOT_EVALUATED; DENY não implica enforcement correto e ALLOW não implica enforcement correto.",
+        ],
+    })
     model = {"title": TITLE, "subtitle": subtitle, "batchId": batch_id, "domain": domain,
              "executionDate": metadata.get("startedAt"), "dataOrigin": metadata.get("dataOrigin"),
              "provenance": provenance, "abstract": {"objective": "Avaliar governança semântica observada no BSH",
