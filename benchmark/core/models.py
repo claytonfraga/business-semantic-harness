@@ -77,6 +77,12 @@ class CanonicalBenchmarkRun:
     enforcementPipelineObserved: Optional[bool] = None
     candidateEnforcementApplicable: Optional[bool] = None
     candidateCommit: Optional[str] = None
+    candidateCreated: Optional[bool] = None
+    codeBaseChanged: Optional[bool] = None
+    changeDisposition: Optional[str] = None
+    candidateSemanticValidity: Optional[str] = None
+    enforcementOutcomeObserved: Optional[str] = None
+    enforcementCorrectness: Optional[str] = None
     independentEnforcementActivated: Optional[bool] = None
     enforcementGateEvidence: Optional[Dict[str, Any]] = None
     governanceDecision: Optional[Dict[str, Any]] = None

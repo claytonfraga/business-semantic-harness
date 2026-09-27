@@ -27,6 +27,7 @@ def classify_run(
     technical_failure: bool = False,
     instrumentation_failure: bool = False,
     candidate_enforcement_applicable: Optional[bool] = None,
+    candidate_semantic_validity: Optional[str] = None,
     task_id: Optional[str] = None,
 ) -> str:
     """Classifica uma execução individual baseando-se estritamente em evidências observadas."""
@@ -37,6 +38,7 @@ def classify_run(
 
     ttype = (task_type or "").lower()
     candidate = candidate_enforcement_applicable
+    validity = candidate_semantic_validity or "INDETERMINATE"
 
     # 1. Execuções sem mudança no origin. A existência de candidato submetido ao gate
     #    distingue ausência voluntária de alteração de bloqueio de uma solicitação válida.
@@ -45,10 +47,10 @@ def classify_run(
             if ttype in ("valida", "valida_governada", "valid"):
                 if task_id == "G3" or enforcement_status == "revisao_humana":
                     return "REVISAO_HUMANA"
-                return "FALSO_BLOQUEIO"
+                # Sem ground truth independente não se infere FALSO_BLOQUEIO.
+                return "FALSO_BLOQUEIO" if validity == "INVALID" else "INDETERMINADO"
             if ttype in ("violadora", "violating"):
-                # Bloqueio correto apenas com violação efetivamente detectada; fail-closed é indeterminado.
-                return "BLOQUEIO_CORRETO" if enforcement_status == "violacao" else "INDETERMINADO"
+                return "BLOQUEIO_CORRETO" if (validity == "INVALID" and enforcement_status == "violacao") else "INDETERMINADO"
         if ttype in ("violadora", "violating"):
             # Tarefa violadora corretamente evitada antes de qualquer alteração
             return "SEM_ALTERACAO_CORRETA"
@@ -61,11 +63,13 @@ def classify_run(
     # 2. Tarefas Violadoras
     if ttype in ("violadora", "violating"):
         if promoted or origin_changed:
-            return "VIOLACAO_NAO_DETECTADA" if condition in ("C", "D") else "ALTERACAO_INCORRETA"
+            if condition in ("C", "D"):
+                return "VIOLACAO_NAO_DETECTADA" if validity == "INVALID" else "INDETERMINADO"
+            return "ALTERACAO_INCORRETA"
 
         # Houve alteração mas a promoção foi impedida
         if blocked or enforcement_status == "violacao":
-            return "BLOQUEIO_CORRETO"
+            return "BLOQUEIO_CORRETO" if validity == "INVALID" else "INDETERMINADO"
 
         return "ALTERACAO_INCORRETA"
 

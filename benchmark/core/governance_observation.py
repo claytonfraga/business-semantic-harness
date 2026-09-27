@@ -39,7 +39,9 @@ def _base(status: str, reason: str | None = None) -> dict[str, Any]:
         "enforcementObserved": None, "enforcementPipelineObserved": None,
         "technicalGatesPassed": None, "identifiedOperation": None,
         "identifiedShapes": None, "candidateEnforcementApplicable": None,
-        "candidateCommit": None,
+        "candidateCommit": None, "candidateCreated": None,
+        "candidateSemanticValidity": None,
+        "enforcementOutcomeObserved": None, "enforcementCorrectness": None,
         "independentEnforcementActivated": None, "enforcementGateEvidence": None,
         "sessionMode": None,
     }
@@ -115,6 +117,8 @@ def collect_governance_observation(project_path: Path) -> dict[str, Any]:
             "blocked": _bool(report.get("bloqueado")), "technicalGatesPassed": _bool(report.get("gatesAprovados")),
             "enforcementObserved": False, "enforcementPipelineObserved": False,
             "candidateEnforcementApplicable": False, "independentEnforcementActivated": False,
+            "candidateCreated": _bool(report.get("alteracaoNaWorktree")),
+            "candidateSemanticValidity": "INDETERMINATE", "enforcementCorrectness": "NOT_EVALUATED",
         })
         return observed
     if session_mode not in (None, "ENFORCED"):
@@ -202,6 +206,10 @@ def collect_governance_observation(project_path: Path) -> dict[str, Any]:
         "identifiedShapes": selected,
         "candidateEnforcementApplicable": candidate_exists,
         "candidateCommit": candidate_commit,
+        "candidateCreated": candidate_worktree,
+        "candidateSemanticValidity": "INDETERMINATE",
+        "enforcementOutcomeObserved": None,
+        "enforcementCorrectness": "NOT_EVALUATED",
         "independentEnforcementActivated": None if conflict_called is None or promoted is None or origin_changed is None else all((
             status == "VIOLATION", executed is True, complete is True,
             decision.get("policyDecision") == "DENY", gate_evidence["blockedPromotion"],

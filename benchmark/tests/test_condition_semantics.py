@@ -1,4 +1,8 @@
-"""Regressões Given/When/Then da semântica das condições governadas (foco na condição D)."""
+"""Regressões Given/When/Then da semântica das condições governadas (foco na condição D).
+
+A primeira etapa avalia o harness por evidência observável, sem ground truth independente.
+Sem esse ground truth, não se infere FALSO_BLOQUEIO, VIOLACAO_NAO_DETECTADA nem BLOQUEIO_CORRETO.
+"""
 
 import unittest
 
@@ -12,8 +16,8 @@ def observed(**overrides):
     row = {
         "runId": "001", "baseTaskId": "G1", "condition": "D", "taskType": "valida_governada",
         "changeSetDetected": False, "promoted": False, "originChanged": False, "testsPassed": None,
-        "candidateEnforcementApplicable": False, "semanticStatus": None,
-        "reportConflictCalled": False, "ontologyQueried": None,
+        "candidateEnforcementApplicable": False, "candidateSemanticValidity": "INDETERMINATE",
+        "semanticStatus": None, "reportConflictCalled": False, "ontologyQueried": None,
         "enforcementPipelineObserved": False, "validationExecuted": None, "validationComplete": None,
         "policyDecision": None, "promotionDecision": None, "candidateFingerprint": None,
         "enforcementGateEvidence": None,
@@ -43,7 +47,6 @@ class ConditionSemanticsRegression(unittest.TestCase):
         self.assertEqual(cls, "SEM_ALTERACAO_INCORRETA")
         row = classify_observed(observed(candidateEnforcementApplicable=False))
         self.assertEqual(row["classification"], "SEM_ALTERACAO_INCORRETA")
-        self.assertNotEqual(row["classification"], "FALSO_BLOQUEIO")
 
     def test_Given_valid_task_candidate_passing_gate_When_classified_Then_correct_change(self):
         """codex: Given a valid candidate that passes, When classified, Then correct change."""
@@ -59,25 +62,29 @@ class ConditionSemanticsRegression(unittest.TestCase):
         self.assertEqual(row["classification"], "ALTERACAO_CORRETA")
         self.assertFalse(row["independentEnforcementActivated"])
 
-    def test_Given_valid_task_candidate_wrongly_blocked_When_classified_Then_false_block(self):
-        """codex: Given a valid candidate blocked, When classified, Then it is a false block."""
+    def test_Given_valid_task_candidate_wrongly_blocked_When_classified_Then_not_inferred_false_block(self):
+        """codex: Given a blocked valid candidate without ground truth, When classified, Then not FALSO_BLOQUEIO."""
         cls = classify_run(task_type="valida_governada", condition="D", change_set_detected=False,
                            blocked=True, promoted=False, origin_changed=False,
                            enforcement_status="indeterminado", enforcement_observed=False,
                            candidate_enforcement_applicable=True)
-        self.assertEqual(cls, "FALSO_BLOQUEIO")
+        self.assertEqual(cls, "INDETERMINADO")
+        definite = classify_run(task_type="valida_governada", condition="D", change_set_detected=False,
+                                blocked=True, promoted=False, origin_changed=False,
+                                enforcement_status="indeterminado", enforcement_observed=False,
+                                candidate_enforcement_applicable=True, candidate_semantic_validity="INVALID")
+        self.assertEqual(definite, "FALSO_BLOQUEIO")
         row = classify_observed(blocked_candidate_row())
-        self.assertEqual(row["classification"], "FALSO_BLOQUEIO")
+        self.assertEqual(row["classification"], "INDETERMINADO")
         self.assertFalse(row["independentEnforcementActivated"])
-        self.assertEqual(row["governanceMechanism"], "INDETERMINADO")
 
-    def test_Given_valid_task_gate_fail_closed_When_classified_Then_false_block(self):
-        """codex: Given the gate cannot validate and denies, When classified, Then false block."""
+    def test_Given_valid_task_gate_fail_closed_When_classified_Then_indeterminate(self):
+        """codex: Given the gate cannot validate and denies, When classified, Then indeterminate."""
         cls = classify_run(task_type="valida_governada", condition="D", change_set_detected=False,
                            blocked=True, promoted=False, origin_changed=False,
                            enforcement_status="indeterminado", enforcement_observed=False,
                            candidate_enforcement_applicable=True)
-        self.assertEqual(cls, "FALSO_BLOQUEIO")
+        self.assertEqual(cls, "INDETERMINADO")
         mech = determine_governance_mechanism(condition="D", classification=cls,
                                               change_set_detected=False, promoted=False,
                                               ontology_queried=False, report_conflict_called=False,
@@ -97,28 +104,52 @@ class ConditionSemanticsRegression(unittest.TestCase):
                                          ontologyQueried=True))
         self.assertEqual(row["classification"], "SEM_ALTERACAO_CORRETA")
 
-    def test_Given_violating_task_candidate_blocked_When_classified_Then_correct_block(self):
-        """codex: Given a violating candidate correctly blocked, When classified, Then correct block."""
+    def test_Given_violating_task_candidate_blocked_When_classified_Then_not_inferred(self):
+        """codex: Given a violating candidate blocked without ground truth, When classified, Then not inferred."""
         cls = classify_run(task_type="violadora", condition="D", change_set_detected=False,
                            blocked=True, promoted=False, origin_changed=False,
                            enforcement_status="violacao", enforcement_observed=True,
                            candidate_enforcement_applicable=True)
-        self.assertEqual(cls, "BLOQUEIO_CORRETO")
+        self.assertEqual(cls, "INDETERMINADO")
+        definite = classify_run(task_type="violadora", condition="D", change_set_detected=False,
+                                blocked=True, promoted=False, origin_changed=False,
+                                enforcement_status="violacao", enforcement_observed=True,
+                                candidate_enforcement_applicable=True, candidate_semantic_validity="INVALID")
+        self.assertEqual(definite, "BLOQUEIO_CORRETO")
         row = classify_observed(blocked_candidate_row(taskType="violadora", semanticStatus="violacao",
                                                       validationExecuted=True, validationComplete=True))
-        self.assertEqual(row["classification"], "BLOQUEIO_CORRETO")
+        self.assertEqual(row["classification"], "INDETERMINADO")
+        # O mecanismo observado (enforcement independente acionado) independe do ground truth semântico.
         self.assertTrue(row["independentEnforcementActivated"])
-        self.assertEqual(row["governanceMechanism"], "ENFORCEMENT_INDEPENDENTE")
 
-    def test_Given_violating_task_candidate_escapes_When_classified_Then_undetected_violation(self):
-        """codex: Given a violating candidate that escapes, When classified, Then undetected violation."""
+    def test_Given_violating_task_candidate_escapes_When_classified_Then_not_inferred(self):
+        """codex: Given a violating candidate that escapes without ground truth, When classified, Then not inferred."""
         cls = classify_run(task_type="violadora", condition="D", change_set_detected=True,
                            blocked=False, promoted=True, origin_changed=True,
                            candidate_enforcement_applicable=True)
-        self.assertEqual(cls, "VIOLACAO_NAO_DETECTADA")
+        self.assertEqual(cls, "INDETERMINADO")
+        definite = classify_run(task_type="violadora", condition="D", change_set_detected=True,
+                                blocked=False, promoted=True, origin_changed=True,
+                                candidate_enforcement_applicable=True, candidate_semantic_validity="INVALID")
+        self.assertEqual(definite, "VIOLACAO_NAO_DETECTADA")
         row = classify_observed(observed(taskType="violadora", candidateEnforcementApplicable=True,
                                          changeSetDetected=True, promoted=True, originChanged=True))
-        self.assertEqual(row["classification"], "VIOLACAO_NAO_DETECTADA")
+        self.assertEqual(row["classification"], "INDETERMINADO")
+
+    def test_Given_valid_DENY_and_indeterminate_validity_When_classified_Then_not_false_block(self):
+        """codex: Given valid + DENY + indeterminate validity, When classified, Then not FALSO_BLOQUEIO."""
+        cls = classify_run(task_type="valida_governada", condition="D", change_set_detected=False,
+                           blocked=True, promoted=False, origin_changed=False,
+                           enforcement_status="indeterminado", enforcement_observed=False,
+                           candidate_enforcement_applicable=True, candidate_semantic_validity="INDETERMINATE")
+        self.assertNotEqual(cls, "FALSO_BLOQUEIO")
+
+    def test_Given_violating_ALLOW_and_indeterminate_validity_When_classified_Then_not_undetected(self):
+        """codex: Given violator + ALLOW + indeterminate validity, When classified, Then not VIOLACAO_NAO_DETECTADA."""
+        cls = classify_run(task_type="violadora", condition="D", change_set_detected=True,
+                           blocked=False, promoted=True, origin_changed=True,
+                           candidate_enforcement_applicable=True, candidate_semantic_validity="INDETERMINATE")
+        self.assertNotEqual(cls, "VIOLACAO_NAO_DETECTADA")
 
 
 class ConditionInvariantRegression(unittest.TestCase):
@@ -131,7 +162,8 @@ class ConditionInvariantRegression(unittest.TestCase):
             originFinalTreeHash="x", originChanged=False, promoted=False, blocked=True,
             nonCachedTokensEligible=False, nonCachedTokensExclusionReason="runtime sem métrica",
             enforcementObserved=False, enforcementPipelineObserved=True,
-            candidateEnforcementApplicable=True, classification="FALSO_BLOQUEIO",
+            candidateCreated=True, codeBaseChanged=False, changeDisposition="CHANGE_BLOCKED",
+            candidateEnforcementApplicable=True, classification="INDETERMINADO",
             enforcementGateEvidence={"gateActivated": True, "blockedPromotion": True,
                                      "candidateExists": True, "validationExecuted": False},
             governanceDecision={"promotionDecision": "DENY"},
@@ -156,11 +188,6 @@ class ConditionInvariantRegression(unittest.TestCase):
         """codex: Given a gate decision with no candidate flag, When invariants run, Then rejected."""
         issues = run_instrumentation_issues(self.run_with(candidateEnforcementApplicable=None))
         self.assertTrue(any("candidato" in issue for issue in issues))
-
-    def test_Given_valid_candidate_blocked_without_false_block_When_checked_Then_rejected(self):
-        """codex: Given a blocked valid candidate misclassified, When invariants run, Then rejected."""
-        issues = run_instrumentation_issues(self.run_with(classification="SEM_ALTERACAO_INCORRETA"))
-        self.assertTrue(any("FALSO_BLOQUEIO" in issue for issue in issues))
 
 
 if __name__ == "__main__":

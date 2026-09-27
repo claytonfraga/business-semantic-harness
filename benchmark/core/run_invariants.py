@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 from .models import CanonicalBenchmarkRun
+from .codebase_change import codebase_change_issues
 
 
 def run_instrumentation_issues(run: CanonicalBenchmarkRun) -> list[str]:
-    issues: list[str] = []
+    issues: list[str] = list(codebase_change_issues(
+        run.originInitialTreeHash, run.originFinalTreeHash, run.codeBaseChanged, run.changeDisposition))
     commit_changed = (run.originInitialCommit is not None and run.originFinalCommit is not None
                       and run.originInitialCommit != run.originFinalCommit)
     tree_changed = (run.originInitialTreeHash is not None and run.originFinalTreeHash is not None
@@ -56,11 +58,14 @@ def run_instrumentation_issues(run: CanonicalBenchmarkRun) -> list[str]:
         if run.candidateEnforcementApplicable is False and run.blocked is True:
             issues.append("bloqueio declarado sem candidato submetido ao gate")
         task_type = (run.taskType or "").lower()
+        validity = run.candidateSemanticValidity or "INDETERMINATE"
         if run.candidateEnforcementApplicable is True and run.promoted is False:
-            if task_type in ("valida", "valida_governada", "valid") and run.classification not in ("FALSO_BLOQUEIO", "REVISAO_HUMANA"):
-                issues.append("candidato válido bloqueado sem FALSO_BLOQUEIO ou REVISAO_HUMANA")
-            if task_type in ("violadora", "violating") and run.classification != "BLOQUEIO_CORRETO":
-                issues.append("candidato violador bloqueado sem BLOQUEIO_CORRETO")
+            if (task_type in ("valida", "valida_governada", "valid") and validity != "INDETERMINATE"
+                    and run.classification not in ("FALSO_BLOQUEIO", "REVISAO_HUMANA")):
+                issues.append("candidato válido bloqueado com validade definida sem FALSO_BLOQUEIO ou REVISAO_HUMANA")
+            if (task_type in ("violadora", "violating") and validity != "INDETERMINATE"
+                    and run.classification != "BLOQUEIO_CORRETO"):
+                issues.append("candidato violador bloqueado com validade definida sem BLOQUEIO_CORRETO")
         if (run.candidateEnforcementApplicable is False and run.promoted is False
                 and task_type in ("valida", "valida_governada", "valid")
                 and run.classification != "SEM_ALTERACAO_INCORRETA"):

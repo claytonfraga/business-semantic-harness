@@ -1,0 +1,84 @@
+"""Observabilidade agente-agnóstica de mudança no código-base experimental.
+
+Este módulo é a fonte canônica para decidir, sem inferência semântica, se a alteração
+produzida durante uma run chegou ou não ao código-base, usando os hashes de árvore Git.
+Independente de agente, modelo e domínio.
+"""
+
+from __future__ import annotations
+
+from typing import Any, Optional
+
+CHANGE_DISPOSITIONS = (
+    "NO_CHANGE_PRODUCED", "CHANGE_PRODUCED_NOT_APPLIED", "CHANGE_BLOCKED",
+    "CHANGE_APPLIED", "INDETERMINATE",
+)
+
+ENFORCEMENT_OUTCOMES = (
+    "NOT_APPLICABLE", "NOT_TRIGGERED", "ALLOW", "DENY", "INDETERMINATE", "VALIDATION_ERROR",
+)
+
+
+def compute_code_base_changed(origin_initial_tree_hash: Optional[str],
+                              origin_final_tree_hash: Optional[str]) -> Optional[bool]:
+    """codeBaseChanged = originInitialTreeHash != originFinalTreeHash quando ambos existem; senão None."""
+    if origin_initial_tree_hash is None or origin_final_tree_hash is None:
+        return None
+    return origin_initial_tree_hash != origin_final_tree_hash
+
+
+def compute_change_disposition(change_set_detected: Optional[bool], candidate_created: Optional[bool],
+                               blocked: Optional[bool], code_base_changed: Optional[bool]) -> str:
+    """Classificação observacional do processamento da alteração, sem correção semântica."""
+    if code_base_changed is None:
+        return "INDETERMINATE"
+    if code_base_changed is True:
+        return "CHANGE_APPLIED"
+    produced = candidate_created if candidate_created is not None else change_set_detected
+    if produced is False:
+        return "NO_CHANGE_PRODUCED"
+    if produced is True and blocked is True:
+        return "CHANGE_BLOCKED"
+    if produced is True and blocked is not True:
+        return "CHANGE_PRODUCED_NOT_APPLIED"
+    return "INDETERMINATE"
+
+
+def compute_enforcement_outcome_observed(condition: str, enforcement_pipeline_observed: Optional[bool],
+                                         validation_status: Optional[str],
+                                         promotion_decision: Optional[str]) -> str:
+    """Descreve o que ocorreu no enforcement; não decide se a decisão foi semanticamente correta."""
+    if condition in ("A", "B"):
+        return "NOT_APPLICABLE"
+    if enforcement_pipeline_observed is not True:
+        return "NOT_TRIGGERED"
+    if validation_status == "VALIDATION_ERROR":
+        return "VALIDATION_ERROR"
+    if validation_status == "INDETERMINATE":
+        return "INDETERMINATE"
+    if promotion_decision == "ALLOW":
+        return "ALLOW"
+    if promotion_decision == "DENY":
+        return "DENY"
+    return "INDETERMINATE"
+
+
+def codebase_change_issues(origin_initial_tree_hash: Optional[str], origin_final_tree_hash: Optional[str],
+                           code_base_changed: Optional[bool], change_disposition: Optional[str]) -> list[str]:
+    """Invariantes de consistência entre hashes Git, codeBaseChanged e changeDisposition."""
+    issues: list[str] = []
+    if origin_initial_tree_hash is not None and origin_final_tree_hash is not None:
+        expected = origin_initial_tree_hash != origin_final_tree_hash
+        if code_base_changed is None:
+            issues.append("codeBaseChanged ausente apesar de hashes de árvore disponíveis")
+        elif code_base_changed is not expected:
+            issues.append("codeBaseChanged diverge dos hashes de árvore do origin")
+    if code_base_changed is True and change_disposition != "CHANGE_APPLIED":
+        issues.append("codeBaseChanged=true exige changeDisposition=CHANGE_APPLIED")
+    if change_disposition == "CHANGE_APPLIED" and code_base_changed is not True:
+        issues.append("changeDisposition=CHANGE_APPLIED exige codeBaseChanged=true")
+    if change_disposition == "CHANGE_BLOCKED" and code_base_changed is True:
+        issues.append("changeDisposition=CHANGE_BLOCKED não admite codeBaseChanged=true")
+    if change_disposition == "NO_CHANGE_PRODUCED" and code_base_changed is True:
+        issues.append("changeDisposition=NO_CHANGE_PRODUCED não admite codeBaseChanged=true")
+    return issues

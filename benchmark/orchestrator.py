@@ -20,6 +20,8 @@ from typing import Any, Dict, List, Optional, Tuple
 from .adapters.base import AgentAdapterRegistry, BenchmarkAgentAdapter
 from .core.config import load_and_validate_config, save_config_to_batch
 from .core.models import CanonicalBenchmarkRun, compute_directory_tree_hash, compute_experiment_hashes
+from .core.codebase_change import (compute_change_disposition, compute_code_base_changed,
+                                   compute_enforcement_outcome_observed)
 from .core.governance_observation import collect_governance_observation
 from .core.run_invariants import run_instrumentation_issues
 from .core.classification import classify_run, determine_governance_mechanism
@@ -288,6 +290,14 @@ class BenchmarkExperimentOrchestrator:
             enf_obs = bsh_obs.get("enforcementObserved") if cond in ("C", "D") else False
             blocked = bsh_obs.get("blocked") is True or (enf_status in ("violacao", "revisao_humana"))
 
+            code_base_changed = compute_code_base_changed(origin_initial_tree, origin_final_tree)
+            candidate_created = (ws_eval["changeSetDetected"] if cond in ("A", "B")
+                                 else bsh_obs.get("candidateCreated"))
+            change_disposition = compute_change_disposition(
+                ws_eval["changeSetDetected"], candidate_created, blocked, code_base_changed)
+            enforcement_outcome = compute_enforcement_outcome_observed(
+                cond, enf_obs, bsh_obs.get("validationStatus"), bsh_obs.get("promotionDecision"))
+
             norm_tokens = self.adapter.normalize_telemetry(raw_tel)
 
             cls = classify_run(
@@ -306,6 +316,7 @@ class BenchmarkExperimentOrchestrator:
                 technical_failure=(status == "FALHA_TECNICA"),
                 instrumentation_failure=bsh_obs.get("evidenceCollectionStatus") == "INVALID",
                 candidate_enforcement_applicable=bsh_obs.get("candidateEnforcementApplicable"),
+                candidate_semantic_validity=bsh_obs.get("candidateSemanticValidity") or "INDETERMINATE",
                 task_id=base_tid,
             )
 
@@ -375,6 +386,12 @@ class BenchmarkExperimentOrchestrator:
                 enforcementPipelineObserved=bsh_obs.get("enforcementPipelineObserved"),
                 candidateEnforcementApplicable=bsh_obs.get("candidateEnforcementApplicable"),
                 candidateCommit=bsh_obs.get("candidateCommit"),
+                candidateCreated=candidate_created,
+                codeBaseChanged=code_base_changed,
+                changeDisposition=change_disposition,
+                candidateSemanticValidity="INDETERMINATE",
+                enforcementOutcomeObserved=enforcement_outcome,
+                enforcementCorrectness="NOT_EVALUATED",
                 independentEnforcementActivated=bsh_obs.get("independentEnforcementActivated"),
                 enforcementGateEvidence=bsh_obs.get("enforcementGateEvidence"),
                 governanceDecision=bsh_obs.get("enforcementEvidence"),

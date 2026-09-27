@@ -190,11 +190,13 @@ class ScientificPipelineRegression(unittest.TestCase):
         self.assertEqual(verdicts["researchQuestions"]["RQ11"]["verdict"], "NAO_AVALIADO")
 
     def test_Given_false_block_When_classified_Then_distinct_from_correct_block(self):
-        item = classified(raw("D", promoted=False, originChanged=False, semanticStatus="violacao"))[0]
+        item = classified(raw("D", promoted=False, originChanged=False, semanticStatus="violacao",
+                              candidateSemanticValidity="INVALID"))[0]
         self.assertEqual(item["classification"], "FALSO_BLOQUEIO")
 
     def test_Given_undetected_violation_When_classified_Then_escape_visible(self):
-        item = classified(raw("D", semanticStatus="violacao"), task_type="violadora")[0]
+        item = classified(raw("D", semanticStatus="violacao", candidateSemanticValidity="INVALID"),
+                          task_type="violadora")[0]
         self.assertEqual(item["classification"], "VIOLACAO_NAO_DETECTADA")
 
     def test_Given_one_pair_When_correlation_checked_Then_pearson_and_spearman_null(self):

@@ -141,6 +141,7 @@ def test_classification_does_not_depend_on_agent_name():
             promoted=False,
             origin_changed=False,
             enforcement_status="violacao",
+            candidate_semantic_validity="INVALID",
         )
         assert cls == "BLOQUEIO_CORRETO"
 

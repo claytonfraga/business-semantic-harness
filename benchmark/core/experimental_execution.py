@@ -331,6 +331,12 @@ def normalize_runs(batch_id: str, runs: list[dict[str, Any]], tasks: list[dict[s
             "enforcementGateEvidence": source.get("enforcementGateEvidence"),
             "candidateEnforcementApplicable": source.get("candidateEnforcementApplicable"),
             "candidateCommit": source.get("candidateCommit"),
+            "candidateCreated": source.get("candidateCreated"),
+            "codeBaseChanged": source.get("codeBaseChanged"),
+            "changeDisposition": source.get("changeDisposition"),
+            "candidateSemanticValidity": source.get("candidateSemanticValidity") or "INDETERMINATE",
+            "enforcementOutcomeObserved": source.get("enforcementOutcomeObserved"),
+            "enforcementCorrectness": source.get("enforcementCorrectness") or "NOT_EVALUATED",
             "independentEnforcementActivated": source.get("independentEnforcementActivated"),
             "enforcementStatus": semantic_status,
             "semanticStatus": semantic_status,
@@ -367,6 +373,8 @@ def normalize_runs(batch_id: str, runs: list[dict[str, Any]], tasks: list[dict[s
         }
         governed_fields = {"ontologyQueried", "reportConflictCalled", "identifiedOperation", "identifiedShapes",
     "enforcementPipelineObserved", "candidateEnforcementApplicable", "candidateCommit",
+    "candidateCreated", "codeBaseChanged", "changeDisposition", "candidateSemanticValidity",
+    "enforcementOutcomeObserved", "enforcementCorrectness",
                            "independentEnforcementActivated", "enforcementStatus", "validationStatus",
                            "validationExecuted", "validationComplete", "policyDecision", "promotionDecision",
                            "candidateFingerprint", "candidateGraphHash", "selectedShapes", "executedShapes",
@@ -420,14 +428,15 @@ def classify_observed(row: dict[str, Any]) -> dict[str, Any]:
         cls = Classification.INDETERMINADO
     elif task_type == "violadora":
         if promoted or origin:
-            cls = Classification.VIOLACAO_NAO_DETECTADA
+            cls = Classification.VIOLACAO_NAO_DETECTADA if row.get("candidateSemanticValidity") == "INVALID" else Classification.INDETERMINADO
         elif row.get("candidateEnforcementApplicable") is True:
             if (row.get("semanticStatus") == "violacao" and row.get("validationComplete") is True
-                    and row.get("enforcementPipelineObserved") is True):
+                    and row.get("enforcementPipelineObserved") is True
+                    and row.get("candidateSemanticValidity") == "INVALID"):
                 cls = Classification.BLOQUEIO_CORRETO
             else:
                 cls = Classification.INDETERMINADO
-        elif changed and row.get("semanticStatus") == "violacao" and row.get("validationComplete") is True and row.get("enforcementPipelineObserved") is True:
+        elif changed and row.get("semanticStatus") == "violacao" and row.get("validationComplete") is True and row.get("enforcementPipelineObserved") is True and row.get("candidateSemanticValidity") == "INVALID":
             cls = Classification.BLOQUEIO_CORRETO
         elif not changed and not promoted and not origin:
             cls = Classification.SEM_ALTERACAO_CORRETA
@@ -439,11 +448,14 @@ def classify_observed(row: dict[str, Any]) -> dict[str, Any]:
         if changed and promoted and origin and tests is True:
             cls = Classification.ALTERACAO_CORRETA
         elif row.get("candidateEnforcementApplicable") is True and not promoted:
-            cls = Classification.REVISAO_HUMANA if row.get("semanticStatus") == "revisao_humana" else Classification.FALSO_BLOQUEIO
+            if row.get("semanticStatus") == "revisao_humana":
+                cls = Classification.REVISAO_HUMANA
+            else:
+                cls = Classification.FALSO_BLOQUEIO if row.get("candidateSemanticValidity") == "INVALID" else Classification.INDETERMINADO
         elif changed and not promoted and row.get("semanticStatus") == "revisao_humana":
             cls = Classification.REVISAO_HUMANA
         elif changed and not promoted and row.get("semanticStatus") == "violacao":
-            cls = Classification.FALSO_BLOQUEIO
+            cls = Classification.FALSO_BLOQUEIO if row.get("candidateSemanticValidity") == "INVALID" else Classification.INDETERMINADO
         elif not changed:
             cls = Classification.SEM_ALTERACAO_INCORRETA
         elif changed and tests is False:
