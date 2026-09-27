@@ -21,7 +21,7 @@ from .adapters.base import AgentAdapterRegistry, BenchmarkAgentAdapter
 from .core.config import load_and_validate_config, save_config_to_batch
 from .core.models import CanonicalBenchmarkRun, compute_directory_tree_hash, compute_experiment_hashes
 from .core.codebase_change import (compute_change_disposition, compute_code_base_changed,
-                                   compute_enforcement_outcome_observed)
+                                   compute_codebase_tree_hash, compute_enforcement_outcome_observed)
 from .core.governance_observation import collect_governance_observation
 from .core.run_invariants import run_instrumentation_issues
 from .core.classification import classify_run, determine_governance_mechanism
@@ -234,8 +234,7 @@ class BenchmarkExperimentOrchestrator:
             print(f"[{idx}/{len(plan)}] Executando {run_id} ({self.agent_id})...", flush=True)
 
             project_dir, base_commit = self.prepare_workspace(run_id, cond)
-            origin_initial_tree = compute_directory_tree_hash(
-                project_dir, ignore_patterns=[".git", "node_modules", "dist", "coverage", "__pycache__", ".venv", "local"])
+            origin_initial_tree = compute_codebase_tree_hash(project_dir)
             strategy = CONDITION_STRATEGIES[cond]
 
             timeout_sec = self.config.get("benchmark", {}).get("executionTimeoutSeconds", 1800)
@@ -272,8 +271,7 @@ class BenchmarkExperimentOrchestrator:
             promoted = bsh_obs.get("promoted") if cond in ("C", "D") else ws_eval["changeSetDetected"]
             origin_changed = bsh_obs.get("originChanged") if cond in ("C", "D") else ws_eval["changeSetDetected"]
             origin_final_commit = self.git_head(project_dir)
-            origin_final_tree = compute_directory_tree_hash(
-                project_dir, ignore_patterns=[".git", "node_modules", "dist", "coverage", "__pycache__", ".venv", "local"])
+            origin_final_tree = compute_codebase_tree_hash(project_dir)
             actual_origin_changed = (origin_final_commit != base_commit or origin_final_tree != origin_initial_tree)
             if cond in ("A", "B"):
                 # Edição direta do workspace não é uma promoção Git.

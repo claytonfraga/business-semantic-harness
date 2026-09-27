@@ -7,6 +7,8 @@ Independente de agente, modelo e domínio.
 
 from __future__ import annotations
 
+import hashlib
+from pathlib import Path
 from typing import Any, Optional
 
 CHANGE_DISPOSITIONS = (
@@ -30,6 +32,27 @@ def is_experimental_codebase_path(path: str) -> bool:
         return False
     first = normalized.split("/", 1)[0]
     return first not in EXPERIMENTAL_CODEBASE_IGNORE
+
+
+def compute_codebase_tree_hash(directory) -> Optional[str]:
+    """Hash de conteúdo do código-base experimental, usando a MESMA definição de universo acima."""
+    root = Path(directory)
+    if not root.is_dir():
+        return None
+    digest = hashlib.sha256()
+    for path in sorted(root.rglob("*")):
+        if not path.is_file():
+            continue
+        rel = path.relative_to(root).as_posix()
+        if not is_experimental_codebase_path(rel):
+            continue
+        data = path.read_bytes()
+        digest.update(rel.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(str(len(data)).encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(data)
+    return digest.hexdigest()
 
 
 def compute_code_base_changed(origin_initial_tree_hash: Optional[str],

@@ -10,11 +10,13 @@ def run_instrumentation_issues(run: CanonicalBenchmarkRun) -> list[str]:
     issues: list[str] = list(codebase_change_issues(
         run.originInitialTreeHash, run.originFinalTreeHash, run.codeBaseChanged, run.changeDisposition))
     if run.changeSetDetected is True and run.codeBaseChanged is False:
-        # Divergência é legítima quando auditável por changeDisposition (candidato produzido
-        # que não foi incorporado ou foi bloqueado). Sem razão classificada, é inconsistência.
-        if run.changeDisposition not in ("CHANGE_PRODUCED_NOT_APPLIED", "CHANGE_BLOCKED"):
+        # A legitimidade vem de evidências anteriores: candidato real observado e/ou gate que bloqueou.
+        candidate_evidence = run.candidateCreated is True or run.candidateEnforcementApplicable is True
+        gate = run.enforcementGateEvidence if isinstance(run.enforcementGateEvidence, dict) else {}
+        blocked_evidence = gate.get("blockedPromotion") is True
+        if not candidate_evidence and not blocked_evidence:
             issues.append("GIT_OBSERVABILITY_INCONSISTENT: changeSetDetected=true, codeBaseChanged=false "
-                          "sem changeDisposition que explique a divergencia")
+                          "sem evidencia independente de candidato ou bloqueio")
     commit_changed = (run.originInitialCommit is not None and run.originFinalCommit is not None
                       and run.originInitialCommit != run.originFinalCommit)
     tree_changed = (run.originInitialTreeHash is not None and run.originFinalTreeHash is not None

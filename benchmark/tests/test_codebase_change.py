@@ -104,17 +104,31 @@ class CodeBaseChangeRegression(unittest.TestCase):
         self.assertTrue(any("GIT_OBSERVABILITY_INCONSISTENT" in issue for issue in issues))
 
     def test_Given_auditable_divergence_When_invariants_Then_allowed(self):
-        """opencode: Given auditable divergence, When invariants, Then it is allowed."""
+        """opencode: Given independent evidence of candidate/block, When invariants, Then allowed."""
         from benchmark.core.models import CanonicalBenchmarkRun
         from benchmark.core.run_invariants import run_instrumentation_issues
-        for disposition in ("CHANGE_PRODUCED_NOT_APPLIED", "CHANGE_BLOCKED"):
-            run = CanonicalBenchmarkRun(
-                runId="001-G1-D", batchId="fixture", taskId="G1", baseTaskId="G1", condition="D",
-                agent="opencode", changeSetDetected=True, codeBaseChanged=False,
-                originInitialTreeHash="x", originFinalTreeHash="x", changeDisposition=disposition,
-                nonCachedTokensEligible=False, nonCachedTokensExclusionReason="runtime sem metrica")
-            issues = run_instrumentation_issues(run)
-            self.assertFalse(any("GIT_OBSERVABILITY_INCONSISTENT" in issue for issue in issues))
+        run = CanonicalBenchmarkRun(
+            runId="001-G1-D", batchId="fixture", taskId="G1", baseTaskId="G1", condition="D",
+            agent="opencode", changeSetDetected=True, codeBaseChanged=False,
+            originInitialTreeHash="x", originFinalTreeHash="x", changeDisposition="CHANGE_BLOCKED",
+            candidateEnforcementApplicable=True,
+            enforcementGateEvidence={"gateActivated": True, "blockedPromotion": True},
+            nonCachedTokensEligible=False, nonCachedTokensExclusionReason="runtime sem metrica")
+        issues = run_instrumentation_issues(run)
+        self.assertFalse(any("GIT_OBSERVABILITY_INCONSISTENT" in issue for issue in issues))
+
+    def test_Given_divergence_without_independent_evidence_When_invariants_Then_inconsistent(self):
+        """opencode: Given divergence without independent evidence, When invariants, Then inconsistent."""
+        from benchmark.core.models import CanonicalBenchmarkRun
+        from benchmark.core.run_invariants import run_instrumentation_issues
+        run = CanonicalBenchmarkRun(
+            runId="001-G1-D", batchId="fixture", taskId="G1", baseTaskId="G1", condition="D",
+            agent="opencode", changeSetDetected=True, codeBaseChanged=False,
+            originInitialTreeHash="x", originFinalTreeHash="x", changeDisposition="CHANGE_BLOCKED",
+            candidateEnforcementApplicable=False,
+            nonCachedTokensEligible=False, nonCachedTokensExclusionReason="runtime sem metrica")
+        issues = run_instrumentation_issues(run)
+        self.assertTrue(any("GIT_OBSERVABILITY_INCONSISTENT" in issue for issue in issues))
 
 
 class CodeBaseChangeInvariantRegression(unittest.TestCase):
