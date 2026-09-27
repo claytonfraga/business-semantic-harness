@@ -120,6 +120,23 @@ class CodeBaseChangeInvariantRegression(unittest.TestCase):
         issues = run_instrumentation_issues(run)
         self.assertTrue(any("GIT_OBSERVABILITY_INCONSISTENT" in issue for issue in issues))
 
+    def test_Given_origin_changed_without_candidate_When_invariants_Then_inconsistent(self):
+        """opencode: Given origin changed without candidate material, When invariants, Then inconsistent."""
+        from benchmark.core.models import CanonicalBenchmarkRun
+        from benchmark.core.run_invariants import run_instrumentation_issues
+        run = CanonicalBenchmarkRun(
+            runId="003-G5-C", batchId="fixture", taskId="G5", baseTaskId="G5", condition="C",
+            agent="opencode", changeSetDetected=False, codeBaseChanged=True,
+            originInitialTreeHash="a", originFinalTreeHash="b", changeDisposition="INDETERMINATE",
+            nonCachedTokensEligible=False, nonCachedTokensExclusionReason="runtime sem metrica")
+        issues = run_instrumentation_issues(run)
+        self.assertTrue(any("changeSetDetected=false" in issue for issue in issues))
+
+    def test_Given_missing_candidate_hashes_When_disposition_Then_indeterminate_no_fallback(self):
+        """opencode: Given missing candidate hashes, When disposition, Then INDETERMINATE without origin fallback."""
+        self.assertEqual(compute_change_disposition(None, None, True), "INDETERMINATE")
+        self.assertEqual(compute_change_disposition(None, None, False), "INDETERMINATE")
+
 
 if __name__ == "__main__":
     unittest.main()

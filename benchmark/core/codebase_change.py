@@ -66,7 +66,7 @@ def compute_code_base_changed(origin_initial_tree_hash: Optional[str],
 def compute_change_disposition(change_set_detected: Optional[bool], blocked: Optional[bool],
                                code_base_changed: Optional[bool]) -> str:
     """Classificação observacional do processamento, a partir das evidências já determinadas."""
-    if code_base_changed is None:
+    if change_set_detected is None or code_base_changed is None:
         return "INDETERMINATE"
     if code_base_changed is True:
         return "CHANGE_APPLIED"

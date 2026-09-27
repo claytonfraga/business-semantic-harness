@@ -17,6 +17,9 @@ def run_instrumentation_issues(run: CanonicalBenchmarkRun) -> list[str]:
         if not candidate_evidence and not blocked_evidence:
             issues.append("GIT_OBSERVABILITY_INCONSISTENT: changeSetDetected=true, codeBaseChanged=false "
                           "sem evidencia independente de candidato ou bloqueio")
+    if run.changeSetDetected is False and run.codeBaseChanged is True:
+        issues.append("GIT_OBSERVABILITY_INCONSISTENT: changeSetDetected=false com codeBaseChanged=true "
+                      "(origin mudou sem candidato material observavel)")
     commit_changed = (run.originInitialCommit is not None and run.originFinalCommit is not None
                       and run.originInitialCommit != run.originFinalCommit)
     tree_changed = (run.originInitialTreeHash is not None and run.originFinalTreeHash is not None

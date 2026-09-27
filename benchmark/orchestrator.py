@@ -292,9 +292,9 @@ class BenchmarkExperimentOrchestrator:
                                       else bsh_obs.get("candidateInitialTreeHash"))
             candidate_final_tree = (origin_final_tree if cond in ("A", "B")
                                     else bsh_obs.get("candidateFinalTreeHash"))
-            candidate_changed = compute_code_base_changed(candidate_initial_tree, candidate_final_tree)
-            change_set_detected = (candidate_changed if candidate_changed is not None
-                                   else ws_eval["changeSetDetected"])
+            # changeSetDetected = mudanca material no candidato, exclusivamente pelos hashes do candidato.
+            # Sem hashes do candidato em C/D, permanece None (INDETERMINATE); nunca usa o origin como substituto.
+            change_set_detected = compute_code_base_changed(candidate_initial_tree, candidate_final_tree)
             code_base_changed = compute_code_base_changed(origin_initial_tree, origin_final_tree)
             candidate_created = (ws_eval["changeSetDetected"] if cond in ("A", "B")
                                  else bsh_obs.get("candidateCreated"))
