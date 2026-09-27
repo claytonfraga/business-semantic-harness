@@ -9,6 +9,8 @@ from .codebase_change import codebase_change_issues
 def run_instrumentation_issues(run: CanonicalBenchmarkRun) -> list[str]:
     issues: list[str] = list(codebase_change_issues(
         run.originInitialTreeHash, run.originFinalTreeHash, run.codeBaseChanged, run.changeDisposition))
+    if run.changeSetDetected is True and run.codeBaseChanged is False:
+        issues.append("GIT_OBSERVABILITY_INCONSISTENT: changeSetDetected=true com codeBaseChanged=false")
     commit_changed = (run.originInitialCommit is not None and run.originFinalCommit is not None
                       and run.originInitialCommit != run.originFinalCommit)
     tree_changed = (run.originInitialTreeHash is not None and run.originFinalTreeHash is not None

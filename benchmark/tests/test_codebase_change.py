@@ -4,7 +4,7 @@ import unittest
 
 from benchmark.core.codebase_change import (
     codebase_change_issues, compute_change_disposition, compute_code_base_changed,
-    compute_enforcement_outcome_observed,
+    compute_enforcement_outcome_observed, is_experimental_codebase_path,
 )
 
 
@@ -78,6 +78,30 @@ class CodeBaseChangeRegression(unittest.TestCase):
     def test_Given_candidate_commit_without_created_When_evaluated_Then_candidate_is_not_inferred(self):
         """opencode: Given a candidateCommit without candidateCreated, When evaluated, Then no candidate is inferred."""
         self.assertEqual(compute_enforcement_outcome_observed("D", False, "CONFORMING", "ALLOW"), "NOT_TRIGGERED")
+
+    def test_Given_paths_When_classified_Then_only_experimental_codebase_paths_are_relevant(self):
+        """opencode: Given file paths, When classified, Then only source-relevant paths count."""
+        self.assertTrue(is_experimental_codebase_path("src/assets/domain/asset.ts"))   # tracked
+        self.assertTrue(is_experimental_codebase_path("test/server.test.mjs"))          # new untracked
+        self.assertFalse(is_experimental_codebase_path("dist/server.js"))               # build
+        self.assertFalse(is_experimental_codebase_path("coverage/index.html"))          # build
+        self.assertFalse(is_experimental_codebase_path("node_modules/pkg/index.js"))    # dependency
+        self.assertFalse(is_experimental_codebase_path(".venv/lib/python/site.py"))     # temp
+        self.assertFalse(is_experimental_codebase_path("__pycache__/x.pyc"))            # temp
+        self.assertFalse(is_experimental_codebase_path(".bsh/local/session.jsonl"))     # runtime
+
+    def test_Given_change_detected_without_codebase_change_When_invariants_Then_inconsistent(self):
+        """opencode: Given changeSetDetected and no codeBaseChanged, When invariants, Then GIT_OBSERVABILITY_INCONSISTENT."""
+        from benchmark.core.models import CanonicalBenchmarkRun
+        from benchmark.core.run_invariants import run_instrumentation_issues
+        run = CanonicalBenchmarkRun(
+            runId="001-G1-A", batchId="fixture", taskId="G1", baseTaskId="G1", condition="A",
+            agent="opencode", changeSetDetected=True, codeBaseChanged=False,
+            originInitialTreeHash="x", originFinalTreeHash="x",
+            changeDisposition="CHANGE_PRODUCED_NOT_APPLIED",
+            nonCachedTokensEligible=False, nonCachedTokensExclusionReason="runtime sem metrica")
+        issues = run_instrumentation_issues(run)
+        self.assertTrue(any("GIT_OBSERVABILITY_INCONSISTENT" in issue for issue in issues))
 
 
 class CodeBaseChangeInvariantRegression(unittest.TestCase):

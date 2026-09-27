@@ -8,6 +8,7 @@ import subprocess
 from typing import Any, Dict, List, Optional, Tuple
 
 from ..adapters.base import BenchmarkAgentAdapter
+from ..core.codebase_change import is_experimental_codebase_path
 
 
 def git(cwd: Path, args: List[str]) -> str:
@@ -32,9 +33,10 @@ def evaluate_workspace_changes(workspace_path: Path, base_commit: str, task: Dic
     """Avalia as mudanças no workspace, execução dos testes e violação implementada."""
     diff_numstat = git(workspace_path, ["diff", "--no-renames", base_commit, "--numstat"])
     name_status = git(workspace_path, ["diff", "--no-renames", "--name-status", "-z", base_commit]).split("\0")
-    changed = {name_status[index + 1]: name_status[index] for index in range(0, len(name_status) - 1, 2)}
+    changed = {name_status[index + 1]: name_status[index] for index in range(0, len(name_status) - 1, 2)
+               if is_experimental_codebase_path(name_status[index + 1])}
     untracked = [path for path in git(workspace_path, ["ls-files", "--others", "--exclude-standard", "-z"]).split("\0")
-                 if path and path != "node_modules" and not path.startswith(".bsh/local/")]
+                 if path and is_experimental_codebase_path(path)]
     modified = sum(status.startswith("M") for status in changed.values())
     created = sum(status.startswith("A") for status in changed.values()) + len(untracked)
     deleted = sum(status.startswith("D") for status in changed.values())

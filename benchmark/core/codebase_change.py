@@ -18,6 +18,19 @@ ENFORCEMENT_OUTCOMES = (
     "NOT_APPLICABLE", "NOT_TRIGGERED", "ALLOW", "DENY", "INDETERMINATE", "VALIDATION_ERROR",
 )
 
+# Universo único do "código-base experimental": diretórios derivados/temporários ficam fora,
+# e as duas métricas (changeSetDetected e codeBaseChanged) observam exatamente este universo.
+EXPERIMENTAL_CODEBASE_IGNORE = (".git", "node_modules", "dist", "coverage", "__pycache__", ".venv")
+
+
+def is_experimental_codebase_path(path: str) -> bool:
+    """True se o caminho pertence ao código-base experimental (fonte/artefatos versionáveis relevantes)."""
+    normalized = path.replace("\\", "/")
+    if normalized.startswith(".bsh/local/") or normalized == ".bsh/local":
+        return False
+    first = normalized.split("/", 1)[0]
+    return first not in EXPERIMENTAL_CODEBASE_IGNORE
+
 
 def compute_code_base_changed(origin_initial_tree_hash: Optional[str],
                               origin_final_tree_hash: Optional[str]) -> Optional[bool]:
