@@ -351,6 +351,25 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
     })
     sections.insert(0, {"title": "Introdução", "paragraphs": _intro_paragraphs()})
     sections.append({"title": "Conclusão", "paragraphs": _conclusion_paragraphs(stats, verdicts, batch_id)})
+    sections.append({"title": "Discussão", "paragraphs": [
+        "O relato seletivo de conflitos (violadoras com conflito; permitidas sem conflito) é tratado como "
+        "evidência de utilidade consultiva, não como demonstração de precisão semântica além desta amostra.",
+        "A execução de solicitações permitidas sob C/D não deve ser diluída pela contagem de violações evitadas: "
+        "a dimensão 'entregar o permitido' e a dimensão 'prevenir o proibido' são avaliadas conjuntamente.",
+        "Zero oportunidades de enforcement independente não é taxa de falha nem sucesso: é ausência de denominador "
+        "de exposição ao gate. Testar o componente exige submissão de candidatos incompatíveis e conformes ao fluxo real.",
+        "'Parcialmente sustentado' indica viabilidade da comparação, não eficácia demonstrada da propriedade.",
+    ]})
+    sections.append({"title": "Ameaças à Validade", "paragraphs": [
+        "Construção: as tarefas concentram-se em poucas famílias semânticas (consulta, baixa, transferência); "
+        "a segunda repetição é parcial; resultados podem não generalizar para operações do domínio não exercitadas.",
+        "Interna: comparabilidade de telemetria dependente de contabilidade idêntica; ausência de critérios externos "
+        "de correção funcional; falhas de execução/instrumentação concentradas em condições específicas.",
+        "Externa: um agente, um modelo, um domínio e uma política congelada; solicitações 'violadoras' o são apenas "
+        "em relação à política congelada e sem autorização do agente para alterá-la.",
+        "Construto: `semanticEvidenceCoverage` fina e tokens não cacheados podem faltar sem significar ausência de "
+        "interação semântica; cobertura mede registros presentes, não qualidade do desfecho.",
+    ]})
     model = {"title": TITLE, "subtitle": subtitle, "batchId": batch_id, "domain": domain,
              "executionDate": metadata.get("startedAt"), "dataOrigin": metadata.get("dataOrigin"),
              "provenance": provenance, "abstract": {"objective": "Avaliar governança semântica observada no BSH",
