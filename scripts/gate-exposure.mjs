@@ -60,7 +60,8 @@ async function main() {
   }
   const valid = results.filter((r) => r.expected === 'VALID');
   const invalid = results.filter((r) => r.expected === 'INVALID');
-  const falseBlocks = valid.filter((r) => r.status !== 'conforme');
+  const falseBlocks = valid.filter((r) => r.status === 'violacao');
+  const humanReview = valid.filter((r) => r.status === 'revisao_humana');
   const escaped = invalid.filter((r) => r.status === 'conforme');
   const summary = {
     status: results.length ? 'AVAILABLE' : 'NOT_AVAILABLE',
@@ -69,8 +70,10 @@ async function main() {
     validCandidates: valid.length, invalidCandidates: invalid.length,
     independentEnforcementOpportunities: invalid.length,
     independentEnforcementActivated: invalid.filter((r) => r.status !== 'conforme').length,
-    falseBlocks: falseBlocks.length, escapedIncompatible: escaped.length,
-    falseBlockIds: falseBlocks.map((r) => r.origin), escapedIds: escaped.map((r) => r.origin),
+    falseBlocks: falseBlocks.length, humanReviewValids: humanReview.length,
+    escapedIncompatible: escaped.length,
+    falseBlockIds: falseBlocks.map((r) => r.origin), humanReviewIds: humanReview.map((r) => r.origin),
+    escapedIds: escaped.map((r) => r.origin),
     results,
   };
   await mkdir(outDir, { recursive: true });

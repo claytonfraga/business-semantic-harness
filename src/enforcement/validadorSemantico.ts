@@ -17,6 +17,7 @@ const SH_TARGET_CLASS = namedNode('http://www.w3.org/ns/shacl#targetClass');
 const SH_PROPERTY = namedNode('http://www.w3.org/ns/shacl#property');
 const SH_PATH = namedNode('http://www.w3.org/ns/shacl#path');
 const SH_MESSAGE = namedNode('http://www.w3.org/ns/shacl#message');
+const SH_MIN_COUNT = namedNode('http://www.w3.org/ns/shacl#minCount');
 
 function shapePorMensagem(shapes: ReturnType<typeof parseShapes>, shapesAvaliados: string[], mensagem: string): string | undefined {
   for (const shape of shapesAvaliados) {
@@ -85,7 +86,11 @@ export async function validarOperacao(
   for (const shape of shapesAplicaveis) {
     for (const propriedade of shapes.getQuads(shape.subject, SH_PROPERTY, null, null)) {
       const caminho = shapes.getQuads(propriedade.object, SH_PATH, null, null)[0];
-      if (caminho) caminhosObrigatorios.add(caminho.object.value);
+      // Só caminhos com sh:minCount >= 1 são obrigatórios para completude do candidato;
+      // constraints como sh:disjoint não exigem presença.
+      const obrigatorio = shapes.getQuads(propriedade.object, SH_MIN_COUNT, null, null)
+        .some((q) => Number(q.object.value) >= 1);
+      if (caminho && obrigatorio) caminhosObrigatorios.add(caminho.object.value);
     }
   }
   const indeterminadosObrigatorios = operacao.fatos.filter((fato) => fato.determinacao === 'indeterminado'
