@@ -19,4 +19,6 @@ export { avaliarOperacoes } from '../enforcement/motorEnforcement.js';
 export { validarOperacao } from '../enforcement/validadorSemantico.js';
 export { aplicarRegras, lerDiff } from '../enforcement/extratorOperacoes.js';
 export { carregarRegrasGovernanca } from '../enforcement/governanca.js';
+export { evaluateGovernance, type CandidateFactsExtractor, type GovernanceDecision,
+  type SemanticStatus, type PromotionDecision } from '../enforcement/governanceDecision.js';
 export type { EstadoValidacao, OperacaoSemantica, ResultadoEnforcement } from '../enforcement/operacaoSemantica.js';

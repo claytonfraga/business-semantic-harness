@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { commitSeNecessario, estaLimpo, git, type SessaoWorktree } from './worktree.js';
+import { candidateStillMatches, evaluateGovernance, type CandidateFactsExtractor, type GovernanceDecision } from '../../enforcement/governanceDecision.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -75,22 +76,41 @@ export async function reconciliar(sessao: SessaoWorktree): Promise<ResultadoReco
 
 export interface OpcoesIntegracao {
   validarGates?: ValidadorGates;
+  extractCandidateFacts?: CandidateFactsExtractor;
+  onGovernanceDecision?: (decision: GovernanceDecision) => Promise<void>;
 }
 
 export async function integrar(sessao: SessaoWorktree, opcoes: OpcoesIntegracao = {}): Promise<ResultadoPromocao> {
+  const decision = await evaluateGovernance(sessao, opcoes.extractCandidateFacts);
+  await opcoes.onGovernanceDecision?.(structuredClone(decision));
+  if (decision.promotionDecision !== 'ALLOW') {
+    return { status: 'bloqueado', detalhes: `Governança ${decision.validationStatus}: ${decision.reason}` };
+  }
   const validarGates = opcoes.validarGates ?? executarGates;
   const gates = await validarGates(sessao.caminhoWorktree);
   if (!gates.ok) return { status: 'falha-validacao', detalhes: gates.saida };
+  if (!(await candidateStillMatches(sessao, decision))) {
+    decision.promotionDecision = 'REVALIDATION_REQUIRED';
+    decision.failureStage = 'TOCTOU';
+    decision.reason = 'Candidato, ontologia, política ou origin alterados após a validação';
+    await opcoes.onGovernanceDecision?.(structuredClone(decision));
+    return { status: 'bloqueado', detalhes: 'REVALIDATION_REQUIRED: candidato, ontologia, política ou origin alterados após a validação' };
+  }
   try {
-    await git(sessao.repositorioOrigem, ['merge', '--ff-only', sessao.branchSessao]);
+    // O hash imutável impede que uma mudança tardia no ponteiro da branch troque o candidato.
+    await git(sessao.repositorioOrigem, ['merge', '--ff-only', decision.candidateCommit as string]);
   } catch (error) {
     return { status: 'bloqueado', detalhes: `Nao foi possivel integrar por fast-forward: ${error instanceof Error ? error.message : String(error)}` };
   }
+  decision.originChanged = true;
+  await opcoes.onGovernanceDecision?.(structuredClone(decision)).catch(() => undefined);
   return { status: 'promovido', detalhes: `Alteracoes integradas em ${sessao.branchOrigem}.` };
 }
 
 export interface OpcoesPromocao {
   validarGates?: ValidadorGates;
+  extractCandidateFacts?: CandidateFactsExtractor;
+  onGovernanceDecision?: (decision: GovernanceDecision) => Promise<void>;
 }
 
 export async function promoverSessao(sessao: SessaoWorktree, opcoes: OpcoesPromocao = {}): Promise<ResultadoPromocao> {

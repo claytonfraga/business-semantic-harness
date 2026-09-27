@@ -21,6 +21,8 @@ export interface OperacaoSemantica {
   fatos: FatoSemantico[];
   proveniencia: ProvenienciaOperacao;
   alteracoesRelacionadas: string[];
+  /** RDF do estado candidato completo, produzido por extrator independente do agente. */
+  candidateGraphTurtle?: string;
 }
 
 export interface ResultadoEnforcement {
@@ -33,6 +35,13 @@ export interface ResultadoEnforcement {
   requerRevisaoHumana: boolean;
   evidencia: string[];
   shapesAvaliados: string[];
+  selectedShapes?: string[];
+  executedShapes?: string[];
+  validationExecuted?: boolean;
+  validationComplete?: boolean;
+  missingFacts?: string[];
+  candidateGraphHash?: string;
+  validationResults?: Array<{ shape: string; focusNode: string; message: string; severity: string; mechanism: 'SHACL_CORE' | 'SHACL_SPARQL' | 'UNKNOWN' }>;
   politicas: string[];
   proveniencia: ProvenienciaOperacao;
 }

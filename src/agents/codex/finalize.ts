@@ -3,13 +3,9 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { appendAudit } from '../../decision/audit.js';
-import { actionDigest, evaluateAction, type ProposedAction } from '../../decision/evaluate.js';
+import { actionDigest, type ProposedAction } from '../../decision/evaluate.js';
 import type { OntologySnapshot } from '../../ontology/query.js';
-import { validateProject } from '../../ontology/validate.js';
-import { carregarRegrasGovernanca } from '../../enforcement/governanca.js';
-import { aplicarRegras, lerDiff } from '../../enforcement/extratorOperacoes.js';
-import { avaliarOperacoes } from '../../enforcement/motorEnforcement.js';
-import type { ResultadoEnforcementLote } from '../../enforcement/operacaoSemantica.js';
+import { evaluateGovernance, type CandidateFactsExtractor, type GovernanceDecision } from '../../enforcement/governanceDecision.js';
 import { writeAlerts, type ConflictAlert } from './alerts.js';
 import { alteracoesNaWorktree, git, removerSessaoWorktree, type SessaoWorktree } from './worktree.js';
 import { integrar, reconciliar, type StatusPromocao, type ValidadorGates } from './promotion.js';
@@ -28,6 +24,7 @@ export interface FinalizeOptions {
   savings?: SavingsReport;
   validarGates?: ValidadorGates;
   confirmar?: (branchOrigem: string) => Promise<boolean>;
+  extractCandidateFacts?: CandidateFactsExtractor;
 }
 
 export interface ResultadoFinalizacao {
@@ -55,18 +52,18 @@ async function auditChange(
   decision: 'allow' | 'deny',
   actor: string,
   reason: string,
+  governance: GovernanceDecision,
 ): Promise<void> {
   const action = buildAction(domain, change);
-  const evaluation = await evaluateAction(root, action, snapshot);
   await appendAudit(root, {
     time: new Date().toISOString(),
     actionId: action.id,
     domain,
     actionDigest: actionDigest(action, snapshot.digest),
     snapshotDigest: snapshot.digest,
-    rules: evaluation.rules,
-    evaluation: evaluation.status,
-    confidence: evaluation.confidence,
+    rules: governance.selectedShapes,
+    evaluation: governance.validationStatus,
+    confidence: governance.validationComplete ? 'complete' : 'partial',
     decision,
     actor,
     reason,
@@ -148,29 +145,23 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
     return { status: 'bloqueado', promovido: false };
   }
 
-  let enforcement: ResultadoEnforcementLote = { status: 'conforme', bloquear: false, resultados: [] };
-  if (process.env.BSH_ENFORCEMENT !== 'off' && alteracoes.length > 0) {
-    const regras = await carregarRegrasGovernanca(root);
-    const diffs = await lerDiff(sessao.caminhoWorktree, sessao.commitBase);
-    const operacoes = aplicarRegras(regras, diffs);
-    if (operacoes.length > 0) {
-      enforcement = await avaliarOperacoes(root, snapshot, operacoes);
-      process.stdout.write(`\nBSH enforcement independente: ${enforcement.resultados.length} operacao(oes) governada(s); status ${enforcement.status}.\n`);
-      for (const resultado of enforcement.resultados) {
-        process.stdout.write(`  - [${resultado.dominio}] ${resultado.operacao}: status=${resultado.status}${resultado.shape ? ` shape=${resultado.shape}` : ''}${resultado.regra ? ` regra=${resultado.regra}` : ''}\n`);
-      }
-      const diretorio = join(root, '.bsh', 'local', 'enforcement');
-      await mkdir(diretorio, { recursive: true });
-      await writeFile(join(diretorio, `${sessao.id}.json`), JSON.stringify(enforcement, null, 2), { mode: 0o600 });
-    }
-    if (alteracoes.some((change) => change.path.startsWith('.bsh/domains/'))) {
-      const relatorio = await validateProject(sessao.caminhoWorktree);
-      if (!relatorio.ready) {
-        enforcement = { ...enforcement, status: 'violacao', bloquear: true };
-        process.stdout.write('BSH enforcement independente: alteracao de ontologia invalida na worktree.\n');
-      }
-    }
-  }
+  const recordDecision = async (decision: GovernanceDecision): Promise<void> => {
+    const diretorio = join(root, '.bsh', 'local', 'enforcement');
+    await mkdir(diretorio, { recursive: true });
+    await writeFile(join(diretorio, `${sessao.id}.json`), JSON.stringify(decision, null, 2), { mode: 0o600 });
+    await gravarRelatorioSessao(root, sessao, {
+      recognizedOperation: decision.recognizedOperation, selectedShapes: decision.selectedShapes,
+      executedShapes: decision.executedShapes, factsExtracted: decision.factsExtracted,
+      coveredPaths: decision.coveredPaths,
+      missingFacts: decision.missingFacts, candidateGraphHash: decision.candidateGraphHash,
+      validationStatus: decision.validationStatus, violations: decision.violations,
+      policyDecision: decision.policyDecision, candidateFingerprint: decision.candidateFingerprint,
+      promotionDecision: decision.promotionDecision, originChanged: decision.originChanged,
+      failureStage: decision.failureStage,
+    });
+  };
+  const governance = await evaluateGovernance(sessao, options.extractCandidateFacts);
+  await recordDecision(governance);
   const numstat = await git(sessao.caminhoWorktree, ['diff', sessao.commitBase, '--numstat']).catch(() => '');
   let arquivosModificados = 0; let linhasAdicionadas = 0; let linhasRemovidas = 0;
   for (const linha of numstat.split('\n')) {
@@ -188,20 +179,25 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
     hashDiff: createHash('sha256').update(diffTexto).digest('hex'),
     worktreeHead: (await git(sessao.caminhoWorktree, ['rev-parse', 'HEAD']).catch(() => '')).trim(),
     origemHeadAntes: (await git(root, ['rev-parse', sessao.branchOrigem]).catch(() => '')).trim(),
-    enforcementExecutado: process.env.BSH_ENFORCEMENT !== 'off' && alteracoes.length > 0,
-    statusEnforcement: enforcement.status,
-    enforcement: enforcement.resultados,
+    enforcementExecutado: governance.validationExecuted,
+    statusEnforcement: governance.validationStatus,
+    enforcement: governance.results,
   });
 
-  const exigirDecisao = alerts.length > 0 || enforcement.bloquear || enforcement.status === 'revisao_humana';
+  if (governance.promotionDecision !== 'ALLOW') {
+    for (const change of alteracoes) await auditChange(root, domain, change, snapshot, 'deny', 'bsh-harness', governance.reason, governance);
+    await gravarSessao(root, sessao, 'VALIDATION_FAILED');
+    await gravarRelatorioSessao(root, sessao, { bloqueado: true, promovido: false, origemAlterada: false });
+    process.stdout.write(`BSH: promoção bloqueada pela governança (${governance.validationStatus}): ${governance.reason}.\n`);
+    return { status: 'bloqueado', promovido: false };
+  }
+
+  const exigirDecisao = alerts.length > 0;
 
   if (exigirDecisao) {
-    if (enforcement.bloquear || enforcement.status === 'revisao_humana') {
-      process.stdout.write(`\nBSH interceptou a alteracao (enforcement ${enforcement.status}); a promocao exige decisao humana.\n`);
-    }
     const aprovado = await confirmar(sessao.branchOrigem);
     if (!aprovado) {
-      for (const change of alteracoes) await auditChange(root, domain, change, snapshot, 'deny', 'local-user', 'Excecao negada pelo usuario');
+      for (const change of alteracoes) await auditChange(root, domain, change, snapshot, 'deny', 'local-user', 'Excecao negada pelo usuario', governance);
       await gravarSessao(root, sessao, 'DISCARDED');
       await removerSessaoWorktree(sessao, true);
       await gravarRelatorioSessao(root, sessao, { bloqueado: true, promovido: false, origemAlterada: false });
@@ -212,9 +208,10 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
 
   process.stdout.write('BSH: validando gates na worktree e promovendo por Git...\n');
   await gravarSessao(root, sessao, 'VALIDATING');
-  const resultado = await integrar(sessao, { validarGates });
+  const resultado = await integrar(sessao, { validarGates, extractCandidateFacts: options.extractCandidateFacts,
+    onGovernanceDecision: recordDecision });
   if (resultado.status === 'promovido') {
-    for (const change of alteracoes) await auditChange(root, domain, change, snapshot, 'allow', 'bsh-harness', exigirDecisao ? 'Excecao aprovada pelo usuario' : 'Ontologia respeitada na sessao');
+    for (const change of alteracoes) await auditChange(root, domain, change, snapshot, 'allow', 'bsh-harness', exigirDecisao ? 'Excecao aprovada pelo usuario' : 'Estado candidato validado e conforme', governance);
     await gravarSessao(root, sessao, 'PROMOTED');
     await removerSessaoWorktree(sessao, true);
     await gravarSessao(root, sessao, 'CLEANED');

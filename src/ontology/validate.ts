@@ -35,7 +35,8 @@ export interface ValidationReport {
 
 export interface DataValidationResult {
   conforms: boolean;
-  results: Array<{ shape: string; focusNode: string; message: string; severity: string }>;
+  results: Array<{ shape: string; focusNode: string; message: string; severity: string;
+    mechanism: 'SHACL_CORE' | 'SHACL_SPARQL' | 'UNKNOWN' }>;
 }
 
 export async function validateData(shapes: Store, data: Store): Promise<DataValidationResult> {
@@ -54,6 +55,8 @@ export async function validateData(shapes: Store, data: Store): Promise<DataVali
         ? item.message.map((term) => term.value).join('; ')
         : (item.constraintComponent?.value ? `Violação de ${item.constraintComponent.value}` : 'Violação SHACL'),
       severity: item.severity?.value ?? '',
+      mechanism: item.constraintComponent?.value?.includes('SPARQLConstraintComponent') ? 'SHACL_SPARQL'
+        : item.constraintComponent?.value ? 'SHACL_CORE' : 'UNKNOWN',
     })),
   };
 }

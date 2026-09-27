@@ -64,12 +64,20 @@ class CanonicalBenchmarkRun:
 
     # Observabilidade de BSH e Governança
     ontologyQueried: Optional[bool] = None
+    queryCount: Optional[int] = None
     reportConflictCalled: Optional[bool] = None
     enforcementObserved: Optional[bool] = None
     enforcementStatus: Optional[str] = None    # conforme, violacao, revisao_humana, indeterminado, null
-    enforcementPipelineObserved: bool = False
-    candidateEnforcementApplicable: bool = False
-    independentEnforcementActivated: bool = False
+    enforcementPipelineObserved: Optional[bool] = None
+    candidateEnforcementApplicable: Optional[bool] = None
+    independentEnforcementActivated: Optional[bool] = None
+    enforcementGateEvidence: Optional[Dict[str, Any]] = None
+    governanceDecision: Optional[Dict[str, Any]] = None
+    evidenceCollectionStatus: Optional[str] = None
+    evidenceCollectionIssue: Optional[str] = None
+    sessionReportSource: Optional[str] = None
+    governanceDecisionSource: Optional[str] = None
+    governanceDecisionSha256: Optional[str] = None
     governanceInteraction: Optional[str] = None
     governanceIntervention: Optional[str] = None
     expectedOperation: Optional[str] = None
@@ -80,8 +88,8 @@ class CanonicalBenchmarkRun:
     shapeRecognitionCorrect: Optional[bool] = None
     technicalGatesObserved: Optional[bool] = None
     technicalGatesPassed: Optional[bool] = None
-    promoted: bool = False
-    originChanged: bool = False
+    promoted: Optional[bool] = None
+    originChanged: Optional[bool] = None
 
     # Sucesso funcional, governança e verificação de regras (Seção 7)
     promptFulfillment: Optional[bool] = None
@@ -133,8 +141,9 @@ class CanonicalBenchmarkRun:
         d["arquivos"] = self.modifiedFiles + self.createdFiles
         d["adicionadas"] = self.addedLines
         d["removidas"] = self.removedLines
-        d["bloqueado"] = (not self.promoted) and (self.changeSetDetected or self.enforcementStatus == "violacao")
-        d["aplicado"] = self.promoted or (self.changeSetDetected and not d["bloqueado"])
+        d["bloqueado"] = ((self.promoted is False) and
+                         (self.changeSetDetected or self.enforcementStatus == "violacao")) if self.promoted is not None else None
+        d["aplicado"] = (self.promoted or (self.changeSetDetected and d["bloqueado"] is False)) if self.promoted is not None else None
         return d
 
 

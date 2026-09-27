@@ -264,8 +264,16 @@ def compute_scientific_statistics(runs: list[dict[str, Any]], pairs: dict[str, l
                   "tokenDifference": _summary([value for _, value in deltas], deltas, policy) if deltas else None}
         if rq_id == "RQ5":
             metric["independentEnforcementActivated"] = sum(run["independentEnforcementActivated"] is True for run in by_condition["D"])
+            metric["validationOutcomes"] = dict(sorted(Counter(
+                run.get("validationStatus") or "MISSING" for run in by_condition["D"]).items()))
         fields = [f"paired:{contrast.replace('-', ':')}", f"classification:{contrast[0]}", f"classification:{contrast[-1]}"] if matched else []
-        if rq_id == "RQ5" and all(run.get("enforcementPipelineObserved") is not None for run in by_condition["D"]):
+        if rq_id == "RQ5" and by_condition["D"] and all(
+            run.get("evidenceCollectionStatus") == "VALID" and
+            run.get("validationStatus") in {"CONFORMING", "VIOLATION", "INDETERMINATE", "VALIDATION_ERROR"} and
+            isinstance(run.get("validationExecuted"), bool) and
+            isinstance(run.get("validationComplete"), bool) and
+            run.get("promotionDecision") in {"ALLOW", "DENY", "REVALIDATION_REQUIRED"}
+            for run in by_condition["D"]):
             fields.append("enforcementEvidence")
         rq[rq_id] = _rq(ResearchQuestionStatus.DESCRITIVA.value if matched else ResearchQuestionStatus.DADOS_INSUFICIENTES.value,
                         matched, requirements[rq_id]["requires"], fields, metric,
@@ -316,10 +324,17 @@ def compute_scientific_statistics(runs: list[dict[str, Any]], pairs: dict[str, l
                      {"semanticViolationsImplemented": len(implemented), "semanticViolationsPassingTests": passing,
                       "semanticViolationsFailingTests": failing, "testsSemanticMatrix": dict(matrix)},
                      [] if testable else ["Nenhuma violação implementada com testes e status semântico observados"])
-    opportunity = [run for run in by_condition["D"] if run.get("changeSetDetected") is True and run.get("candidateEnforcementApplicable") is True and run.get("semanticStatus") == "violacao" and run.get("reportConflictCalled") is False]
+    opportunity = [run for run in by_condition["D"] if run.get("changeSetDetected") is True
+                   and run.get("candidateEnforcementApplicable") is True
+                   and run.get("validationStatus") == "VIOLATION"
+                   and run.get("validationExecuted") is True and run.get("validationComplete") is True
+                   and isinstance(run.get("candidateFingerprint"), str)
+                   and run.get("reportConflictCalled") is False]
     independent = [run for run in opportunity if run["independentEnforcementActivated"] is True]
+    independent_fields = [field for field in requirements["RQ11"]["requires"]
+                          if opportunity and all(run.get(field) is not None for run in opportunity)]
     rq["RQ11"] = _rq(ResearchQuestionStatus.DESCRITIVA.value if opportunity else ResearchQuestionStatus.NAO_AVALIADA.value,
-                     opportunity, requirements["RQ11"]["requires"], requirements["RQ11"]["requires"] if opportunity else [],
+                     opportunity, requirements["RQ11"]["requires"], independent_fields,
                      {"independentOpportunities": len(opportunity), "independentEnforcementActivated": len(independent)},
                      [] if opportunity else ["Nenhuma oportunidade real de enforcement independente"])
     for rq_id, entry in rq.items():
@@ -381,7 +396,7 @@ class ScientificUsabilityGate:
             else:
                 status = ScientificUsability.NOT_USABLE
             by_rq[rq_id] = {"status": status.value, "requiredFields": required, "availableFields": sorted(available),
-                            "missingFields": missing, "analysisStatus": entry["status"] if not missing else ResearchQuestionStatus.DADOS_INSUFICIENTES.value}
+                            "missingFields": missing, "analysisStatus": entry["status"] if not missing or entry["status"] == ResearchQuestionStatus.NAO_AVALIADA.value else ResearchQuestionStatus.DADOS_INSUFICIENTES.value}
             metric = entry.get("metric")
             if isinstance(metric, dict):
                 for metric_id, value in metric.items():

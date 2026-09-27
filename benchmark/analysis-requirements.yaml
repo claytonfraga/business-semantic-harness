@@ -22,4 +22,4 @@ RQ9:
 RQ10:
   requires: [semanticViolationImplemented, testsExecuted, testsPassed, semanticStatus]
 RQ11:
-  requires: [changeSetDetected, candidateEnforcementApplicable, semanticStatus, reportConflictCalled, enforcementPipelineObserved, promoted, originChanged]
+  requires: [changeSetDetected, candidateEnforcementApplicable, semanticStatus, reportConflictCalled, enforcementPipelineObserved, validationExecuted, validationComplete, policyDecision, promotionDecision, candidateFingerprint, enforcementGateEvidence, promoted, originChanged]

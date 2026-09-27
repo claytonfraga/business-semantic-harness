@@ -4,7 +4,6 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { test } from 'node:test';
 import { createOntologySnapshot } from '../../dist/ontology/query.js';
-import { readAudit } from '../../dist/decision/audit.js';
 import { reviewAndApplyPatch } from '../../dist/agents/codex/patch.js';
 import { collectWorkspaceChanges, synchronizeWorkspaceFile } from '../../dist/agents/codex/workspace.js';
 
@@ -18,20 +17,16 @@ async function fixture() {
   return { root, workspace, cleanup: async () => { await rm(root, { recursive: true, force: true }); await rm(workspace, { recursive: true, force: true }); } };
 }
 
-test('Given a governed copy, when Codex edits a source file and the user approves, then the original changes only after approval and the decision is audited', async () => {
+test('Given a governed copy, When a direct patch is approved, Then the original still requires worktree promotion', async () => {
   const { root, workspace, cleanup } = await fixture();
   try {
     await writeFile(join(workspace, 'src', 'asset.ts'), 'after\n');
     const [change] = await collectWorkspaceChanges(root, workspace, 'ativos');
     assert.equal(await readFile(join(root, 'src', 'asset.ts'), 'utf8'), 'before\n');
-    const result = await reviewAndApplyPatch(root, change, await createOntologySnapshot(root), async (diff, evaluation) => {
-      assert.match(diff, /after/);
-      assert.equal(evaluation.status, 'needs-human');
-      return { choice: 'allow-once', actor: 'qa', reason: 'Mudança revisada' };
-    });
-    assert.equal(result.applied, true);
-    assert.equal(await readFile(join(root, 'src', 'asset.ts'), 'utf8'), 'after\n');
-    assert.equal((await readAudit(root))[0].decision, 'allow');
+    const result = await reviewAndApplyPatch(root, change, await createOntologySnapshot(root), async () => ({ choice: 'allow-once', actor: 'qa', reason: 'Mudança revisada' }));
+    assert.equal(result.applied, false);
+    assert.match(result.reason, /GOVERNANCE_GATE_REQUIRED/);
+    assert.equal(await readFile(join(root, 'src', 'asset.ts'), 'utf8'), 'before\n');
   } finally { await cleanup(); }
 });
 
@@ -49,15 +44,16 @@ test('Given a governed copy, when a native edit is denied, then the original sta
   } finally { await cleanup(); }
 });
 
-test('Given a governed copy, when Codex creates a nested source file and approval is granted, then the new path is promoted', async () => {
+test('Given a governed copy, When a nested file is proposed directly, Then origin is preserved', async () => {
   const { root, workspace, cleanup } = await fixture();
   try {
     await mkdir(join(workspace, 'src', 'history'));
     await writeFile(join(workspace, 'src', 'history', 'index.ts'), 'export const history = [];\n');
     const [change] = await collectWorkspaceChanges(root, workspace, 'ativos');
     const result = await reviewAndApplyPatch(root, change, await createOntologySnapshot(root), async () => ({ choice: 'allow-once', actor: 'qa', reason: 'Novo módulo revisado' }));
-    assert.equal(result.applied, true);
-    assert.equal(await readFile(join(root, 'src', 'history', 'index.ts'), 'utf8'), 'export const history = [];\n');
+    assert.equal(result.applied, false);
+    assert.match(result.reason, /GOVERNANCE_GATE_REQUIRED/);
+    await assert.rejects(readFile(join(root, 'src', 'history', 'index.ts'), 'utf8'));
   } finally { await cleanup(); }
 });
 
@@ -74,10 +70,10 @@ test('Given a governed copy, when Codex deletes a source file and the user denie
   } finally { await cleanup(); }
 });
 
-test('Given a governed copy, when Codex changes approved ontology files, then the broker refuses direct promotion', async () => {
+test('Given a governed copy, When project governance metadata changes, Then direct patching is refused', async () => {
   const { root, workspace, cleanup } = await fixture();
   try {
-    const path = '.bsh/domains/ativos/ontology.jsonld';
+    const path = '.bsh/project.json';
     await writeFile(join(workspace, path), (await readFile(join(workspace, path), 'utf8')) + '\n');
     const [change] = await collectWorkspaceChanges(root, workspace, 'ativos');
     await assert.rejects(reviewAndApplyPatch(root, change, await createOntologySnapshot(root), async () => ({ choice: 'allow-once', actor: 'qa', reason: 'Tentativa' })), /Caminho reservado/);

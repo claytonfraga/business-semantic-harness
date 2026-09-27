@@ -268,7 +268,7 @@ The harness acts **before** the agent implements anything: the context and the o
 
 The summary is also written to `.bsh/local/`, alongside the audit trail. Codex shows live token usage in its own TUI.
 
-For source code, the link between a diff and RDF facts is partial: the harness **does not claim that SHACL proved the code's behavior**. Review the diff and run your project's tests. Changes under `.bsh/` require their own editing and validation. Because Codex works in an isolated worktree, an intermediate or rejected change never reaches your main checkout; the harness validates and promotes only after the session ends.
+For source code, the link between a diff and RDF facts is partial: the harness **does not claim that SHACL proved the code's behavior**. A governed candidate is promoted only when a trusted host extractor supplies the resulting RDF graph, attests to the candidate commit, and accounts for every relevant changed path. Static facts in an enforcement rule do not establish this proof. When no trusted extractor is available, the candidate remains indeterminate and promotion is blocked. SHACL Core and SHACL-SPARQL run on the supplied candidate graph; the promotion gate rechecks the commit, worktree, ontology, shapes, policy, and graph fingerprint after technical gates. Human approval cannot override a semantic violation or missing validation. Direct patch application to a governed origin is blocked; use the worktree promotion path.
 
 ## Code quality
 

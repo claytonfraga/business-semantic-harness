@@ -10,7 +10,7 @@ export interface DiffArquivo {
   removido: boolean;
 }
 
-function paraRegex(glob: string): RegExp {
+export function paraRegex(glob: string): RegExp {
   const escapado = glob.replace(/[.+^${}()|[\]\\]/g, '\\$&');
   const corpo = escapado.split('**').map((parte) => parte.replace(/\*/g, '[^/]*')).join('.*');
   return new RegExp(`^${corpo}`);

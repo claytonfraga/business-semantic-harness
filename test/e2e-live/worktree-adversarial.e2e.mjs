@@ -26,8 +26,6 @@ function novoProjeto(caminho) {
   git(repo, ['config', 'user.name', 'Teste']);
   git(repo, ['config', 'user.email', 'teste@example.com']);
   git(repo, ['config', 'commit.gpgsign', 'false']);
-  mkdirSync(join(repo, '.bsh', 'domains', 'ativos'), { recursive: true });
-  writeFileSync(join(repo, '.bsh', 'project.json'), '{}\n');
   writeFileSync(join(repo, 'server.ts'), '// base\n');
   git(repo, ['add', '-A']);
   git(repo, ['commit', '-q', '-m', 'A']);

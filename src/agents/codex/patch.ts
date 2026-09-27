@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { execFile } from 'node:child_process';
-import { lstat, mkdtemp, mkdir, readFile, rename, rm, stat, unlink, writeFile } from 'node:fs/promises';
+import { access, lstat, mkdtemp, mkdir, readFile, rename, rm, stat, unlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { promisify } from 'node:util';
@@ -101,6 +101,18 @@ export async function reviewAndApplyPatch(
   const proposal = PatchSchema.parse(raw);
   const prepared = await preparePatch(root, proposal);
   try {
+    try {
+      await access(join(root, '.bsh', 'project.json'));
+      return { applied: false, reason: 'GOVERNANCE_GATE_REQUIRED: use a worktree e a promoção governada' };
+    } catch (error) {
+      if (typeof error !== 'object' || error === null || !('code' in error) || error.code !== 'ENOENT') throw error;
+      try {
+        await execFileAsync('git', ['-C', root, 'cat-file', '-e', 'HEAD:.bsh/project.json']);
+        return { applied: false, reason: 'GOVERNANCE_GATE_REQUIRED: manifesto BSH removido da worktree' };
+      } catch (gitError) {
+        if (typeof gitError === 'object' && gitError !== null && 'code' in gitError && gitError.code === 'EACCES') throw gitError;
+      }
+    }
     const action: ProposedAction = {
       id: randomUUID(), tool: 'bsh_propose_patch', domain: proposal.domain,
       arguments: { summary: proposal.summary, files: proposal.files.map((file) => ({ path: file.path, beforeSha256: file.beforeSha256, afterSha256: file.content === null ? null : sha(Buffer.from(file.content)) })) },

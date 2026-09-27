@@ -164,6 +164,27 @@ class ScientificConsistencyChecker:
         if rq8["status"] != "COMPUTABLE" and (rq8["pearson"] is not None or rq8["spearman"] is not None):
             errors.append("correlation interpreted when not computable")
         rq11 = stats["researchQuestions"]["RQ11"]["metric"]
+        for run in runs:
+            if run.get("condition") != "D":
+                continue
+            if run.get("evidenceCollectionStatus") == "INVALID":
+                errors.append(f"invalid governance evidence: {run.get('runId')}")
+            if run.get("independentEnforcementActivated") is True and not all((
+                run.get("validationStatus") == "VIOLATION",
+                run.get("validationExecuted") is True,
+                run.get("validationComplete") is True,
+                run.get("policyDecision") == "DENY",
+                run.get("promotionDecision") == "DENY",
+                isinstance(run.get("candidateFingerprint"), str),
+                run.get("reportConflictCalled") is False,
+                run.get("promoted") is False,
+                run.get("originChanged") is False,
+                isinstance(run.get("enforcementGateEvidence"), dict),
+                (run.get("enforcementGateEvidence") or {}).get("blockedPromotion") is True,
+            )):
+                errors.append(f"independent enforcement without complete gate evidence: {run.get('runId')}")
+            if run.get("promotionDecision") == "DENY" and run.get("promoted") is True:
+                errors.append(f"denied candidate promoted: {run.get('runId')}")
         if rq11["independentEnforcementActivated"] == 0 and any(row.get("researchQuestion") == "RQ11" and row.get("verdict") == "SUSTENTADO_NESTE_LOTE" for row in evidence):
             errors.append("independent enforcement claimed without activation")
         report_text = json.dumps({"sections": model.get("sections"), "abstract": model.get("abstract")}, ensure_ascii=False).lower()

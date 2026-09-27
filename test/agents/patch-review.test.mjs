@@ -5,7 +5,6 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { test } from 'node:test';
 import { createOntologySnapshot } from '../../dist/ontology/query.js';
-import { readAudit } from '../../dist/decision/audit.js';
 import { preparePatch, reviewAndApplyPatch } from '../../dist/agents/codex/patch.js';
 
 const hash = (text) => createHash('sha256').update(text).digest('hex');
@@ -20,19 +19,14 @@ function proposal(path = 'src/asset.ts', beforeSha256 = hash('old\n'), content =
   return { domain: 'ativos', summary: 'Atualizar ativo', files: [{ path, beforeSha256, content }] };
 }
 
-test('Given a reviewed code change, when the user allows it once, then only the proposed file changes and approval is audited', async () => {
+test('Given a governed code change, When the user approves a direct patch, Then the promotion gate still blocks it', async () => {
   const root = await project();
   try {
     const snapshot = await createOntologySnapshot(root);
-    const result = await reviewAndApplyPatch(root, proposal(), snapshot, async (diff, evaluation) => {
-      assert.match(diff, /old/);
-      assert.match(diff, /new/);
-      assert.equal(evaluation.status, 'needs-human');
-      return { choice: 'allow-once', actor: 'qa', reason: 'Diff revisado' };
-    });
-    assert.equal(result.applied, true);
-    assert.equal(await readFile(join(root, 'src', 'asset.ts'), 'utf8'), 'new\n');
-    assert.equal((await readAudit(root))[0].decision, 'allow');
+    const result = await reviewAndApplyPatch(root, proposal(), snapshot, async () => ({ choice: 'allow-once', actor: 'qa', reason: 'Diff revisado' }));
+    assert.equal(result.applied, false);
+    assert.match(result.reason, /GOVERNANCE_GATE_REQUIRED/);
+    assert.equal(await readFile(join(root, 'src', 'asset.ts'), 'utf8'), 'old\n');
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
@@ -42,7 +36,7 @@ test('Given a conflicting code change, when the user denies it, then the file st
     const result = await reviewAndApplyPatch(root, proposal(), await createOntologySnapshot(root), async () => ({ choice: 'deny', actor: 'qa', reason: 'Contraria a regra' }));
     assert.equal(result.applied, false);
     assert.equal(await readFile(join(root, 'src', 'asset.ts'), 'utf8'), 'old\n');
-    assert.equal((await readAudit(root))[0].decision, 'deny');
+    assert.match(result.reason, /GOVERNANCE_GATE_REQUIRED/);
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
@@ -95,7 +89,7 @@ test('Given a file changed during review, when the user approves stale content, 
       return { choice: 'allow-once', actor: 'qa', reason: 'Aceito' };
     });
     assert.equal(result.applied, false);
-    assert.equal(await readFile(join(root, 'src', 'asset.ts'), 'utf8'), 'concurrent\n');
+    assert.equal(await readFile(join(root, 'src', 'asset.ts'), 'utf8'), 'old\n');
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 

@@ -28,7 +28,11 @@ AUDITED_FIELDS = (
     "ontologyQueried", "reportConflictCalled", "identifiedOperation", "identifiedShapes",
     "enforcementPipelineObserved", "candidateEnforcementApplicable",
     "independentEnforcementActivated", "enforcementStatus", "promoted",
-    "originChanged", "classification",
+    "originChanged", "classification", "validationStatus", "validationExecuted",
+    "validationComplete", "policyDecision", "promotionDecision",
+    "candidateFingerprint", "candidateGraphHash", "selectedShapes",
+    "executedShapes", "missingFacts", "failureStage",
+    "governanceDecisionSha256", "evidenceCollectionStatus",
 )
 
 METRIC_COVERAGE = {
@@ -37,7 +41,8 @@ METRIC_COVERAGE = {
     "testCoverage": ("testsExecuted", "testsPassed"),
     "diffCoverage": ("changeSetDetected", "diffSha256"),
     "semanticEvidenceCoverage": ("identifiedOperation", "identifiedShapes"),
-    "enforcementCoverage": ("enforcementPipelineObserved", "enforcementStatus"),
+    "enforcementCoverage": ("enforcementPipelineObserved", "validationStatus",
+                            "validationExecuted", "validationComplete", "promotionDecision"),
     "classificationCoverage": ("classification",),
 }
 
@@ -264,16 +269,31 @@ def _nonnegative_number(value: Any) -> float | None:
     return number if 0 <= number < float("inf") else None
 
 
+_LEGACY_SEMANTIC_STATUS = {"CONFORMING": "conforme", "VIOLATION": "violacao",
+                           "INDETERMINATE": "indeterminado", "VALIDATION_ERROR": "erro_validacao"}
+
+
+def _semantic_status(source: dict[str, Any], decision: dict[str, Any] | None) -> str | None:
+    canonical = decision.get("validationStatus") if decision else source.get("validationStatus")
+    if canonical is not None:
+        return _LEGACY_SEMANTIC_STATUS.get(canonical)
+    legacy = source.get("semanticStatus") or source.get("enforcementStatus")
+    return legacy if legacy in _LEGACY_SEMANTIC_STATUS.values() or legacy == "revisao_humana" else None
+
+
 def normalize_runs(batch_id: str, runs: list[dict[str, Any]], tasks: list[dict[str, Any]]) -> list[dict[str, Any]]:
     by_task = {str(item.get("baseTaskId") or item.get("taskId") or item.get("id")): item for item in tasks}
     result = []
     for source in runs:
+        decision = source.get("governanceDecision") if isinstance(source.get("governanceDecision"), dict) else None
+        semantic_status = _semantic_status(source, decision)
         condition, base, rep, variant = run_identity(source)
         task = by_task.get(base, {})
         row: dict[str, Any] = {
             "runId": source.get("runId") or source.get("execucao"),
             "batchId": source.get("batchId"), "condition": condition,
             "taskId": source.get("taskId") or source.get("tarefa"), "baseTaskId": base,
+            "sessionId": source.get("sessionId"),
             "replicationIndex": rep, "promptVariantId": variant,
             "taskType": task.get("taskType") or task.get("tipo"),
             "taskCategory": task.get("semanticClusterId") or task.get("taskType") or task.get("tipo"),
@@ -311,8 +331,29 @@ def normalize_runs(batch_id: str, runs: list[dict[str, Any]], tasks: list[dict[s
             "enforcementGateEvidence": source.get("enforcementGateEvidence"),
             "candidateEnforcementApplicable": source.get("candidateEnforcementApplicable"),
             "independentEnforcementActivated": source.get("independentEnforcementActivated"),
-            "enforcementStatus": source.get("enforcementStatus"),
-            "semanticStatus": source.get("semanticStatus") or source.get("enforcementStatus"),
+            "enforcementStatus": semantic_status,
+            "semanticStatus": semantic_status,
+            "governanceDecision": decision,
+            "evidenceCollectionStatus": source.get("evidenceCollectionStatus"),
+            "evidenceCollectionIssue": source.get("evidenceCollectionIssue"),
+            "sessionReportSource": source.get("sessionReportSource"),
+            "governanceDecisionSource": source.get("governanceDecisionSource"),
+            "governanceDecisionSha256": source.get("governanceDecisionSha256"),
+            "validationStatus": decision.get("validationStatus") if decision else source.get("validationStatus"),
+            "validationExecuted": decision.get("validationExecuted") if decision else None,
+            "validationComplete": decision.get("validationComplete") if decision else None,
+            "policyDecision": decision.get("policyDecision") if decision else None,
+            "promotionDecision": decision.get("promotionDecision") if decision else None,
+            "candidateFingerprint": decision.get("candidateFingerprint") if decision else None,
+            "candidateGraphHash": decision.get("candidateGraphHash") if decision else None,
+            "recognizedOperation": decision.get("recognizedOperation") if decision else None,
+            "selectedShapes": decision.get("selectedShapes") if decision else None,
+            "executedShapes": decision.get("executedShapes") if decision else None,
+            "factsExtracted": decision.get("factsExtracted") if decision else None,
+            "missingFacts": decision.get("missingFacts") if decision else None,
+            "violations": decision.get("violations") if decision else None,
+            "failureStage": decision.get("failureStage") if decision else None,
+            "governanceReason": decision.get("reason") if decision else None,
             "promoted": source.get("promoted"), "originChanged": source.get("originChanged"),
             "violacaoImplementada": source.get("violacaoImplementada"),
             "functionalCorrectnessObserved": source.get("functionalCorrectness"),
@@ -323,7 +364,13 @@ def normalize_runs(batch_id: str, runs: list[dict[str, Any]], tasks: list[dict[s
             "expectedSource": "tasks.json",
             "observedSource": source.get("observedSource") or (f"executions/{source.get('runId')}/result.json" if source.get("runId") else None),
         }
-        row["availability"] = {field: availability(row.get(field), applicable=(condition in {"C", "D"} if field in {"ontologyQueried", "reportConflictCalled", "identifiedOperation", "identifiedShapes", "enforcementPipelineObserved", "candidateEnforcementApplicable", "independentEnforcementActivated", "enforcementStatus"} else True)) for field in AUDITED_FIELDS}
+        governed_fields = {"ontologyQueried", "reportConflictCalled", "identifiedOperation", "identifiedShapes",
+                           "enforcementPipelineObserved", "candidateEnforcementApplicable",
+                           "independentEnforcementActivated", "enforcementStatus", "validationStatus",
+                           "validationExecuted", "validationComplete", "policyDecision", "promotionDecision",
+                           "candidateFingerprint", "candidateGraphHash", "selectedShapes", "executedShapes",
+                           "missingFacts", "failureStage", "governanceDecisionSha256", "evidenceCollectionStatus"}
+        row["availability"] = {field: availability(row.get(field), applicable=(condition in {"C", "D"} if field in governed_fields else True)) for field in AUDITED_FIELDS}
         numeric_sources = {
             "durationSeconds": ("durationSeconds", "tempo"),
             "inputTokens": ("inputTokens", "entrada"),
@@ -354,16 +401,16 @@ def classify_observed(row: dict[str, Any]) -> dict[str, Any]:
     origin = row.get("originChanged")
     tests = row.get("testsPassed")
     status = str(row.get("executionStatus") or "").upper()
-    if status == "FALHA_TECNICA":
-        cls = Classification.FALHA_TECNICA
-    elif status == "FALHA_INSTRUMENTACAO":
+    if row.get("evidenceCollectionStatus") == "INVALID" or status == "FALHA_INSTRUMENTACAO":
         cls = Classification.FALHA_INSTRUMENTACAO
+    elif status == "FALHA_TECNICA":
+        cls = Classification.FALHA_TECNICA
     elif changed is None or promoted is None or origin is None:
         cls = Classification.INDETERMINADO
     elif task_type == "violadora":
         if promoted or origin:
             cls = Classification.VIOLACAO_NAO_DETECTADA
-        elif changed and row.get("semanticStatus") == "violacao" and row.get("enforcementPipelineObserved") is True:
+        elif changed and row.get("semanticStatus") == "violacao" and row.get("validationComplete") is True and row.get("enforcementPipelineObserved") is True:
             cls = Classification.BLOQUEIO_CORRETO
         elif not changed and not promoted and not origin:
             cls = Classification.SEM_ALTERACAO_CORRETA
@@ -393,6 +440,9 @@ def classify_observed(row: dict[str, Any]) -> dict[str, Any]:
         changed is True, row.get("candidateEnforcementApplicable") is True,
         row.get("semanticStatus") == "violacao", row.get("reportConflictCalled") is False,
         row.get("enforcementPipelineObserved") is True,
+        row.get("validationExecuted") is True, row.get("validationComplete") is True,
+        row.get("policyDecision") == "DENY", row.get("promotionDecision") == "DENY",
+        isinstance(row.get("candidateFingerprint"), str),
         isinstance(row.get("enforcementGateEvidence"), dict),
         (row.get("enforcementGateEvidence") or {}).get("gateActivated") is True,
         (row.get("enforcementGateEvidence") or {}).get("blockedPromotion") is True,

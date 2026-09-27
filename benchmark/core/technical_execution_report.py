@@ -42,6 +42,14 @@ TECHNICAL_FIELDS = (
     "changeSetDetected", "testsExecuted", "testsPassed", "promoted", "originChanged",
     "classification",
 )
+GOVERNANCE_FIELDS = (
+    "evidenceCollectionStatus", "validationStatus", "validationExecuted",
+    "validationComplete", "policyDecision", "promotionDecision",
+    "recognizedOperation", "selectedShapes", "executedShapes",
+    "missingFacts", "candidateGraphHash", "candidateFingerprint",
+    "failureStage", "governanceReason", "sessionReportSource", "governanceDecisionSource",
+    "governanceDecisionSha256",
+)
 SECTIONS = (
     "Identificação da Execução Experimental", "Proveniência e Versões",
     "Plano da Execução", "Execução Observada", "Completude",
@@ -167,13 +175,17 @@ def _source_hashes(batch_dir: Path, tasks: list[dict[str, Any]], metadata: dict[
 def _field_coverage(runs: list[dict[str, Any]], conditions: list[str]) -> dict[str, Any]:
     result = {}
     for field in (*TELEMETRY_FIELDS, "classification", "identifiedOperation", "identifiedShapes",
-                  "enforcementPipelineObserved", "candidateEnforcementApplicable", "independentEnforcementActivated"):
+                  "enforcementPipelineObserved", "candidateEnforcementApplicable", "independentEnforcementActivated",
+                  "validationStatus", "validationExecuted", "validationComplete", "promotionDecision",
+                  "governanceDecisionSha256"):
         cells = {}
         for condition in conditions:
             group = [run for run in runs if run["condition"] == condition]
             applicable = condition in {"C", "D"} or field not in {
                 "identifiedOperation", "identifiedShapes", "enforcementPipelineObserved",
-                "candidateEnforcementApplicable", "independentEnforcementActivated"}
+                "candidateEnforcementApplicable", "independentEnforcementActivated",
+                "validationStatus", "validationExecuted", "validationComplete",
+                "promotionDecision", "governanceDecisionSha256"}
             expected = len(group) if applicable else 0
             observed = sum(run.get("availability", {}).get(field) in {"PRESENT", "OBSERVED_ZERO"} for run in group) if applicable else 0
             cells[condition] = {"observed": observed, "expected": expected,
@@ -273,7 +285,10 @@ def _readiness(completion: dict[str, Any], isolation: dict[str, Any], coverage: 
     semantic_conditions = tuple(condition for condition in ("C", "D") if condition in conditions)
     recognition = bool(semantic_conditions) and all(complete(field, semantic_conditions) for field in ("identifiedOperation", "identifiedShapes"))
     enforcement = "D" in conditions and all(complete(field, ("D",)) for field in (
-        "enforcementPipelineObserved", "candidateEnforcementApplicable", "independentEnforcementActivated"))
+        "enforcementPipelineObserved", "validationStatus", "validationExecuted",
+        "validationComplete", "promotionDecision", "governanceDecisionSha256"))
+    enforcement = enforcement and all(run.get("evidenceCollectionStatus") == "VALID"
+                                      for run in runs if run["condition"] == "D")
     critical = (completion["completionStatus"] != "COMPLETE" or isolation["status"] != "PASS"
                 or any(issue["severity"] == "EXECUTION_FAIL" for issue in issues))
     technical_integrity = worktrees["integrityConfirmed"] and origin["integrityConfirmed"]
@@ -286,6 +301,12 @@ def _readiness(completion: dict[str, Any], isolation: dict[str, Any], coverage: 
         for field in ("ontologyQueried", "reportConflictCalled", "identifiedOperation",
                       "identifiedShapes", "enforcementPipelineObserved",
                       "candidateEnforcementApplicable", "independentEnforcementActivated")
+    )
+    all_required = all_required and all(
+        observed(run, field)
+        for run in runs if run["condition"] == "D"
+        for field in ("validationStatus", "validationExecuted", "validationComplete",
+                      "policyDecision", "promotionDecision", "governanceDecisionSha256")
     )
     all_required = all_required and all(
         observed(run, field)
@@ -374,6 +395,17 @@ def _build_tables(model: dict[str, Any]) -> list[dict[str, Any]]:
     add("Interações com a Ontologia", "Interações registradas por run", ["runId", "ontologyQueried", "queryCount", "semanticToolsCalled"], runs, "measurements.json")
     add("Mecanismos de Governança Observados", "Mecanismos registrados", ["runId", "condition", "governanceMechanism"], runs, "classified-runs.json")
     add("Enforcement", "Evidência de enforcement por run", ["runId", "enforcementPipelineObserved", "candidateEnforcementApplicable", "independentEnforcementActivated", "semanticStatus", "promoted", "originChanged"], runs, "measurements.json + classified-runs.json")
+    add("Enforcement", "Decisão e completude da validação por run",
+        ["runId", "evidenceCollectionStatus", "validationStatus", "validationExecuted", "validationComplete",
+         "policyDecision", "promotionDecision", "candidateFingerprint", "failureStage", "governanceReason"],
+        runs, "executions/*/project/.bsh/local/enforcement/*.json")
+    add("Enforcement", "Reconhecimento, shapes e fatos por run",
+        ["runId", "recognizedOperation", "selectedShapes", "executedShapes", "missingFacts",
+         "candidateGraphHash", "violations"], runs,
+        "executions/*/project/.bsh/local/enforcement/*.json")
+    add("Enforcement", "Origem da decisão por run",
+        ["runId", "sessionId", "sessionReportSource", "governanceDecisionSource", "governanceDecisionSha256"],
+        runs, "measurements.json")
     add("Promoção Git", "Promoção e origin por run", ["runId", "candidateCreated", "promotionAttempted", "promotionSucceeded", "originChanged"], runs, "measurements.json")
     add("Classificações Observadas", "Classificações por condição", ["condition", "classification", "count"],
         model["classificationRows"], "classified-runs.json", "runs")
@@ -461,6 +493,34 @@ def _model(batch_dir: Path, config: dict[str, Any], tasks: list[dict[str, Any]],
         issues.append({"severity": "EXECUTION_FAIL", "code": "DUPLICATE_RUN", "detail": str(completion["duplicateRunKeys"])})
     if instrument["invalidValues"]:
         issues.append({"severity": "EXECUTION_FAIL", "code": "INVALID_INSTRUMENTATION", "detail": str(instrument["invalidValues"])})
+    for run in classified:
+        if run.get("evidenceCollectionStatus") == "INVALID":
+            issues.append({"severity": "EXECUTION_FAIL", "code": "GOVERNANCE_EVIDENCE_INVALID",
+                           "detail": f"{run['runId']}: {run.get('evidenceCollectionIssue')}"})
+        elif run.get("evidenceCollectionStatus") == "VALID":
+            decision = run.get("governanceDecision")
+            expected_source = (f"executions/{run['runId']}/project/.bsh/local/enforcement/"
+                               f"{run.get('sessionId')}.json")
+            source_path = batch_dir / expected_source
+            try:
+                matching = (isinstance(decision, dict)
+                            and decision.get("validationStatus") in {"CONFORMING", "VIOLATION", "INDETERMINATE", "VALIDATION_ERROR"}
+                            and isinstance(decision.get("validationExecuted"), bool)
+                            and isinstance(decision.get("validationComplete"), bool)
+                            and decision.get("policyDecision") in {"ALLOW", "DENY"}
+                            and decision.get("promotionDecision") in {"ALLOW", "DENY", "REVALIDATION_REQUIRED"}
+                            and source_path.resolve().is_relative_to(batch_dir.resolve())
+                            and run.get("governanceDecisionSource") == expected_source
+                            and run.get("governanceDecisionSha256") == sha256_file(source_path)
+                            and source_path.is_file() and read_json(source_path) == decision)
+            except (ValueError, UnicodeError):
+                matching = False
+            if not matching:
+                issues.append({"severity": "EXECUTION_FAIL", "code": "GOVERNANCE_PROVENANCE_MISMATCH",
+                               "detail": str(run["runId"])})
+        elif run["condition"] == "D" and run.get("evidenceCollectionStatus") != "VALID":
+            issues.append({"severity": "EXECUTION_WARNING", "code": "GOVERNANCE_EVIDENCE_MISSING",
+                           "detail": str(run["runId"])})
     if worktrees["worktreesResidual"] or worktrees["missingResultFiles"]:
         issues.append({"severity": "EXECUTION_FAIL", "code": "WORKTREE_INTEGRITY_FAILURE", "detail": json.dumps(worktrees, ensure_ascii=False)})
     elif worktrees["missingWorkspaces"]:
@@ -514,7 +574,7 @@ def _model(batch_dir: Path, config: dict[str, Any], tasks: list[dict[str, Any]],
                "durationCoverage": {condition: coverage["durationSeconds"][condition] for condition in conditions},
                "classificationCoverage": {condition: coverage["classification"][condition] for condition in conditions},
                "semanticEvidenceCoverage": {condition: coverage["identifiedOperation"][condition] for condition in conditions},
-               "enforcementEvidenceCoverage": {condition: coverage["enforcementPipelineObserved"][condition] for condition in conditions},
+               "enforcementEvidenceCoverage": {condition: coverage["validationStatus"][condition] for condition in conditions},
                "missingDataCount": sum(len(item["affectedRuns"]) for item in missing),
                "executionFailCount": sum(issue["severity"] == "EXECUTION_FAIL" for issue in issues),
                "executionWarningCount": sum(issue["severity"] == "EXECUTION_WARNING" for issue in issues),
@@ -569,6 +629,8 @@ def _provenance(model: dict[str, Any]) -> list[dict[str, Any]]:
             if key in {"rawTelemetry", "availability"}:
                 continue
             source = ("tasks.json" if key.startswith("expected") else
+                      run.get("sessionReportSource") if key == "sessionReportSource" and run.get("sessionReportSource") else
+                      run.get("governanceDecisionSource") if key in GOVERNANCE_FIELDS and run.get("governanceDecisionSource") else
                       "classified-runs.json" if key in {"classification", "governanceMechanism"} else
                       "measurements.json")
             add({f"runs.{run['runId']}.{key}": value}, source, [run["runId"]])

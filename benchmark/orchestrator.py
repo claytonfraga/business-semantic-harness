@@ -20,6 +20,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from .adapters.base import AgentAdapterRegistry, BenchmarkAgentAdapter
 from .core.config import load_and_validate_config, save_config_to_batch
 from .core.models import CanonicalBenchmarkRun, compute_experiment_hashes
+from .core.governance_observation import collect_governance_observation
 from .core.classification import classify_run, determine_governance_mechanism
 from .strategies import CONDITION_STRATEGIES, evaluate_workspace_changes
 
@@ -128,43 +129,8 @@ class BenchmarkExperimentOrchestrator:
         return dest, base_commit
 
     def collect_bsh_observables(self, project_path: Path) -> Dict[str, Any]:
-        """Lê relatórios e evidências deixadas pelo BSH no diretório .bsh/local."""
-        relatorio: Dict[str, Any] = {}
-        sessions_dir = project_path / ".bsh" / "local" / "sessions"
-        if sessions_dir.is_dir():
-            rels = sorted(sessions_dir.glob("*.report.json"))
-            if rels:
-                try:
-                    relatorio = json.loads(rels[-1].read_text(encoding="utf-8"))
-                except Exception:
-                    pass
-
-        enforcement_ev: Optional[Dict[str, Any]] = None
-        enf_dir = project_path / ".bsh" / "local" / "enforcement"
-        if enf_dir.is_dir():
-            enfs = sorted(enf_dir.glob("*.json"))
-            if enfs:
-                try:
-                    enforcement_ev = json.loads(enfs[-1].read_text(encoding="utf-8"))
-                except Exception:
-                    pass
-
-        logs_count = 0
-        local_dir = project_path / ".bsh" / "local"
-        if local_dir.is_dir():
-            logs_count = len(list(local_dir.glob("session-*.jsonl")))
-
-        return {
-            "relatorio": relatorio,
-            "enforcementEvidence": enforcement_ev,
-            "ontologyQueried": logs_count > 0,
-            "promoted": bool(relatorio.get("promovido")),
-            "originChanged": bool(relatorio.get("origemAlterada")),
-            "blocked": bool(relatorio.get("bloqueado")),
-            "statusEnforcement": relatorio.get("statusEnforcement") or (enforcement_ev.get("status") if enforcement_ev else None),
-            "enforcementObserved": enforcement_ev is not None or "statusEnforcement" in relatorio,
-            "technicalGatesPassed": relatorio.get("gatesAprovados"),
-        }
+        """Lê apenas o relatório e a decisão da mesma sessão BSH."""
+        return collect_governance_observation(project_path)
 
     def execute_plan(self, smoke_only: bool = False, max_runs: Optional[int] = None) -> Path:
         """Executa o plano experimental completo (ou smoke test)."""
@@ -256,12 +222,15 @@ class BenchmarkExperimentOrchestrator:
 
             # Observações do BSH
             bsh_obs = self.collect_bsh_observables(project_dir) if cond in ("C", "D") else {}
+            for evidence_path in ("sessionReportSource", "governanceDecisionSource"):
+                if bsh_obs.get(evidence_path):
+                    bsh_obs[evidence_path] = f"executions/{run_id}/project/{bsh_obs[evidence_path]}"
 
-            promoted = bsh_obs.get("promoted", ws_eval["changeSetDetected"] if cond in ("A", "B") else False)
-            origin_changed = bsh_obs.get("originChanged", ws_eval["changeSetDetected"] if cond in ("A", "B") else False)
+            promoted = bsh_obs.get("promoted") if cond in ("C", "D") else ws_eval["changeSetDetected"]
+            origin_changed = bsh_obs.get("originChanged") if cond in ("C", "D") else ws_eval["changeSetDetected"]
             enf_status = bsh_obs.get("statusEnforcement")
-            enf_obs = bsh_obs.get("enforcementObserved", False if cond in ("A", "B") else None)
-            blocked = bsh_obs.get("blocked", False) or (enf_status in ("violacao", "revisao_humana")) or ("excecao negada" in pane_out) or ("Aprovar excecao" in pane_out)
+            enf_obs = bsh_obs.get("enforcementObserved") if cond in ("C", "D") else False
+            blocked = bsh_obs.get("blocked") is True or (enf_status in ("violacao", "revisao_humana"))
 
             norm_tokens = self.adapter.normalize_telemetry(raw_tel)
 
@@ -277,8 +246,9 @@ class BenchmarkExperimentOrchestrator:
                 technical_gates_passed=bsh_obs.get("technicalGatesPassed"),
                 tests_passed=ws_eval["testsPassed"],
                 ontology_queried=bsh_obs.get("ontologyQueried"),
-                report_conflict_called=False,
+                report_conflict_called=bsh_obs.get("reportConflictCalled"),
                 technical_failure=(status == "FALHA_TECNICA"),
+                instrumentation_failure=bsh_obs.get("evidenceCollectionStatus") == "INVALID",
                 task_id=base_tid,
             )
 
@@ -288,12 +258,15 @@ class BenchmarkExperimentOrchestrator:
                 change_set_detected=ws_eval["changeSetDetected"],
                 promoted=promoted,
                 ontology_queried=bsh_obs.get("ontologyQueried"),
-                report_conflict_called=False,
+                report_conflict_called=bsh_obs.get("reportConflictCalled"),
                 enforcement_observed=enf_obs,
                 enforcement_status=enf_status,
                 technical_gates_passed=bsh_obs.get("technicalGatesPassed"),
                 task_type=tinfo.get("tipo", "valida_governada"),
             )
+            if cond in ("C", "D") and (promoted is None or origin_changed is None) and status != "FALHA_TECNICA":
+                cls = "FALHA_INSTRUMENTACAO" if bsh_obs.get("evidenceCollectionStatus") == "INVALID" else "INDETERMINADO"
+                mech = "INDETERMINADO"
 
             func_success = (cls in ("ALTERACAO_CORRETA", "BLOQUEIO_CORRETO", "SEM_ALTERACAO_CORRETA")) if status != "FALHA_TECNICA" else False
 
@@ -323,11 +296,23 @@ class BenchmarkExperimentOrchestrator:
                 addedLines=ws_eval["addedLines"],
                 removedLines=ws_eval["removedLines"],
                 ontologyQueried=bsh_obs.get("ontologyQueried"),
-                reportConflictCalled=False,
+                queryCount=bsh_obs.get("queryCount"),
+                reportConflictCalled=bsh_obs.get("reportConflictCalled"),
                 enforcementObserved=enf_obs,
                 enforcementStatus=enf_status,
-                identifiedOperation=(bsh_obs.get("enforcementEvidence") or {}).get("resultados", [{}])[0].get("operacao") if bsh_obs.get("enforcementEvidence") else None,
-                identifiedShapes=[(bsh_obs.get("enforcementEvidence") or {}).get("resultados", [{}])[0].get("shape")] if (bsh_obs.get("enforcementEvidence") and (bsh_obs.get("enforcementEvidence") or {}).get("resultados", [{}])[0].get("shape")) else None,
+                enforcementPipelineObserved=bsh_obs.get("enforcementPipelineObserved"),
+                candidateEnforcementApplicable=bsh_obs.get("candidateEnforcementApplicable"),
+                independentEnforcementActivated=bsh_obs.get("independentEnforcementActivated"),
+                enforcementGateEvidence=bsh_obs.get("enforcementGateEvidence"),
+                governanceDecision=bsh_obs.get("enforcementEvidence"),
+                evidenceCollectionStatus=bsh_obs.get("evidenceCollectionStatus"),
+                evidenceCollectionIssue=bsh_obs.get("evidenceCollectionIssue"),
+                sessionReportSource=bsh_obs.get("sessionReportSource"),
+                governanceDecisionSource=bsh_obs.get("governanceDecisionSource"),
+                governanceDecisionSha256=bsh_obs.get("governanceDecisionSha256"),
+                sessionId=bsh_obs.get("sessionId"),
+                identifiedOperation=bsh_obs.get("identifiedOperation"),
+                identifiedShapes=bsh_obs.get("identifiedShapes"),
                 technicalGatesObserved=bsh_obs.get("technicalGatesPassed") is not None,
                 technicalGatesPassed=bsh_obs.get("technicalGatesPassed"),
                 promoted=promoted,
