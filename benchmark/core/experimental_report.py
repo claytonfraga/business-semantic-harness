@@ -30,7 +30,7 @@ SECTION_TITLES = [
     "RQ8: Tokens versus Tempo", "RQ9: Distribuição", "RQ10: Testes versus Semântica",
     "RQ11: Independência do Harness", "Falsos Bloqueios", "Violações Não Detectadas",
     "Enforcement Independente", "Matriz de Evidências", "Respostas às Questões de Pesquisa",
-    "Discussão", "Ameaças à Validade", "Reprodutibilidade", "Conclusão",
+    "Discussão", "Ameaças à Validade", "Reprodutibilidade",
 ]
 
 RQ_TITLES = {
@@ -196,6 +196,60 @@ def _conclusion_paragraphs(stats: dict[str, Any], verdicts: dict[str, Any], batc
     ]
 
 
+def _audit_paragraphs(batch_id: str) -> list[str]:
+    """Cadeia de auditoria por execução: tarefa, consulta, conflito, candidato, promoção, estado final."""
+    path = Path(__file__).resolve().parents[1] / "results" / batch_id / "classified-runs.json"
+    if not path.is_file():
+        return ["Dados estruturados de auditoria indisponíveis para este batch."]
+    try:
+        runs = json.loads(path.read_text(encoding="utf-8"))
+    except (ValueError, OSError):
+        return ["Dados estruturados de auditoria ilegíveis para este batch."]
+    lines: list[str] = []
+    for run in runs:
+        parts = [
+            str(run.get("runId")),
+            "cond=" + str(run.get("condition")),
+            "task=" + str(run.get("baseTaskId")),
+            "tipo=" + str(run.get("taskType")),
+            "consulta=" + str(run.get("ontologyQueried")),
+            "conflito=" + str(run.get("reportConflictCalled")),
+            "candidato=" + str(run.get("candidateCreated")),
+            "changeSet=" + str(run.get("changeSetDetected")),
+            "codeBase=" + str(run.get("codeBaseChanged")),
+            "promovido=" + str(run.get("promoted")),
+            "testes=" + str(run.get("testsPassed")),
+            "classe=" + str(run.get("classification")),
+        ]
+        lines.append(" | ".join(parts))
+    return lines
+
+
+def _discussion_paragraphs() -> list[str]:
+    return [
+        "O relato seletivo de conflitos (violadoras com conflito; permitidas sem conflito) é tratado como "
+        "evidência de utilidade consultiva, não como demonstração de precisão semântica além desta amostra.",
+        "A execução de solicitações permitidas sob C/D não deve ser diluída pela contagem de violações evitadas: "
+        "a dimensão 'entregar o permitido' e a dimensão 'prevenir o proibido' são avaliadas conjuntamente.",
+        "Zero oportunidades de enforcement independente não é taxa de falha nem sucesso: é ausência de denominador "
+        "de exposição ao gate. Testar o componente exige submissão de candidatos incompatíveis e conformes ao fluxo real.",
+        "'Parcialmente sustentado' indica viabilidade da comparação, não eficácia demonstrada da propriedade.",
+    ]
+
+
+def _threats_paragraphs() -> list[str]:
+    return [
+        "Construção: as tarefas concentram-se em poucas famílias semânticas (consulta, baixa, transferência); "
+        "a segunda repetição é parcial; resultados podem não generalizar para operações não exercitadas.",
+        "Interna: comparabilidade de telemetria dependente de contabilidade idêntica; ausência de critérios externos "
+        "de correção funcional; falhas de execução/instrumentação concentradas em condições específicas.",
+        "Externa: um agente, um modelo, um domínio e uma política congelada; solicitações 'violadoras' o são apenas "
+        "em relação à política congelada e sem autorização do agente para alterá-la.",
+        "Construto: `semanticEvidenceCoverage` fina e tokens não cacheados podem faltar sem significar ausência de "
+        "interação semântica; cobertura mede registros presentes, não qualidade do desfecho.",
+    ]
+
+
 def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str, Any],
                        completion: dict[str, Any], quality: dict[str, Any], isolation: dict[str, Any],
                        usability: dict[str, Any], ground_truth: dict[str, Any], stats: dict[str, Any],
@@ -219,8 +273,8 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
         "Ground Truth e Oracles": "expectedOperation e expectedShapes são lidos do manifesto de tarefas congelado no batch. identifiedOperation e identifiedShapes são lidos das evidências da execução. Precision e recall são publicados somente se as fontes independentes forem verificáveis.",
         "Instrumentação": "O adapter registra runtime, telemetria de tokens, duração, diff, testes, consultas MCP, conflitos e status de enforcement. Valor ausente permanece nulo; zero indica medição explícita de zero. Tokens não cacheados não são derivados sem garantia documentada da semântica do runtime.",
         "Resultados Funcionais": "Cumprimento do pedido, correção funcional, correção de governança e correção do desfecho são dimensões independentes. Uma violação evitada pode ter desfecho correto sem entregar o pedido literal.",
-        "Discussão": "Os resultados favoráveis, desfavoráveis e não calculáveis são apresentados separadamente. Diferenças de tokens após bloqueio não equivalem a maior eficiência na entrega da mesma funcionalidade. Mecanismos não observados não recebem atribuição causal.",
-        "Ameaças à Validade": "Validade interna: mecanismos podem não estar isolados. Validade externa: um único domínio, agente ou modelo restringe generalização. Validade de construto: testes técnicos não provam conformidade semântica. Validade de conclusão: tarefas-base e oportunidades podem ser insuficientes para inferência populacional.",
+        "Discussão": "Os resultados favoráveis, desfavoráveis e não calculáveis são apresentados separadamente. O relato seletivo de conflitos é evidência de utilidade consultiva, não de precisão semântica além da amostra. A execução de solicitações permitidas sob C/D não deve ser diluída pela contagem de violações evitadas. Zero oportunidades de enforcement independente não é taxa de falha nem sucesso: é ausência de denominador de exposição ao gate. Diferenças de tokens após bloqueio não equivalem a maior eficiência na entrega da mesma funcionalidade. 'Parcialmente sustentado' indica viabilidade da comparação, não eficácia demonstrada.",
+        "Ameaças à Validade": "Construção: tarefas concentram-se em poucas famílias (consulta, baixa, transferência) e a segunda repetição é parcial. Interna: comparabilidade de telemetria depende de contabilidade idêntica, faltam critérios externos de correção funcional e há falhas concentradas em condições específicas. Externa: um agente, um modelo, um domínio e uma política congelada; 'violadora' refere-se apenas à política congelada. Construto: cobertura mede registros presentes, não qualidade do desfecho; evidência semântica fina e tokens não cacheados podem faltar sem significar ausência de interação.",
     }
     for title in SECTION_TITLES:
         paragraph = static.get(title)
@@ -351,25 +405,7 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
     })
     sections.insert(0, {"title": "Introdução", "paragraphs": _intro_paragraphs()})
     sections.append({"title": "Conclusão", "paragraphs": _conclusion_paragraphs(stats, verdicts, batch_id)})
-    sections.append({"title": "Discussão", "paragraphs": [
-        "O relato seletivo de conflitos (violadoras com conflito; permitidas sem conflito) é tratado como "
-        "evidência de utilidade consultiva, não como demonstração de precisão semântica além desta amostra.",
-        "A execução de solicitações permitidas sob C/D não deve ser diluída pela contagem de violações evitadas: "
-        "a dimensão 'entregar o permitido' e a dimensão 'prevenir o proibido' são avaliadas conjuntamente.",
-        "Zero oportunidades de enforcement independente não é taxa de falha nem sucesso: é ausência de denominador "
-        "de exposição ao gate. Testar o componente exige submissão de candidatos incompatíveis e conformes ao fluxo real.",
-        "'Parcialmente sustentado' indica viabilidade da comparação, não eficácia demonstrada da propriedade.",
-    ]})
-    sections.append({"title": "Ameaças à Validade", "paragraphs": [
-        "Construção: as tarefas concentram-se em poucas famílias semânticas (consulta, baixa, transferência); "
-        "a segunda repetição é parcial; resultados podem não generalizar para operações do domínio não exercitadas.",
-        "Interna: comparabilidade de telemetria dependente de contabilidade idêntica; ausência de critérios externos "
-        "de correção funcional; falhas de execução/instrumentação concentradas em condições específicas.",
-        "Externa: um agente, um modelo, um domínio e uma política congelada; solicitações 'violadoras' o são apenas "
-        "em relação à política congelada e sem autorização do agente para alterá-la.",
-        "Construto: `semanticEvidenceCoverage` fina e tokens não cacheados podem faltar sem significar ausência de "
-        "interação semântica; cobertura mede registros presentes, não qualidade do desfecho.",
-    ]})
+    sections.append({"title": "Auditoria por Execução", "paragraphs": _audit_paragraphs(batch_id)})
     model = {"title": TITLE, "subtitle": subtitle, "batchId": batch_id, "domain": domain,
              "executionDate": metadata.get("startedAt"), "dataOrigin": metadata.get("dataOrigin"),
              "provenance": provenance, "abstract": {"objective": "Avaliar governança semântica observada no BSH",
