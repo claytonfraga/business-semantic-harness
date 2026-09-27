@@ -395,6 +395,41 @@ def render_figures(model: dict[str, Any], batch_dir: Path) -> list[str]:
     return result
 
 
+def _appendix_prompts(batch_dir: Path) -> list[str]:
+    """Apêndice com o prompt integral efetivamente enviado ao agente em cada run do batch."""
+    results: dict[str, str] = {}
+    for path in sorted((batch_dir / "executions").glob("*/result.json")):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (ValueError, OSError):
+            continue
+        run_id = data.get("runId")
+        if run_id:
+            results[str(run_id)] = str(data.get("baseTaskId") or data.get("taskId") or "")
+    tasks: dict[str, str] = {}
+    tasks_path = batch_dir / "tasks.json"
+    if tasks_path.is_file():
+        for task in json.loads(tasks_path.read_text(encoding="utf-8")).get("tarefas", []):
+            tasks[str(task.get("baseTaskId") or task.get("id"))] = str(task.get("prompt", ""))
+    order: list[str] = []
+    metadata_path = batch_dir / "metadata.json"
+    if metadata_path.is_file():
+        ordem = json.loads(metadata_path.read_text(encoding="utf-8")).get("ordemExecucao")
+        if isinstance(ordem, list):
+            order = [str(run_id) for run_id in ordem if str(run_id) in results]
+    if not order:
+        order = sorted(results)
+    lines = [r"\clearpage",
+             r"\section*{Apêndice --- Prompts utilizados nas execuções experimentais}",
+             r"\addcontentsline{toc}{section}{Apêndice --- Prompts utilizados nas execuções experimentais}"]
+    for run_id in order:
+        prompt = tasks.get(results.get(run_id, ""), "")
+        lines.append(r"\noindent\textbf{" + _latex(run_id) + r":}\par")
+        lines.append(r"\begin{sloppypar}" + _latex(prompt) + r"\end{sloppypar}")
+        lines.append(r"\par\bigskip")
+    return lines
+
+
 def render_latex(model: dict[str, Any], batch_dir: Path) -> Path:
     report_dir = batch_dir / "report"
     report_dir.mkdir(exist_ok=True)
@@ -435,7 +470,9 @@ def render_latex(model: dict[str, Any], batch_dir: Path) -> Path:
     latex.append(r"\begin{thebibliography}{99}")
     for item in model["references"]:
         latex.append(r"\bibitem[" + _latex(item["author"]) + "(" + _latex(item["year"]) + ")]{" + item["key"] + "}" + _latex(item["entry"]))
-    latex.extend([r"\end{thebibliography}", r"\end{document}"])
+    latex.append(r"\end{thebibliography}")
+    latex.extend(_appendix_prompts(batch_dir))
+    latex.append(r"\end{document}")
     path = report_dir / "report.tex"
     path.write_text("\n\n".join(latex) + "\n", encoding="utf-8")
     return path

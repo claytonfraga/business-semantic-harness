@@ -458,15 +458,16 @@ class BenchmarkExperimentOrchestrator:
                 if cond in ("C", "D") and status == "OK" and not bsh_obs.get("sessionReportSource"):
                     critical.append("relatório da sessão BSH ausente")
                 if critical:
-                    self.save_batch_artifacts(
-                        runs_records, started_at=started_at,
-                        finished_at=datetime.now(timezone.utc).isoformat(),
-                        origin_initial_commit=source_origin_initial,
-                        origin_final_commit=self.git_head(self.project_source),
-                        origin_initial_tree_hash=source_tree_initial,
-                        origin_final_tree_hash=compute_directory_tree_hash(self.project_source),
-                    )
-                    raise RuntimeError(f"HARD_FAIL: instrumentação de {run_id}: {'; '.join(critical)}")
+                    # Robustez: uma falha de instrumentacao de uma run nao aborta a campanha.
+                    # A run e registrada como falha (EXECUCAO_INTERROMPIDA) e a execucao continua.
+                    run_record.executionStatus = "FALHA_INSTRUMENTACAO"
+                    if run_record.classification in (None, "", "INDETERMINADO"):
+                        run_record.classification = "FALHA_INSTRUMENTACAO"
+                    run_record.failureType = run_record.failureType or "EXECUCAO_INTERROMPIDA"
+                    run_record.failureMessage = "; ".join(critical)
+                    (self.batch_dir / "executions" / run_id / "result.json").write_text(
+                        json.dumps(run_record.to_dict(), indent=2, ensure_ascii=False), encoding="utf-8")
+                    print(f"      [robustez] {run_id} registrada como falha (EXECUCAO_INTERROMPIDA); campanha continua.")
 
         finished_at = datetime.now(timezone.utc).isoformat()
         # Salva metadados e artefatos globais do lote
