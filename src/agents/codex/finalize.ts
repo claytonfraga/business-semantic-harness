@@ -159,7 +159,7 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
       candidateCommit, origemHeadAntes: originCommit,
     });
     if (!candidateClean || candidateCommit === originCommit) {
-      await gravarRelatorioSessao(root, sessao, { bloqueado: true, promotionFailureReason: 'CANDIDATE_STATE' });
+      await gravarRelatorioSessao(root, sessao, { bloqueado: !candidateClean || candidateCommit !== originCommit, promotionFailureReason: 'CANDIDATE_STATE' });
       return { status: 'bloqueado', promovido: false };
     }
     const gates = await (validarGates ?? executarGates)(sessao.caminhoWorktree);

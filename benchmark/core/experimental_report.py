@@ -246,12 +246,21 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
                               "hash, versão ou identificador", "report-model.json", sample["nRuns"])
     provenance_table["section"] = "Reprodutibilidade"
     tables.append(provenance_table)
+    sections.append(
+        "Escopo da Avaliação do Harness e Limite do Ground Truth: esta etapa avalia o BSH como "
+        "harness ontológico por evidência observável do fluxo (consulta semântica, acionamento do "
+        "enforcement, bloqueio, promoção e mudança no código-base). Avaliar se o harness atuou não é "
+        "avaliar se cada decisão semântica estava correta: a correção de decisões específicas de "
+        "enforcement requer ground truth independente e constitui uma etapa distinta. Sem esse ground "
+        "truth, candidateSemanticValidity = INDETERMINATE e enforcementCorrectness = NOT_EVALUATED; "
+        "DENY não implica enforcement correto e ALLOW não implica enforcement correto.")
     model = {"title": TITLE, "subtitle": subtitle, "batchId": batch_id, "domain": domain,
              "executionDate": metadata.get("startedAt"), "dataOrigin": metadata.get("dataOrigin"),
              "provenance": provenance, "abstract": {"objective": "Avaliar governança semântica observada no BSH",
              "design": "Quatro condições pareadas A/B/C/D", "nRuns": sample["nRuns"], "nBaseTasks": sample["nBaseTasks"],
              "mainResults": {rq: verdicts["researchQuestions"][rq]["verdict"] for rq in ("RQ1_A", "RQ1_B", "RQ5", "RQ10", "RQ11")},
-             "limitations": ["Generalização limitada ao agente, modelo, domínio e tarefas observados"]},
+             "limitations": ["Generalização limitada ao agente, modelo, domínio e tarefas observados",
+                             "Escopo observacional: sem ground truth independente a correção semântica de decisões de enforcement é NOT_EVALUATED"]},
              "execution": completion, "isolation": isolation, "quality": quality,
              "usability": usability, "groundTruth": ground_truth, "statistics": stats,
              "evidenceMatrix": evidence, "verdicts": verdicts, "sections": sections,
