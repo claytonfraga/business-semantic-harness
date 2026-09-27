@@ -91,17 +91,30 @@ class CodeBaseChangeRegression(unittest.TestCase):
         self.assertFalse(is_experimental_codebase_path(".bsh/local/session.jsonl"))     # runtime
 
     def test_Given_change_detected_without_codebase_change_When_invariants_Then_inconsistent(self):
-        """opencode: Given changeSetDetected and no codeBaseChanged, When invariants, Then GIT_OBSERVABILITY_INCONSISTENT."""
+        """opencode: Given unexplained divergence, When invariants, Then GIT_OBSERVABILITY_INCONSISTENT."""
         from benchmark.core.models import CanonicalBenchmarkRun
         from benchmark.core.run_invariants import run_instrumentation_issues
         run = CanonicalBenchmarkRun(
             runId="001-G1-A", batchId="fixture", taskId="G1", baseTaskId="G1", condition="A",
             agent="opencode", changeSetDetected=True, codeBaseChanged=False,
             originInitialTreeHash="x", originFinalTreeHash="x",
-            changeDisposition="CHANGE_PRODUCED_NOT_APPLIED",
+            changeDisposition="CHANGE_APPLIED",
             nonCachedTokensEligible=False, nonCachedTokensExclusionReason="runtime sem metrica")
         issues = run_instrumentation_issues(run)
         self.assertTrue(any("GIT_OBSERVABILITY_INCONSISTENT" in issue for issue in issues))
+
+    def test_Given_auditable_divergence_When_invariants_Then_allowed(self):
+        """opencode: Given auditable divergence, When invariants, Then it is allowed."""
+        from benchmark.core.models import CanonicalBenchmarkRun
+        from benchmark.core.run_invariants import run_instrumentation_issues
+        for disposition in ("CHANGE_PRODUCED_NOT_APPLIED", "CHANGE_BLOCKED"):
+            run = CanonicalBenchmarkRun(
+                runId="001-G1-D", batchId="fixture", taskId="G1", baseTaskId="G1", condition="D",
+                agent="opencode", changeSetDetected=True, codeBaseChanged=False,
+                originInitialTreeHash="x", originFinalTreeHash="x", changeDisposition=disposition,
+                nonCachedTokensEligible=False, nonCachedTokensExclusionReason="runtime sem metrica")
+            issues = run_instrumentation_issues(run)
+            self.assertFalse(any("GIT_OBSERVABILITY_INCONSISTENT" in issue for issue in issues))
 
 
 class CodeBaseChangeInvariantRegression(unittest.TestCase):
