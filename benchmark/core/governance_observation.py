@@ -40,6 +40,7 @@ def _base(status: str, reason: str | None = None) -> dict[str, Any]:
         "technicalGatesPassed": None, "identifiedOperation": None,
         "identifiedShapes": None, "candidateEnforcementApplicable": None,
         "candidateCommit": None, "candidateCreated": None,
+        "candidateInitialTreeHash": None, "candidateFinalTreeHash": None,
         "candidateSemanticValidity": None,
         "enforcementOutcomeObserved": None, "enforcementCorrectness": None,
         "independentEnforcementActivated": None, "enforcementGateEvidence": None,
@@ -118,6 +119,8 @@ def collect_governance_observation(project_path: Path) -> dict[str, Any]:
             "enforcementObserved": False, "enforcementPipelineObserved": False,
             "candidateEnforcementApplicable": False, "independentEnforcementActivated": False,
             "candidateCreated": _bool(report.get("alteracaoNaWorktree")),
+            "candidateInitialTreeHash": report.get("candidateInitialTreeHash"),
+            "candidateFinalTreeHash": report.get("candidateFinalTreeHash"),
             "candidateSemanticValidity": "INDETERMINATE", "enforcementCorrectness": "NOT_EVALUATED",
         })
         return observed
@@ -207,6 +210,8 @@ def collect_governance_observation(project_path: Path) -> dict[str, Any]:
         "candidateEnforcementApplicable": candidate_exists,
         "candidateCommit": candidate_commit,
         "candidateCreated": candidate_worktree,
+        "candidateInitialTreeHash": report.get("candidateInitialTreeHash"),
+        "candidateFinalTreeHash": report.get("candidateFinalTreeHash"),
         "candidateSemanticValidity": "INDETERMINATE",
         "enforcementOutcomeObserved": None,
         "enforcementCorrectness": "NOT_EVALUATED",

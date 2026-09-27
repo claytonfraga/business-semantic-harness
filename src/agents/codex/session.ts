@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process';
 import { loadManifest } from '../../project/manifest.js';
 import { createOntologySnapshot } from '../../ontology/query.js';
+import { hashConteudoCodigoBase } from '../../enforcement/codigoBase.js';
 import { diagnoseCodexRuntime } from './doctor.js';
 import { startGovernedAppServer } from './launcher.js';
 import { finalizeSession } from './finalize.js';
@@ -35,6 +36,7 @@ export async function runCodexSession(root: string, options: { consultative?: bo
   const commitBase = await commitAtual(repositorioOrigem);
   const incluirEstadoLocal = process.env.BSH_WORKTREE_INCLUDE_LOCAL === '1';
   const sessao = await criarSessaoWorktree({ repositorioOrigem, branchOrigem, commitBase, incluirEstadoLocal });
+  const candidateInitialTreeHash = await hashConteudoCodigoBase(sessao.caminhoWorktree);
   await gravarSessao(repositorioOrigem, sessao, 'WORKTREE_READY');
   const manifest = await loadManifest(repositorioOrigem);
   const snapshot = await createOntologySnapshot(repositorioOrigem);
@@ -84,6 +86,7 @@ export async function runCodexSession(root: string, options: { consultative?: bo
       ontologyQueries: instrumentation.ontologyQueries(),
       harnessTokens: instrumentation.harnessTokens(),
       consultative: options.consultative === true,
+      candidateInitialTreeHash,
     });
   } finally {
     await cleanup();

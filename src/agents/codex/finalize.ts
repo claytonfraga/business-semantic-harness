@@ -3,6 +3,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { appendAudit } from '../../decision/audit.js';
+import { hashConteudoCodigoBase } from '../../enforcement/codigoBase.js';
 import { actionDigest, type ProposedAction } from '../../decision/evaluate.js';
 import type { OntologySnapshot } from '../../ontology/query.js';
 import { evaluateGovernance, type CandidateFactsExtractor, type GovernanceDecision } from '../../enforcement/governanceDecision.js';
@@ -26,6 +27,7 @@ export interface FinalizeOptions {
   confirmar?: (branchOrigem: string) => Promise<boolean>;
   extractCandidateFacts?: CandidateFactsExtractor;
   consultative?: boolean;
+  candidateInitialTreeHash?: string;
 }
 
 export interface ResultadoFinalizacao {
@@ -104,6 +106,7 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
     }
   }
   const alteracoes = await alteracoesNaWorktree(sessao);
+  const candidateFinalTreeHash = await hashConteudoCodigoBase(sessao.caminhoWorktree);
   process.stdout.write(`BSH: worktree da sessao ${sessao.id} em ${sessao.caminhoWorktree}; branch ${sessao.branchSessao}.\n`);
   {
     const numstatInicial = await git(sessao.caminhoWorktree, ['diff', sessao.commitBase, '--numstat']).catch(() => '');
@@ -119,6 +122,8 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
       origemHeadAntes: (await git(root, ['rev-parse', sessao.branchOrigem]).catch(() => '')).trim(),
       promovido: false, origemAlterada: false, bloqueado: false,
       sessionMode: options.consultative ? 'CONSULTATIVE' : 'ENFORCED',
+      candidateInitialTreeHash: options.candidateInitialTreeHash ?? null,
+      candidateFinalTreeHash,
       ...(options.consultative ? { enforcementExecutado: false, blockedBySemanticGate: false } : {}),
     });
   }

@@ -63,19 +63,18 @@ def compute_code_base_changed(origin_initial_tree_hash: Optional[str],
     return origin_initial_tree_hash != origin_final_tree_hash
 
 
-def compute_change_disposition(change_set_detected: Optional[bool], candidate_created: Optional[bool],
-                               blocked: Optional[bool], code_base_changed: Optional[bool]) -> str:
-    """Classificação observacional do processamento da alteração, sem correção semântica."""
+def compute_change_disposition(change_set_detected: Optional[bool], blocked: Optional[bool],
+                               code_base_changed: Optional[bool]) -> str:
+    """Classificação observacional do processamento, a partir das evidências já determinadas."""
     if code_base_changed is None:
         return "INDETERMINATE"
     if code_base_changed is True:
         return "CHANGE_APPLIED"
-    produced = candidate_created if candidate_created is not None else change_set_detected
-    if produced is False:
+    if change_set_detected is False:
         return "NO_CHANGE_PRODUCED"
-    if produced is True and blocked is True:
+    if change_set_detected is True and blocked is True:
         return "CHANGE_BLOCKED"
-    if produced is True and blocked is not True:
+    if change_set_detected is True:
         return "CHANGE_PRODUCED_NOT_APPLIED"
     return "INDETERMINATE"
 

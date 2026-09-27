@@ -332,6 +332,8 @@ def normalize_runs(batch_id: str, runs: list[dict[str, Any]], tasks: list[dict[s
             "candidateEnforcementApplicable": source.get("candidateEnforcementApplicable"),
             "candidateCommit": source.get("candidateCommit"),
             "candidateCreated": source.get("candidateCreated"),
+            "candidateInitialTreeHash": source.get("candidateInitialTreeHash"),
+            "candidateFinalTreeHash": source.get("candidateFinalTreeHash"),
             "codeBaseChanged": source.get("codeBaseChanged"),
             "changeDisposition": source.get("changeDisposition"),
             "candidateSemanticValidity": source.get("candidateSemanticValidity") or "INDETERMINATE",

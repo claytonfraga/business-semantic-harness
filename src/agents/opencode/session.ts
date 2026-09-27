@@ -2,6 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { loadManifest } from '../../project/manifest.js';
 import { createOntologySnapshot } from '../../ontology/query.js';
+import { hashConteudoCodigoBase } from '../../enforcement/codigoBase.js';
 import { branchAtual, commitAtual, criarSessaoWorktree, finalizeSession, gravarSessao, resolverRepositorio } from '../../harness/index.js';
 import type { TokenTotals } from '../../harness/index.js';
 import {
@@ -70,6 +71,7 @@ export async function runOpencodeSession(root: string, options: OpencodeSessionO
   const commitBase = await commitAtual(repositorioOrigem);
   const incluirEstadoLocal = process.env.BSH_WORKTREE_INCLUDE_LOCAL === '1';
   const sessao = await criarSessaoWorktree({ repositorioOrigem, branchOrigem, commitBase, incluirEstadoLocal });
+  const candidateInitialTreeHash = await hashConteudoCodigoBase(sessao.caminhoWorktree);
   await gravarSessao(repositorioOrigem, sessao, 'WORKTREE_READY');
   const manifest = await loadManifest(repositorioOrigem);
   const snapshot = await createOntologySnapshot(repositorioOrigem);
@@ -109,6 +111,7 @@ export async function runOpencodeSession(root: string, options: OpencodeSessionO
       consultative: options.consultative === true,
       // No modo não-interativo não há TUI para responder; a exceção é negada por padrão.
       confirmar: options.prompt !== undefined ? async () => false : undefined,
+      candidateInitialTreeHash,
     });
   } finally {
     await estado.dispose();

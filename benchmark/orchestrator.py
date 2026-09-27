@@ -288,11 +288,18 @@ class BenchmarkExperimentOrchestrator:
             enf_obs = bsh_obs.get("enforcementObserved") if cond in ("C", "D") else False
             blocked = bsh_obs.get("blocked") is True or (enf_status in ("violacao", "revisao_humana"))
 
+            candidate_initial_tree = (origin_initial_tree if cond in ("A", "B")
+                                      else bsh_obs.get("candidateInitialTreeHash"))
+            candidate_final_tree = (origin_final_tree if cond in ("A", "B")
+                                    else bsh_obs.get("candidateFinalTreeHash"))
+            candidate_changed = compute_code_base_changed(candidate_initial_tree, candidate_final_tree)
+            change_set_detected = (candidate_changed if candidate_changed is not None
+                                   else ws_eval["changeSetDetected"])
             code_base_changed = compute_code_base_changed(origin_initial_tree, origin_final_tree)
             candidate_created = (ws_eval["changeSetDetected"] if cond in ("A", "B")
                                  else bsh_obs.get("candidateCreated"))
             change_disposition = compute_change_disposition(
-                ws_eval["changeSetDetected"], candidate_created, blocked, code_base_changed)
+                change_set_detected, blocked, code_base_changed)
             enforcement_outcome = compute_enforcement_outcome_observed(
                 cond, bsh_obs.get("candidateEnforcementApplicable"), bsh_obs.get("validationStatus"),
                 bsh_obs.get("promotionDecision"))
@@ -302,7 +309,7 @@ class BenchmarkExperimentOrchestrator:
             cls = classify_run(
                 task_type=tinfo.get("tipo", "valida_governada"),
                 condition=cond,
-                change_set_detected=ws_eval["changeSetDetected"],
+                change_set_detected=change_set_detected,
                 blocked=blocked,
                 promoted=promoted,
                 origin_changed=origin_changed,
@@ -322,7 +329,7 @@ class BenchmarkExperimentOrchestrator:
             mech = determine_governance_mechanism(
                 condition=cond,
                 classification=cls,
-                change_set_detected=ws_eval["changeSetDetected"],
+                change_set_detected=change_set_detected,
                 promoted=promoted,
                 ontology_queried=bsh_obs.get("ontologyQueried"),
                 report_conflict_called=bsh_obs.get("reportConflictCalled"),
@@ -370,7 +377,7 @@ class BenchmarkExperimentOrchestrator:
                 nonCachedTokensEligible=(norm_tokens.get("nonCachedTokens") is not None),
                 nonCachedTokensExclusionReason=(None if norm_tokens.get("nonCachedTokens") is not None
                     else f"Adapter/runtime {self.agent_id} não fornece métrica direta com semântica de cache garantida"),
-                changeSetDetected=ws_eval["changeSetDetected"],
+                changeSetDetected=change_set_detected,
                 modifiedFiles=ws_eval["modifiedFiles"],
                 createdFiles=ws_eval["createdFiles"],
                 removedFiles=ws_eval["removedFiles"],
@@ -386,6 +393,8 @@ class BenchmarkExperimentOrchestrator:
                 candidateEnforcementApplicable=bsh_obs.get("candidateEnforcementApplicable"),
                 candidateCommit=bsh_obs.get("candidateCommit"),
                 candidateCreated=candidate_created,
+                candidateInitialTreeHash=candidate_initial_tree,
+                candidateFinalTreeHash=candidate_final_tree,
                 codeBaseChanged=code_base_changed,
                 changeDisposition=change_disposition,
                 candidateSemanticValidity="INDETERMINATE",

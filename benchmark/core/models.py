@@ -80,6 +80,8 @@ class CanonicalBenchmarkRun:
     # As fontes canônicas são candidateCreated e candidateEnforcementApplicable.
     candidateCommit: Optional[str] = None
     candidateCreated: Optional[bool] = None
+    candidateInitialTreeHash: Optional[str] = None
+    candidateFinalTreeHash: Optional[str] = None
     codeBaseChanged: Optional[bool] = None
     changeDisposition: Optional[str] = None
     candidateSemanticValidity: Optional[str] = None
