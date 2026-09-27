@@ -39,6 +39,22 @@ def commit():
     return result.stdout.strip() if result.returncode == 0 else None
 
 
+def file_hashes(root):
+    result = {}
+    for path in sorted(path for path in root.rglob("*") if path.is_file() and path.name != "batch-sync-manifest.json"):
+        result[path.relative_to(root).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
+    return result
+
+
+def dest_is_subset(source, dest):
+    """True se todo arquivo do destino existe idêntico na origem (origem pode ter mais: progresso)."""
+    src_files = file_hashes(source)
+    dst_files = file_hashes(dest)
+    if len(dst_files) > len(src_files):
+        return False
+    return all(src_files.get(rel) == digest for rel, digest in dst_files.items())
+
+
 def sync(batch_id, status):
     source = WT / "benchmark" / "results" / batch_id
     dest = ORIGINAL / "benchmark" / "results" / batch_id
@@ -51,8 +67,10 @@ def sync(batch_id, status):
         if src == dst:
             print("ja sincronizado e identico: " + batch_id)
             return 0
-        print("HARD_FAIL: destino existente difere da origem: " + batch_id)
-        return 2
+        if not dest_is_subset(source, dest):
+            print("HARD_FAIL: destino existente difere da origem: " + batch_id)
+            return 2
+        shutil.rmtree(dest)
     dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(source, dest)
     dst = aggregate(dest)
