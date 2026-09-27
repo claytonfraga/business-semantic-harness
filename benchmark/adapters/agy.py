@@ -155,31 +155,14 @@ class AgyBenchmarkAdapter(BenchmarkAgentAdapter):
         home_dir = project_path.parent / "agy-home"
         home_dir.mkdir(parents=True, exist_ok=True)
         os.chmod(str(home_dir), 0o700)
-        gemini_dir = home_dir / ".gemini"
-        agy_dir = gemini_dir / "antigravity-cli"
-        cache_dir = agy_dir / "cache"
-        config_dir = gemini_dir / "config"
-        agy_dir.mkdir(parents=True, exist_ok=True)
-        cache_dir.mkdir(parents=True, exist_ok=True)
-        config_dir.mkdir(parents=True, exist_ok=True)
-
-        real_gemini = Path.home() / ".gemini"
-        real_agy = real_gemini / "antigravity-cli"
-
-        for f in ["oauth_creds.json", "google_accounts.json", "google_account_id", "installation_id", "state.json"]:
-            src = real_gemini / f
-            if src.exists():
-                shutil.copy2(src, gemini_dir / f)
-
-        for f in ["antigravity-oauth-token", "installation_id", "jetski_state.pbtxt"]:
-            src = real_agy / f
-            if src.exists():
-                shutil.copy2(src, agy_dir / f)
-
-        (gemini_dir / "trustedFolders.json").write_text(json.dumps({str(project_path): "TRUST_FOLDER"}))
-        (agy_dir / "settings.json").write_text(json.dumps({"trustedWorkspaces": [str(project_path)], "permissions": {"allow": ["*"]}}))
-        (gemini_dir / "settings.json").write_text(json.dumps({"ui": {"theme": "Default"}}))
-        (cache_dir / "onboarding.json").write_text(json.dumps({"consumerOnboardingComplete": True, "onboardingComplete": True}))
+        for d in [".gemini", ".config", ".local"]:
+            target = home_dir / d
+            src = Path.home() / d
+            if not target.exists() and src.exists():
+                try:
+                    target.symlink_to(src)
+                except Exception:
+                    pass
 
         env = {**os.environ, "HOME": str(home_dir)}
         cmd = ["agy", "-p", prompt, "--dangerously-skip-permissions", "--output-format", "json"]
@@ -295,25 +278,50 @@ class AgyBenchmarkAdapter(BenchmarkAgentAdapter):
         dur = time.time() - ini
         return raw_usage, dur, pane_texto, "OK"
 
-    def normalize_telemetry(self, raw_telemetry: Dict[str, Any]) -> Dict[str, Optional[int]]:
+    def normalize_telemetry(self, raw_telemetry: Dict[str, Any]) -> Dict[str, Any]:
         if not raw_telemetry:
             return {
                 "inputTokens": None, "cachedInputTokens": None, "outputTokens": None,
-                "reasoningTokens": None, "totalTokens": None, "nonCachedTokens": None
+                "reasoningTokens": None, "totalTokens": None, "rawTotalTokens": None,
+                "normalizedTotalTokens": None, "nonCachedTokens": None,
+                "nonCachedTokensEligible": False,
+                "nonCachedTokensExclusionReason": "Telemetria bruta ausente",
+                "tokenTelemetryStatus": "NOT_AVAILABLE"
             }
         inp = raw_telemetry.get("inputTokens") or raw_telemetry.get("input_tokens")
-        cac = raw_telemetry.get("cachedInputTokens") or raw_telemetry.get("cache_read_tokens")
+        cac = raw_telemetry.get("cachedInputTokens") or raw_telemetry.get("cachedTokens") or raw_telemetry.get("cache_read_tokens")
         out = raw_telemetry.get("outputTokens") or raw_telemetry.get("output_tokens")
         rac = raw_telemetry.get("reasoningOutputTokens") or raw_telemetry.get("thinking_tokens")
-        tot = raw_telemetry.get("totalTokens") or raw_telemetry.get("total_tokens")
+        raw_tot = raw_telemetry.get("totalTokens") or raw_telemetry.get("total_tokens")
 
+        tot = raw_tot
         if tot is None and inp is not None and out is not None:
             tot = inp + out
 
         nc = None
-        if inp is not None and out is not None:
+        nc_eligible = False
+        nc_reason = None
+
+        if inp is not None and cac is not None and cac > inp:
+            nc = None
+            nc_eligible = False
+            nc_reason = "Semântica de cache incompatível com a fórmula adotada"
+        elif inp is not None and out is not None:
             c = cac or 0
-            nc = max(0, inp - c) + out
+            nc = inp - c + out
+            nc_eligible = True
+            nc_reason = None
+        else:
+            nc = None
+            nc_eligible = False
+            nc_reason = "Telemetria de tokens incompleta para cálculo de cache"
+
+        if tot is not None and tot > 0:
+            status = "VALID" if nc_eligible else "PARTIAL"
+        elif tot is None and (inp is not None or out is not None):
+            status = "PARTIAL"
+        else:
+            status = "NOT_AVAILABLE"
 
         return {
             "inputTokens": inp,
@@ -321,5 +329,10 @@ class AgyBenchmarkAdapter(BenchmarkAgentAdapter):
             "outputTokens": out,
             "reasoningTokens": rac,
             "totalTokens": tot,
+            "rawTotalTokens": raw_tot,
+            "normalizedTotalTokens": tot,
             "nonCachedTokens": nc,
+            "nonCachedTokensEligible": nc_eligible,
+            "nonCachedTokensExclusionReason": nc_reason,
+            "tokenTelemetryStatus": status,
         }

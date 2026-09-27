@@ -1,0 +1,3231 @@
+{
+  "@context": {
+    "ex": "urn:bsh:pilot:ativos:",
+    "bsh": "urn:bsh:ns:v1:",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "@graph": [
+    {
+      "@id": "ex:fix-transf-v-001",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-007"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-005"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-comercial"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000001 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-002",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-008"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-006"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000002 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-003",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-009"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-007"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-operacoes"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000003 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-004",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-010"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-008"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-financeiro"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000004 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-005",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-011"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-009"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-juridico"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000005 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-006",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-012"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-010"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-rh"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000006 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-007",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-013"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-011"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-engenharia"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000007 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-008",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-014"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-012"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-administrativo"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000008 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-009",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-015"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-013"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-comercial"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000009 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-010",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-016"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-014"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000010 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-011",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-017"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-015"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-operacoes"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000011 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-012",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-018"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-016"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-financeiro"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000012 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-013",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-019"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-017"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-juridico"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000013 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-014",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-020"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-018"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-rh"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000014 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-015",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-021"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-019"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-engenharia"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000015 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-016",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-022"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-020"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-administrativo"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000016 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-017",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-023"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-comercial"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000017 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-018",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-024"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000018 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-019",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-025"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-003"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-operacoes"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000019 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-020",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-026"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-004"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-financeiro"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000020 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-021",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-027"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-005"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-juridico"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000021 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-022",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-028"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-006"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-rh"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000022 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-023",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-029"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-007"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-engenharia"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000023 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-024",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-030"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-008"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-administrativo"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000024 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-025",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-031"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-009"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-comercial"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000025 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-026",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-032"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-010"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000026 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-027",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-033"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-011"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-operacoes"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000027 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-028",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-034"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-012"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-financeiro"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000028 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-029",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-035"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-013"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-juridico"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000029 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-030",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-036"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-014"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-rh"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000030 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-031",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-037"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-015"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-engenharia"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000031 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-032",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-038"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-016"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-administrativo"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000032 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-033",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-039"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-017"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-comercial"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000033 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-034",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-040"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-018"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000034 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-035",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-019"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-operacoes"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000035 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-036",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-020"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-financeiro"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000036 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-037",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-003"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-juridico"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000037 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-038",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-rh"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000038 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-039",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-003"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-engenharia"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000039 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-v-040",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-006"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-004"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-administrativo"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Transferência operacional planejada do ativo PAT-000040 para expansão da equipe",
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-10T14:30:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-001",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-002",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-003",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-004",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-005",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-006",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-007",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-008",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-009",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-010",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-011",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-012",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-013",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-014",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-015",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-016",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-017",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-018",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-019",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-020",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-v-021",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0021"
+    },
+    {
+      "@id": "ex:fix-baixa-v-022",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0022"
+    },
+    {
+      "@id": "ex:fix-baixa-v-023",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0023"
+    },
+    {
+      "@id": "ex:fix-baixa-v-024",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0024"
+    },
+    {
+      "@id": "ex:fix-baixa-v-025",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0025"
+    },
+    {
+      "@id": "ex:fix-baixa-v-026",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0026"
+    },
+    {
+      "@id": "ex:fix-baixa-v-027",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0027"
+    },
+    {
+      "@id": "ex:fix-baixa-v-028",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0028"
+    },
+    {
+      "@id": "ex:fix-baixa-v-029",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0029"
+    },
+    {
+      "@id": "ex:fix-baixa-v-030",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0030"
+    },
+    {
+      "@id": "ex:fix-baixa-v-031",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0031"
+    },
+    {
+      "@id": "ex:fix-baixa-v-032",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0032"
+    },
+    {
+      "@id": "ex:fix-baixa-v-033",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0033"
+    },
+    {
+      "@id": "ex:fix-baixa-v-034",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0034"
+    },
+    {
+      "@id": "ex:fix-baixa-v-035",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0035"
+    },
+    {
+      "@id": "ex:fix-baixa-v-036",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0036"
+    },
+    {
+      "@id": "ex:fix-baixa-v-037",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0037"
+    },
+    {
+      "@id": "ex:fix-baixa-v-038",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0038"
+    },
+    {
+      "@id": "ex:fix-baixa-v-039",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0039"
+    },
+    {
+      "@id": "ex:fix-baixa-v-040",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Sucateamento por desgaste técnico irremediável comprovado",
+      "ex:valorResidual": {
+        "@value": "150.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "4500.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "gestor.patrimonio@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-14T09:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoTecnicoDescarte": "LAUDO-DESC-0040"
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-v-01",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": true
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-v-02",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": true
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-v-03",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": true
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-v-04",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": true
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-v-05",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": true
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-v-06",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": true
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-v-07",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": true
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-v-08",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": true
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-v-09",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": true
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-v-10",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": true
+    },
+    {
+      "@id": "ex:fix-reservaativo-v-01",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      },
+      "ex:motivoReserva": "Projeto X"
+    },
+    {
+      "@id": "ex:fix-reservaativo-v-02",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      },
+      "ex:motivoReserva": "Projeto X"
+    },
+    {
+      "@id": "ex:fix-reservaativo-v-03",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      },
+      "ex:motivoReserva": "Projeto X"
+    },
+    {
+      "@id": "ex:fix-reservaativo-v-04",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      },
+      "ex:motivoReserva": "Projeto X"
+    },
+    {
+      "@id": "ex:fix-reservaativo-v-05",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      },
+      "ex:motivoReserva": "Projeto X"
+    },
+    {
+      "@id": "ex:fix-reservaativo-v-06",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      },
+      "ex:motivoReserva": "Projeto X"
+    },
+    {
+      "@id": "ex:fix-reservaativo-v-07",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      },
+      "ex:motivoReserva": "Projeto X"
+    },
+    {
+      "@id": "ex:fix-reservaativo-v-08",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      },
+      "ex:motivoReserva": "Projeto X"
+    },
+    {
+      "@id": "ex:fix-reservaativo-v-09",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      },
+      "ex:motivoReserva": "Projeto X"
+    },
+    {
+      "@id": "ex:fix-reservaativo-v-10",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      },
+      "ex:motivoReserva": "Projeto X"
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-v-01",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoManutencao": "Tela trincada"
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-v-02",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoManutencao": "Tela trincada"
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-v-03",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoManutencao": "Tela trincada"
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-v-04",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoManutencao": "Tela trincada"
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-v-05",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoManutencao": "Tela trincada"
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-v-06",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoManutencao": "Tela trincada"
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-v-07",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoManutencao": "Tela trincada"
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-v-08",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoManutencao": "Tela trincada"
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-v-09",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoManutencao": "Tela trincada"
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-v-10",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoManutencao": "Tela trincada"
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-v-01",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoManutencao": "Reparo efetuado"
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-v-02",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoManutencao": "Reparo efetuado"
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-v-03",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoManutencao": "Reparo efetuado"
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-v-04",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoManutencao": "Reparo efetuado"
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-v-05",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoManutencao": "Reparo efetuado"
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-v-06",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoManutencao": "Reparo efetuado"
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-v-07",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoManutencao": "Reparo efetuado"
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-v-08",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoManutencao": "Reparo efetuado"
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-v-09",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoManutencao": "Reparo efetuado"
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-v-10",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoManutencao": "Reparo efetuado"
+    },
+    {
+      "@id": "ex:fix-envioativo-v-01",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-envioativo-v-02",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-envioativo-v-03",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-envioativo-v-04",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-envioativo-v-05",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-envioativo-v-06",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-envioativo-v-07",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-envioativo-v-08",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-envioativo-v-09",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-envioativo-v-10",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-v-01",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:movimentacaoReferenciada": "DOC-ENV-001"
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-v-02",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:movimentacaoReferenciada": "DOC-ENV-001"
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-v-03",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:movimentacaoReferenciada": "DOC-ENV-001"
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-v-04",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:movimentacaoReferenciada": "DOC-ENV-001"
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-v-05",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:movimentacaoReferenciada": "DOC-ENV-001"
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-v-06",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:movimentacaoReferenciada": "DOC-ENV-001"
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-v-07",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:movimentacaoReferenciada": "DOC-ENV-001"
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-v-08",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:movimentacaoReferenciada": "DOC-ENV-001"
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-v-09",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:movimentacaoReferenciada": "DOC-ENV-001"
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-v-10",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:movimentacaoReferenciada": "DOC-ENV-001"
+    },
+    {
+      "@id": "ex:fix-registroextravio-v-01",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "SIN-2026/000123"
+    },
+    {
+      "@id": "ex:fix-registroextravio-v-02",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "SIN-2026/000123"
+    },
+    {
+      "@id": "ex:fix-registroextravio-v-03",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "SIN-2026/000123"
+    },
+    {
+      "@id": "ex:fix-registroextravio-v-04",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "SIN-2026/000123"
+    },
+    {
+      "@id": "ex:fix-registroextravio-v-05",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "SIN-2026/000123"
+    },
+    {
+      "@id": "ex:fix-registroextravio-v-06",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "SIN-2026/000123"
+    },
+    {
+      "@id": "ex:fix-registroextravio-v-07",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "SIN-2026/000123"
+    },
+    {
+      "@id": "ex:fix-registroextravio-v-08",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "SIN-2026/000123"
+    },
+    {
+      "@id": "ex:fix-registroextravio-v-09",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "SIN-2026/000123"
+    },
+    {
+      "@id": "ex:fix-registroextravio-v-10",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "SIN-2026/000123"
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-v-01",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Extraviado"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoRecuperacao": "Aparelho recuperado em vistoria policial"
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-v-02",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Extraviado"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoRecuperacao": "Aparelho recuperado em vistoria policial"
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-v-03",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Extraviado"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoRecuperacao": "Aparelho recuperado em vistoria policial"
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-v-04",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Extraviado"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoRecuperacao": "Aparelho recuperado em vistoria policial"
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-v-05",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Extraviado"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoRecuperacao": "Aparelho recuperado em vistoria policial"
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-v-06",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Extraviado"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoRecuperacao": "Aparelho recuperado em vistoria policial"
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-v-07",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Extraviado"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoRecuperacao": "Aparelho recuperado em vistoria policial"
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-v-08",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Extraviado"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoRecuperacao": "Aparelho recuperado em vistoria policial"
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-v-09",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Extraviado"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoRecuperacao": "Aparelho recuperado em vistoria policial"
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-v-10",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Extraviado"
+      },
+      "ex:registradoPor": "operador@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:laudoRecuperacao": "Aparelho recuperado em vistoria policial"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+version: "1.0.0"
+RQ1_A:
+  requires: [totalTokens:A, totalTokens:D, comparableTokenAccounting]
+RQ1_B:
+  requires: [totalTokens:A, totalTokens:D, functionalCorrectness:A, functionalCorrectness:D, behavioralEquivalence, comparableTokenAccounting]
+RQ2:
+  requires: [RQ1_B, violatingOutcome:A, violatingOutcome:D, comparableTokenAccounting]
+RQ3:
+  requires: [paired:A:B, classification:A, classification:B]
+RQ4:
+  requires: [paired:B:C, classification:B, classification:C]
+RQ5:
+  requires: [paired:C:D, classification:C, classification:D, enforcementEvidence]
+RQ6:
+  requires: [expectedOperation, expectedShapes, identifiedOperation, identifiedShapes, independentGroundTruth]
+RQ7:
+  requires: [governanceInteraction, governanceIntervention, governanceMechanism]
+RQ8:
+  requires: [deltaTokens, deltaDuration, minimumEligiblePairs, nonzeroTokenVariance, nonzeroDurationVariance]
+RQ9:
+  requires: [paired:A:D, totalTokens:A, totalTokens:D, taskCategory]
+RQ10:
+  requires: [semanticViolationImplemented, testsExecuted, testsPassed, semanticStatus]
+RQ11:
+  requires: [changeSetDetected, candidateEnforcementApplicable, semanticStatus, reportConflictCalled, enforcementPipelineObserved, promoted, originChanged]

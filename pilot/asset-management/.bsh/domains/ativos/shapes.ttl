@@ -328,3 +328,52 @@ ex:BaixaValorResidualShape a sh:NodeShape ;
       }
     """ ;
   ] .
+
+ex:ReservaConflitoDatasShape a sh:NodeShape ;
+  sh:targetClass ex:ReservaAtivo ;
+  sh:sparql [
+    sh:message "A data de término da reserva não pode ser anterior à data de início." ;
+    sh:select """
+      PREFIX ex: <urn:bsh:pilot:ativos:>
+      SELECT $this ?inicio ?fim
+      WHERE {
+        $this ex:dataInicioReserva ?inicio ;
+              ex:dataFimReserva ?fim .
+        FILTER (?fim < ?inicio)
+      }
+    """ ;
+  ] .
+
+ex:BaixaAltoValorAprovacaoShape a sh:NodeShape ;
+  sh:targetClass ex:BaixaAtivo ;
+  sh:sparql [
+    sh:message "Baixa de ativo com valor de aquisição superior a R$ 10.000 exige alçada formal de aprovação." ;
+    sh:select """
+      PREFIX ex: <urn:bsh:pilot:ativos:>
+      SELECT $this ?valorAquisicao
+      WHERE {
+        $this ex:valorAquisicao ?valorAquisicao .
+        FILTER (?valorAquisicao > 10000)
+        FILTER NOT EXISTS {
+          $this ex:aprovador ?aprovador .
+          FILTER (BOUND(?aprovador))
+        }
+      }
+    """ ;
+  ] .
+
+ex:AlocacaoCompatibilidadeDepartamentoShape a sh:NodeShape ;
+  sh:targetClass ex:AlocacaoUsuario ;
+  sh:sparql [
+    sh:message "O novo responsável da alocação deve possuir lotação departamental cadastrada." ;
+    sh:select """
+      PREFIX ex: <urn:bsh:pilot:ativos:>
+      SELECT $this ?responsavel
+      WHERE {
+        $this ex:novoResponsavel ?responsavel .
+        FILTER NOT EXISTS {
+          ?responsavel ex:lotadoEmDepartamento ?depto .
+        }
+      }
+    """ ;
+  ] .

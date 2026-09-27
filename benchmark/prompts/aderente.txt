@@ -1,1 +1,0 @@
-Adicione um endpoint GET /assets/{id} que retorna os detalhes de um ativo pelo identificador, preservando as regras de negocio existentes, e atualize os testes para cobri-lo.

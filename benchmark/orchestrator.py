@@ -9,6 +9,7 @@ import csv
 import hashlib
 import json
 import os
+from datetime import datetime, timezone
 from pathlib import Path
 import random
 import shutil
@@ -20,11 +21,6 @@ from .adapters.base import AgentAdapterRegistry, BenchmarkAgentAdapter
 from .core.config import load_and_validate_config, save_config_to_batch
 from .core.models import CanonicalBenchmarkRun, compute_experiment_hashes
 from .core.classification import classify_run, determine_governance_mechanism
-from .core.pairing import compute_paired_dataset, export_paired_csvs
-from .core.statistics import compute_statistics, export_statistics_json
-from .core.validation import validate_batch_data_quality
-from .core.figures import generate_all_figures
-from .core.report import generate_and_compile_report
 from .strategies import CONDITION_STRATEGIES, evaluate_workspace_changes
 
 HERE = Path(__file__).resolve().parent
@@ -178,6 +174,12 @@ class BenchmarkExperimentOrchestrator:
         if self.config_path and self.config_path.is_file():
             save_config_to_batch(self.config_path, self.batch_dir)
 
+        # FASE A0: Validação e Integração da Base Semântica
+        from .core.semantic_preflight import run_semantic_preflight
+        preflight_data = run_semantic_preflight(output_dir=self.batch_dir)
+        if preflight_data.get("status") != "APPROVED":
+            raise RuntimeError(f"HARD_FAIL: Validação pré-voo da base semântica reprovada (FASE A0): {preflight_data.get('reasons')}")
+
         # Monta a lista planejada
         if smoke_only:
             if self.configured_smoke and self.configured_smoke.get("runs"):
@@ -222,6 +224,7 @@ class BenchmarkExperimentOrchestrator:
             plan = plan[:target_runs]
 
         print(f"[{self.batch_id}] Iniciando campanha com agente '{self.agent_id}' e modelo '{self.model}'. Total: {len(plan)} execuções.")
+        started_at = datetime.now(timezone.utc).isoformat()
 
         runs_records: List[CanonicalBenchmarkRun] = []
         for idx, item in enumerate(plan, 1):
@@ -238,12 +241,14 @@ class BenchmarkExperimentOrchestrator:
             project_dir, base_commit = self.prepare_workspace(run_id, cond)
             strategy = CONDITION_STRATEGIES[cond]
 
+            timeout_sec = self.config.get("benchmark", {}).get("executionTimeoutSeconds", 60)
             raw_tel, duration, pane_out, status = strategy.execute(
                 adapter=self.adapter,
                 workspace_path=project_dir,
                 prompt=tinfo["prompt"],
                 model=self.model,
                 effort=self.reasoning_effort,
+                timeout_seconds=timeout_sec,
             )
 
             # Avaliações do workspace
@@ -341,12 +346,18 @@ class BenchmarkExperimentOrchestrator:
             )
             print(f"      Desfecho: {cls} | Tokens: {run_record.totalTokens} | Duração: {duration:.1f}s | Mecanismo: {mech}")
 
+        finished_at = datetime.now(timezone.utc).isoformat()
         # Salva metadados e artefatos globais do lote
-        self.save_batch_artifacts(runs_records)
+        self.save_batch_artifacts(runs_records, started_at=started_at, finished_at=finished_at)
         return self.batch_dir
 
-    def save_batch_artifacts(self, runs_records: List[CanonicalBenchmarkRun]) -> None:
-        """Salva todos os artefatos agregados do lote e dispara a análise completa."""
+    def save_batch_artifacts(
+        self,
+        runs_records: List[CanonicalBenchmarkRun],
+        started_at: Optional[str] = None,
+        finished_at: Optional[str] = None,
+    ) -> None:
+        """Salva os dados observados do lote e gera seu relatório técnico."""
         measurements = [r.to_dict() for r in runs_records]
 
         # 1. measurements.json e measurements.csv
@@ -376,9 +387,12 @@ class BenchmarkExperimentOrchestrator:
         hashes = compute_experiment_hashes(REPO, self.project_source, self.tasks_path)
         metadata = {
             "lote": self.batch_id,
+            "dataOrigin": "REAL_EXECUTION",
             "agente": self.agent_id,
             "modelo": self.model,
             "esforco": self.reasoning_effort,
+            "startedAt": started_at,
+            "finishedAt": finished_at,
             "condicoes": ["A", "B", "C", "D"],
             "targetRuns": len(runs_records),
             "ordemExecucao": [r.runId for r in runs_records],
@@ -388,41 +402,6 @@ class BenchmarkExperimentOrchestrator:
         }
         (self.batch_dir / "metadata.json").write_text(json.dumps(metadata, indent=2, ensure_ascii=False), encoding="utf-8")
 
-        # 5. Reconhecimento semântico
-        d_runs = [r for r in runs_records if r.condition == "D" and r.taskType in ("valida_governada", "violadora")]
-        gov_ops = len(d_runs)
-        corr_ops = sum(1 for r in d_runs if r.identifiedOperation is not None)
-        semantic_rec = {
-            "operationRecall": (corr_ops / gov_ops) if gov_ops > 0 else 0.0,
-            "operationPrecision": 1.0 if corr_ops > 0 else 0.0,
-            "shapeRecall": (corr_ops / gov_ops) if gov_ops > 0 else 0.0,
-            "shapePrecision": 1.0 if corr_ops > 0 else 0.0,
-        }
-        (self.batch_dir / "semantic-recognition.json").write_text(json.dumps(semantic_rec, indent=2, ensure_ascii=False), encoding="utf-8")
-
-        # 6. Pareamento e CSVs
-        paired = compute_paired_dataset(measurements, self.tasks_list)
-        export_paired_csvs(paired, self.batch_dir)
-
-        # 7. Estatísticas
-        stats = compute_statistics(measurements, paired, semantic_rec, metadata)
-        export_statistics_json(stats, self.batch_dir)
-
-        # 8. Validação de qualidade dos dados
-        quality = validate_batch_data_quality(measurements, paired, metadata, self.batch_dir)
-
-        # 9. Geração de figuras científicas
-        figures_geradas = generate_all_figures(paired, stats, self.batch_dir)
-
-        # 10. Relatório LaTeX, PDF e cópia para Downloads
-        generate_and_compile_report(
-            batch_dir=self.batch_dir,
-            metadata=metadata,
-            stats=stats,
-            quality=quality,
-            measurements=measurements,
-            paired=paired,
-            capabilities=self.adapter.capability_profile.to_dict(),
-            generated_figures=figures_geradas,
-            tasks=self.tasks_list,
-        )
+        # 5. Registra a execução; a análise científica é iniciada separadamente.
+        from .core.technical_execution_report import generate_execution_report
+        generate_execution_report(self.batch_dir)

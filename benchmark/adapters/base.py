@@ -28,6 +28,14 @@ class BenchmarkAgentAdapter(ABC):
         """Declaração de suporte a telemetria e controle do agente."""
         pass
 
+    @property
+    def name(self) -> str:
+        return self.capability_profile.agentName
+
+    @property
+    def version(self) -> str:
+        return getattr(self.capability_profile, "agentVersion", "1.0.0")
+
     @abstractmethod
     def run_direct(
         self,
@@ -63,7 +71,7 @@ class BenchmarkAgentAdapter(ABC):
         pass
 
     @abstractmethod
-    def normalize_telemetry(self, raw_telemetry: Dict[str, Any]) -> Dict[str, Optional[int]]:
+    def normalize_telemetry(self, raw_telemetry: Dict[str, Any]) -> Dict[str, Any]:
         """Converte a telemetria bruta específica do agente para campos numéricos canônicos."""
         pass
 

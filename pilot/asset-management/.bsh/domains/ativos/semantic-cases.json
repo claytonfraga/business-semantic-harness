@@ -1,0 +1,6652 @@
+[
+  {
+    "caseId": "CASE-TRANSF-VALID-001",
+    "entityIds": [
+      "ex:fix-transf-v-001",
+      "ex:ativo-001"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-002",
+    "entityIds": [
+      "ex:fix-transf-v-002",
+      "ex:ativo-002"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-003",
+    "entityIds": [
+      "ex:fix-transf-v-003",
+      "ex:ativo-003"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-004",
+    "entityIds": [
+      "ex:fix-transf-v-004",
+      "ex:ativo-004"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-005",
+    "entityIds": [
+      "ex:fix-transf-v-005",
+      "ex:ativo-005"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-006",
+    "entityIds": [
+      "ex:fix-transf-v-006",
+      "ex:ativo-006"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-007",
+    "entityIds": [
+      "ex:fix-transf-v-007",
+      "ex:ativo-007"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-008",
+    "entityIds": [
+      "ex:fix-transf-v-008",
+      "ex:ativo-008"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-009",
+    "entityIds": [
+      "ex:fix-transf-v-009",
+      "ex:ativo-009"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-010",
+    "entityIds": [
+      "ex:fix-transf-v-010",
+      "ex:ativo-010"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-011",
+    "entityIds": [
+      "ex:fix-transf-v-011",
+      "ex:ativo-011"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-012",
+    "entityIds": [
+      "ex:fix-transf-v-012",
+      "ex:ativo-012"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-013",
+    "entityIds": [
+      "ex:fix-transf-v-013",
+      "ex:ativo-013"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-014",
+    "entityIds": [
+      "ex:fix-transf-v-014",
+      "ex:ativo-014"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-015",
+    "entityIds": [
+      "ex:fix-transf-v-015",
+      "ex:ativo-015"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-016",
+    "entityIds": [
+      "ex:fix-transf-v-016",
+      "ex:ativo-016"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-017",
+    "entityIds": [
+      "ex:fix-transf-v-017",
+      "ex:ativo-017"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-018",
+    "entityIds": [
+      "ex:fix-transf-v-018",
+      "ex:ativo-018"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-019",
+    "entityIds": [
+      "ex:fix-transf-v-019",
+      "ex:ativo-019"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-020",
+    "entityIds": [
+      "ex:fix-transf-v-020",
+      "ex:ativo-020"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-021",
+    "entityIds": [
+      "ex:fix-transf-v-021",
+      "ex:ativo-021"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-022",
+    "entityIds": [
+      "ex:fix-transf-v-022",
+      "ex:ativo-022"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-023",
+    "entityIds": [
+      "ex:fix-transf-v-023",
+      "ex:ativo-023"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-024",
+    "entityIds": [
+      "ex:fix-transf-v-024",
+      "ex:ativo-024"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-025",
+    "entityIds": [
+      "ex:fix-transf-v-025",
+      "ex:ativo-025"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-026",
+    "entityIds": [
+      "ex:fix-transf-v-026",
+      "ex:ativo-026"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-027",
+    "entityIds": [
+      "ex:fix-transf-v-027",
+      "ex:ativo-027"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-028",
+    "entityIds": [
+      "ex:fix-transf-v-028",
+      "ex:ativo-028"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-029",
+    "entityIds": [
+      "ex:fix-transf-v-029",
+      "ex:ativo-029"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-030",
+    "entityIds": [
+      "ex:fix-transf-v-030",
+      "ex:ativo-030"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-031",
+    "entityIds": [
+      "ex:fix-transf-v-031",
+      "ex:ativo-031"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-032",
+    "entityIds": [
+      "ex:fix-transf-v-032",
+      "ex:ativo-032"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-033",
+    "entityIds": [
+      "ex:fix-transf-v-033",
+      "ex:ativo-033"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-034",
+    "entityIds": [
+      "ex:fix-transf-v-034",
+      "ex:ativo-034"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-035",
+    "entityIds": [
+      "ex:fix-transf-v-035",
+      "ex:ativo-035"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-036",
+    "entityIds": [
+      "ex:fix-transf-v-036",
+      "ex:ativo-036"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-037",
+    "entityIds": [
+      "ex:fix-transf-v-037",
+      "ex:ativo-037"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-038",
+    "entityIds": [
+      "ex:fix-transf-v-038",
+      "ex:ativo-038"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-039",
+    "entityIds": [
+      "ex:fix-transf-v-039",
+      "ex:ativo-039"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-VALID-040",
+    "entityIds": [
+      "ex:fix-transf-v-040",
+      "ex:ativo-040"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Transf-EstadoValido",
+      "Regra-Transf-Segregacao",
+      "Regra-Transf-LotacaoDestino"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Transferência válida de ativo em uso com novo responsável lotado no departamento de destino e segregação de aprovador."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-001",
+    "entityIds": [
+      "ex:fix-transf-inv-001"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Transferência sem novo responsável especificado."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-002",
+    "entityIds": [
+      "ex:fix-transf-inv-002"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Solicitante e aprovador são a mesma pessoa (violação de segregação)."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-003",
+    "entityIds": [
+      "ex:fix-transf-inv-003"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Novo responsável não pertence ao departamento de destino."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-004",
+    "entityIds": [
+      "ex:fix-transf-inv-004"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Ativo baixado não pode ser transferido."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-005",
+    "entityIds": [
+      "ex:fix-transf-inv-005"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Transferência sem novo responsável especificado."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-006",
+    "entityIds": [
+      "ex:fix-transf-inv-006"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Solicitante e aprovador são a mesma pessoa (violação de segregação)."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-007",
+    "entityIds": [
+      "ex:fix-transf-inv-007"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Novo responsável não pertence ao departamento de destino."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-008",
+    "entityIds": [
+      "ex:fix-transf-inv-008"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Ativo baixado não pode ser transferido."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-009",
+    "entityIds": [
+      "ex:fix-transf-inv-009"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Transferência sem novo responsável especificado."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-010",
+    "entityIds": [
+      "ex:fix-transf-inv-010"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Solicitante e aprovador são a mesma pessoa (violação de segregação)."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-011",
+    "entityIds": [
+      "ex:fix-transf-inv-011"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Novo responsável não pertence ao departamento de destino."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-012",
+    "entityIds": [
+      "ex:fix-transf-inv-012"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Ativo baixado não pode ser transferido."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-013",
+    "entityIds": [
+      "ex:fix-transf-inv-013"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Transferência sem novo responsável especificado."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-014",
+    "entityIds": [
+      "ex:fix-transf-inv-014"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Solicitante e aprovador são a mesma pessoa (violação de segregação)."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-015",
+    "entityIds": [
+      "ex:fix-transf-inv-015"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Novo responsável não pertence ao departamento de destino."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-016",
+    "entityIds": [
+      "ex:fix-transf-inv-016"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Ativo baixado não pode ser transferido."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-017",
+    "entityIds": [
+      "ex:fix-transf-inv-017"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Transferência sem novo responsável especificado."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-018",
+    "entityIds": [
+      "ex:fix-transf-inv-018"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Solicitante e aprovador são a mesma pessoa (violação de segregação)."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-019",
+    "entityIds": [
+      "ex:fix-transf-inv-019"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Novo responsável não pertence ao departamento de destino."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-020",
+    "entityIds": [
+      "ex:fix-transf-inv-020"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Ativo baixado não pode ser transferido."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-021",
+    "entityIds": [
+      "ex:fix-transf-inv-021"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Transferência sem novo responsável especificado."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-022",
+    "entityIds": [
+      "ex:fix-transf-inv-022"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Solicitante e aprovador são a mesma pessoa (violação de segregação)."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-023",
+    "entityIds": [
+      "ex:fix-transf-inv-023"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Novo responsável não pertence ao departamento de destino."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-024",
+    "entityIds": [
+      "ex:fix-transf-inv-024"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Ativo baixado não pode ser transferido."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-025",
+    "entityIds": [
+      "ex:fix-transf-inv-025"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Transferência sem novo responsável especificado."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-026",
+    "entityIds": [
+      "ex:fix-transf-inv-026"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Solicitante e aprovador são a mesma pessoa (violação de segregação)."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-027",
+    "entityIds": [
+      "ex:fix-transf-inv-027"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Novo responsável não pertence ao departamento de destino."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-028",
+    "entityIds": [
+      "ex:fix-transf-inv-028"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Ativo baixado não pode ser transferido."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-029",
+    "entityIds": [
+      "ex:fix-transf-inv-029"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Transferência sem novo responsável especificado."
+  },
+  {
+    "caseId": "CASE-TRANSF-INVALID-030",
+    "entityIds": [
+      "ex:fix-transf-inv-030"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Transferencia"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Solicitante e aprovador são a mesma pessoa (violação de segregação)."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-001",
+    "entityIds": [
+      "ex:fix-transf-bnd-001"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-002",
+    "entityIds": [
+      "ex:fix-transf-bnd-002"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-003",
+    "entityIds": [
+      "ex:fix-transf-bnd-003"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-004",
+    "entityIds": [
+      "ex:fix-transf-bnd-004"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-005",
+    "entityIds": [
+      "ex:fix-transf-bnd-005"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-006",
+    "entityIds": [
+      "ex:fix-transf-bnd-006"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-007",
+    "entityIds": [
+      "ex:fix-transf-bnd-007"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-008",
+    "entityIds": [
+      "ex:fix-transf-bnd-008"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-009",
+    "entityIds": [
+      "ex:fix-transf-bnd-009"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-010",
+    "entityIds": [
+      "ex:fix-transf-bnd-010"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-011",
+    "entityIds": [
+      "ex:fix-transf-bnd-011"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-012",
+    "entityIds": [
+      "ex:fix-transf-bnd-012"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-013",
+    "entityIds": [
+      "ex:fix-transf-bnd-013"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-014",
+    "entityIds": [
+      "ex:fix-transf-bnd-014"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-015",
+    "entityIds": [
+      "ex:fix-transf-bnd-015"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-016",
+    "entityIds": [
+      "ex:fix-transf-bnd-016"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-017",
+    "entityIds": [
+      "ex:fix-transf-bnd-017"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-018",
+    "entityIds": [
+      "ex:fix-transf-bnd-018"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-019",
+    "entityIds": [
+      "ex:fix-transf-bnd-019"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-BOUNDARY-020",
+    "entityIds": [
+      "ex:fix-transf-bnd-020"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-Estado-Lotacao"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Caso de fronteira avaliando estados adjacentes e lotação departamental em transição."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-001",
+    "entityIds": [
+      "ex:fix-transf-multi-001"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-002",
+    "entityIds": [
+      "ex:fix-transf-multi-002"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-003",
+    "entityIds": [
+      "ex:fix-transf-multi-003"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-004",
+    "entityIds": [
+      "ex:fix-transf-multi-004"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-005",
+    "entityIds": [
+      "ex:fix-transf-multi-005"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-006",
+    "entityIds": [
+      "ex:fix-transf-multi-006"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-007",
+    "entityIds": [
+      "ex:fix-transf-multi-007"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-008",
+    "entityIds": [
+      "ex:fix-transf-multi-008"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-009",
+    "entityIds": [
+      "ex:fix-transf-multi-009"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-010",
+    "entityIds": [
+      "ex:fix-transf-multi-010"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-011",
+    "entityIds": [
+      "ex:fix-transf-multi-011"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-012",
+    "entityIds": [
+      "ex:fix-transf-multi-012"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-013",
+    "entityIds": [
+      "ex:fix-transf-multi-013"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-014",
+    "entityIds": [
+      "ex:fix-transf-multi-014"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-015",
+    "entityIds": [
+      "ex:fix-transf-multi-015"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-016",
+    "entityIds": [
+      "ex:fix-transf-multi-016"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-017",
+    "entityIds": [
+      "ex:fix-transf-multi-017"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-018",
+    "entityIds": [
+      "ex:fix-transf-multi-018"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-019",
+    "entityIds": [
+      "ex:fix-transf-multi-019"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-TRANSF-MULTIRULE-020",
+    "entityIds": [
+      "ex:fix-transf-multi-020"
+    ],
+    "operation": "TransferenciaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:TransferenciaShape",
+      "ex:TransferenciaCompatibilidadeOrganizacionalShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Estado-Segregacao-Lotacao"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Combinação simultânea de regras de estado de ativo, segregação de funções e compatibilidade organizacional."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-001",
+    "entityIds": [
+      "ex:fix-baixa-v-001"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-002",
+    "entityIds": [
+      "ex:fix-baixa-v-002"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-003",
+    "entityIds": [
+      "ex:fix-baixa-v-003"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-004",
+    "entityIds": [
+      "ex:fix-baixa-v-004"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-005",
+    "entityIds": [
+      "ex:fix-baixa-v-005"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-006",
+    "entityIds": [
+      "ex:fix-baixa-v-006"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-007",
+    "entityIds": [
+      "ex:fix-baixa-v-007"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-008",
+    "entityIds": [
+      "ex:fix-baixa-v-008"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-009",
+    "entityIds": [
+      "ex:fix-baixa-v-009"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-010",
+    "entityIds": [
+      "ex:fix-baixa-v-010"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-011",
+    "entityIds": [
+      "ex:fix-baixa-v-011"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-012",
+    "entityIds": [
+      "ex:fix-baixa-v-012"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-013",
+    "entityIds": [
+      "ex:fix-baixa-v-013"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-014",
+    "entityIds": [
+      "ex:fix-baixa-v-014"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-015",
+    "entityIds": [
+      "ex:fix-baixa-v-015"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-016",
+    "entityIds": [
+      "ex:fix-baixa-v-016"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-017",
+    "entityIds": [
+      "ex:fix-baixa-v-017"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-018",
+    "entityIds": [
+      "ex:fix-baixa-v-018"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-019",
+    "entityIds": [
+      "ex:fix-baixa-v-019"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-020",
+    "entityIds": [
+      "ex:fix-baixa-v-020"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-021",
+    "entityIds": [
+      "ex:fix-baixa-v-021"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-022",
+    "entityIds": [
+      "ex:fix-baixa-v-022"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-023",
+    "entityIds": [
+      "ex:fix-baixa-v-023"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-024",
+    "entityIds": [
+      "ex:fix-baixa-v-024"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-025",
+    "entityIds": [
+      "ex:fix-baixa-v-025"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-026",
+    "entityIds": [
+      "ex:fix-baixa-v-026"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-027",
+    "entityIds": [
+      "ex:fix-baixa-v-027"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-028",
+    "entityIds": [
+      "ex:fix-baixa-v-028"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-029",
+    "entityIds": [
+      "ex:fix-baixa-v-029"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-030",
+    "entityIds": [
+      "ex:fix-baixa-v-030"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-031",
+    "entityIds": [
+      "ex:fix-baixa-v-031"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-032",
+    "entityIds": [
+      "ex:fix-baixa-v-032"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-033",
+    "entityIds": [
+      "ex:fix-baixa-v-033"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-034",
+    "entityIds": [
+      "ex:fix-baixa-v-034"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-035",
+    "entityIds": [
+      "ex:fix-baixa-v-035"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-036",
+    "entityIds": [
+      "ex:fix-baixa-v-036"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-037",
+    "entityIds": [
+      "ex:fix-baixa-v-037"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-038",
+    "entityIds": [
+      "ex:fix-baixa-v-038"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-039",
+    "entityIds": [
+      "ex:fix-baixa-v-039"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-VALID-040",
+    "entityIds": [
+      "ex:fix-baixa-v-040"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Baixa-Motivo",
+      "Regra-Baixa-ValorResidualLaudo"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Baixa válida com motivo justificado e laudo técnico para valor residual positivo."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-001",
+    "entityIds": [
+      "ex:fix-baixa-inv-001"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa sem motivo obrigatório."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-002",
+    "entityIds": [
+      "ex:fix-baixa-inv-002"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa com valor residual positivo sem laudo técnico de descarte."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-003",
+    "entityIds": [
+      "ex:fix-baixa-inv-003"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Ativo já baixado não pode sofrer nova baixa."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-004",
+    "entityIds": [
+      "ex:fix-baixa-inv-004"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa sem motivo obrigatório."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-005",
+    "entityIds": [
+      "ex:fix-baixa-inv-005"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa com valor residual positivo sem laudo técnico de descarte."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-006",
+    "entityIds": [
+      "ex:fix-baixa-inv-006"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Ativo já baixado não pode sofrer nova baixa."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-007",
+    "entityIds": [
+      "ex:fix-baixa-inv-007"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa sem motivo obrigatório."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-008",
+    "entityIds": [
+      "ex:fix-baixa-inv-008"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa com valor residual positivo sem laudo técnico de descarte."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-009",
+    "entityIds": [
+      "ex:fix-baixa-inv-009"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Ativo já baixado não pode sofrer nova baixa."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-010",
+    "entityIds": [
+      "ex:fix-baixa-inv-010"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa sem motivo obrigatório."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-011",
+    "entityIds": [
+      "ex:fix-baixa-inv-011"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa com valor residual positivo sem laudo técnico de descarte."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-012",
+    "entityIds": [
+      "ex:fix-baixa-inv-012"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Ativo já baixado não pode sofrer nova baixa."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-013",
+    "entityIds": [
+      "ex:fix-baixa-inv-013"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa sem motivo obrigatório."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-014",
+    "entityIds": [
+      "ex:fix-baixa-inv-014"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa com valor residual positivo sem laudo técnico de descarte."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-015",
+    "entityIds": [
+      "ex:fix-baixa-inv-015"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Ativo já baixado não pode sofrer nova baixa."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-016",
+    "entityIds": [
+      "ex:fix-baixa-inv-016"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa sem motivo obrigatório."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-017",
+    "entityIds": [
+      "ex:fix-baixa-inv-017"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa com valor residual positivo sem laudo técnico de descarte."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-018",
+    "entityIds": [
+      "ex:fix-baixa-inv-018"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Ativo já baixado não pode sofrer nova baixa."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-019",
+    "entityIds": [
+      "ex:fix-baixa-inv-019"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa sem motivo obrigatório."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-020",
+    "entityIds": [
+      "ex:fix-baixa-inv-020"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa com valor residual positivo sem laudo técnico de descarte."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-021",
+    "entityIds": [
+      "ex:fix-baixa-inv-021"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Ativo já baixado não pode sofrer nova baixa."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-022",
+    "entityIds": [
+      "ex:fix-baixa-inv-022"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa sem motivo obrigatório."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-023",
+    "entityIds": [
+      "ex:fix-baixa-inv-023"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa com valor residual positivo sem laudo técnico de descarte."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-024",
+    "entityIds": [
+      "ex:fix-baixa-inv-024"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Ativo já baixado não pode sofrer nova baixa."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-025",
+    "entityIds": [
+      "ex:fix-baixa-inv-025"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa sem motivo obrigatório."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-026",
+    "entityIds": [
+      "ex:fix-baixa-inv-026"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa com valor residual positivo sem laudo técnico de descarte."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-027",
+    "entityIds": [
+      "ex:fix-baixa-inv-027"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Ativo já baixado não pode sofrer nova baixa."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-028",
+    "entityIds": [
+      "ex:fix-baixa-inv-028"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa sem motivo obrigatório."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-029",
+    "entityIds": [
+      "ex:fix-baixa-inv-029"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Baixa com valor residual positivo sem laudo técnico de descarte."
+  },
+  {
+    "caseId": "CASE-BAIXA-INVALID-030",
+    "entityIds": [
+      "ex:fix-baixa-inv-030"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape"
+    ],
+    "expectedRules": [
+      "Regra-Restricao-Baixa"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Ativo já baixado não pode sofrer nova baixa."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-001",
+    "entityIds": [
+      "ex:fix-baixa-bnd-001"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-002",
+    "entityIds": [
+      "ex:fix-baixa-bnd-002"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-003",
+    "entityIds": [
+      "ex:fix-baixa-bnd-003"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-004",
+    "entityIds": [
+      "ex:fix-baixa-bnd-004"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-005",
+    "entityIds": [
+      "ex:fix-baixa-bnd-005"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-006",
+    "entityIds": [
+      "ex:fix-baixa-bnd-006"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-007",
+    "entityIds": [
+      "ex:fix-baixa-bnd-007"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-008",
+    "entityIds": [
+      "ex:fix-baixa-bnd-008"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-009",
+    "entityIds": [
+      "ex:fix-baixa-bnd-009"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-010",
+    "entityIds": [
+      "ex:fix-baixa-bnd-010"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-011",
+    "entityIds": [
+      "ex:fix-baixa-bnd-011"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-012",
+    "entityIds": [
+      "ex:fix-baixa-bnd-012"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-013",
+    "entityIds": [
+      "ex:fix-baixa-bnd-013"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-014",
+    "entityIds": [
+      "ex:fix-baixa-bnd-014"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-015",
+    "entityIds": [
+      "ex:fix-baixa-bnd-015"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-016",
+    "entityIds": [
+      "ex:fix-baixa-bnd-016"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-017",
+    "entityIds": [
+      "ex:fix-baixa-bnd-017"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-018",
+    "entityIds": [
+      "ex:fix-baixa-bnd-018"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-019",
+    "entityIds": [
+      "ex:fix-baixa-bnd-019"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_VALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-BOUNDARY-020",
+    "entityIds": [
+      "ex:fix-baixa-bnd-020"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "BOUNDARY_INVALID",
+    "expectedShapes": [
+      "ex:BaixaValorResidualShape"
+    ],
+    "expectedRules": [
+      "Regra-Fronteira-ValorResidual-Zero"
+    ],
+    "caseType": "BOUNDARY_INVALID",
+    "complexity": "BOUNDARY",
+    "description": "Fronteira contábil exata entre valor residual nulo e valor residual positivo sem laudo."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-001",
+    "entityIds": [
+      "ex:fix-baixa-multi-001"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-002",
+    "entityIds": [
+      "ex:fix-baixa-multi-002"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape",
+      "ex:BaixaAltoValorAprovacaoShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-003",
+    "entityIds": [
+      "ex:fix-baixa-multi-003"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-004",
+    "entityIds": [
+      "ex:fix-baixa-multi-004"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape",
+      "ex:BaixaAltoValorAprovacaoShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-005",
+    "entityIds": [
+      "ex:fix-baixa-multi-005"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-006",
+    "entityIds": [
+      "ex:fix-baixa-multi-006"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape",
+      "ex:BaixaAltoValorAprovacaoShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-007",
+    "entityIds": [
+      "ex:fix-baixa-multi-007"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-008",
+    "entityIds": [
+      "ex:fix-baixa-multi-008"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape",
+      "ex:BaixaAltoValorAprovacaoShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-009",
+    "entityIds": [
+      "ex:fix-baixa-multi-009"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-010",
+    "entityIds": [
+      "ex:fix-baixa-multi-010"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape",
+      "ex:BaixaAltoValorAprovacaoShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-011",
+    "entityIds": [
+      "ex:fix-baixa-multi-011"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-012",
+    "entityIds": [
+      "ex:fix-baixa-multi-012"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape",
+      "ex:BaixaAltoValorAprovacaoShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-013",
+    "entityIds": [
+      "ex:fix-baixa-multi-013"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-014",
+    "entityIds": [
+      "ex:fix-baixa-multi-014"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape",
+      "ex:BaixaAltoValorAprovacaoShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-015",
+    "entityIds": [
+      "ex:fix-baixa-multi-015"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-016",
+    "entityIds": [
+      "ex:fix-baixa-multi-016"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape",
+      "ex:BaixaAltoValorAprovacaoShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-017",
+    "entityIds": [
+      "ex:fix-baixa-multi-017"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-018",
+    "entityIds": [
+      "ex:fix-baixa-multi-018"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape",
+      "ex:BaixaAltoValorAprovacaoShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-019",
+    "entityIds": [
+      "ex:fix-baixa-multi-019"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_VALID",
+    "expectedShapes": [],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_VALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-BAIXA-MULTIRULE-020",
+    "entityIds": [
+      "ex:fix-baixa-multi-020"
+    ],
+    "operation": "BaixaAtivo",
+    "expectedSemanticStatus": "MULTI_RULE_INVALID",
+    "expectedShapes": [
+      "ex:BaixaShape",
+      "ex:BaixaValorResidualShape",
+      "ex:BaixaAltoValorAprovacaoShape"
+    ],
+    "expectedRules": [
+      "Regra-Multi-Baixa-Residual-Alcada"
+    ],
+    "caseType": "MULTI_RULE_INVALID",
+    "complexity": "MULTI_RULE",
+    "description": "Interação de regras de estado de ativo, laudo de valor residual e alçada formal para alto valor (> R$ 10.000)."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-V-01",
+    "entityIds": [
+      "ex:fix-alocacaousuario-v-01"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação AlocacaoUsuario sob ex:AlocacaoUsuarioShape."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-INV-01",
+    "entityIds": [
+      "ex:fix-alocacaousuario-inv-01"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:AlocacaoUsuarioShape na operação AlocacaoUsuario."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-V-02",
+    "entityIds": [
+      "ex:fix-alocacaousuario-v-02"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação AlocacaoUsuario sob ex:AlocacaoUsuarioShape."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-INV-02",
+    "entityIds": [
+      "ex:fix-alocacaousuario-inv-02"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:AlocacaoUsuarioShape na operação AlocacaoUsuario."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-V-03",
+    "entityIds": [
+      "ex:fix-alocacaousuario-v-03"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação AlocacaoUsuario sob ex:AlocacaoUsuarioShape."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-INV-03",
+    "entityIds": [
+      "ex:fix-alocacaousuario-inv-03"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:AlocacaoUsuarioShape na operação AlocacaoUsuario."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-V-04",
+    "entityIds": [
+      "ex:fix-alocacaousuario-v-04"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação AlocacaoUsuario sob ex:AlocacaoUsuarioShape."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-INV-04",
+    "entityIds": [
+      "ex:fix-alocacaousuario-inv-04"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:AlocacaoUsuarioShape na operação AlocacaoUsuario."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-V-05",
+    "entityIds": [
+      "ex:fix-alocacaousuario-v-05"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação AlocacaoUsuario sob ex:AlocacaoUsuarioShape."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-INV-05",
+    "entityIds": [
+      "ex:fix-alocacaousuario-inv-05"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:AlocacaoUsuarioShape na operação AlocacaoUsuario."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-V-06",
+    "entityIds": [
+      "ex:fix-alocacaousuario-v-06"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação AlocacaoUsuario sob ex:AlocacaoUsuarioShape."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-INV-06",
+    "entityIds": [
+      "ex:fix-alocacaousuario-inv-06"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:AlocacaoUsuarioShape na operação AlocacaoUsuario."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-V-07",
+    "entityIds": [
+      "ex:fix-alocacaousuario-v-07"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação AlocacaoUsuario sob ex:AlocacaoUsuarioShape."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-INV-07",
+    "entityIds": [
+      "ex:fix-alocacaousuario-inv-07"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:AlocacaoUsuarioShape na operação AlocacaoUsuario."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-V-08",
+    "entityIds": [
+      "ex:fix-alocacaousuario-v-08"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação AlocacaoUsuario sob ex:AlocacaoUsuarioShape."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-INV-08",
+    "entityIds": [
+      "ex:fix-alocacaousuario-inv-08"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:AlocacaoUsuarioShape na operação AlocacaoUsuario."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-V-09",
+    "entityIds": [
+      "ex:fix-alocacaousuario-v-09"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação AlocacaoUsuario sob ex:AlocacaoUsuarioShape."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-INV-09",
+    "entityIds": [
+      "ex:fix-alocacaousuario-inv-09"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:AlocacaoUsuarioShape na operação AlocacaoUsuario."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-V-10",
+    "entityIds": [
+      "ex:fix-alocacaousuario-v-10"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação AlocacaoUsuario sob ex:AlocacaoUsuarioShape."
+  },
+  {
+    "caseId": "CASE-ALOCACAOUSUARIO-INV-10",
+    "entityIds": [
+      "ex:fix-alocacaousuario-inv-10"
+    ],
+    "operation": "AlocacaoUsuario",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:AlocacaoUsuarioShape"
+    ],
+    "expectedRules": [
+      "Regra-AlocacaoUsuario-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:AlocacaoUsuarioShape na operação AlocacaoUsuario."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-V-01",
+    "entityIds": [
+      "ex:fix-reservaativo-v-01"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ReservaAtivo sob ex:ReservaAtivoShape."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-INV-01",
+    "entityIds": [
+      "ex:fix-reservaativo-inv-01"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ReservaAtivoShape na operação ReservaAtivo."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-V-02",
+    "entityIds": [
+      "ex:fix-reservaativo-v-02"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ReservaAtivo sob ex:ReservaAtivoShape."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-INV-02",
+    "entityIds": [
+      "ex:fix-reservaativo-inv-02"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ReservaAtivoShape na operação ReservaAtivo."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-V-03",
+    "entityIds": [
+      "ex:fix-reservaativo-v-03"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ReservaAtivo sob ex:ReservaAtivoShape."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-INV-03",
+    "entityIds": [
+      "ex:fix-reservaativo-inv-03"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ReservaAtivoShape na operação ReservaAtivo."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-V-04",
+    "entityIds": [
+      "ex:fix-reservaativo-v-04"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ReservaAtivo sob ex:ReservaAtivoShape."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-INV-04",
+    "entityIds": [
+      "ex:fix-reservaativo-inv-04"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ReservaAtivoShape na operação ReservaAtivo."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-V-05",
+    "entityIds": [
+      "ex:fix-reservaativo-v-05"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ReservaAtivo sob ex:ReservaAtivoShape."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-INV-05",
+    "entityIds": [
+      "ex:fix-reservaativo-inv-05"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ReservaAtivoShape na operação ReservaAtivo."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-V-06",
+    "entityIds": [
+      "ex:fix-reservaativo-v-06"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ReservaAtivo sob ex:ReservaAtivoShape."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-INV-06",
+    "entityIds": [
+      "ex:fix-reservaativo-inv-06"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ReservaAtivoShape na operação ReservaAtivo."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-V-07",
+    "entityIds": [
+      "ex:fix-reservaativo-v-07"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ReservaAtivo sob ex:ReservaAtivoShape."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-INV-07",
+    "entityIds": [
+      "ex:fix-reservaativo-inv-07"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ReservaAtivoShape na operação ReservaAtivo."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-V-08",
+    "entityIds": [
+      "ex:fix-reservaativo-v-08"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ReservaAtivo sob ex:ReservaAtivoShape."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-INV-08",
+    "entityIds": [
+      "ex:fix-reservaativo-inv-08"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ReservaAtivoShape na operação ReservaAtivo."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-V-09",
+    "entityIds": [
+      "ex:fix-reservaativo-v-09"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ReservaAtivo sob ex:ReservaAtivoShape."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-INV-09",
+    "entityIds": [
+      "ex:fix-reservaativo-inv-09"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ReservaAtivoShape na operação ReservaAtivo."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-V-10",
+    "entityIds": [
+      "ex:fix-reservaativo-v-10"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ReservaAtivo sob ex:ReservaAtivoShape."
+  },
+  {
+    "caseId": "CASE-RESERVAATIVO-INV-10",
+    "entityIds": [
+      "ex:fix-reservaativo-inv-10"
+    ],
+    "operation": "ReservaAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ReservaAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-ReservaAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ReservaAtivoShape na operação ReservaAtivo."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-V-01",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-v-01"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação InicioManutencao sob ex:InicioManutencaoShape."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-INV-01",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-inv-01"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:InicioManutencaoShape na operação InicioManutencao."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-V-02",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-v-02"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação InicioManutencao sob ex:InicioManutencaoShape."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-INV-02",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-inv-02"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:InicioManutencaoShape na operação InicioManutencao."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-V-03",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-v-03"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação InicioManutencao sob ex:InicioManutencaoShape."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-INV-03",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-inv-03"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:InicioManutencaoShape na operação InicioManutencao."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-V-04",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-v-04"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação InicioManutencao sob ex:InicioManutencaoShape."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-INV-04",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-inv-04"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:InicioManutencaoShape na operação InicioManutencao."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-V-05",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-v-05"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação InicioManutencao sob ex:InicioManutencaoShape."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-INV-05",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-inv-05"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:InicioManutencaoShape na operação InicioManutencao."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-V-06",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-v-06"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação InicioManutencao sob ex:InicioManutencaoShape."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-INV-06",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-inv-06"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:InicioManutencaoShape na operação InicioManutencao."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-V-07",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-v-07"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação InicioManutencao sob ex:InicioManutencaoShape."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-INV-07",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-inv-07"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:InicioManutencaoShape na operação InicioManutencao."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-V-08",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-v-08"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação InicioManutencao sob ex:InicioManutencaoShape."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-INV-08",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-inv-08"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:InicioManutencaoShape na operação InicioManutencao."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-V-09",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-v-09"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação InicioManutencao sob ex:InicioManutencaoShape."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-INV-09",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-inv-09"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:InicioManutencaoShape na operação InicioManutencao."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-V-10",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-v-10"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação InicioManutencao sob ex:InicioManutencaoShape."
+  },
+  {
+    "caseId": "CASE-INICIOMANUTENCAO-INV-10",
+    "entityIds": [
+      "ex:fix-iniciomanutencao-inv-10"
+    ],
+    "operation": "InicioManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:InicioManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-InicioManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:InicioManutencaoShape na operação InicioManutencao."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-V-01",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-v-01"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ConclusaoManutencao sob ex:ConclusaoManutencaoShape."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-INV-01",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-inv-01"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ConclusaoManutencaoShape na operação ConclusaoManutencao."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-V-02",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-v-02"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ConclusaoManutencao sob ex:ConclusaoManutencaoShape."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-INV-02",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-inv-02"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ConclusaoManutencaoShape na operação ConclusaoManutencao."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-V-03",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-v-03"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ConclusaoManutencao sob ex:ConclusaoManutencaoShape."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-INV-03",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-inv-03"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ConclusaoManutencaoShape na operação ConclusaoManutencao."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-V-04",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-v-04"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ConclusaoManutencao sob ex:ConclusaoManutencaoShape."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-INV-04",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-inv-04"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ConclusaoManutencaoShape na operação ConclusaoManutencao."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-V-05",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-v-05"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ConclusaoManutencao sob ex:ConclusaoManutencaoShape."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-INV-05",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-inv-05"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ConclusaoManutencaoShape na operação ConclusaoManutencao."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-V-06",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-v-06"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ConclusaoManutencao sob ex:ConclusaoManutencaoShape."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-INV-06",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-inv-06"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ConclusaoManutencaoShape na operação ConclusaoManutencao."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-V-07",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-v-07"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ConclusaoManutencao sob ex:ConclusaoManutencaoShape."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-INV-07",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-inv-07"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ConclusaoManutencaoShape na operação ConclusaoManutencao."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-V-08",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-v-08"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ConclusaoManutencao sob ex:ConclusaoManutencaoShape."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-INV-08",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-inv-08"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ConclusaoManutencaoShape na operação ConclusaoManutencao."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-V-09",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-v-09"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ConclusaoManutencao sob ex:ConclusaoManutencaoShape."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-INV-09",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-inv-09"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ConclusaoManutencaoShape na operação ConclusaoManutencao."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-V-10",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-v-10"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação ConclusaoManutencao sob ex:ConclusaoManutencaoShape."
+  },
+  {
+    "caseId": "CASE-CONCLUSAOMANUTENCAO-INV-10",
+    "entityIds": [
+      "ex:fix-conclusaomanutencao-inv-10"
+    ],
+    "operation": "ConclusaoManutencao",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:ConclusaoManutencaoShape"
+    ],
+    "expectedRules": [
+      "Regra-ConclusaoManutencao-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:ConclusaoManutencaoShape na operação ConclusaoManutencao."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-V-01",
+    "entityIds": [
+      "ex:fix-envioativo-v-01"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação EnvioAtivo sob ex:EnvioAtivoShape."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-INV-01",
+    "entityIds": [
+      "ex:fix-envioativo-inv-01"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:EnvioAtivoShape na operação EnvioAtivo."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-V-02",
+    "entityIds": [
+      "ex:fix-envioativo-v-02"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação EnvioAtivo sob ex:EnvioAtivoShape."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-INV-02",
+    "entityIds": [
+      "ex:fix-envioativo-inv-02"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:EnvioAtivoShape na operação EnvioAtivo."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-V-03",
+    "entityIds": [
+      "ex:fix-envioativo-v-03"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação EnvioAtivo sob ex:EnvioAtivoShape."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-INV-03",
+    "entityIds": [
+      "ex:fix-envioativo-inv-03"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:EnvioAtivoShape na operação EnvioAtivo."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-V-04",
+    "entityIds": [
+      "ex:fix-envioativo-v-04"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação EnvioAtivo sob ex:EnvioAtivoShape."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-INV-04",
+    "entityIds": [
+      "ex:fix-envioativo-inv-04"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:EnvioAtivoShape na operação EnvioAtivo."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-V-05",
+    "entityIds": [
+      "ex:fix-envioativo-v-05"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação EnvioAtivo sob ex:EnvioAtivoShape."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-INV-05",
+    "entityIds": [
+      "ex:fix-envioativo-inv-05"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:EnvioAtivoShape na operação EnvioAtivo."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-V-06",
+    "entityIds": [
+      "ex:fix-envioativo-v-06"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação EnvioAtivo sob ex:EnvioAtivoShape."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-INV-06",
+    "entityIds": [
+      "ex:fix-envioativo-inv-06"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:EnvioAtivoShape na operação EnvioAtivo."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-V-07",
+    "entityIds": [
+      "ex:fix-envioativo-v-07"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação EnvioAtivo sob ex:EnvioAtivoShape."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-INV-07",
+    "entityIds": [
+      "ex:fix-envioativo-inv-07"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:EnvioAtivoShape na operação EnvioAtivo."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-V-08",
+    "entityIds": [
+      "ex:fix-envioativo-v-08"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação EnvioAtivo sob ex:EnvioAtivoShape."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-INV-08",
+    "entityIds": [
+      "ex:fix-envioativo-inv-08"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:EnvioAtivoShape na operação EnvioAtivo."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-V-09",
+    "entityIds": [
+      "ex:fix-envioativo-v-09"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação EnvioAtivo sob ex:EnvioAtivoShape."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-INV-09",
+    "entityIds": [
+      "ex:fix-envioativo-inv-09"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:EnvioAtivoShape na operação EnvioAtivo."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-V-10",
+    "entityIds": [
+      "ex:fix-envioativo-v-10"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação EnvioAtivo sob ex:EnvioAtivoShape."
+  },
+  {
+    "caseId": "CASE-ENVIOATIVO-INV-10",
+    "entityIds": [
+      "ex:fix-envioativo-inv-10"
+    ],
+    "operation": "EnvioAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:EnvioAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-EnvioAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:EnvioAtivoShape na operação EnvioAtivo."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-V-01",
+    "entityIds": [
+      "ex:fix-recebimentoativo-v-01"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecebimentoAtivo sob ex:RecebimentoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-INV-01",
+    "entityIds": [
+      "ex:fix-recebimentoativo-inv-01"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecebimentoAtivoShape na operação RecebimentoAtivo."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-V-02",
+    "entityIds": [
+      "ex:fix-recebimentoativo-v-02"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecebimentoAtivo sob ex:RecebimentoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-INV-02",
+    "entityIds": [
+      "ex:fix-recebimentoativo-inv-02"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecebimentoAtivoShape na operação RecebimentoAtivo."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-V-03",
+    "entityIds": [
+      "ex:fix-recebimentoativo-v-03"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecebimentoAtivo sob ex:RecebimentoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-INV-03",
+    "entityIds": [
+      "ex:fix-recebimentoativo-inv-03"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecebimentoAtivoShape na operação RecebimentoAtivo."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-V-04",
+    "entityIds": [
+      "ex:fix-recebimentoativo-v-04"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecebimentoAtivo sob ex:RecebimentoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-INV-04",
+    "entityIds": [
+      "ex:fix-recebimentoativo-inv-04"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecebimentoAtivoShape na operação RecebimentoAtivo."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-V-05",
+    "entityIds": [
+      "ex:fix-recebimentoativo-v-05"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecebimentoAtivo sob ex:RecebimentoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-INV-05",
+    "entityIds": [
+      "ex:fix-recebimentoativo-inv-05"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecebimentoAtivoShape na operação RecebimentoAtivo."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-V-06",
+    "entityIds": [
+      "ex:fix-recebimentoativo-v-06"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecebimentoAtivo sob ex:RecebimentoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-INV-06",
+    "entityIds": [
+      "ex:fix-recebimentoativo-inv-06"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecebimentoAtivoShape na operação RecebimentoAtivo."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-V-07",
+    "entityIds": [
+      "ex:fix-recebimentoativo-v-07"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecebimentoAtivo sob ex:RecebimentoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-INV-07",
+    "entityIds": [
+      "ex:fix-recebimentoativo-inv-07"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecebimentoAtivoShape na operação RecebimentoAtivo."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-V-08",
+    "entityIds": [
+      "ex:fix-recebimentoativo-v-08"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecebimentoAtivo sob ex:RecebimentoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-INV-08",
+    "entityIds": [
+      "ex:fix-recebimentoativo-inv-08"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecebimentoAtivoShape na operação RecebimentoAtivo."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-V-09",
+    "entityIds": [
+      "ex:fix-recebimentoativo-v-09"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecebimentoAtivo sob ex:RecebimentoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-INV-09",
+    "entityIds": [
+      "ex:fix-recebimentoativo-inv-09"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecebimentoAtivoShape na operação RecebimentoAtivo."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-V-10",
+    "entityIds": [
+      "ex:fix-recebimentoativo-v-10"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecebimentoAtivo sob ex:RecebimentoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECEBIMENTOATIVO-INV-10",
+    "entityIds": [
+      "ex:fix-recebimentoativo-inv-10"
+    ],
+    "operation": "RecebimentoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecebimentoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecebimentoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecebimentoAtivoShape na operação RecebimentoAtivo."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-V-01",
+    "entityIds": [
+      "ex:fix-registroextravio-v-01"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RegistroExtravio sob ex:RegistroExtravioShape."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-INV-01",
+    "entityIds": [
+      "ex:fix-registroextravio-inv-01"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RegistroExtravioShape na operação RegistroExtravio."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-V-02",
+    "entityIds": [
+      "ex:fix-registroextravio-v-02"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RegistroExtravio sob ex:RegistroExtravioShape."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-INV-02",
+    "entityIds": [
+      "ex:fix-registroextravio-inv-02"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RegistroExtravioShape na operação RegistroExtravio."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-V-03",
+    "entityIds": [
+      "ex:fix-registroextravio-v-03"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RegistroExtravio sob ex:RegistroExtravioShape."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-INV-03",
+    "entityIds": [
+      "ex:fix-registroextravio-inv-03"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RegistroExtravioShape na operação RegistroExtravio."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-V-04",
+    "entityIds": [
+      "ex:fix-registroextravio-v-04"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RegistroExtravio sob ex:RegistroExtravioShape."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-INV-04",
+    "entityIds": [
+      "ex:fix-registroextravio-inv-04"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RegistroExtravioShape na operação RegistroExtravio."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-V-05",
+    "entityIds": [
+      "ex:fix-registroextravio-v-05"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RegistroExtravio sob ex:RegistroExtravioShape."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-INV-05",
+    "entityIds": [
+      "ex:fix-registroextravio-inv-05"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RegistroExtravioShape na operação RegistroExtravio."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-V-06",
+    "entityIds": [
+      "ex:fix-registroextravio-v-06"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RegistroExtravio sob ex:RegistroExtravioShape."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-INV-06",
+    "entityIds": [
+      "ex:fix-registroextravio-inv-06"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RegistroExtravioShape na operação RegistroExtravio."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-V-07",
+    "entityIds": [
+      "ex:fix-registroextravio-v-07"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RegistroExtravio sob ex:RegistroExtravioShape."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-INV-07",
+    "entityIds": [
+      "ex:fix-registroextravio-inv-07"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RegistroExtravioShape na operação RegistroExtravio."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-V-08",
+    "entityIds": [
+      "ex:fix-registroextravio-v-08"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RegistroExtravio sob ex:RegistroExtravioShape."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-INV-08",
+    "entityIds": [
+      "ex:fix-registroextravio-inv-08"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RegistroExtravioShape na operação RegistroExtravio."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-V-09",
+    "entityIds": [
+      "ex:fix-registroextravio-v-09"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RegistroExtravio sob ex:RegistroExtravioShape."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-INV-09",
+    "entityIds": [
+      "ex:fix-registroextravio-inv-09"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RegistroExtravioShape na operação RegistroExtravio."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-V-10",
+    "entityIds": [
+      "ex:fix-registroextravio-v-10"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RegistroExtravio sob ex:RegistroExtravioShape."
+  },
+  {
+    "caseId": "CASE-REGISTROEXTRAVIO-INV-10",
+    "entityIds": [
+      "ex:fix-registroextravio-inv-10"
+    ],
+    "operation": "RegistroExtravio",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RegistroExtravioShape"
+    ],
+    "expectedRules": [
+      "Regra-RegistroExtravio-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RegistroExtravioShape na operação RegistroExtravio."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-V-01",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-v-01"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecuperacaoAtivo sob ex:RecuperacaoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-INV-01",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-inv-01"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecuperacaoAtivoShape na operação RecuperacaoAtivo."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-V-02",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-v-02"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecuperacaoAtivo sob ex:RecuperacaoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-INV-02",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-inv-02"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecuperacaoAtivoShape na operação RecuperacaoAtivo."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-V-03",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-v-03"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecuperacaoAtivo sob ex:RecuperacaoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-INV-03",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-inv-03"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecuperacaoAtivoShape na operação RecuperacaoAtivo."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-V-04",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-v-04"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecuperacaoAtivo sob ex:RecuperacaoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-INV-04",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-inv-04"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecuperacaoAtivoShape na operação RecuperacaoAtivo."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-V-05",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-v-05"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecuperacaoAtivo sob ex:RecuperacaoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-INV-05",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-inv-05"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecuperacaoAtivoShape na operação RecuperacaoAtivo."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-V-06",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-v-06"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecuperacaoAtivo sob ex:RecuperacaoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-INV-06",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-inv-06"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecuperacaoAtivoShape na operação RecuperacaoAtivo."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-V-07",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-v-07"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecuperacaoAtivo sob ex:RecuperacaoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-INV-07",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-inv-07"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecuperacaoAtivoShape na operação RecuperacaoAtivo."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-V-08",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-v-08"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecuperacaoAtivo sob ex:RecuperacaoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-INV-08",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-inv-08"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecuperacaoAtivoShape na operação RecuperacaoAtivo."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-V-09",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-v-09"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecuperacaoAtivo sob ex:RecuperacaoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-INV-09",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-inv-09"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecuperacaoAtivoShape na operação RecuperacaoAtivo."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-V-10",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-v-10"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "VALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Conforme"
+    ],
+    "caseType": "VALID",
+    "complexity": "STANDARD",
+    "description": "Instância conforme para teste da operação RecuperacaoAtivo sob ex:RecuperacaoAtivoShape."
+  },
+  {
+    "caseId": "CASE-RECUPERACAOATIVO-INV-10",
+    "entityIds": [
+      "ex:fix-recuperacaoativo-inv-10"
+    ],
+    "operation": "RecuperacaoAtivo",
+    "expectedSemanticStatus": "INVALID",
+    "expectedShapes": [
+      "ex:RecuperacaoAtivoShape"
+    ],
+    "expectedRules": [
+      "Regra-RecuperacaoAtivo-Violacao"
+    ],
+    "caseType": "INVALID",
+    "complexity": "STANDARD",
+    "description": "Instância violadora para teste da restrição ex:RecuperacaoAtivoShape na operação RecuperacaoAtivo."
+  }
+]
