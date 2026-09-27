@@ -7,6 +7,7 @@ import { promisify } from 'node:util';
 import { test } from 'node:test';
 import { criarSessaoWorktree, git, removerSessaoWorktree } from '../../dist/agents/codex/worktree.js';
 import { promoverSessao } from '../../dist/agents/codex/promotion.js';
+import { finalizeSession } from '../../dist/agents/codex/finalize.js';
 import { evaluateGovernance } from '../../dist/enforcement/governanceDecision.js';
 import { avaliarOperacoes } from '../../dist/enforcement/motorEnforcement.js';
 
@@ -179,6 +180,25 @@ test('Given an enforcement disable environment flag, When promotion is attempted
     else process.env.BSH_ENFORCEMENT = before;
     await f.cleanup();
   }
+});
+
+test('codex: Given consultative condition, When finalized, Then no semantic enforcement decision is created', async () => {
+  const f = await fixture();
+  try {
+    const result = await finalizeSession({
+      sessao: f.session, domain: 'generic', snapshot: { digest: 'fixture' },
+      alerts: [], tokenTotals: undefined, ontologyQueries: 0, harnessTokens: 0,
+      validarGates: gatesOk, consultative: true,
+    });
+    assert.equal(result.status, 'promovido');
+    assert.notEqual((await git(f.repo, ['rev-parse', 'HEAD'])).trim(), f.base);
+    const report = JSON.parse(await readFile(join(f.repo, '.bsh/local/sessions', `${f.session.id}.report.json`), 'utf8'));
+    assert.equal(report.sessionMode, 'CONSULTATIVE');
+    assert.equal(report.enforcementExecutado, false);
+    assert.equal(report.promovido, true);
+    assert.equal(report.origemAlterada, true);
+    await assert.rejects(readFile(join(f.repo, '.bsh/local/enforcement', `${f.session.id}.json`), 'utf8'));
+  } finally { await f.cleanup(); }
 });
 
 test('Given incomplete coverage, When promotion is attempted, Then relevant diff is not silently ignored', async () => {

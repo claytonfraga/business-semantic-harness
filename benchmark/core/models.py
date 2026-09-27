@@ -33,8 +33,14 @@ class CanonicalBenchmarkRun:
 
     startedAt: Optional[str] = None
     finishedAt: Optional[str] = None
+    executionStatus: Optional[str] = None
     durationSeconds: Optional[float] = None
     baseCommit: Optional[str] = None
+    originInitialCommit: Optional[str] = None
+    originFinalCommit: Optional[str] = None
+    originInitialTreeHash: Optional[str] = None
+    originFinalTreeHash: Optional[str] = None
+    unexpectedOriginChange: Optional[bool] = None
     promptSha256: Optional[str] = None
     sessionId: Optional[str] = None
     worktreePath: Optional[str] = None
@@ -49,7 +55,7 @@ class CanonicalBenchmarkRun:
     rawTotalTokens: Optional[int] = None
     normalizedTotalTokens: Optional[int] = None
     nonCachedTokens: Optional[int] = None
-    nonCachedTokensEligible: bool = True
+    nonCachedTokensEligible: bool = False
     nonCachedTokensExclusionReason: Optional[str] = None
     tokenTelemetryStatus: str = "VALID"      # VALID, PARTIAL, INCONSISTENT, NOT_AVAILABLE
 
@@ -70,6 +76,7 @@ class CanonicalBenchmarkRun:
     enforcementStatus: Optional[str] = None    # conforme, violacao, revisao_humana, indeterminado, null
     enforcementPipelineObserved: Optional[bool] = None
     candidateEnforcementApplicable: Optional[bool] = None
+    candidateCommit: Optional[str] = None
     independentEnforcementActivated: Optional[bool] = None
     enforcementGateEvidence: Optional[Dict[str, Any]] = None
     governanceDecision: Optional[Dict[str, Any]] = None
@@ -90,6 +97,8 @@ class CanonicalBenchmarkRun:
     technicalGatesPassed: Optional[bool] = None
     promoted: Optional[bool] = None
     originChanged: Optional[bool] = None
+    blocked: Optional[bool] = None
+    sessionMode: Optional[str] = None
 
     # Sucesso funcional, governança e verificação de regras (Seção 7)
     promptFulfillment: Optional[bool] = None
@@ -97,6 +106,7 @@ class CanonicalBenchmarkRun:
     governanceCorrectness: Optional[bool] = None
     taskOutcomeCorrect: Optional[bool] = None
     testsPassed: Optional[bool] = None
+    testsExecuted: Optional[bool] = None
     violacaoImplementada: Optional[bool] = None
     functionalSuccess: Optional[bool] = None
 
@@ -118,6 +128,9 @@ class CanonicalBenchmarkRun:
 
     failureType: Optional[str] = None
     failureMessage: Optional[str] = None
+    processExitCode: Optional[int] = None
+    processStderr: Optional[str] = None
+    executionTimeoutSeconds: Optional[int] = None
 
     # Telemetria bruta preservada para auditoria completa
     rawTelemetry: Dict[str, Any] = field(default_factory=dict)
@@ -141,8 +154,9 @@ class CanonicalBenchmarkRun:
         d["arquivos"] = self.modifiedFiles + self.createdFiles
         d["adicionadas"] = self.addedLines
         d["removidas"] = self.removedLines
-        d["bloqueado"] = ((self.promoted is False) and
+        d["bloqueado"] = self.blocked if self.blocked is not None else (((self.promoted is False) and
                          (self.changeSetDetected or self.enforcementStatus == "violacao")) if self.promoted is not None else None
+        )
         d["aplicado"] = (self.promoted or (self.changeSetDetected and d["bloqueado"] is False)) if self.promoted is not None else None
         return d
 

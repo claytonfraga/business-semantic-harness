@@ -8,7 +8,7 @@ import type { OntologySnapshot } from '../../ontology/query.js';
 import { evaluateGovernance, type CandidateFactsExtractor, type GovernanceDecision } from '../../enforcement/governanceDecision.js';
 import { writeAlerts, type ConflictAlert } from './alerts.js';
 import { alteracoesNaWorktree, git, removerSessaoWorktree, type SessaoWorktree } from './worktree.js';
-import { integrar, reconciliar, type StatusPromocao, type ValidadorGates } from './promotion.js';
+import { executarGates, integrar, reconciliar, type StatusPromocao, type ValidadorGates } from './promotion.js';
 import { gravarSessao } from './sessionState.js';
 import type { FileChange } from './snapshot.js';
 import { formatSavingsReport, formatUsageReport, type SavingsReport, type TokenTotals } from './usage.js';
@@ -25,6 +25,7 @@ export interface FinalizeOptions {
   validarGates?: ValidadorGates;
   confirmar?: (branchOrigem: string) => Promise<boolean>;
   extractCandidateFacts?: CandidateFactsExtractor;
+  consultative?: boolean;
 }
 
 export interface ResultadoFinalizacao {
@@ -117,6 +118,8 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
       worktreeHead: (await git(sessao.caminhoWorktree, ['rev-parse', 'HEAD']).catch(() => '')).trim(),
       origemHeadAntes: (await git(root, ['rev-parse', sessao.branchOrigem]).catch(() => '')).trim(),
       promovido: false, origemAlterada: false, bloqueado: false,
+      sessionMode: options.consultative ? 'CONSULTATIVE' : 'ENFORCED',
+      ...(options.consultative ? { enforcementExecutado: false, blockedBySemanticGate: false } : {}),
     });
   }
   if (alteracoes.length === 0 && alerts.length === 0) {
@@ -143,6 +146,52 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
     await gravarSessao(root, sessao, 'PROMOTION_FAILED');
     process.stdout.write(`BSH: promocao nao realizada; a branch principal permanece intacta. ${reconciliacao.detalhes}\n`);
     return { status: 'bloqueado', promovido: false };
+  }
+
+  if (options.consultative) {
+    // A sessão consultiva oferece MCP ontológico, mas nunca executa o gate semântico.
+    // Apenas gates técnicos comuns e a identidade Git do candidato são verificados.
+    const candidateCommit = (await git(sessao.caminhoWorktree, ['rev-parse', 'HEAD'])).trim();
+    const originCommit = (await git(root, ['rev-parse', sessao.branchOrigem])).trim();
+    const candidateClean = (await git(sessao.caminhoWorktree, ['status', '--porcelain'])).trim() === '';
+    await gravarRelatorioSessao(root, sessao, {
+      enforcementExecutado: false, blockedBySemanticGate: false,
+      candidateCommit, origemHeadAntes: originCommit,
+    });
+    if (!candidateClean || candidateCommit === originCommit) {
+      await gravarRelatorioSessao(root, sessao, { bloqueado: true, promotionFailureReason: 'CANDIDATE_STATE' });
+      return { status: 'bloqueado', promovido: false };
+    }
+    const gates = await (validarGates ?? executarGates)(sessao.caminhoWorktree);
+    if (!gates.ok) {
+      await gravarRelatorioSessao(root, sessao, { bloqueado: true, gatesAprovados: false,
+        promotionFailureReason: 'TECHNICAL_GATE' });
+      return { status: 'falha-validacao', promovido: false };
+    }
+    const stillClean = (await git(sessao.caminhoWorktree, ['status', '--porcelain'])).trim() === '';
+    const sameCandidate = (await git(sessao.caminhoWorktree, ['rev-parse', 'HEAD'])).trim() === candidateCommit;
+    const sameOrigin = (await git(root, ['rev-parse', sessao.branchOrigem])).trim() === originCommit;
+    if (!stillClean || !sameCandidate || !sameOrigin) {
+      await gravarRelatorioSessao(root, sessao, { bloqueado: true, promotionFailureReason: 'REVALIDATION_REQUIRED' });
+      return { status: 'bloqueado', promovido: false };
+    }
+    try {
+      await git(root, ['merge', '--ff-only', candidateCommit]);
+    } catch (_error) {
+      await gravarRelatorioSessao(root, sessao, { bloqueado: true, promotionFailureReason: 'GIT_MERGE_ERROR' });
+      return { status: 'bloqueado', promovido: false };
+    }
+    const finalCommit = (await git(root, ['rev-parse', sessao.branchOrigem])).trim();
+    if (finalCommit !== candidateCommit || finalCommit === originCommit) {
+      throw new Error('Promoção consultiva sem evidência Git correspondente');
+    }
+    await gravarSessao(root, sessao, 'PROMOTED');
+    await removerSessaoWorktree(sessao, true);
+    await gravarSessao(root, sessao, 'CLEANED');
+    await gravarRelatorioSessao(root, sessao, { promovido: true, origemAlterada: true, bloqueado: false,
+      gatesAprovados: true, origemHeadDepois: finalCommit });
+    process.stdout.write('BSH: candidato consultivo promovido após gates técnicos; sem enforcement semântico. Worktree temporaria removida.\n');
+    return { status: 'promovido', promovido: true };
   }
 
   const recordDecision = async (decision: GovernanceDecision): Promise<void> => {
@@ -200,7 +249,7 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
       for (const change of alteracoes) await auditChange(root, domain, change, snapshot, 'deny', 'local-user', 'Excecao negada pelo usuario', governance);
       await gravarSessao(root, sessao, 'DISCARDED');
       await removerSessaoWorktree(sessao, true);
-      await gravarRelatorioSessao(root, sessao, { bloqueado: true, promovido: false, origemAlterada: false });
+      await gravarRelatorioSessao(root, sessao, { bloqueado: alteracoes.length > 0, promovido: false, origemAlterada: false });
       process.stdout.write('BSH: excecao negada; worktree e branch da sessao removidas. O checkout principal nao foi alterado.\n');
       return { status: 'descartado', promovido: false };
     }

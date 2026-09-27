@@ -43,6 +43,7 @@ def workspace(root, session="session-one", *, governance=None, promoted=False, c
     (local / "enforcement").mkdir(exist_ok=True)
     (local / "sessions" / f"{session}.report.json").write_text(json.dumps({
         "promovido": promoted, "origemAlterada": promoted, "bloqueado": not promoted,
+        "alteracaoNaWorktree": True,
         "validationStatus": governance["validationStatus"] if governance else None,
         "candidateFingerprint": governance["candidateFingerprint"] if governance else None,
     }), encoding="utf-8")

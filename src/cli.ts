@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { realpathSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import { addDomain, initProject } from './project/scaffold.js';
@@ -8,14 +9,16 @@ import { queryOntology } from './ontology/query.js';
 import { validateProject } from './ontology/validate.js';
 import { diagnoseCodex, diagnoseCodexRuntime } from './agents/codex/doctor.js';
 import { diagnoseAgy, diagnoseAgyRuntime } from './agents/agy/launcher.js';
+import { diagnoseOpencode, diagnoseOpencodeRuntime } from './agents/opencode/launcher.js';
 import { runCodexSession } from './agents/codex/session.js';
 import { runAgySession } from './agents/agy/session.js';
+import { runOpencodeSession } from './agents/opencode/session.js';
 import { resolverRepositorio } from './agents/codex/worktree.js';
 import { limparSessao, listarSessoesDoProjeto } from './agents/codex/sessions.js';
 
 export async function main(argv: string[]): Promise<number> {
   if (argv.length === 1 && argv[0] === '--help') {
-    process.stdout.write('bsh: init | domain add | ontology validate | ontology show | doctor [agy] | code base | agy [--model <nome>] | sessions list|clean | benchmark <run|validate|smoke|analyze|report>\n');
+    process.stdout.write('bsh: init | domain add | ontology validate | ontology show | doctor [agy|opencode] | code base | codex [--consultative] | agy [--model <nome>] | opencode [--model <nome>] [--consultative] [--prompt <texto>|--prompt-file <arquivo>] | sessions list|clean | benchmark <run|validate|smoke|analyze|report>\n');
     return 0;
   }
 
@@ -36,12 +39,28 @@ export async function main(argv: string[]): Promise<number> {
   if (modelFlag >= 0) {
     model = argsWithoutProject[modelFlag + 1];
   }
-  const command = modelFlag >= 0
+  let command = modelFlag >= 0
     ? argsWithoutProject.filter((_, index) => index !== modelFlag && index !== modelFlag + 1)
     : argsWithoutProject;
+
+  const promptFlag = command.findIndex((arg) => arg === '--prompt');
+  const promptFileFlag = command.findIndex((arg) => arg === '--prompt-file');
+  if (promptFlag >= 0 && !command[promptFlag + 1]) {
+    process.stderr.write('Texto ausente após --prompt.\n');
+    return 2;
+  }
+  if (promptFileFlag >= 0 && !command[promptFileFlag + 1]) {
+    process.stderr.write('Caminho ausente após --prompt-file.\n');
+    return 2;
+  }
+  const promptValue = promptFlag >= 0 ? command[promptFlag + 1] : undefined;
+  const promptFileValue = promptFileFlag >= 0 ? command[promptFileFlag + 1] : undefined;
+  const promptIndexes = [promptFlag, promptFileFlag].filter((index) => index >= 0).flatMap((index) => [index, index + 1]);
+  command = command.filter((_, index) => !promptIndexes.includes(index));
   try {
-    if (command.length === 1 && command[0] === 'init') {
-      await initProject(projectRoot);
+    let prompt = promptValue;
+    if (promptFileValue) prompt = (await readFile(resolve(promptFileValue), 'utf8')).trim();
+    if (command.length === 1 && command[0] === 'init') {      await initProject(projectRoot);
       process.stdout.write(`Projeto BSH criado em ${projectRoot}. Adicione ao menos um domínio.\n`);
       return 0;
     }
@@ -76,13 +95,20 @@ export async function main(argv: string[]): Promise<number> {
       process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
       return report.ready ? 0 : 1;
     }
-    if ((command.length === 1 && command[0] === 'codex') || (command.length === 2 && command[0] === 'code' && command[1] === 'base')) {
+    if (command.length === 2 && command[0] === 'doctor' && command[1] === 'opencode') {
+      const report = await diagnoseOpencode(projectRoot);
+      process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+      return report.ready ? 0 : 1;
+    }
+    if ((command.length === 1 && command[0] === 'codex') ||
+        (command.length === 2 && command[0] === 'codex' && command[1] === '--consultative') ||
+        (command.length === 2 && command[0] === 'code' && command[1] === 'base')) {
       const report = await diagnoseCodexRuntime(projectRoot);
       if (!report.ready) {
         process.stderr.write(`Sessão governada indisponível: ${report.reasons.join('; ')}\n`);
         return 1;
       }
-      await runCodexSession(projectRoot);
+      await runCodexSession(projectRoot, { consultative: command.includes('--consultative') });
       return 0;
     }
     if (command.length === 1 && command[0] === 'agy') {
@@ -92,6 +118,15 @@ export async function main(argv: string[]): Promise<number> {
         return 1;
       }
       await runAgySession(projectRoot, { model });
+      return 0;
+    }
+    if (command.length >= 1 && command[0] === 'opencode' && command.slice(1).every((arg) => arg === '--consultative')) {
+      const report = await diagnoseOpencodeRuntime(projectRoot);
+      if (!report.ready) {
+        process.stderr.write(`Sessão governada indisponível: ${report.reasons.join('; ')}\n`);
+        return 1;
+      }
+      await runOpencodeSession(projectRoot, { model, consultative: command.includes('--consultative'), prompt });
       return 0;
     }
     if (command.length === 2 && command[0] === 'sessions' && command[1] === 'list') {

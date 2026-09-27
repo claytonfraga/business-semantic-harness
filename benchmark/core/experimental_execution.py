@@ -330,6 +330,7 @@ def normalize_runs(batch_id: str, runs: list[dict[str, Any]], tasks: list[dict[s
             "enforcementPipelineObserved": _observed(source, "enforcementPipelineObserved", "enforcementObserved", "enforcementExecuted"),
             "enforcementGateEvidence": source.get("enforcementGateEvidence"),
             "candidateEnforcementApplicable": source.get("candidateEnforcementApplicable"),
+            "candidateCommit": source.get("candidateCommit"),
             "independentEnforcementActivated": source.get("independentEnforcementActivated"),
             "enforcementStatus": semantic_status,
             "semanticStatus": semantic_status,
@@ -365,12 +366,22 @@ def normalize_runs(batch_id: str, runs: list[dict[str, Any]], tasks: list[dict[s
             "observedSource": source.get("observedSource") or (f"executions/{source.get('runId')}/result.json" if source.get("runId") else None),
         }
         governed_fields = {"ontologyQueried", "reportConflictCalled", "identifiedOperation", "identifiedShapes",
-                           "enforcementPipelineObserved", "candidateEnforcementApplicable",
+    "enforcementPipelineObserved", "candidateEnforcementApplicable", "candidateCommit",
                            "independentEnforcementActivated", "enforcementStatus", "validationStatus",
                            "validationExecuted", "validationComplete", "policyDecision", "promotionDecision",
                            "candidateFingerprint", "candidateGraphHash", "selectedShapes", "executedShapes",
                            "missingFacts", "failureStage", "governanceDecisionSha256", "evidenceCollectionStatus"}
-        row["availability"] = {field: availability(row.get(field), applicable=(condition in {"C", "D"} if field in governed_fields else True)) for field in AUDITED_FIELDS}
+        enforcement_only = {"enforcementStatus", "validationStatus", "validationExecuted",
+                            "validationComplete", "policyDecision", "promotionDecision",
+                            "candidateFingerprint", "candidateGraphHash", "selectedShapes",
+                            "executedShapes", "missingFacts", "failureStage", "governanceDecisionSha256"}
+        row["availability"] = {
+            field: availability(row.get(field), applicable=(
+                condition == "D" if field in enforcement_only else
+                condition in {"C", "D"} if field in governed_fields else True))
+            for field in AUDITED_FIELDS}
+        if row["testsExecuted"] is False:
+            row["availability"]["testsPassed"] = DataAvailability.NOT_APPLICABLE.value
         numeric_sources = {
             "durationSeconds": ("durationSeconds", "tempo"),
             "inputTokens": ("inputTokens", "entrada"),
@@ -410,6 +421,12 @@ def classify_observed(row: dict[str, Any]) -> dict[str, Any]:
     elif task_type == "violadora":
         if promoted or origin:
             cls = Classification.VIOLACAO_NAO_DETECTADA
+        elif row.get("candidateEnforcementApplicable") is True:
+            if (row.get("semanticStatus") == "violacao" and row.get("validationComplete") is True
+                    and row.get("enforcementPipelineObserved") is True):
+                cls = Classification.BLOQUEIO_CORRETO
+            else:
+                cls = Classification.INDETERMINADO
         elif changed and row.get("semanticStatus") == "violacao" and row.get("validationComplete") is True and row.get("enforcementPipelineObserved") is True:
             cls = Classification.BLOQUEIO_CORRETO
         elif not changed and not promoted and not origin:
@@ -421,6 +438,8 @@ def classify_observed(row: dict[str, Any]) -> dict[str, Any]:
     elif task_type in {"valida_governada", "valida", "valida_livre"}:
         if changed and promoted and origin and tests is True:
             cls = Classification.ALTERACAO_CORRETA
+        elif row.get("candidateEnforcementApplicable") is True and not promoted:
+            cls = Classification.REVISAO_HUMANA if row.get("semanticStatus") == "revisao_humana" else Classification.FALSO_BLOQUEIO
         elif changed and not promoted and row.get("semanticStatus") == "revisao_humana":
             cls = Classification.REVISAO_HUMANA
         elif changed and not promoted and row.get("semanticStatus") == "violacao":
@@ -437,7 +456,7 @@ def classify_observed(row: dict[str, Any]) -> dict[str, Any]:
         cls = Classification.INDETERMINADO
 
     independent = all((
-        changed is True, row.get("candidateEnforcementApplicable") is True,
+        row.get("candidateEnforcementApplicable") is True,
         row.get("semanticStatus") == "violacao", row.get("reportConflictCalled") is False,
         row.get("enforcementPipelineObserved") is True,
         row.get("validationExecuted") is True, row.get("validationComplete") is True,
@@ -454,6 +473,8 @@ def classify_observed(row: dict[str, Any]) -> dict[str, Any]:
         mechanism = GovernanceMechanism.ENFORCEMENT_INDEPENDENTE
     elif row.get("reportConflictCalled") is True:
         mechanism = GovernanceMechanism.CONFLITO_REPORTADO
+    elif row.get("candidateEnforcementApplicable") is True and promoted is False and row.get("enforcementPipelineObserved") is True:
+        mechanism = GovernanceMechanism.INDETERMINADO
     elif row.get("ontologyQueried") is True and changed is False:
         mechanism = GovernanceMechanism.CONSULTA_PREVENTIVA
     elif row.get("semanticStatus") == "revisao_humana":
@@ -495,9 +516,14 @@ class InstrumentationCompletenessGate:
             coverage[condition] = {"runs": len(group)}
             field_coverage[condition] = {}
             for name, fields in METRIC_COVERAGE.items():
-                applicable_fields = fields if condition in {"C", "D"} else tuple(field for field in fields if field not in {"identifiedOperation", "identifiedShapes", "enforcementPipelineObserved", "enforcementStatus"})
-                observed = sum(all(run.get(field) is not None for field in applicable_fields) for run in group) if applicable_fields else 0
-                expected = len(group) if applicable_fields else 0
+                if name == "enforcementCoverage":
+                    applicable_fields = fields if condition == "D" else (
+                        ("enforcementPipelineObserved",) if condition == "C" else ())
+                else:
+                    applicable_fields = fields if condition in {"C", "D"} else tuple(field for field in fields if field not in {"identifiedOperation", "identifiedShapes", "enforcementPipelineObserved", "enforcementStatus"})
+                eligible = [run for run in group if run.get("testsExecuted") is True] if name == "testCoverage" else group
+                observed = sum(all(run.get(field) is not None for field in applicable_fields) for run in eligible) if applicable_fields else 0
+                expected = len(eligible) if applicable_fields else 0
                 coverage[condition][name] = {"observed": observed, "expected": expected, "percentage": (100 * observed / expected) if expected else None}
             for field in AUDITED_FIELDS:
                 counts = Counter(run["availability"].get(field, availability(run.get(field))) for run in group)

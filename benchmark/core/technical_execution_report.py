@@ -39,7 +39,7 @@ TECHNICAL_FIELDS = (
     "runId", "batchId", "condition", "taskId", "baseTaskId", "replicationIndex",
     "startedAt", "finishedAt", "durationSeconds", "inputTokens", "cachedInputTokens",
     "outputTokens", "reasoningTokens", "totalTokens", "rawTelemetry",
-    "changeSetDetected", "testsExecuted", "testsPassed", "promoted", "originChanged",
+    "changeSetDetected", "testsExecuted", "promoted", "originChanged",
     "classification",
 )
 GOVERNANCE_FIELDS = (
@@ -181,11 +181,14 @@ def _field_coverage(runs: list[dict[str, Any]], conditions: list[str]) -> dict[s
         cells = {}
         for condition in conditions:
             group = [run for run in runs if run["condition"] == condition]
-            applicable = condition in {"C", "D"} or field not in {
+            enforcement_only = {"validationStatus", "validationExecuted", "validationComplete",
+                                "promotionDecision", "governanceDecisionSha256"}
+            applicable = (condition == "D" if field in enforcement_only else
+                          condition in {"C", "D"} or field not in {
                 "identifiedOperation", "identifiedShapes", "enforcementPipelineObserved",
                 "candidateEnforcementApplicable", "independentEnforcementActivated",
                 "validationStatus", "validationExecuted", "validationComplete",
-                "promotionDecision", "governanceDecisionSha256"}
+                "promotionDecision", "governanceDecisionSha256"})
             expected = len(group) if applicable else 0
             observed = sum(run.get("availability", {}).get(field) in {"PRESENT", "OBSERVED_ZERO"} for run in group) if applicable else 0
             cells[condition] = {"observed": observed, "expected": expected,
@@ -255,10 +258,15 @@ def _worktrees(batch_dir: Path, runs: list[dict[str, Any]]) -> dict[str, Any]:
 def _origin(batch_dir: Path, runs: list[dict[str, Any]], metadata: dict[str, Any]) -> dict[str, Any]:
     initial = metadata.get("originInitialCommit")
     final = metadata.get("originFinalCommit")
+    initial_tree = metadata.get("originInitialTreeHash")
+    final_tree = metadata.get("originFinalTreeHash")
     unexpected = [run["runId"] for run in runs if run.get("unexpectedOriginChange") is True]
     return {"originInitialCommit": initial, "originFinalCommit": final,
+            "originInitialTreeHash": initial_tree, "originFinalTreeHash": final_tree,
             "unexpectedOriginChanges": len(unexpected), "affectedRuns": unexpected,
-            "integrityConfirmed": initial is not None and final is not None and not unexpected}
+            "integrityConfirmed": initial is not None and final is not None and initial == final and
+                                  initial_tree is not None and final_tree is not None and
+                                  initial_tree == final_tree and not unexpected}
 
 
 def _technical_pairs(runs: list[dict[str, Any]]) -> dict[str, Any]:
@@ -295,6 +303,8 @@ def _readiness(completion: dict[str, Any], isolation: dict[str, Any], coverage: 
     def observed(run: dict[str, Any], field: str) -> bool:
         return run.get("availability", {}).get(field) in {"PRESENT", "OBSERVED_ZERO"}
     all_required = all(observed(run, field) for run in runs for field in TECHNICAL_FIELDS)
+    all_required = all_required and all(observed(run, "testsPassed") for run in runs
+                                    if run.get("testsExecuted") is True)
     all_required = all_required and all(
         observed(run, field)
         for run in runs if run["condition"] in {"C", "D"}
@@ -503,7 +513,16 @@ def _model(batch_dir: Path, config: dict[str, Any], tasks: list[dict[str, Any]],
                                f"{run.get('sessionId')}.json")
             source_path = batch_dir / expected_source
             try:
-                matching = (isinstance(decision, dict)
+                if run["condition"] == "C" and source.get("sessionMode") == "CONSULTATIVE":
+                    report_source = source.get("sessionReportSource")
+                    report_path = batch_dir / report_source if isinstance(report_source, str) else batch_dir
+                    matching = (decision is None and source.get("governanceDecisionSource") is None
+                                and source.get("enforcementPipelineObserved") is False
+                                and report_path.resolve().is_relative_to(batch_dir.resolve())
+                                and report_path.is_file()
+                                and read_json(report_path).get("sessionMode") == "CONSULTATIVE")
+                else:
+                    matching = (isinstance(decision, dict)
                             and decision.get("validationStatus") in {"CONFORMING", "VIOLATION", "INDETERMINATE", "VALIDATION_ERROR"}
                             and isinstance(decision.get("validationExecuted"), bool)
                             and isinstance(decision.get("validationComplete"), bool)
@@ -525,10 +544,13 @@ def _model(batch_dir: Path, config: dict[str, Any], tasks: list[dict[str, Any]],
         issues.append({"severity": "EXECUTION_FAIL", "code": "WORKTREE_INTEGRITY_FAILURE", "detail": json.dumps(worktrees, ensure_ascii=False)})
     elif worktrees["missingWorkspaces"]:
         issues.append({"severity": "EXECUTION_WARNING", "code": "WORKTREE_INTEGRITY_UNCONFIRMED", "detail": json.dumps(worktrees, ensure_ascii=False)})
-    if origin["unexpectedOriginChanges"]:
-        issues.append({"severity": "EXECUTION_FAIL", "code": "UNEXPECTED_ORIGIN_CHANGE", "detail": str(origin["affectedRuns"])})
+    if origin["unexpectedOriginChanges"] or (origin["originInitialCommit"] is not None and
+            origin["originFinalCommit"] is not None and origin["originInitialCommit"] != origin["originFinalCommit"]) or (
+            origin["originInitialTreeHash"] is not None and origin["originFinalTreeHash"] is not None and
+            origin["originInitialTreeHash"] != origin["originFinalTreeHash"]):
+        issues.append({"severity": "EXECUTION_FAIL", "code": "UNEXPECTED_ORIGIN_CHANGE", "detail": str(origin)})
     elif not origin["integrityConfirmed"]:
-        issues.append({"severity": "EXECUTION_WARNING", "code": "ORIGIN_INTEGRITY_UNCONFIRMED", "detail": "Commits inicial/final indisponíveis"})
+        issues.append({"severity": "EXECUTION_WARNING", "code": "ORIGIN_INTEGRITY_UNCONFIRMED", "detail": "Commits ou hashes inicial/final indisponíveis"})
     if missing:
         issues.append({"severity": "EXECUTION_WARNING", "code": "MISSING_DATA", "detail": f"{len(missing)} campos/condições com ausência"})
     if any(run["classification"] == "FALHA_TECNICA" for run in classified):
@@ -691,7 +713,8 @@ def _render_latex(model: dict[str, Any]) -> str:
     lines = [r"\documentclass[11pt,a4paper]{article}", r"\usepackage[utf8]{inputenc}",
              r"\usepackage[T1]{fontenc}", r"\usepackage[brazil]{babel}",
              r"\usepackage[margin=2.2cm]{geometry}", r"\usepackage{longtable,array,booktabs,hyperref}",
-             r"\setlength{\parindent}{0pt}", r"\setlength{\parskip}{0.5em}", r"\sloppy",
+             r"\setlength{\parindent}{0pt}", r"\setlength{\parskip}{0.5em}",
+             r"\setlength{\tabcolsep}{1.5pt}", r"\sloppy",
              r"\begin{document}", r"\begin{titlepage}\centering",
              r"{\LARGE\bfseries " + _latex(model["title"]) + r"\par}",
              r"\vspace{1.5cm}{\large " + _latex(model["subtitle"]) + r"\par}",
@@ -718,7 +741,7 @@ def _render_latex(model: dict[str, Any]) -> str:
             lines.append("Esta execução experimental foi registrada e validada quanto à sua integridade técnica. O status de prontidão abaixo indica se seus dados podem ser encaminhados ao módulo separado de Análise Experimental. Nenhuma inferência científica é realizada neste documento.")
         for table_number, table in by_section.get(section, []):
             lines.append("A Tabela~\\ref{tab:" + str(table_number) + "} registra os dados desta seção.")
-            width = 0.77 if len(table["headers"]) >= 7 else 0.85
+            width = 0.88
             columns = "".join("p{" + f"{width / len(table['headers']):.4f}" + r"\textwidth}" for _ in table["headers"])
             lines.append(r"\begin{longtable}{@{}" + columns + "@{}}")
             lines.append(r"\caption{" + _latex(table["title"]) + "; unidades: " + _latex(table["units"]) +
@@ -752,7 +775,11 @@ def _compile_pdf(tex_path: Path) -> dict[str, Any]:
     if re.search(r"Overfull \\hbox|Overfull \\vbox", log):
         issues.append({"type": "LATEX_OVERFLOW"})
     pdf = tex_path.with_suffix(".pdf")
-    layout = PDFLayoutGate().validate(pdf, tex_path.parent / "layout-pages") if pdf.is_file() else {"status": "PUBLICATION_BLOCK", "issues": [{"type": "PDF_MISSING"}], "pagesRendered": 0, "pdfValid": False}
+    pages_dir = tex_path.parent / "layout-pages"
+    if pages_dir.is_dir():
+        for stale_page in pages_dir.glob("page-*.png"):
+            stale_page.unlink()
+    layout = PDFLayoutGate().validate(pdf, pages_dir) if pdf.is_file() else {"status": "PUBLICATION_BLOCK", "issues": [{"type": "PDF_MISSING"}], "pagesRendered": 0, "pdfValid": False}
     issues.extend(layout["issues"])
     return {"status": "PASS" if not issues else "FAIL", "issues": issues,
             "pagesRendered": layout["pagesRendered"], "mediaCropTextImageValid": layout["status"] == "PASS",

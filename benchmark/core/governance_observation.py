@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+import subprocess
 from typing import Any
 
 
@@ -38,7 +39,9 @@ def _base(status: str, reason: str | None = None) -> dict[str, Any]:
         "enforcementObserved": None, "enforcementPipelineObserved": None,
         "technicalGatesPassed": None, "identifiedOperation": None,
         "identifiedShapes": None, "candidateEnforcementApplicable": None,
+        "candidateCommit": None,
         "independentEnforcementActivated": None, "enforcementGateEvidence": None,
+        "sessionMode": None,
     }
 
 
@@ -90,6 +93,32 @@ def collect_governance_observation(project_path: Path) -> dict[str, Any]:
         return _base("INVALID", str(error))
     promoted = _bool(report.get("promovido"))
     origin_changed = _bool(report.get("origemAlterada"))
+    session_mode = report.get("sessionMode")
+    if session_mode == "CONSULTATIVE":
+        if decision is not None or report.get("enforcementExecutado") is not False:
+            return _base("INVALID", "sessão consultiva contém decisão ou execução de enforcement")
+        before = report.get("origemHeadAntes")
+        after = report.get("origemHeadDepois")
+        head = subprocess.run(["git", "-C", str(project_path), "rev-parse", "HEAD"],
+                              capture_output=True, text=True)
+        if (head.returncode != 0 or not before or
+                (promoted is True and (origin_changed is not True or after == before or after != head.stdout.strip())) or
+                (promoted is not True and origin_changed is not False)):
+            return _base("INVALID", "promoção consultiva diverge do estado Git do origin")
+        ontology_queried, conflict_called, query_count = _tool_observations(local)
+        observed = _base("VALID")
+        observed.update({
+            "sessionMode": "CONSULTATIVE", "sessionId": session_id,
+            "sessionReportSource": str(report_path.relative_to(project_path)),
+            "ontologyQueried": ontology_queried, "reportConflictCalled": conflict_called,
+            "queryCount": query_count, "promoted": promoted, "originChanged": origin_changed,
+            "blocked": _bool(report.get("bloqueado")), "technicalGatesPassed": _bool(report.get("gatesAprovados")),
+            "enforcementObserved": False, "enforcementPipelineObserved": False,
+            "candidateEnforcementApplicable": False, "independentEnforcementActivated": False,
+        })
+        return observed
+    if session_mode not in (None, "ENFORCED"):
+        return _base("INVALID", "modo de sessão desconhecido")
     if decision is not None:
         semantic_status = decision.get("validationStatus")
         if semantic_status not in SEMANTIC_TO_LEGACY:
@@ -135,6 +164,7 @@ def collect_governance_observation(project_path: Path) -> dict[str, Any]:
         "promoted": promoted, "originChanged": origin_changed,
         "blocked": _bool(report.get("bloqueado")),
         "technicalGatesPassed": _bool(report.get("gatesAprovados")),
+        "sessionMode": session_mode,
     })
     if decision is None:
         return observed
@@ -145,10 +175,19 @@ def collect_governance_observation(project_path: Path) -> dict[str, Any]:
     status = decision["validationStatus"]
     executed = _bool(decision.get("validationExecuted"))
     complete = _bool(decision.get("validationComplete"))
-    gate_denied = decision.get("promotionDecision") == "DENY"
+    candidate_worktree = _bool(report.get("alteracaoNaWorktree"))
+    candidate_commit = decision.get("candidateCommit")
+    origin_commit = decision.get("originCommit")
+    candidate_exists = (candidate_worktree is True and isinstance(candidate_commit, str)
+                        and candidate_commit != origin_commit)
+    blocked_promotion = candidate_exists and promoted is False and origin_changed is False
+    if _bool(report.get("bloqueado")) != blocked_promotion:
+        return _base("INVALID", "bloqueio resumido diverge do gate de promoção")
     gate_evidence = {
-        "gateActivated": gate_denied,
-        "blockedPromotion": gate_denied and promoted is False and origin_changed is False,
+        "gateActivated": True,
+        "blockedPromotion": blocked_promotion,
+        "candidateExists": candidate_exists,
+        "candidateCommit": candidate_commit,
         "validationExecuted": executed, "validationComplete": complete,
         "policyDecision": decision.get("policyDecision"),
         "promotionDecision": decision.get("promotionDecision"),
@@ -158,10 +197,11 @@ def collect_governance_observation(project_path: Path) -> dict[str, Any]:
     observed.update({
         "statusEnforcement": SEMANTIC_TO_LEGACY[status],
         "validationStatus": status, "enforcementObserved": executed,
-        "enforcementPipelineObserved": executed,
+        "enforcementPipelineObserved": True,
         "identifiedOperation": operations[0] if len(operations) == 1 else None,
         "identifiedShapes": selected,
-        "candidateEnforcementApplicable": bool(operations) if operations else None,
+        "candidateEnforcementApplicable": candidate_exists,
+        "candidateCommit": candidate_commit,
         "independentEnforcementActivated": None if conflict_called is None or promoted is None or origin_changed is None else all((
             status == "VIOLATION", executed is True, complete is True,
             decision.get("policyDecision") == "DENY", gate_evidence["blockedPromotion"],

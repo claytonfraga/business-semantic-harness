@@ -27,7 +27,7 @@ function launchTerminalUi(server: { url: string; workspaceSessao: string; stateD
   });
 }
 
-export async function runCodexSession(root: string): Promise<void> {
+export async function runCodexSession(root: string, options: { consultative?: boolean } = {}): Promise<void> {
   const report = await diagnoseCodexRuntime(root);
   if (!report.ready) throw new Error(`Sessão governada indisponível: ${report.reasons.join('; ')}`);
   const repositorioOrigem = await resolverRepositorio(root);
@@ -70,7 +70,7 @@ export async function runCodexSession(root: string): Promise<void> {
     instrumentation = await instrumentSession(control, repositorioOrigem, sessao.caminhoWorktree);
     await gravarSessao(repositorioOrigem, sessao, 'AGENT_RUNNING');
     process.stdout.write(`BSH pronto. Sessao isolada: branch ${sessao.branchSessao} a partir de ${branchOrigem}@${commitBase.slice(0, 7)}; worktree ${sessao.caminhoWorktree}.\n`);
-    process.stdout.write(`O Codex trabalha apenas na worktree; o BSH promove as alteracoes ao final. Dominios: ${domains.join(', ')}.\n`);
+    process.stdout.write(`O Codex trabalha apenas na worktree; o BSH promove as alteracoes ao final. Modo: ${options.consultative ? 'consultivo' : 'governado'}. Dominios: ${domains.join(', ')}.\n`);
     terminalUiRunning = true;
     const code = await launchTerminalUi(server);
     terminalUiRunning = false;
@@ -83,6 +83,7 @@ export async function runCodexSession(root: string): Promise<void> {
       tokenTotals: instrumentation.tokenTotals(),
       ontologyQueries: instrumentation.ontologyQueries(),
       harnessTokens: instrumentation.harnessTokens(),
+      consultative: options.consultative === true,
     });
   } finally {
     await cleanup();

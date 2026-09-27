@@ -38,6 +38,9 @@ def load_and_validate_config(config_path: Path, repo_root: Optional[Path] = None
     max_execs = bench_sec.get("maximumExecutions", 50)
     if not isinstance(max_execs, int) or max_execs <= 0:
         raise ValueError(f"Campo 'benchmark.maximumExecutions' deve ser um inteiro positivo, obtido: {max_execs}")
+    timeout = bench_sec.get("executionTimeoutSeconds", 1800)
+    if isinstance(timeout, bool) or not isinstance(timeout, int) or timeout <= 0:
+        raise ValueError(f"Campo 'benchmark.executionTimeoutSeconds' deve ser um inteiro positivo, obtido: {timeout}")
 
     # 2. Seção agent
     if "agent" not in cfg or not isinstance(cfg["agent"], dict):

@@ -19,8 +19,9 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from .adapters.base import AgentAdapterRegistry, BenchmarkAgentAdapter
 from .core.config import load_and_validate_config, save_config_to_batch
-from .core.models import CanonicalBenchmarkRun, compute_experiment_hashes
+from .core.models import CanonicalBenchmarkRun, compute_directory_tree_hash, compute_experiment_hashes
 from .core.governance_observation import collect_governance_observation
+from .core.run_invariants import run_instrumentation_issues
 from .core.classification import classify_run, determine_governance_mechanism
 from .strategies import CONDITION_STRATEGIES, evaluate_workspace_changes
 
@@ -107,7 +108,13 @@ class BenchmarkExperimentOrchestrator:
         dest = self.batch_dir / "executions" / run_id / "project"
         shutil.rmtree(dest.parent, ignore_errors=True)
         dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copytree(self.project_source, dest, ignore=shutil.ignore_patterns(".git", "node_modules", "dist", "coverage"))
+        def ignore_runtime_artifacts(directory: str, names: List[str]) -> set[str]:
+            ignored = set(names) & {".git", "node_modules", "dist", "coverage"}
+            if Path(directory).name == ".bsh":
+                ignored.add("local")
+            return ignored
+
+        shutil.copytree(self.project_source, dest, ignore=ignore_runtime_artifacts)
 
         # Cria symlink de node_modules se existir na fonte para viabilizar testes rápidos
         src_nm = self.project_source / "node_modules"
@@ -123,17 +130,37 @@ class BenchmarkExperimentOrchestrator:
         subprocess.run(["git", "-C", str(dest), "add", "-A"], check=True)
         subprocess.run(["git", "-C", str(dest), "commit", "-q", "-m", "base"], check=True)
 
-        base_commit = subprocess.run(["git", "-C", str(dest), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
         strategy = CONDITION_STRATEGIES[condition]
+        base_commit = self.git_head(dest)
+        if base_commit is None:
+            raise RuntimeError(f"Commit base indisponível para {run_id}")
         strategy.prepare_workspace(dest, base_commit)
+        # A configuração da condição integra o estado inicial, não o diff do agente.
+        setup_status = subprocess.run(["git", "-C", str(dest), "status", "--porcelain"],
+                                      capture_output=True, text=True, check=True).stdout
+        if setup_status.strip():
+            subprocess.run(["git", "-C", str(dest), "add", "-A"], check=True)
+            subprocess.run(["git", "-C", str(dest), "commit", "-q", "-m", "condition setup"], check=True)
+            base_commit = self.git_head(dest)
+            if base_commit is None:
+                raise RuntimeError(f"Commit da condição indisponível para {run_id}")
         return dest, base_commit
 
     def collect_bsh_observables(self, project_path: Path) -> Dict[str, Any]:
         """Lê apenas o relatório e a decisão da mesma sessão BSH."""
         return collect_governance_observation(project_path)
 
+    @staticmethod
+    def git_head(project_path: Path) -> Optional[str]:
+        """Observa o commit corrente; falhas permanecem ausentes."""
+        result = subprocess.run(["git", "-C", str(project_path), "rev-parse", "HEAD"],
+                                capture_output=True, text=True)
+        return result.stdout.strip() if result.returncode == 0 and result.stdout.strip() else None
+
     def execute_plan(self, smoke_only: bool = False, max_runs: Optional[int] = None) -> Path:
         """Executa o plano experimental completo (ou smoke test)."""
+        source_origin_initial = self.git_head(self.project_source)
+        source_tree_initial = compute_directory_tree_hash(self.project_source)
         self.batch_dir.mkdir(parents=True, exist_ok=True)
         (self.batch_dir / "executions").mkdir(parents=True, exist_ok=True)
 
@@ -205,9 +232,12 @@ class BenchmarkExperimentOrchestrator:
             print(f"[{idx}/{len(plan)}] Executando {run_id} ({self.agent_id})...", flush=True)
 
             project_dir, base_commit = self.prepare_workspace(run_id, cond)
+            origin_initial_tree = compute_directory_tree_hash(
+                project_dir, ignore_patterns=[".git", "node_modules", "dist", "coverage", "__pycache__", ".venv", "local"])
             strategy = CONDITION_STRATEGIES[cond]
 
-            timeout_sec = self.config.get("benchmark", {}).get("executionTimeoutSeconds", 60)
+            timeout_sec = self.config.get("benchmark", {}).get("executionTimeoutSeconds", 1800)
+            run_started_at = datetime.now(timezone.utc).isoformat()
             raw_tel, duration, pane_out, status = strategy.execute(
                 adapter=self.adapter,
                 workspace_path=project_dir,
@@ -216,6 +246,17 @@ class BenchmarkExperimentOrchestrator:
                 effort=self.reasoning_effort,
                 timeout_seconds=timeout_sec,
             )
+            run_finished_at = datetime.now(timezone.utc).isoformat()
+            adapter_diagnostic = dict(getattr(self.adapter, "last_execution_diagnostic", {}) or {})
+            if status == "FALHA_TECNICA":
+                diagnostic_path = self.batch_dir / "executions" / run_id / "adapter-diagnostic.json"
+                diagnostic_path.write_text(
+                    json.dumps({"batchId": self.batch_id, "runId": run_id,
+                                "diagnostic": adapter_diagnostic}, indent=2, ensure_ascii=False),
+                    encoding="utf-8",
+                )
+                if pane_out:
+                    (diagnostic_path.parent / "agent-output.txt").write_text(pane_out, encoding="utf-8")
 
             # Avaliações do workspace
             ws_eval = evaluate_workspace_changes(project_dir, base_commit, tinfo)
@@ -228,6 +269,21 @@ class BenchmarkExperimentOrchestrator:
 
             promoted = bsh_obs.get("promoted") if cond in ("C", "D") else ws_eval["changeSetDetected"]
             origin_changed = bsh_obs.get("originChanged") if cond in ("C", "D") else ws_eval["changeSetDetected"]
+            origin_final_commit = self.git_head(project_dir)
+            origin_final_tree = compute_directory_tree_hash(
+                project_dir, ignore_patterns=[".git", "node_modules", "dist", "coverage", "__pycache__", ".venv", "local"])
+            actual_origin_changed = (origin_final_commit != base_commit or origin_final_tree != origin_initial_tree)
+            if cond in ("A", "B"):
+                # Edição direta do workspace não é uma promoção Git.
+                promoted = None
+                origin_changed = actual_origin_changed
+            else:
+                origin_changed = bsh_obs.get("originChanged")
+            unexpected_origin_change = (origin_final_commit is None or origin_initial_tree is None or
+                                        origin_final_tree is None or
+                                        (cond in ("C", "D") and
+                                         (origin_changed is not actual_origin_changed or
+                                          (promoted is True and origin_final_commit == base_commit))))
             enf_status = bsh_obs.get("statusEnforcement")
             enf_obs = bsh_obs.get("enforcementObserved") if cond in ("C", "D") else False
             blocked = bsh_obs.get("blocked") is True or (enf_status in ("violacao", "revisao_humana"))
@@ -249,6 +305,7 @@ class BenchmarkExperimentOrchestrator:
                 report_conflict_called=bsh_obs.get("reportConflictCalled"),
                 technical_failure=(status == "FALHA_TECNICA"),
                 instrumentation_failure=bsh_obs.get("evidenceCollectionStatus") == "INVALID",
+                candidate_enforcement_applicable=bsh_obs.get("candidateEnforcementApplicable"),
                 task_id=base_tid,
             )
 
@@ -263,6 +320,7 @@ class BenchmarkExperimentOrchestrator:
                 enforcement_status=enf_status,
                 technical_gates_passed=bsh_obs.get("technicalGatesPassed"),
                 task_type=tinfo.get("tipo", "valida_governada"),
+                candidate_enforcement_applicable=bsh_obs.get("candidateEnforcementApplicable"),
             )
             if cond in ("C", "D") and (promoted is None or origin_changed is None) and status != "FALHA_TECNICA":
                 cls = "FALHA_INSTRUMENTACAO" if bsh_obs.get("evidenceCollectionStatus") == "INVALID" else "INDETERMINADO"
@@ -282,8 +340,16 @@ class BenchmarkExperimentOrchestrator:
                 agentVersion=self.agent_id,
                 model=self.model,
                 reasoningEffort=self.reasoning_effort,
+                startedAt=run_started_at,
+                finishedAt=run_finished_at,
+                executionStatus=status,
                 durationSeconds=duration,
                 baseCommit=base_commit,
+                originInitialCommit=base_commit,
+                originFinalCommit=origin_final_commit,
+                originInitialTreeHash=origin_initial_tree,
+                originFinalTreeHash=origin_final_tree,
+                unexpectedOriginChange=unexpected_origin_change,
                 promptSha256=hashlib.sha256(tinfo["prompt"].encode("utf-8")).hexdigest(),
                 inputTokens=norm_tokens.get("inputTokens"),
                 cachedInputTokens=norm_tokens.get("cachedInputTokens"),
@@ -291,10 +357,16 @@ class BenchmarkExperimentOrchestrator:
                 reasoningTokens=norm_tokens.get("reasoningTokens"),
                 totalTokens=norm_tokens.get("totalTokens"),
                 nonCachedTokens=norm_tokens.get("nonCachedTokens"),
+                nonCachedTokensEligible=(norm_tokens.get("nonCachedTokens") is not None),
+                nonCachedTokensExclusionReason=(None if norm_tokens.get("nonCachedTokens") is not None
+                    else f"Adapter/runtime {self.agent_id} não fornece métrica direta com semântica de cache garantida"),
                 changeSetDetected=ws_eval["changeSetDetected"],
                 modifiedFiles=ws_eval["modifiedFiles"],
+                createdFiles=ws_eval["createdFiles"],
+                removedFiles=ws_eval["removedFiles"],
                 addedLines=ws_eval["addedLines"],
                 removedLines=ws_eval["removedLines"],
+                diffSha256=ws_eval["diffSha256"],
                 ontologyQueried=bsh_obs.get("ontologyQueried"),
                 queryCount=bsh_obs.get("queryCount"),
                 reportConflictCalled=bsh_obs.get("reportConflictCalled"),
@@ -302,6 +374,7 @@ class BenchmarkExperimentOrchestrator:
                 enforcementStatus=enf_status,
                 enforcementPipelineObserved=bsh_obs.get("enforcementPipelineObserved"),
                 candidateEnforcementApplicable=bsh_obs.get("candidateEnforcementApplicable"),
+                candidateCommit=bsh_obs.get("candidateCommit"),
                 independentEnforcementActivated=bsh_obs.get("independentEnforcementActivated"),
                 enforcementGateEvidence=bsh_obs.get("enforcementGateEvidence"),
                 governanceDecision=bsh_obs.get("enforcementEvidence"),
@@ -317,23 +390,66 @@ class BenchmarkExperimentOrchestrator:
                 technicalGatesPassed=bsh_obs.get("technicalGatesPassed"),
                 promoted=promoted,
                 originChanged=origin_changed,
+                blocked=bsh_obs.get("blocked") if cond in ("C", "D") else None,
+                sessionMode=bsh_obs.get("sessionMode") if cond in ("C", "D") else None,
                 testsPassed=ws_eval["testsPassed"],
+                testsExecuted=ws_eval["testsExecuted"],
                 violacaoImplementada=ws_eval["violacaoImplementada"],
                 functionalSuccess=func_success,
                 classification=cls,
                 governanceMechanism=mech,
+                failureType=adapter_diagnostic.get("failureType"),
+                failureMessage=adapter_diagnostic.get("failureMessage"),
+                processExitCode=adapter_diagnostic.get("processExitCode"),
+                processStderr=adapter_diagnostic.get("processStderr"),
+                executionTimeoutSeconds=timeout_sec,
                 rawTelemetry=raw_tel,
             )
 
+            invariant_issues = run_instrumentation_issues(run_record)
+            if invariant_issues:
+                run_record.executionStatus = "FALHA_INSTRUMENTACAO"
+                run_record.classification = "FALHA_INSTRUMENTACAO"
+                run_record.failureType = "RUN_INVARIANT_FAILURE"
+                run_record.failureMessage = "; ".join(invariant_issues)
             runs_records.append(run_record)
             (self.batch_dir / "executions" / run_id / "result.json").write_text(
                 json.dumps(run_record.to_dict(), indent=2, ensure_ascii=False), encoding="utf-8"
             )
             print(f"      Desfecho: {cls} | Tokens: {run_record.totalTokens} | Duração: {duration:.1f}s | Mecanismo: {mech}")
 
+            if self.config.get("benchmark", {}).get("failFastOnInstrumentationError"):
+                missing_tokens = [field for field in ("inputTokens", "cachedInputTokens", "outputTokens",
+                                                       "reasoningTokens", "totalTokens")
+                                  if getattr(run_record, field) is None]
+                critical = []
+                if status == "FALHA_TECNICA":
+                    critical.append("adapter retornou FALHA_TECNICA")
+                critical.extend(invariant_issues)
+                if self.config.get("telemetry", {}).get("collectTokens", True) and missing_tokens:
+                    critical.append(f"telemetria de tokens ausente: {', '.join(missing_tokens)}")
+                if cond in ("C", "D") and bsh_obs.get("evidenceCollectionStatus") == "INVALID":
+                    critical.append(f"evidência de governança inválida: {bsh_obs.get('evidenceCollectionIssue')}")
+                if cond in ("C", "D") and status == "OK" and not bsh_obs.get("sessionReportSource"):
+                    critical.append("relatório da sessão BSH ausente")
+                if critical:
+                    self.save_batch_artifacts(
+                        runs_records, started_at=started_at,
+                        finished_at=datetime.now(timezone.utc).isoformat(),
+                        origin_initial_commit=source_origin_initial,
+                        origin_final_commit=self.git_head(self.project_source),
+                        origin_initial_tree_hash=source_tree_initial,
+                        origin_final_tree_hash=compute_directory_tree_hash(self.project_source),
+                    )
+                    raise RuntimeError(f"HARD_FAIL: instrumentação de {run_id}: {'; '.join(critical)}")
+
         finished_at = datetime.now(timezone.utc).isoformat()
         # Salva metadados e artefatos globais do lote
-        self.save_batch_artifacts(runs_records, started_at=started_at, finished_at=finished_at)
+        self.save_batch_artifacts(runs_records, started_at=started_at, finished_at=finished_at,
+                                  origin_initial_commit=source_origin_initial,
+                                  origin_final_commit=self.git_head(self.project_source),
+                                  origin_initial_tree_hash=source_tree_initial,
+                                  origin_final_tree_hash=compute_directory_tree_hash(self.project_source))
         return self.batch_dir
 
     def save_batch_artifacts(
@@ -341,6 +457,10 @@ class BenchmarkExperimentOrchestrator:
         runs_records: List[CanonicalBenchmarkRun],
         started_at: Optional[str] = None,
         finished_at: Optional[str] = None,
+        origin_initial_commit: Optional[str] = None,
+        origin_final_commit: Optional[str] = None,
+        origin_initial_tree_hash: Optional[str] = None,
+        origin_final_tree_hash: Optional[str] = None,
     ) -> None:
         """Salva os dados observados do lote e gera seu relatório técnico."""
         measurements = [r.to_dict() for r in runs_records]
@@ -378,6 +498,10 @@ class BenchmarkExperimentOrchestrator:
             "esforco": self.reasoning_effort,
             "startedAt": started_at,
             "finishedAt": finished_at,
+            "originInitialCommit": origin_initial_commit,
+            "originFinalCommit": origin_final_commit,
+            "originInitialTreeHash": origin_initial_tree_hash,
+            "originFinalTreeHash": origin_final_tree_hash,
             "condicoes": ["A", "B", "C", "D"],
             "targetRuns": len(runs_records),
             "ordemExecucao": [r.runId for r in runs_records],

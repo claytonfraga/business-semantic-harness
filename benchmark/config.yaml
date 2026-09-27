@@ -4,13 +4,22 @@ benchmark:
   maximumExecutions: 60
   randomizeExecutionOrder: true
   failFastOnInstrumentationError: true
+  executionTimeoutSeconds: 1800
 
 agent:
-  id: codex
-  model: gpt-5.6-sol
+  id: opencode
+  model: openrouter/deepseek/deepseek-v4.1-flash
   reasoningEffort: low
-  adapter: codex
-  executable: codex
+  adapter: opencode
+  executable: opencode
+
+  # Configuração alternativa para Codex
+  #
+  # id: codex
+  # model: gpt-5.6-sol
+  # reasoningEffort: low
+  # adapter: codex
+  # executable: codex
 
   # Configuração alternativa para Agy
   #
