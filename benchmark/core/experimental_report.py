@@ -296,6 +296,8 @@ def _g4_case_paragraphs(batch_id: str) -> list[str]:
         run_id = str(run.get("runId"))
         raw = results.get(run_id, {})
         gd = raw.get("governanceDecision") if isinstance(raw.get("governanceDecision"), dict) else {}
+        from .classification_contract import denial_sequence, first_failed_stage
+        etapa_declarada = first_failed_stage(denial_sequence(raw))
         extractor = "disponivel" if isinstance(raw.get("governanceDecision"), dict) and gd.get("candidateGraphHash") else "ausente"
         parts = [
             "runId=" + run_id, "cond=" + str(run.get("condition")),
@@ -307,6 +309,7 @@ def _g4_case_paragraphs(batch_id: str) -> list[str]:
             "conflito=" + str(run.get("reportConflictCalled")),
             "operacoesReconhecidas=" + str(gd.get("recognizedOperation")),
             "etapaFalha=" + _denial_stage(raw),
+            "primeiraEtapaFalha=" + etapa_declarada,
             "extrator=" + extractor,
             "validacaoExec=" + str(run.get("validationExecuted")),
             "validacaoCompleta=" + str(run.get("validationComplete")),
