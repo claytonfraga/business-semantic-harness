@@ -346,10 +346,8 @@ def normalize_runs(batch_id: str, runs: list[dict[str, Any]], tasks: list[dict[s
             "candidateFinalTreeHash": source.get("candidateFinalTreeHash"),
             "codeBaseChanged": source.get("codeBaseChanged"),
             "changeDisposition": source.get("changeDisposition"),
-            "candidateSemanticValidity": (
-                source.get("candidateSemanticValidity")
-                if source.get("candidateSemanticValidity") not in (None, "INDETERMINATE")
-                else oracle_candidate_validity(task)),
+            "candidateSemanticValidity": source.get("candidateSemanticValidity") or "INDETERMINATE",
+            "solicitacaoPermitida": oracle_candidate_validity(task) == "VALID",
             "enforcementOutcomeObserved": source.get("enforcementOutcomeObserved"),
             "enforcementCorrectness": source.get("enforcementCorrectness") or "NOT_EVALUATED",
             "independentEnforcementActivated": source.get("independentEnforcementActivated"),
