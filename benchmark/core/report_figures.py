@@ -14,6 +14,9 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
+plt.rcParams.update({"font.size": 12, "axes.labelsize": 12, "axes.titlesize": 13,
+                     "xtick.labelsize": 11, "ytick.labelsize": 11, "legend.fontsize": 11})
+
 CONDICOES = ("A", "B", "C", "D")
 
 
@@ -36,7 +39,7 @@ def figure_outcomes(runs: list[dict[str, Any]], out_dir: Path) -> list[dict[str,
     dados: dict[str, Counter] = {cond: Counter() for cond in CONDICOES}
     for run in runs:
         dados[str(run.get("condition"))][_categoria(run)] += 1
-    fig, axes = plt.subplots(1, 2, figsize=(8, 3))
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 3))
     for ax, categoria in zip(axes, ("permitida", "violadora")):
         valores = [dados[cond].get(categoria, 0) for cond in CONDICOES]
         ax.bar(CONDICOES, valores, color="#4C72B0")
@@ -81,7 +84,7 @@ def figure_coverage(runs: list[dict[str, Any]], out_dir: Path) -> list[dict[str,
               "validacao": "validationComplete", "decisao": "promotionDecision"}
     contagem = {nome: [sum(1 for r in runs if r.get("condition") == cond and r.get(campo) is not None)
                        for cond in CONDICOES] for nome, campo in campos.items()}
-    fig, ax = plt.subplots(figsize=(8, 3))
+    fig, ax = plt.subplots(figsize=(7.2, 3))
     largura = 0.15
     for index, (nome, valores) in enumerate(contagem.items()):
         posicoes = [i + index * largura for i in range(len(CONDICOES))]

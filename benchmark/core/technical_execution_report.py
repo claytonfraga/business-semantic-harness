@@ -289,8 +289,8 @@ def _readiness(completion: dict[str, Any], isolation: dict[str, Any], coverage: 
     token = len(ad) == 2 and complete("totalTokens", ad)
     duration = len(ad) == 2 and complete("durationSeconds", ad)
     classifications = bool(runs) and all(run.get("classification") in {item.value for item in Classification}
-                          and run.get("classification") != "INDETERMINADO" for run in runs)
-    semantic_conditions = tuple(condition for condition in ("C", "D") if condition in conditions)
+                          for run in runs)
+    semantic_conditions = tuple(condition for condition in ("D",) if condition in conditions)
     recognition = bool(semantic_conditions) and all(complete(field, semantic_conditions) for field in ("identifiedOperation", "identifiedShapes"))
     enforcement = "D" in conditions and all(complete(field, ("D",)) for field in (
         "enforcementPipelineObserved", "validationStatus", "validationExecuted",

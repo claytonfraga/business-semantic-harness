@@ -20,7 +20,7 @@ TITLE = "Avaliação Experimental de Governança Semântica no Business Semantic
 SECTION_TITLES = [
     "Introdução", "Fundamentação", "Arquitetura do BSH", "Desenho Experimental",
     "Condições Experimentais", "Questões de Pesquisa", "Variáveis e Estimandos",
-    "Ground Truth e Oracles", "Instrumentação", "Integridade da Execução Experimental",
+    "Instrumentação", "Integridade da Execução Experimental",
     "Qualidade e Completude dos Dados", "Pareabilidade", "Resultados Funcionais",
     "RQ1-A: Consumo Bruto", "RQ1-B: Eficiência sob Equivalência", "RQ2: Benefício Computacional",
     "RQ3: Regras Textuais", "RQ4: Ontologia Consultiva", "RQ5: BSH Completo",
@@ -490,10 +490,9 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
         "Introdução": "Este estudo avalia governança semântica em alterações de código propostas por agentes. O objetivo é descrever diferenças observadas entre condições e os limites de inferência, seguindo princípios de experimentação em Engenharia de Software [wohlin2012; kitchenham2002].",
         "Fundamentação": "RDF representa fatos em grafos [rdf2014]; JSON-LD serializa dados ligados [jsonld2020]; OWL formaliza vocabulários [owl2012]; SHACL valida restrições [shacl2017]; SPARQL consulta grafos [sparql2013]. Agentes que raciocinam e agem podem usar ferramentas externas, mas a validação independente exige evidência separada da resposta voluntária do agente [yao2023].",
         "Arquitetura do BSH": "O agente trabalha em worktree isolada. Uma alteração candidata pode ser reconhecida como operação, materializada em grafo e verificada por SHACL antes dos gates técnicos e da promoção. Consulta ontológica é orientação consultiva; enforcement independente requer um candidato incompatível cujo gate tenha impedido a promoção sem relato voluntário.",
-        "Desenho Experimental": "A unidade de execução é a run; a unidade conceitual de generalização é a tarefa-base. Réplicas repetem uma tarefa e não aumentam nBaseTasks. Ordem, bloqueamento e parâmetros são lidos exclusivamente do plano e dos metadados congelados nesta Execução Experimental.",
+        "Desenho Experimental": "A unidade de execução é a run; a unidade conceitual de generalização é a tarefa-base. Réplicas repetem uma tarefa e não aumentam nBaseTasks. Ordem, bloqueamento e parâmetros são lidos exclusivamente do plano e dos metadados congelados nesta Execução Experimental. Critérios de avaliação dos resultados: o protocolo distingue (i) o resultado esperado da tarefa, definido previamente pelo protocolo (implementar uma consulta permitida ou preservar uma regra diante de uma solicitação violadora); (ii) o comportamento observado (consulta à ontologia, relato de conflito, produção de candidato, alteração da origem e decisão de promoção); e (iii) a correção do candidato e da decisão do gate, que exige examinar a alteração concreta, pois uma solicitação permitida pode resultar em implementação incorreta. expectedOperation e expectedShapes são lidos do manifesto de tarefas congelado no batch; identifiedOperation e identifiedShapes, das evidências da execução. A origem do critério de correção é explícita: SEM_ALTERACAO_CORRETA e REVISAO_HUMANA derivam da categoria da tarefa e da política congelada, não de julgamento independente; a correção semântica verificada é NOT_EVALUATED na ausência de referência independente, situação distinta da adequação ao critério operacional do experimento. A decisão do próprio BSH não serve, isoladamente, como comprovação de que o BSH decidiu corretamente.",
         "Condições Experimentais": "A executa o agente diretamente; B adiciona regras textuais; C adiciona ontologia consultiva; D usa o BSH completo. A × D mede efeito conjunto; A × B, B × C e C × D exploram componentes progressivos sem presumir causalidade.",
         "Variáveis e Estimandos": "Condição é a variável independente. Consumo de tokens, duração, correção funcional, correção de governança e desfecho da tarefa são variáveis dependentes distintas. WORKLOAD_TOKEN_REDUCTION é 1 menos a razão entre a soma de tokens D e a soma de tokens A, somente em pares com contabilidade comparável e denominador positivo.",
-        "Ground Truth e Oracles": "expectedOperation e expectedShapes são lidos do manifesto de tarefas congelado no batch. identifiedOperation e identifiedShapes são lidos das evidências da execução. Precision e recall são publicados somente se as fontes independentes forem verificáveis. A origem do critério de correção é explícita: SEM_ALTERACAO_CORRETA e REVISAO_HUMANA derivam da categoria da tarefa e da política congelada, não de julgamento independente; governanceCorrectness é NOT_EVALUATED na ausência de ground truth independente; taskOutcomeCorrect deriva dessas mesmas regras e deve ser lido como critério do experimento, não como verdade externa.",
         "Instrumentação": "O adapter registra runtime, telemetria de tokens, duração, diff, testes, consultas MCP, conflitos e status de enforcement. Valor ausente permanece nulo; zero indica medição explícita de zero. Tokens não cacheados não são derivados sem garantia documentada da semântica do runtime. Cobertura mede registros presentes, não o desfecho: 'cobertura de testes' é o número de execuções com teste executado sobre o total elegível (não o total de runs), e a cobertura de diff distingue diff vazio confirmado (por comparação de conteúdo inicial e final), diff não coletado e medida não aplicável.",
         "Resultados Funcionais": "Cumprimento do pedido, correção funcional, correção de governança e correção do desfecho são dimensões independentes. Uma violação evitada pode ter desfecho correto sem entregar o pedido literal. Os denominadores são explícitos por condição: contagens não devem ser lidas como proporções do total de runs quando o conjunto elegível for menor.",
         "Discussão": "Os resultados favoráveis, desfavoráveis e não calculáveis são apresentados separadamente. O relato seletivo de conflitos é evidência de utilidade consultiva, não de precisão semântica além da amostra. A execução de solicitações permitidas sob C/D não deve ser diluída pela contagem de violações evitadas. Zero oportunidades de enforcement independente não é taxa de falha nem sucesso: é ausência de denominador de exposição ao gate. Diferenças de tokens após bloqueio não equivalem a maior eficiência na entrega da mesma funcionalidade. 'Parcialmente sustentado' indica viabilidade da comparação, não eficácia demonstrada. Denominadores são separados por natureza: pareamento estrutural (universo de tarefas comuns) não é o mesmo que elegibilidade analítica (pares com contabilidade comparável); o conjunto completo de D não é o mesmo que o contraste pareado C × D; 'violações implementadas' e 'violações contidas' podem ser conjuntos distintos e devem ser identificados por runId; falha de instrumentação é distinta de falha de execução.",
@@ -764,7 +763,9 @@ def render_figures(model: dict[str, Any], batch_dir: Path) -> list[str]:
         if not data:
             continue
         out_dir.mkdir(exist_ok=True)
-        fig, ax = plt.subplots(figsize=(7.2, 4.2))
+        plt.rcParams.update({"font.size": 14, "axes.labelsize": 14, "axes.titlesize": 15,
+                             "xtick.labelsize": 13, "ytick.labelsize": 13, "legend.fontsize": 13})
+        fig, ax = plt.subplots(figsize=(6.4, 3.8))
         if figure["id"] == "paired-tokens":
             x = range(len(data))
             ax.plot(x, [row["leftTokens"] for row in data], "o-", color="black", label="A: direto")
@@ -783,7 +784,7 @@ def render_figures(model: dict[str, Any], batch_dir: Path) -> list[str]:
             labels = data.get("labels", [])
             values = data.get("values", [])
             ax.bar(range(len(labels)), values, color="#4C72B0")
-            ax.set_xticks(range(len(labels)), labels, rotation=45, ha="right")
+            ax.set_xticks(range(len(labels)), labels, rotation=90, ha="center")
             ax.set_ylabel(figure.get("ylabel") or "execuções")
             for index, value in enumerate(values):
                 ax.text(index, value, str(value), ha="center", va="bottom")
@@ -885,6 +886,7 @@ def render_latex(model: dict[str, Any], batch_dir: Path) -> Path:
     figures_by_section: dict[str, list[dict[str, Any]]] = {}
     for item in model["figures"]:
         figures_by_section.setdefault(item["section"], []).append(item)
+    details: list[tuple[str, str, Any]] = []
     for index, section in enumerate(model["sections"], 1):
         label = f"sec:{index:02d}"
         latex.append(r"\section{" + _latex(section["title"]) + r"}\label{" + label + "}")
@@ -894,8 +896,17 @@ def render_latex(model: dict[str, Any], batch_dir: Path) -> Path:
             latex.extend([r"\begin{longtable}{@{}" + ("p{" + f"{0.82 / columns:.3f}" + r"\textwidth}") * columns + "@{}}",
                           r"\caption{" + _latex(table["title"]) + "; unidades: " + _latex(table["units"]) + "; n=" + str(table["n"]) + "; fonte: " + _latex(table["source"]) + r"}\label{tab:" + str(table_number) + r"}\\",
                           r"\toprule " + " & ".join(_table_cell(header) for header in table["headers"]) + r"\\\midrule\endfirsthead"])
-            for row in table["rows"]:
-                latex.append(" & ".join(_table_cell(value) for value in row) + r"\\")
+            for row_number, row in enumerate(table["rows"], 1):
+                cells = []
+                for column_number, value in enumerate(row, 1):
+                    if len(_safe_text(value)) > 600:
+                        reference = "detalhe-" + str(table_number) + "-" + str(row_number) + "-" + str(column_number)
+                        detail_label = "Tabela " + str(table_number) + ", linha " + str(row_number) + ", coluna " + _safe_text(table["headers"][column_number - 1])
+                        details.append((reference, detail_label, value))
+                        cells.append(r"\textit{[valor integral na Seção~\ref{" + reference + "}]}")
+                    else:
+                        cells.append(_table_cell(value))
+                latex.append(" & ".join(cells) + r"\\")
             latex.extend([r"\bottomrule", r"\end{longtable}"])
         for figure in figures_by_section.get(section["title"], []):
             latex.extend(_figure_latex(figure))
@@ -905,6 +916,12 @@ def render_latex(model: dict[str, Any], batch_dir: Path) -> Path:
         latex.append(r"\bibitem[" + _latex(item["author"]) + "(" + _latex(item["year"]) + ")]{" + item["key"] + "}" + _latex(item["entry"]))
     latex.append(r"\end{thebibliography}")
     latex.extend(_appendix_prompts(batch_dir))
+    if details:
+        latex.append(r"\section{Detalhamento de Valores Longos}")
+        latex.append("Esta seção preserva integralmente os valores cujo conteúdo excede a largura de uma célula e não pode ser exibido em uma linha de tabela sem exceder a altura da página.")
+        for reference, detail_label, value in details:
+            latex.append(r"\subsection{" + _latex(detail_label) + r"}\label{" + reference + "}")
+            latex.append(_latex(value))
     latex.append(r"\end{document}")
     path = report_dir / "report.tex"
     path.write_text("\n\n".join(latex) + "\n", encoding="utf-8")

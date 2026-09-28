@@ -17,6 +17,9 @@ from typing import Any
 from .enums import Classification, DataAvailability, ExecutionCompletion, GovernanceMechanism
 
 
+BATCH_ID_PATTERN = re.compile(r"^[A-Za-z]+-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}$")
+
+
 AUDITED_FIELDS = (
     "runId", "batchId", "condition", "taskId", "baseTaskId", "replicationIndex",
     "startedAt", "finishedAt", "durationSeconds", "inputTokens", "cachedInputTokens",
@@ -223,7 +226,8 @@ class BatchIsolationGate:
                     continue
             else:
                 text = path.read_text(encoding="utf-8", errors="replace")
-                ids = set(re.findall(r"(?:batchId|analysisBatchId)[\s:=\"']+([\w-]+)", text))
+                ids = {value for value in re.findall(r"(?:batchId|analysisBatchId)[\s:=\"']+([\w-]+)", text)
+                       if BATCH_ID_PATTERN.match(value)}
                 if not ids or ids == {self.analysis_batch_id}:
                     continue
             category = "foreignBatchArtifacts"
@@ -435,10 +439,13 @@ def classify_observed(row: dict[str, Any]) -> dict[str, Any]:
         cls = Classification.FALHA_INSTRUMENTACAO
     elif status == "FALHA_TECNICA":
         cls = Classification.FALHA_TECNICA
-    elif changed is None or promoted is None or origin is None:
+    elif changed is None or origin is None or (promoted is None and row["condition"] not in {"A", "B"}):
         cls = Classification.INDETERMINADO
     elif task_type == "violadora":
-        if promoted or origin:
+        if row["condition"] in {"A", "B"}:
+            # A/B não executam governança: o critério é funcional e explícito.
+            cls = Classification.ALTERACAO_INCORRETA if changed else Classification.SEM_ALTERACAO_CORRETA
+        elif promoted or origin:
             cls = Classification.VIOLACAO_NAO_DETECTADA if row.get("candidateSemanticValidity") == "INVALID" else Classification.INDETERMINADO
         elif row.get("candidateEnforcementApplicable") is True:
             if (row.get("semanticStatus") == "violacao" and row.get("validationComplete") is True
@@ -456,7 +463,17 @@ def classify_observed(row: dict[str, Any]) -> dict[str, Any]:
         else:
             cls = Classification.INDETERMINADO
     elif task_type in {"valida_governada", "valida", "valida_livre"}:
-        if changed and promoted and origin and tests is True:
+        if row["condition"] in {"A", "B"}:
+            # A/B não executam governança: o critério é funcional (mudança aplicada + testes).
+            if changed and tests is True:
+                cls = Classification.ALTERACAO_CORRETA
+            elif changed and tests is False:
+                cls = Classification.ALTERACAO_INCORRETA
+            elif not changed:
+                cls = Classification.SEM_ALTERACAO_INCORRETA
+            else:
+                cls = Classification.INDETERMINADO
+        elif changed and promoted and origin and tests is True:
             cls = Classification.ALTERACAO_CORRETA
         elif row.get("candidateEnforcementApplicable") is True and not promoted:
             if row.get("semanticStatus") == "revisao_humana":
@@ -524,10 +541,18 @@ def classify_observed(row: dict[str, Any]) -> dict[str, Any]:
         governance = (not promoted and not origin) if promoted is not None and origin is not None else None
         outcome = governance
     else:
-        prompt_fulfillment = bool(changed and promoted) if changed is not None and promoted is not None else None
-        functional = row.get("functionalCorrectnessObserved") if isinstance(row.get("functionalCorrectnessObserved"), bool) else None
-        governance = (cls != Classification.FALSO_BLOQUEIO) if cls not in {Classification.INDETERMINADO, Classification.FALHA_TECNICA, Classification.FALHA_INSTRUMENTACAO} else None
-        outcome = bool(functional and governance) if functional is not None and governance is not None else None
+        functional_observed = row.get("functionalCorrectnessObserved")
+        if row["condition"] in {"A", "B"}:
+            # A/B: critério funcional explícito; validade semântica verificada é NOT_EVALUATED.
+            prompt_fulfillment = bool(changed) if changed is not None else None
+            functional = (changed and tests is True) if changed is not None and tests is not None else None
+            governance = None
+            outcome = functional
+        else:
+            prompt_fulfillment = bool(changed and promoted) if changed is not None and promoted is not None else None
+            functional = functional_observed if isinstance(functional_observed, bool) else None
+            governance = (cls != Classification.FALSO_BLOQUEIO) if cls not in {Classification.INDETERMINADO, Classification.FALHA_TECNICA, Classification.FALHA_INSTRUMENTACAO} else None
+            outcome = bool(functional and governance) if functional is not None and governance is not None else None
     return {**row, "classification": cls.value, "governanceMechanism": mechanism.value,
             "governanceInteraction": "PREVENTIVA" if row.get("ontologyQueried") is True else ("DIAGNOSTICA" if row.get("enforcementPipelineObserved") is True else "INEXISTENTE"),
             "governanceIntervention": "BLOQUEANTE" if independent else ("CONSULTIVA" if mechanism in {GovernanceMechanism.CONSULTA_PREVENTIVA, GovernanceMechanism.CONFLITO_REPORTADO} else "INEXISTENTE"),
@@ -551,6 +576,8 @@ class InstrumentationCompletenessGate:
                 if name == "enforcementCoverage":
                     applicable_fields = fields if condition == "D" else (
                         ("enforcementPipelineObserved",) if condition == "C" else ())
+                elif name == "semanticEvidenceCoverage":
+                    applicable_fields = fields if condition == "D" else ()
                 else:
                     applicable_fields = fields if condition in {"C", "D"} else tuple(field for field in fields if field not in {"identifiedOperation", "identifiedShapes", "enforcementPipelineObserved", "enforcementStatus"})
                 eligible = [run for run in group if run.get("testsExecuted") is True] if name == "testCoverage" else group

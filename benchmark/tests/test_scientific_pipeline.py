@@ -374,5 +374,24 @@ class ScientificPipelineRegression(unittest.TestCase):
                 self.assertEqual(value, read_json(batch / name), name)
 
 
+    def test_Given_prose_mentioning_batchId_When_isolation_checked_Then_not_foreign(self):
+        """codex: Given .tex prose mentioning batchId and runIds, When isolation is checked, Then no foreign artifact."""
+        with TemporaryDirectory() as directory:
+            report = Path(directory) / "report" / "report.tex"
+            report.parent.mkdir(parents=True)
+            report.write_text("cada afirmação identifica o batchId e as runIds.", encoding="utf-8")
+            result = BatchIsolationGate(Path(directory), "opencode-2026-09-27T23-12-05").evaluate([])
+            self.assertEqual(result["status"], "PASS")
+
+    def test_Given_foreign_batch_id_in_tex_When_isolation_checked_Then_hard_fail(self):
+        """codex: Given a foreign batch id in .tex, When isolation is checked, Then hard fail."""
+        with TemporaryDirectory() as directory:
+            report = Path(directory) / "report" / "report.tex"
+            report.parent.mkdir(parents=True)
+            report.write_text("batchId: opencode-2020-01-01T00-00-00", encoding="utf-8")
+            result = BatchIsolationGate(Path(directory), "opencode-2026-09-27T23-12-05").evaluate([])
+            self.assertEqual(result["status"], "HARD_FAIL")
+
+
 if __name__ == "__main__":
     unittest.main()
