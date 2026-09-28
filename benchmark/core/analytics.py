@@ -77,11 +77,15 @@ def false_block_metric(runs: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def delivery_metric(runs: list[dict[str, Any]]) -> dict[str, Any]:
+    """Entrega observada: a alteração solicitada foi aplicada à origem (uniforme em A/B/C/D).
+
+    Não exige validade semântica verificada; 'promovido' é apenas um dos caminhos para a
+    alteração de origem, portanto não é requisito exclusivo de C/D.
+    """
     permitidas = [r for r in runs if r.get("solicitacaoPermitida") is True]
-    entregues = [str(r.get("runId")) for r in permitidas
-                 if r.get("codeBaseChanged") is True and r.get("promoted") is True]
+    entregues = [str(r.get("runId")) for r in permitidas if r.get("codeBaseChanged") is True]
     sem_candidato = [str(r.get("runId")) for r in permitidas if r.get("candidateCreated") is not True]
-    return _metric(entregues, [str(r.get("runId")) for r in permitidas], "solicitacao permitida executada",
+    return _metric(entregues, [str(r.get("runId")) for r in permitidas], "solicitacao permitida aplicada a origem",
                    {"sem candidato": sem_candidato})
 
 

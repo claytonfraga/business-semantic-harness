@@ -206,10 +206,19 @@ class ScientificPipelineRegression(unittest.TestCase):
         self.assertIsNone(correlation["pearson"])
         self.assertIsNone(correlation["spearman"])
 
-    def test_Given_zero_violations_When_wilson_computed_Then_upper_bound_positive(self):
+    def test_Given_zero_violations_and_no_verified_candidate_When_false_block_then_rate_not_computable(self):
         records = [raw("C", task=f"G{number}") for number in range(1, 4)]
         result = statistics(*records)
         self.assertEqual(result["falseBlocks"]["falseBlocksObserved"], 0)
+        self.assertFalse(result["falseBlocks"]["falseBlockRateComputable"])
+        self.assertIsNone(result["falseBlocks"]["confidenceInterval"])
+        self.assertIsNone(result["falseBlocks"]["falseBlockRate"])
+
+    def test_Given_zero_violations_with_verified_candidates_When_wilson_computed_Then_upper_bound_positive(self):
+        records = [raw("C", task=f"G{number}", candidateSemanticValidity="VALID") for number in range(1, 4)]
+        result = statistics(*records)
+        self.assertEqual(result["falseBlocks"]["falseBlocksObserved"], 0)
+        self.assertTrue(result["falseBlocks"]["falseBlockRateComputable"])
         self.assertGreater(result["falseBlocks"]["confidenceInterval"][1], 0)
         self.assertEqual(result["falseBlocks"]["intervalSidedness"], "two-sided")
 

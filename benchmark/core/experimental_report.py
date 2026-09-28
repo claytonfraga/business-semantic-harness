@@ -295,23 +295,26 @@ def _g4_case_paragraphs(batch_id: str) -> list[str]:
         raw = results.get(run_id, {})
         gd = raw.get("governanceDecision") if isinstance(raw.get("governanceDecision"), dict) else {}
         from .classification_contract import denial_sequence, first_failed_stage
-        etapa_declarada = first_failed_stage(denial_sequence(raw))
+        cond = str(run.get("condition"))
+        enforcement_applicable = cond in {"C", "D"}
+        etapa_declarada = first_failed_stage(denial_sequence(raw)) if enforcement_applicable else "nao_aplicavel"
         extractor = "disponivel" if isinstance(raw.get("governanceDecision"), dict) and gd.get("candidateGraphHash") else "ausente"
+        nao_aplicavel = not enforcement_applicable
         parts = [
-            "runId=" + run_id, "cond=" + str(run.get("condition")),
+            "runId=" + run_id, "cond=" + cond,
             "solicitacaoPermitida=" + str(run.get("solicitacaoPermitida")),
             "candidato=" + str(run.get("candidateCreated")),
             "changeSet=" + str(run.get("changeSetDetected")),
             "codeBase=" + str(run.get("codeBaseChanged")),
             "consulta=" + str(run.get("ontologyQueried")),
             "conflito=" + str(run.get("reportConflictCalled")),
-            "operacoesReconhecidas=" + str(gd.get("recognizedOperation")),
-            "etapaFalha=" + _denial_stage(raw),
+            "operacoesReconhecidas=" + (str(gd.get("recognizedOperation")) if enforcement_applicable else "nao_aplicavel"),
+            "etapaFalha=" + ("nao_aplicavel" if nao_aplicavel else _denial_stage(raw)),
             "primeiraEtapaFalha=" + etapa_declarada,
-            "extrator=" + extractor,
-            "validacaoExec=" + str(run.get("validationExecuted")),
-            "validacaoCompleta=" + str(run.get("validationComplete")),
-            "promocao=" + str(run.get("promotionDecision")),
+            "extrator=" + ("nao_aplicavel" if nao_aplicavel else extractor),
+            "validacaoExec=" + ("nao_aplicavel" if nao_aplicavel else str(run.get("validationExecuted"))),
+            "validacaoCompleta=" + ("nao_aplicavel" if nao_aplicavel else str(run.get("validationComplete"))),
+            "promocao=" + ("nao_aplicavel" if nao_aplicavel else str(run.get("promotionDecision"))),
             "promovido=" + str(run.get("promoted")),
             "classe=" + str(run.get("classification")),
         ]
@@ -473,6 +476,91 @@ def _complementary_figures(batch_id: str) -> list[dict[str, Any]]:
     return figuras
 
 
+def _median(values: list[Any]) -> Any:
+    ordered = sorted(value for value in values if value is not None)
+    if not ordered:
+        return None
+    middle = len(ordered) // 2
+    value = ordered[middle] if len(ordered) % 2 else (ordered[middle - 1] + ordered[middle]) / 2
+    return round(value, 1)
+
+
+def _observed_analyses(batch_id: str) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    runs = _read_classified(batch_id)
+    if not runs:
+        return [], []
+
+    def categoria(run: dict[str, Any]) -> str:
+        return "violadora" if str(run.get("taskType") or "").lower() in ("violadora", "violating") else "permitida"
+
+    sections: list[dict[str, Any]] = []
+    tables: list[dict[str, Any]] = []
+
+    comportamento = []
+    for condition in "ABCD":
+        for category in ("permitida", "violadora"):
+            group = [run for run in runs if run.get("condition") == condition and categoria(run) == category]
+            if not group:
+                continue
+            comportamento.append([condition, category, len(group),
+                                  sum(run.get("candidateCreated") is True for run in group),
+                                  sum(run.get("codeBaseChanged") is True for run in group),
+                                  sum(run.get("ontologyQueried") is True for run in group),
+                                  sum(run.get("reportConflictCalled") is True for run in group),
+                                  sum(run.get("promoted") is True for run in group)])
+    table = _table("Comportamentos observados por condição e categoria",
+                   ["Condição", "Categoria", "Execuções", "Com candidato", "Alterou origem", "Consultou ontologia", "Relatou conflito", "Promovido"],
+                   comportamento, "execuções", "classified-runs.json", len(runs))
+    table["section"] = "Comportamento Observado por Condição"
+    tables.append(table)
+    sections.append({"title": "Comportamento Observado por Condição", "paragraphs": [
+        "Descrição observada por condição e categoria, sem juízo de correção: produção de candidato, alteração da origem, consulta à ontologia, relato de conflito e promoção.",
+        "A contenção de solicitações violadoras e a entrega de solicitações permitidas são dimensões distintas e não devem ser somadas. Cada contagem é absoluta; quando o conjunto elegível for menor que o total, a proporção não é apresentada."]})
+
+    custo = []
+    for condition in "ABCD":
+        for category in ("permitida", "violadora"):
+            group = [run for run in runs if run.get("condition") == condition and categoria(run) == category]
+            if not group:
+                continue
+            tokens = [run.get("totalTokens") for run in group if run.get("totalTokens") is not None]
+            durations = [run.get("durationSeconds") for run in group if run.get("durationSeconds") is not None]
+            custo.append([condition, category, len(group),
+                          int(sum(tokens)) if tokens else None,
+                          int(_median(tokens)) if tokens else None,
+                          round(sum(durations), 1) if durations else None,
+                          _median(durations)])
+    table = _table("Tokens e duração por condição e categoria",
+                   ["Condição", "Categoria", "Execuções", "Tokens totais", "Tokens mediana", "Duração total (s)", "Duração mediana (s)"],
+                   custo, "tokens e segundos", "classified-runs.json", len(runs))
+    table["section"] = "Custo Observado por Categoria"
+    tables.append(table)
+    sections.append({"title": "Custo Observado por Categoria", "paragraphs": [
+        "Somas e medianas de tokens e duração separando solicitações permitidas de violadoras.",
+        "Reduzir consumo ao conter uma solicitação violadora, que pode terminar bloqueada, não equivale a eficiência na entrega de trabalho equivalente; compare apenas pares com contabilidade comparável. Ausência de token não é zero."]})
+
+    results = _read_results(batch_id)
+    permitidas_d = [run for run in runs if run.get("condition") == "D" and categoria(run) == "permitida"]
+    linhas_d = []
+    for run in permitidas_d:
+        gd = (results.get(str(run.get("runId")), {}) or {}).get("governanceDecision")
+        gd = gd if isinstance(gd, dict) else {}
+        linhas_d.append([str(run.get("runId")), str(run.get("candidateCreated")), str(run.get("promotionDecision")),
+                         str(gd.get("failureStage")), str(run.get("testsPassed")), str(run.get("originChanged")),
+                         str(run.get("classification"))])
+    if linhas_d:
+        table = _table("Execuções de solicitações permitidas em D",
+                       ["Run", "Candidato", "Decisão de promoção", "Etapa de falha", "Testes aprovados", "Alterou origem", "Classe"],
+                       linhas_d, "execuções", "classified-runs.json + result.json", len(linhas_d))
+        table["section"] = "Solicitações Permitidas em D"
+        tables.append(table)
+        sections.append({"title": "Solicitações Permitidas em D", "paragraphs": [
+            "Reúne as execuções de solicitações permitidas em D, distinguindo existência de candidato, decisão, etapa alcançada, testes e efeito sobre a origem.",
+            "Existência de candidato desconhecida, negativa por reconhecimento e validade semântica não verificada são situações distintas e não devem ser tratadas como um único tipo de bloqueio."]})
+
+    return sections, tables
+
+
 def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str, Any],
                        completion: dict[str, Any], quality: dict[str, Any], isolation: dict[str, Any],
                        usability: dict[str, Any], ground_truth: dict[str, Any], stats: dict[str, Any],
@@ -514,7 +602,13 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
             paragraph = f"{RQ_TITLES[rq_id]} {_metric_sentence(rq_id, entry)} Status: {entry['status']}; nRuns: {entry['nRuns']}; nBaseTasks: {entry['nBaseTasks']}. " + ("Limitações: " + "; ".join(entry["limitations"]) + "." if entry["limitations"] else "")
         elif title == "Falsos Bloqueios":
             fb = stats["falseBlocks"]
-            paragraph = f"Foram observados {fb['falseBlocksObserved']} falsos bloqueios em {fb['falseBlockOpportunities']} oportunidades ({fb['nBaseTasks']} tarefas-base). O intervalo de Wilson é bilateral; zero eventos não implica risco zero."
+            if fb.get("falseBlockRateComputable"):
+                paragraph = f"Foram observados {fb['falseBlocksObserved']} falsos bloqueios em {fb['falseBlockOpportunities']} oportunidades ({fb['nBaseTasks']} tarefas-base); conformes verificados: {fb['verifiedValidCandidates']}; inválidos verificados: {fb['verifiedInvalidCandidates']}. O intervalo de Wilson é bilateral; zero eventos não implica risco zero."
+            else:
+                paragraph = (f"Não foram observados falsos bloqueios, mas a taxa e o intervalo de confiança são NÃO COMPUTÁVEIS: "
+                             f"nenhum dos {fb['falseBlockOpportunities']} candidatos bloqueados de solicitações permitidas teve validade semântica verificada "
+                             f"(conformes verificados: {fb['verifiedValidCandidates']}; inválidos verificados: {fb['verifiedInvalidCandidates']}). "
+                             "Sem denominador verificado não se apresenta taxa zero nem intervalo: ausência de verificação não é evidência de correção.")
         elif title == "Violações Não Detectadas":
             vio = stats["violations"]
             case_ids = ", ".join(case["runId"] for case in vio["escapedCases"])
@@ -582,6 +676,9 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
                               functional_rows, "runs", "classified-runs.json", sample["nRuns"])
     functional_table["section"] = "Resultados Funcionais"
     tables.append(functional_table)
+    extra_sections, extra_tables = _observed_analyses(batch_id)
+    sections.extend(extra_sections)
+    tables.extend(extra_tables)
     ad_plot = [{"baseTaskId": row["baseTaskId"], "leftTokens": row["leftTokens"], "rightTokens": row["rightTokens"]}
                for row in pairs["A-D"] if row["status"] == "PAIRED" and row["tokenAccountingComparable"] == "TRUE"]
     figures = [{"id": "paired-tokens", "title": "Consumo observado de tokens por par A × D", "data": ad_plot,
