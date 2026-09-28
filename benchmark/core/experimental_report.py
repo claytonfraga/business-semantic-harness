@@ -860,7 +860,9 @@ def render_latex(model: dict[str, Any], batch_dir: Path) -> Path:
     table_sections: dict[str, list[tuple[int, dict[str, Any]]]] = {}
     for table_number, table in enumerate(model["tables"], 1):
         table_sections.setdefault(table["section"], []).append((table_number, table))
-    figures_by_section = {item["section"]: item for item in model["figures"]}
+    figures_by_section: dict[str, list[dict[str, Any]]] = {}
+    for item in model["figures"]:
+        figures_by_section.setdefault(item["section"], []).append(item)
     for index, section in enumerate(model["sections"], 1):
         label = f"sec:{index:02d}"
         latex.append(r"\section{" + _latex(section["title"]) + r"}\label{" + label + "}")
@@ -873,8 +875,8 @@ def render_latex(model: dict[str, Any], batch_dir: Path) -> Path:
             for row in table["rows"]:
                 latex.append(" & ".join(_table_cell(value) for value in row) + r"\\")
             latex.extend([r"\bottomrule", r"\end{longtable}"])
-        if section["title"] in figures_by_section:
-            latex.extend(_figure_latex(figures_by_section[section["title"]]))
+        for figure in figures_by_section.get(section["title"], []):
+            latex.extend(_figure_latex(figure))
     latex.append(r"\section*{Referências}\addcontentsline{toc}{section}{Referências}")
     latex.append(r"\begin{thebibliography}{99}")
     for item in model["references"]:
