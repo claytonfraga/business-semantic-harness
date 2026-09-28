@@ -33,8 +33,9 @@ class ReportConceptRegression(unittest.TestCase):
         text = " ".join(_intro_paragraphs())
         self.assertIn("C — BSH consultivo", text)
         self.assertIn("D — BSH completo", text)
-        self.assertIn("apenas D possui enforcement independente", text)
-        self.assertIn("Tanto C quanto D utilizam BSH", text)
+        self.assertIn("sem enforcement independente no gate de promoção", text)
+        self.assertIn("acrescenta enforcement independente no gate de promoção", text)
+        self.assertIn("D = BSH consultivo + controle independente da promoção", text)
 
     def test_Given_introduction_When_built_Then_all_four_contrasts_documented(self):
         """opencode: Given the introduction, When built, Then A×B, B×C, C×D and A×D are documented."""

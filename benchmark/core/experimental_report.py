@@ -114,9 +114,6 @@ def _intro_paragraphs() -> list[str]:
         "semântico e decide como agir.",
         "D — BSH completo: utiliza o mesmo BSH semântico de C e acrescenta enforcement independente no "
         "gate de promoção. Portanto, D = BSH consultivo + controle independente da promoção.",
-        "Identidades: A = sem BSH; B = sem BSH, com regras textuais; C = BSH semântico consultivo; "
-        "D = BSH semântico consultivo + enforcement independente. Tanto C quanto D utilizam BSH; "
-        "apenas D possui enforcement independente.",
         "Os contrastes experimentais são interpretados assim: A × B, efeito das regras textuais; "
         "B × C, efeito da introdução do BSH semântico; C × D, efeito adicional do enforcement "
         "independente do BSH; A × D, efeito combinado do BSH completo em relação ao agente sem governança.",
@@ -604,7 +601,7 @@ def _observed_analyses(batch_id: str) -> tuple[list[dict[str, Any]], list[dict[s
     vio = [run for run in runs if categoria(run) == "violadora"]
     sections.append({"title": "Testes Técnicos e Preservação das Regras", "paragraphs": [
         f"Entre {len(vio)} execuções violadoras, {sum(run.get('testsExecuted') is True for run in vio)} executaram testes e {sum(run.get('testsPassed') is True for run in vio)} os reportaram como aprovados.",
-        "Os artefatos não permitem distinguir testes adaptados à solicitação violadora de verificações preservadas da política original; a resposta à RQ10 permanece parcialmente sustentada e não se atribui aprovação à preservação de regras sem essa distinção no dado."]})
+        "Os artefatos não permitem distinguir testes adaptados à solicitação violadora de verificações preservadas da política original; a resposta à RQ10 deve ser lida com o mesmo status e veredito reportados na seção de Questões de Pesquisa e na matriz de evidências, sem atribuir aprovação à preservação de regras."]})
 
     rep1 = [run for run in runs if (run.get("replicationIndex") or 1) == 1]
     rep2 = [run for run in runs if (run.get("replicationIndex") or 1) > 1]
@@ -833,13 +830,37 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
         "No relatório anterior, as oportunidades de falso bloqueio pertenciam a uma única tarefa-base, o que "
         "restringe a interpretação de intervalos estatísticos que tratem as execuções como independentes.",
     ]})
+    runs_cls = _read_classified(batch_id)
+
+    def _permitida(run: dict[str, Any]) -> bool:
+        return str(run.get("taskType") or "").lower() not in ("violadora", "violating")
+
+    entrega_resumo = []
+    for condition in "ABCD":
+        grupo = [run for run in runs_cls if run.get("condition") == condition and _permitida(run)]
+        if grupo:
+            entrega_resumo.append(f"{condition}={sum(run.get('codeBaseChanged') is True for run in grupo)}/{len(grupo)}")
+    fb_resumo = stats["falseBlocks"]
+    vio_resumo = stats["violations"]
+    observed_summary = [
+        f"Amostra observada: {sample['nRuns']} execuções e {sample['nBaseTasks']} tarefas-base; comparação principal equilibrada com as 12 tarefas da 1ª repetição em A/B/C/D (48 execuções) e 10 execuções adicionais restritas a A e D, analisadas em caráter complementar.",
+        "Entrega observada (alteração efetivamente aplicada à origem) nas solicitações permitidas: " + ", ".join(entrega_resumo) + ". Não é correção integral comprovada.",
+        f"Contenção de solicitações violadoras em C/D: contidas={vio_resumo['containedViolations']}, escaparam={vio_resumo['escapedViolations']}, indeterminadas={vio_resumo['undeterminedViolatingRuns']}.",
+        (f"Falsos bloqueios: 0 confirmados; taxa e intervalo indisponíveis — não há candidato de validade semântica verificada "
+         f"(oportunidades de bloqueio de solicitação permitida: {fb_resumo['falseBlockOpportunities']}).")
+        if not fb_resumo.get("falseBlockRateComputable") else
+        (f"Falsos bloqueios: {fb_resumo['falseBlocksObserved']} em {fb_resumo['falseBlockOpportunities']} oportunidades."),
+        "Limitações que afetam a interpretação: correção semântica verificada é NO_AVALIADA sem referência independente; prompts completos por condição não são armazenados; tarefas concentram-se em poucas famílias.",
+    ]
     model = {"title": TITLE, "subtitle": subtitle, "batchId": batch_id, "domain": domain,
              "executionDate": metadata.get("startedAt"), "dataOrigin": metadata.get("dataOrigin"),
-             "provenance": provenance, "abstract": {"objective": "Avaliar governança semântica observada no BSH",
-             "design": "Quatro condições pareadas A/B/C/D", "nRuns": sample["nRuns"], "nBaseTasks": sample["nBaseTasks"],
+             "provenance": provenance, "abstract": {"objective": "Descrever o comportamento observado do BSH sob quatro condições, sem inferir correção semântica onde não há verificação independente",
+             "design": "Comparação principal equilibrada (12 tarefas × A/B/C/D) e repetições complementares em A/D", "nRuns": sample["nRuns"], "nBaseTasks": sample["nBaseTasks"],
+             "observedSummary": observed_summary,
              "mainResults": {rq: verdicts["researchQuestions"][rq]["verdict"] for rq in ("RQ1_A", "RQ1_B", "RQ5", "RQ10", "RQ11")},
              "limitations": ["Generalização limitada ao agente, modelo, domínio e tarefas observados",
-                             "Escopo observacional: sem ground truth independente a correção semântica de decisões de enforcement é NOT_EVALUATED"]},
+                             "Correção semântica de decisões de enforcement é NOT_EVALUATED na ausência de referência independente",
+                             "O conteúdo completo enviado por condição não está disponível nos registros"]},
              "execution": completion, "isolation": isolation, "quality": quality,
              "usability": usability, "groundTruth": ground_truth, "statistics": stats,
              "evidenceMatrix": evidence, "verdicts": verdicts, "sections": sections,
@@ -1070,7 +1091,7 @@ def render_latex(model: dict[str, Any], batch_dir: Path) -> Path:
              r"\begin{document}", r"\begin{titlepage}\centering", r"{\LARGE\bfseries " + _latex(model["title"]) + r"\par}",
              r"\vspace{2cm}{\large " + _latex(model["subtitle"]) + r"\par}",
              r"\vfill " + _latex(model["dataOrigin"]) + r"\end{titlepage}",
-             r"\section*{Resumo}", _latex(model["abstract"]["objective"]) + ". " + _latex(model["abstract"]["design"]) + ". " + f"nRuns={model['abstract']['nRuns']}; nBaseTasks={model['abstract']['nBaseTasks']}. " + "Resultados centrais: " + _latex(abstract_results) + ". " + _latex("; ".join(model["abstract"]["limitations"])),
+             r"\section*{Resumo}", _latex(model["abstract"]["objective"]) + ". " + _latex(model["abstract"]["design"]) + ". " + f"nRuns={model['abstract']['nRuns']}; nBaseTasks={model['abstract']['nBaseTasks']}. " + _latex(" ".join(model["abstract"].get("observedSummary", []))) + " " + _latex("; ".join(model["abstract"]["limitations"])),
              r"\section*{Abstract}", "Experimental semantic governance assessment of the Business Semantic Harness. " + f"Observed runs: {model['abstract']['nRuns']}; base tasks: {model['abstract']['nBaseTasks']}. " + "Main results: " + _latex(abstract_results) + ". Conclusions are limited to the observed agent, model, domain and tasks.", r"\tableofcontents", r"\clearpage"]
     table_sections: dict[str, list[tuple[int, dict[str, Any]]]] = {}
     for table_number, table in enumerate(model["tables"], 1):
