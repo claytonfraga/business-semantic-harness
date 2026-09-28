@@ -446,6 +446,17 @@ def _complementary_figures(batch_id: str) -> list[dict[str, Any]]:
                         "ylabel": "execuções com campo observado",
                         "interpretation": "Cobertura mede registro presente, não qualidade do desfecho; ausência não é zero."})
 
+    totais = [sum(r.get("totalTokens") for r in runs if r.get("condition") == cond and r.get("totalTokens") is not None) for cond in "ABCD"]
+    contagens = [sum(1 for r in runs if r.get("condition") == cond and r.get("totalTokens") is not None) for cond in "ABCD"]
+    if any(contagens):
+        medias = [round(totais[i] / contagens[i], 1) if contagens[i] else 0 for i in range(4)]
+        figuras.append({"id": "fig-tokens", "title": "Tokens por condição (média observada)", "question": "Qual o consumo de tokens por condição?",
+                        "population": "execuções com totalTokens e contabilidade comparável",
+                        "section": "Figura: Tokens", "source": "classified-runs.json", "n": sum(contagens),
+                        "data": {"labels": [cond + " (n=" + str(contagens[i]) + ")" for i, cond in enumerate("ABCD")], "values": medias},
+                        "ylabel": "tokens médios por execução",
+                        "interpretation": "Média descritiva por condição; réplicas não são amostras independentes, o denominador é o número de execuções com token observado e ausência não é zero."})
+
     code_map = {"ALTERACAO_CORRETA": 0, "SEM_ALTERACAO_CORRETA": 1, "BLOQUEIO_CORRETO": 2,
                 "SEM_ALTERACAO_INCORRETA": 3, "ALTERACAO_INCORRETA": 4, "FALSO_BLOQUEIO": 5,
                 "REVISAO_HUMANA": 6, "INDETERMINADO": 7, "FALHA_INSTRUMENTACAO": 8, "FALHA_TECNICA": 9}
