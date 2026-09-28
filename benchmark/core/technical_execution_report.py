@@ -504,6 +504,7 @@ def _model(batch_dir: Path, config: dict[str, Any], tasks: list[dict[str, Any]],
     if instrument["invalidValues"]:
         issues.append({"severity": "EXECUTION_FAIL", "code": "INVALID_INSTRUMENTATION", "detail": str(instrument["invalidValues"])})
     for run in classified:
+        source = by_raw_id.get(run.get("runId"), {})
         if run.get("evidenceCollectionStatus") == "INVALID":
             issues.append({"severity": "EXECUTION_FAIL", "code": "GOVERNANCE_EVIDENCE_INVALID",
                            "detail": f"{run['runId']}: {run.get('evidenceCollectionIssue')}"})

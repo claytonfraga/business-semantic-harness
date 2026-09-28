@@ -562,8 +562,18 @@ def _observed_analyses(batch_id: str) -> tuple[list[dict[str, Any]], list[dict[s
     for run in permitidas_d:
         gd = (results.get(str(run.get("runId")), {}) or {}).get("governanceDecision")
         gd = gd if isinstance(gd, dict) else {}
-        linhas_d.append([str(run.get("runId")), rotulo_candidato(run), rotulo_promocao(run),
-                         str(gd.get("failureStage") or "nao_alancada"), str(run.get("testsPassed")),
+        candidato = run.get("candidateCreated")
+        if candidato is None:
+            etapa = "desconhecida"
+        elif gd.get("failureStage"):
+            etapa = str(gd["failureStage"])
+        elif run.get("promotionDecision") == "DENY":
+            etapa = "desconhecida"
+        else:
+            etapa = "nao_aplicavel"
+        testes = run.get("testsPassed")
+        linhas_d.append([str(run.get("runId")), rotulo_candidato(run), rotulo_promocao(run), etapa,
+                         "aprovados" if testes is True else ("reprovados" if testes is False else "desconhecido"),
                          str(run.get("originChanged")), str(run.get("classification"))])
     if linhas_d:
         table = _table("Execuções de solicitações permitidas em D",
@@ -627,8 +637,21 @@ def _observed_analyses(batch_id: str) -> tuple[list[dict[str, Any]], list[dict[s
     tables.append(table)
     rep2_tasks = sorted({str(run.get("baseTaskId")) for run in rep2})
     rep2_conds = sorted({str(run.get("condition")) for run in rep2})
+    paired_path = Path(__file__).resolve().parents[1] / "results" / batch_id / "paired-results.csv"
+    contrast_paired: dict[str, int] = {}
+    comparabilidade: set[str] = set()
+    if paired_path.is_file():
+        import csv as _csv
+        for row in _csv.DictReader(paired_path.open(encoding="utf-8")):
+            if row.get("status") == "PAIRED":
+                contrast_paired[row.get("contrast")] = contrast_paired.get(row.get("contrast"), 0) + 1
+            comparabilidade.add(str(row.get("tokenAccountingComparable")))
+    contraste_txt = "; ".join(f"{c}={n} pares" for c, n in sorted(contrast_paired.items())) or "sem pares"
+    comparavel = comparabilidade == {"TRUE"}
     sections.append({"title": "Comparação Principal Equilibrada", "paragraphs": [
         f"A comparação principal usa as 12 tarefas da 1ª repetição nas quatro condições ({len(rep1)} execuções). 'Entrega observada' = alteração efetivamente aplicada à origem; NÃO é correção integral comprovada.",
+        f"Pareamento por contraste (tarefa, repetição e variante): {contraste_txt}. Contrastes com menos de 12 pares refletem a ausência de execução correspondente na outra condição, registrada como NO_MATCHING_RUN.",
+        f"Comparabilidade contábil de tokens observada nos pares: {', '.join(sorted(comparabilidade)) or 'indeterminada'}. " + ("Diferenças percentuais são publicadas apenas quando a contabilidade é comparável." if not comparavel else "A contabilidade é comparável; diferenças absolutas e percentuais são calculadas sobre os pares elegíveis."),
         f"As dez execuções adicionais da 2ª repetição (tarefas {', '.join(rep2_tasks)}, condições {', '.join(rep2_conds)}) são analisadas em caráter complementar e não substituem a comparação equilibrada.",
         "As estatísticas da campanha completa (58 execuções) são mantidas, mas não substituem a comparação equilibrada. As 12 tarefas concentram-se em poucas famílias (consulta, baixa, transferência): variações da mesma solicitação não equivalem a diversidade de problemas funcionalmente distintos."]})
 
@@ -652,11 +675,11 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
         "Introdução": "Este estudo avalia governança semântica em alterações de código propostas por agentes. O objetivo é descrever diferenças observadas entre condições e os limites de inferência, seguindo princípios de experimentação em Engenharia de Software [wohlin2012; kitchenham2002].",
         "Fundamentação": "RDF representa fatos em grafos [rdf2014]; JSON-LD serializa dados ligados [jsonld2020]; OWL formaliza vocabulários [owl2012]; SHACL valida restrições [shacl2017]; SPARQL consulta grafos [sparql2013]. Agentes que raciocinam e agem podem usar ferramentas externas, mas a validação independente exige evidência separada da resposta voluntária do agente [yao2023].",
         "Arquitetura do BSH": "O agente trabalha em worktree isolada. Uma alteração candidata pode ser reconhecida como operação, materializada em grafo e verificada por SHACL antes dos gates técnicos e da promoção. Consulta ontológica é orientação consultiva; enforcement independente requer um candidato incompatível cujo gate tenha impedido a promoção sem relato voluntário.",
-        "Desenho Experimental": "A unidade de execução é a run; a unidade conceitual de generalização é a tarefa-base. Réplicas repetem uma tarefa e não aumentam nBaseTasks. Ordem, bloqueamento e parâmetros são lidos exclusivamente do plano e dos metadados congelados nesta Execução Experimental. Critérios de avaliação dos resultados: o protocolo distingue (i) o resultado esperado da tarefa, definido previamente pelo protocolo (implementar uma consulta permitida ou preservar uma regra diante de uma solicitação violadora); (ii) o comportamento observado (consulta à ontologia, relato de conflito, produção de candidato, alteração da origem e decisão de promoção); e (iii) a correção do candidato e da decisão do gate, que exige examinar a alteração concreta, pois uma solicitação permitida pode resultar em implementação incorreta. expectedOperation e expectedShapes são lidos do manifesto de tarefas congelado no batch; identifiedOperation e identifiedShapes, das evidências da execução. A origem do critério de correção é explícita: SEM_ALTERACAO_CORRETA e REVISAO_HUMANA derivam da categoria da tarefa e da política congelada, não de julgamento independente; a correção semântica verificada é NOT_EVALUATED na ausência de referência independente, situação distinta da adequação ao critério operacional do experimento. A decisão do próprio BSH não serve, isoladamente, como comprovação de que o BSH decidiu corretamente.",
+        "Desenho Experimental": "A unidade de execução é a run; a unidade conceitual de generalização é a tarefa-base. Réplicas repetem uma tarefa e não aumentam nBaseTasks. Ordem, bloqueamento e parâmetros são lidos exclusivamente do plano e dos metadados congelados nesta Execução Experimental. Critérios de avaliação dos resultados: o protocolo distingue (i) o resultado esperado da tarefa, definido previamente pelo protocolo (implementar uma consulta permitida ou preservar uma regra diante de uma solicitação violadora); (ii) o comportamento observado (consulta à ontologia, relato de conflito, produção de candidato, alteração da origem e decisão de promoção); e (iii) a correção do candidato e da decisão do gate, que exige examinar a alteração concreta, pois uma solicitação permitida pode resultar em implementação incorreta. expectedOperation e expectedShapes são lidos do manifesto de tarefas congelado no batch; identifiedOperation e identifiedShapes, das evidências da execução. A origem do critério de correção é explícita: SEM_ALTERACAO_CORRETA e REVISAO_HUMANA derivam da categoria da tarefa e da política congelada, não de julgamento independente; a correção semântica verificada é NOT_EVALUATED na ausência de referência independente, situação distinta da adequação ao critério operacional do experimento. A decisão do próprio BSH não serve, isoladamente, como comprovação de que o BSH decidiu corretamente. Classificações originais são preservadas; quando o relatório apresenta um rótulo funcional para A/B, esse rótulo corresponde ao desfecho registrado no log da campanha (critério operacional), não a uma nova verificação independente de conformidade. Revisões analíticas quanto ao denominador (ex.: oportunidades de falso bloqueio) são documentadas separadamente e não alteram os registros brutos.",
         "Condições Experimentais": "A executa o agente diretamente; B adiciona regras textuais; C adiciona ontologia consultiva; D usa o BSH completo. A × D mede efeito conjunto; A × B, B × C e C × D exploram componentes progressivos sem presumir causalidade.",
         "Variáveis e Estimandos": "Condição é a variável independente. Consumo de tokens, duração, correção funcional, correção de governança e desfecho da tarefa são variáveis dependentes distintas. WORKLOAD_TOKEN_REDUCTION é 1 menos a razão entre a soma de tokens D e a soma de tokens A, somente em pares com contabilidade comparável e denominador positivo.",
         "Instrumentação": "O adapter registra runtime, telemetria de tokens, duração, diff, testes, consultas MCP, conflitos e status de enforcement. Valor ausente permanece nulo; zero indica medição explícita de zero. Tokens não cacheados não são derivados sem garantia documentada da semântica do runtime. Cobertura mede registros presentes, não o desfecho: 'cobertura de testes' é o número de execuções com teste executado sobre o total elegível (não o total de runs), e a cobertura de diff distingue diff vazio confirmado (por comparação de conteúdo inicial e final), diff não coletado e medida não aplicável.",
-        "Resultados Funcionais": "Cumprimento do pedido, correção funcional, adequação ao critério operacional e correção do desfecho são dimensões independentes. A dimensão 'adequacaoAoCritérioOperacional' registra apenas que a decisão observada não contradiz o critério operacional do experimento; NÃO é correção semântica verificada, que permanece NOT_EVALUATED na ausência de referência independente (reportada como candidateSemanticValidity/enforcementCorrectness). Uma violação evitada pode ter desfecho correto sem entregar o pedido literal. Os denominadores são explícitos por condição: contagens não devem ser lidas como proporções do total de runs quando o conjunto elegível for menor.",
+        "Resultados Funcionais": "Quatro dimensões distintas, com o mesmo padrão em A/B/C/D: 'cumprimentoDoPedido' (a alteração solicitada foi aplicada?), 'alteracaoAplicadaComTestesAprovados' (alteração observada e suíte executada aprovada — NÃO é correção funcional), 'correcaoFuncionalVerificada' (só existe com evidência de atendimento aos requisitos; ausente caso contrário) e 'desfechoCorreto'. 'adequacaoAoCritérioOperacional' mede a interação/decisão face ao BSH (a decisão observada não contradiz o critério operacional) e é NÃO APLICÁVEL em A/B, que não possuem BSH; NÃO é aderência verificada à política nem correção semântica. A validade semântica verificada permanece NOT_EVALUATED sem referência independente.",
         "Discussão": "Os resultados favoráveis, desfavoráveis e não calculáveis são apresentados separadamente. O relato seletivo de conflitos é evidência de utilidade consultiva, não de precisão semântica além da amostra. A execução de solicitações permitidas sob C/D não deve ser diluída pela contagem de violações evitadas. Zero oportunidades de enforcement independente não é taxa de falha nem sucesso: é ausência de denominador de exposição ao gate. Diferenças de tokens após bloqueio não equivalem a maior eficiência na entrega da mesma funcionalidade. 'Parcialmente sustentado' indica viabilidade da comparação, não eficácia demonstrada. Denominadores são separados por natureza: pareamento estrutural (universo de tarefas comuns) não é o mesmo que elegibilidade analítica (pares com contabilidade comparável); o conjunto completo de D não é o mesmo que o contraste pareado C × D; 'violações implementadas' e 'violações contidas' podem ser conjuntos distintos e devem ser identificados por runId; falha de instrumentação é distinta de falha de execução.",
         "Ameaças à Validade": "Construção: tarefas concentram-se em poucas famílias (consulta, baixa, transferência) e a segunda repetição é parcial. Interna: comparabilidade de telemetria depende de contabilidade idêntica, faltam critérios externos de correção funcional e há falhas concentradas em condições específicas. Externa: um agente, um modelo, um domínio e uma política congelada; 'violadora' refere-se apenas à política congelada. Construto: cobertura mede registros presentes, não qualidade do desfecho; evidência semântica fina e tokens não cacheados podem faltar sem significar ausência de interação.",
     }
@@ -680,9 +703,10 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
                 paragraph = f"Foram observados {fb['falseBlocksObserved']} falsos bloqueios em {fb['falseBlockOpportunities']} oportunidades ({fb['nBaseTasks']} tarefas-base); conformes verificados: {fb['verifiedValidCandidates']}; inválidos verificados: {fb['verifiedInvalidCandidates']}. O intervalo de Wilson é bilateral; zero eventos não implica risco zero."
             else:
                 paragraph = (f"Não foram observados falsos bloqueios, mas a taxa e o intervalo de confiança são NÃO COMPUTÁVEIS: "
-                             f"nenhum dos {fb['falseBlockOpportunities']} candidatos bloqueados de solicitações permitidas teve validade semântica verificada "
-                             f"(conformes verificados: {fb['verifiedValidCandidates']}; inválidos verificados: {fb['verifiedInvalidCandidates']}). "
-                             "Sem denominador verificado não se apresenta taxa zero nem intervalo: ausência de verificação não é evidência de correção.")
+                             f"nenhum dos {fb['falseBlockOpportunities']} candidatos de solicitações permitidas com promoção negada teve validade semântica verificada "
+                             f"(candidatos conformes verificados: {fb['verifiedValidCandidates']}; candidatos inválidos verificados: {fb['verifiedInvalidCandidates']}). "
+                             "Sem denominador de candidatos conformes verificados não se apresenta taxa zero nem intervalo: ausência de verificação não é evidência de correção. "
+                             "A negativa por si só não é falso bloqueio nem oportunidade verificada.")
         elif title == "Violações Não Detectadas":
             vio = stats["violations"]
             case_ids = ", ".join(case["runId"] for case in vio["escapedCases"])
@@ -743,7 +767,8 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
     sample_table["section"] = "Desenho Experimental"
     tables.append(sample_table)
     dimension_labels = {"promptFulfillment": "cumprimentoDoPedido",
-                        "functionalCorrectness": "correcaoFuncional",
+                        "alteracaoAplicadaComTestes": "alteracaoAplicadaComTestesAprovados",
+                        "functionalCorrectness": "correcaoFuncionalVerificada",
                         "governanceCorrectness": "adequacaoAoCritérioOperacional",
                         "taskOutcomeCorrect": "desfechoCorreto"}
     functional_rows = [[condition, dimension_labels.get(field, field), counts["true"], counts["false"], counts["missing"]]

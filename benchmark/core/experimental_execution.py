@@ -542,23 +542,18 @@ def classify_observed(row: dict[str, Any]) -> dict[str, Any]:
         outcome = governance
     else:
         functional_observed = row.get("functionalCorrectnessObserved")
-        if row["condition"] in {"A", "B"}:
-            # A/B: critério funcional explícito; validade semântica verificada é NOT_EVALUATED.
-            prompt_fulfillment = bool(changed) if changed is not None else None
-            functional = (changed and tests is True) if changed is not None and tests is not None else None
-            governance = None
-            outcome = functional
-        else:
-            prompt_fulfillment = bool(changed and promoted) if changed is not None and promoted is not None else None
-            functional = functional_observed if isinstance(functional_observed, bool) else (
-                (changed and tests is True) if changed is not None and tests is not None else None)
-            governance = (cls != Classification.FALSO_BLOQUEIO) if cls not in {Classification.INDETERMINADO, Classification.FALHA_TECNICA, Classification.FALHA_INSTRUMENTACAO} else None
-            outcome = bool(functional and governance) if functional is not None and governance is not None else None
+        prompt_fulfillment = bool(changed) if changed is not None else None
+        functional = functional_observed if isinstance(functional_observed, bool) else None
+        governance = None if row["condition"] in {"A", "B"} else (
+            (cls != Classification.FALSO_BLOQUEIO) if cls not in {Classification.INDETERMINADO, Classification.FALHA_TECNICA, Classification.FALHA_INSTRUMENTACAO} else None)
+        outcome = bool(functional and governance) if functional is not None and governance is not None else None
+    alteracao_aplicada_com_testes = (changed and tests is True) if changed is not None and tests is not None else None
     return {**row, "classification": cls.value, "governanceMechanism": mechanism.value,
             "governanceInteraction": "PREVENTIVA" if row.get("ontologyQueried") is True else ("DIAGNOSTICA" if row.get("enforcementPipelineObserved") is True else "INEXISTENTE"),
             "governanceIntervention": "BLOQUEANTE" if independent else ("CONSULTIVA" if mechanism in {GovernanceMechanism.CONSULTA_PREVENTIVA, GovernanceMechanism.CONFLITO_REPORTADO} else "INEXISTENTE"),
             "independentEnforcementActivated": independent,
             "promptFulfillment": prompt_fulfillment, "functionalCorrectness": functional,
+            "alteracaoAplicadaComTestes": alteracao_aplicada_com_testes,
             "governanceCorrectness": governance, "taskOutcomeCorrect": outcome}
 
 

@@ -201,5 +201,14 @@ class ConditionInvariantRegression(unittest.TestCase):
         self.assertTrue(any("candidato" in issue for issue in issues))
 
 
+    def test_Given_change_and_tests_When_classified_Then_dimensions_uniform_across_conditions(self):
+        """codex: Given change applied and tests passed, When classified, Then the observed dimension is uniform and functional correctness is not presumed."""
+        for condition in "ABCD":
+            result = classify_observed(observed(condition=condition, changeSetDetected=True, testsPassed=True))
+            with self.subTest(condition=condition):
+                self.assertTrue(result["alteracaoAplicadaComTestes"])
+                self.assertIsNone(result["functionalCorrectness"])
+
+
 if __name__ == "__main__":
     unittest.main()

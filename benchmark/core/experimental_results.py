@@ -376,7 +376,7 @@ def compute_scientific_statistics(runs: list[dict[str, Any]], pairs: dict[str, l
                     field: {"true": sum(run.get(field) is True for run in group),
                             "false": sum(run.get(field) is False for run in group),
                             "missing": sum(run.get(field) is None for run in group)}
-                    for field in ("promptFulfillment", "functionalCorrectness", "governanceCorrectness", "taskOutcomeCorrect")
+                    for field in ("promptFulfillment", "alteracaoAplicadaComTestes", "functionalCorrectness", "governanceCorrectness", "taskOutcomeCorrect")
                 } for condition, group in by_condition.items()},
             "falseBlocks": false_block,
             "violations": {"containedViolations": contained, "escapedViolations": escaped,
