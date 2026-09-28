@@ -112,10 +112,12 @@ def coverage_metric(runs: list[dict[str, Any]], field: str, applicable=lambda r:
 
 
 def compute_report_metrics(runs: list[dict[str, Any]]) -> dict[str, Any]:
+    from .invariants import validate_runs
     return {
         "identidades": {"campos": list(IDENTITY_FIELDS), "n": len(runs),
                         "unicas": len({run_identity(r) for r in runs})},
         "contrato": FIELD_CONTRACT,
+        "invariantes": validate_runs(runs),
         "falsosBloqueios": false_block_metric(runs),
         "entregaPermitidas": delivery_metric(runs),
         "contencao": containment_metric(runs),

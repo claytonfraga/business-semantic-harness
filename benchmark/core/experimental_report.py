@@ -360,6 +360,9 @@ def _auditable_indicators(stats: dict[str, Any], batch_id: str) -> list[str]:
         fmt("Escapes de violadoras (C/D)", metrics["escapes"]),
         fmt("Oportunidades de enforcement independente (D)", metrics["oportunidadesEnforcement"]),
         "Contrato de campos (origem/tipo/unidade/null): " + "; ".join(item["campo"] for item in metrics["contrato"]),
+        "Invariantes: {} (violações: {}; limitações: {}).".format(
+            metrics["invariantes"]["status"], len(metrics["invariantes"]["violations"]),
+            len(metrics["invariantes"]["limitations"])),
         "Identidades: {} runs, {} identidades únicas.".format(
             metrics["identidades"]["n"], metrics["identidades"]["unicas"]),
     ]
