@@ -6,7 +6,7 @@ from tempfile import TemporaryDirectory
 import unittest
 
 from benchmark.core.report_figures import build_figures
-from benchmark.core.experimental_report import render_figures
+from benchmark.core.experimental_report import render_figures, _figure_latex
 
 
 def run(run_id, condition="A", task_type="valida_governada", **fields):
@@ -59,6 +59,18 @@ class ReportFiguresRegression(unittest.TestCase):
             ids = render_figures(model, Path(directory))
             self.assertEqual(ids, ["fig-matrix"])
             self.assertTrue((Path(directory) / "figures" / "fig-matrix.pdf").is_file())
+
+
+    def test_Given_figure_When_rendered_Then_model_matches_tex(self):
+        """opencode: Given a figure, When _figure_latex builds it, Then id, n, fonte and interpretation match the model."""
+        figure = {"id": "fig-outcomes", "title": "Desfechos", "n": 3, "source": "classified-runs.json",
+                  "question": "Quantas execuções?", "interpretation": "LEITURA-DO-MODELO"}
+        bloco = "\n".join(_figure_latex(figure))
+        self.assertIn("../figures/fig-outcomes.pdf", bloco)
+        self.assertIn("n=3", bloco)
+        self.assertIn("fonte: classified-runs.json", bloco)
+        self.assertIn("LEITURA-DO-MODELO", bloco)
+        self.assertNotIn("Os pontos mostram o consumo observado", bloco)
 
 
 if __name__ == "__main__":

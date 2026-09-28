@@ -836,6 +836,13 @@ def _appendix_prompts(batch_dir: Path) -> list[str]:
     return lines
 
 
+def _figure_latex(figure: dict[str, Any]) -> list[str]:
+    return ["A Figura~\\ref{fig:" + figure["id"] + "} responde: " + _latex(figure.get("question", "questão desta seção")) + ".",
+            r"\begin{figure}[H]\centering\includegraphics[width=0.84\textwidth]{../figures/" + figure["id"] + r".pdf}",
+            r"\caption{" + _latex(figure["title"]) + "; n=" + str(figure["n"]) + "; fonte: " + _latex(figure["source"]) + r"}\label{fig:" + figure["id"] + r"}\end{figure}",
+            _latex(figure.get("interpretation", "Os pontos mostram o consumo observado por tarefa-base; linhas conectam medidas dentro de cada condição. Não representam intervalo de confiança."))]
+
+
 def render_latex(model: dict[str, Any], batch_dir: Path) -> Path:
     report_dir = batch_dir / "report"
     report_dir.mkdir(exist_ok=True)
@@ -867,11 +874,7 @@ def render_latex(model: dict[str, Any], batch_dir: Path) -> Path:
                 latex.append(" & ".join(_table_cell(value) for value in row) + r"\\")
             latex.extend([r"\bottomrule", r"\end{longtable}"])
         if section["title"] in figures_by_section:
-            figure = figures_by_section[section["title"]]
-            latex.extend(["A Figura~\\ref{fig:" + figure["id"] + "} responde: " + _latex(figure.get("question", "questão desta seção")) + ".",
-                          r"\begin{figure}[H]\centering\includegraphics[width=0.84\textwidth]{../figures/" + figure["id"] + r".pdf}",
-                          r"\caption{" + _latex(figure["title"]) + "; n=" + str(figure["n"]) + "; fonte: " + _latex(figure["source"]) + r"}\label{fig:" + figure["id"] + r"}\end{figure}",
-                          _latex(figure.get("interpretation", "Os pontos mostram o consumo observado por tarefa-base; linhas conectam medidas dentro de cada condição. Não representam intervalo de confiança."))])
+            latex.extend(_figure_latex(figures_by_section[section["title"]]))
     latex.append(r"\section*{Referências}\addcontentsline{toc}{section}{Referências}")
     latex.append(r"\begin{thebibliography}{99}")
     for item in model["references"]:
