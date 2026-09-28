@@ -341,25 +341,29 @@ def _glossary_paragraphs() -> list[str]:
 
 
 def _auditable_indicators(stats: dict[str, Any], batch_id: str) -> list[str]:
-    runs = _read_classified(batch_id)
-    conformes = [r for r in runs if r.get("candidateSemanticValidity") == "VALID"
-                 and r.get("candidateEnforcementApplicable") is True]
-    conforme_negados = [r for r in conformes if r.get("promotionDecision") == "DENY"
-                        or r.get("blocked") is True]
-    permitidas = [r for r in runs if r.get("solicitacaoPermitida") is True]
-    entregues = [r for r in permitidas if r.get("codeBaseChanged") is True and r.get("promoted") is True]
-    indeterminadas = [r for r in runs if r.get("candidateSemanticValidity") == "INDETERMINATE"]
-    taxa_fb = (len(conforme_negados) / len(conformes)) if conformes else None
-    taxa_ent = (len(entregues) / len(permitidas)) if permitidas else None
-    return [
-        "Taxa de falsos bloqueios entre candidatos conformes = candidatos comprovadamente conformes com promoção "
-        "negada / candidatos comprovadamente conformes submetidos ao gate = {}/{} = {}".format(
-            len(conforme_negados), len(conformes), "indisponivel" if taxa_fb is None else "{:.3f}".format(taxa_fb)),
-        "Taxa de entrega das solicitações permitidas = solicitações permitidas implementadas, verificadas e "
-        "promovidas / solicitações permitidas executadas = {}/{} = {}".format(
-            len(entregues), len(permitidas), "indisponivel" if taxa_ent is None else "{:.3f}".format(taxa_ent)),
-        "Observações com validade de candidato indeterminada: {} de {} runs.".format(len(indeterminadas), len(runs)),
+    from .analytics import compute_report_metrics, load_classified
+    base = Path(__file__).resolve().parents[1] / "results" / batch_id if batch_id else None
+    runs = load_classified(str(base)) if base else []
+    metrics = compute_report_metrics(runs)
+
+    def fmt(name: str, m: dict[str, Any]) -> str:
+        valor = "indisponível" if m["valor"] is None else "{:.3f}".format(m["valor"])
+        ids = ", ".join(m["idsNumerador"]) or "-"
+        excl = "; ".join("{}=[{}]".format(k, ",".join(v)) for k, v in m["excluidos"].items()) or "nenhuma"
+        return "{} = {}/{} = {} (unidade: {}; ids numerador: {}; exclusões: {})".format(
+            name, m["numerador"], m["denominador"], valor, m["unidade"], ids, excl)
+
+    linhas = [
+        fmt("Taxa de falsos bloqueios entre candidatos conformes", metrics["falsosBloqueios"]),
+        fmt("Taxa de entrega das solicitações permitidas", metrics["entregaPermitidas"]),
+        fmt("Contenção de violadoras (C/D)", metrics["contencao"]),
+        fmt("Escapes de violadoras (C/D)", metrics["escapes"]),
+        fmt("Oportunidades de enforcement independente (D)", metrics["oportunidadesEnforcement"]),
+        "Contrato de campos (origem/tipo/unidade/null): " + "; ".join(item["campo"] for item in metrics["contrato"]),
+        "Identidades: {} runs, {} identidades únicas.".format(
+            metrics["identidades"]["n"], metrics["identidades"]["unicas"]),
     ]
+    return linhas
 
 
 def _denial_decomposition(batch_id: str) -> list[str]:
