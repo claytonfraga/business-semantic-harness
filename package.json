@@ -1,6 +1,6 @@
 {
   "name": "business-semantic-harness",
-  "version": "0.2.1-beta",
+  "version": "0.2.1",
   "type": "module",
   "files": [
     "dist/",
