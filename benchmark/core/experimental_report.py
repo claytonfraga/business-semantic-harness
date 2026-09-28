@@ -843,6 +843,30 @@ def _figure_latex(figure: dict[str, Any]) -> list[str]:
             _latex(figure.get("interpretation", "Os pontos mostram o consumo observado por tarefa-base; linhas conectam medidas dentro de cada condição. Não representam intervalo de confiança."))]
 
 
+def verify_report_contract(model: dict[str, Any], tex_text: str) -> list[str]:
+    violations: list[str] = []
+    for table_number, table in enumerate(model.get("tables", []), 1):
+        if _latex(table["title"]) not in tex_text:
+            violations.append("TABELA_TITULO_AUSENTE:" + str(table_number))
+        if "n=" + str(table["n"]) not in tex_text:
+            violations.append("TABELA_N_AUSENTE:" + str(table_number))
+        if "unidades: " + _latex(table["units"]) not in tex_text:
+            violations.append("TABELA_UNIDADES_AUSENTE:" + str(table_number))
+        if "fonte: " + _latex(table["source"]) not in tex_text:
+            violations.append("TABELA_FONTE_AUSENTE:" + str(table_number))
+    for figure in model.get("figures", []):
+        if "../figures/" + figure["id"] + ".pdf" not in tex_text:
+            violations.append("FIGURA_ARQUIVO_AUSENTE:" + figure["id"])
+        if "=" + str(figure["n"]) not in tex_text:
+            violations.append("FIGURA_N_AUSENTE:" + figure["id"])
+        if "fonte: " + _latex(figure["source"]) not in tex_text:
+            violations.append("FIGURA_FONTE_AUSENTE:" + figure["id"])
+    for item in model.get("references", []):
+        if "{" + item["key"] + "}" not in tex_text:
+            violations.append("REFERENCIA_AUSENTE:" + item["key"])
+    return violations
+
+
 def render_latex(model: dict[str, Any], batch_dir: Path) -> Path:
     report_dir = batch_dir / "report"
     report_dir.mkdir(exist_ok=True)

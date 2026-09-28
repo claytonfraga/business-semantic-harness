@@ -6,7 +6,7 @@ from tempfile import TemporaryDirectory
 import unittest
 
 from benchmark.core.report_figures import build_figures
-from benchmark.core.experimental_report import render_figures, _figure_latex
+from benchmark.core.experimental_report import render_figures, _figure_latex, verify_report_contract
 
 
 def run(run_id, condition="A", task_type="valida_governada", **fields):
@@ -71,6 +71,17 @@ class ReportFiguresRegression(unittest.TestCase):
         self.assertIn("fonte: classified-runs.json", bloco)
         self.assertIn("LEITURA-DO-MODELO", bloco)
         self.assertNotIn("Os pontos mostram o consumo observado", bloco)
+
+
+    def test_Given_model_and_tex_When_verified_Then_missing_provenance_is_detected(self):
+        """opencode: Given a model and its TeX, When verified, Then absent fonte/n is reported."""
+        modelo = {"tables": [{"title": "T", "n": 2, "units": "u", "source": "s.json", "headers": ["a"], "rows": [[1]]}],
+                  "figures": [{"id": "fig-outcomes", "n": 3, "source": "classified-runs.json"}],
+                  "references": [{"key": "ref1"}]}
+        tex = "T; n=2; unidades: u; fonte: s.json ../figures/fig-outcomes.pdf n=3 fonte: classified-runs.json {ref1}"
+        self.assertEqual(verify_report_contract(modelo, tex), [])
+        violacoes = verify_report_contract(modelo, tex.replace("fonte: classified-runs.json", ""))
+        self.assertIn("FIGURA_FONTE_AUSENTE:fig-outcomes", violacoes)
 
 
 if __name__ == "__main__":
