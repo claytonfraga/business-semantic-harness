@@ -18,7 +18,7 @@ from .experimental_execution import canonical_json, write_json
 
 TITLE = "Avaliação Experimental de Governança Semântica no Business Semantic Harness"
 SECTION_TITLES = [
-    "Introdução", "Fundamentação", "Arquitetura do BSH", "Desenho Experimental",
+    "Fundamentação", "Arquitetura do BSH", "Desenho Experimental",
     "Condições Experimentais", "Questões de Pesquisa", "Variáveis e Estimandos",
     "Instrumentação", "Integridade da Execução Experimental",
     "Qualidade e Completude dos Dados", "Pareabilidade", "Resultados Funcionais",
@@ -104,19 +104,25 @@ def _metric_rows(value: Any, prefix: str = "") -> list[list[Any]]:
 
 def _intro_paragraphs() -> list[str]:
     return [
-        "Este relatório descreve uma avaliação experimental do Business Semantic Harness (BSH) sob "
-        "quatro condições. As condições distinguem-se pela presença de BSH e pelo tipo de governança.",
+        "Este relatório descreve uma avaliação experimental do Business Semantic Harness (BSH) em alterações de "
+        "código propostas por agentes de programação. O problema investigado é o de governança semântica: verificar "
+        "se uma alteração proposta respeita o conhecimento de domínio antes de ser promovida à origem.",
+        "O BSH é um harness que disponibiliza conhecimento semântico (ontologia e restrições) ao agente e, quando "
+        "habilitado, avalia de forma independente a alteração candidata antes da promoção à origem. O estudo segue "
+        "princípios de experimentação em Engenharia de Software [wohlin2012; kitchenham2002]; a presença dessas "
+        "referências orienta o delineamento, mas não comprova, por si só, a adequação do experimento.",
+        "O objetivo é descrever diferenças observadas entre condições e os limites de inferência, sem presumir "
+        "correção semântica onde não há verificação independente.",
         "A — Direta: não utiliza BSH. O agente atua sem ontologia e sem regras textuais.",
-        "B — Regras textuais: não utiliza BSH. O agente recebe apenas regras de negócio em linguagem "
-        "natural via AGENTS.md, sem ontologia e sem enforcement.",
-        "C — BSH consultivo: utiliza o BSH como camada semântica consultiva, com acesso à ontologia por "
-        "MCP, mas sem enforcement independente no gate de promoção. O agente consulta o conhecimento "
-        "semântico e decide como agir.",
-        "D — BSH completo: utiliza o mesmo BSH semântico de C e acrescenta enforcement independente no "
-        "gate de promoção. Portanto, D = BSH consultivo + controle independente da promoção.",
-        "Os contrastes experimentais são interpretados assim: A × B, efeito das regras textuais; "
-        "B × C, efeito da introdução do BSH semântico; C × D, efeito adicional do enforcement "
-        "independente do BSH; A × D, efeito combinado do BSH completo em relação ao agente sem governança.",
+        "B — Regras textuais: não utiliza BSH. O agente recebe apenas regras de negócio em linguagem natural via "
+        "AGENTS.md, sem ontologia e sem enforcement.",
+        "C — BSH consultivo: utiliza o BSH como camada semântica consultiva, com acesso à ontologia por MCP, mas "
+        "sem enforcement independente no gate de promoção. O agente consulta o conhecimento semântico e decide como agir.",
+        "D — BSH completo: utiliza o mesmo BSH semântico de C e acrescenta enforcement independente no gate de "
+        "promoção. Portanto, D = BSH consultivo + controle independente da promoção.",
+        "Os contrastes experimentais são interpretados assim: A × B, efeito das regras textuais; B × C, efeito da "
+        "introdução do BSH semântico; C × D, efeito adicional do enforcement independente do BSH; A × D, efeito "
+        "combinado do BSH completo em relação ao agente sem governança.",
     ]
 
 
@@ -191,33 +197,39 @@ def _conclusion_paragraphs(stats: dict[str, Any], verdicts: dict[str, Any], batc
     ]
 
 
-def _audit_paragraphs(batch_id: str) -> list[str]:
-    """Cadeia de auditoria por execução: tarefa, consulta, conflito, candidato, promoção, estado final."""
+def _tri(valor: Any) -> str:
+    return "sim" if valor is True else ("não" if valor is False else "desconhecido")
+
+
+def _testes(valor: Any) -> str:
+    return "aprovados" if valor is True else ("reprovados" if valor is False else "desconhecido")
+
+
+def _promocao(run: dict[str, Any]) -> str:
+    valor = run.get("promotionDecision")
+    if valor in ("ALLOW", "DENY"):
+        return valor
+    return "desconhecida" if run.get("candidateCreated") is None else "não aplicável"
+
+
+def _audit_rows(batch_id: str) -> list[list[Any]]:
+    """Linhas da auditoria por execução, com estados sim/não/desconhecido/não aplicável."""
     path = Path(__file__).resolve().parents[1] / "results" / batch_id / "classified-runs.json"
     if not path.is_file():
-        return ["Dados estruturados de auditoria indisponíveis para este batch."]
+        return []
     try:
         runs = json.loads(path.read_text(encoding="utf-8"))
     except (ValueError, OSError):
-        return ["Dados estruturados de auditoria ilegíveis para este batch."]
-    lines: list[str] = []
+        return []
+    rows: list[list[Any]] = []
     for run in runs:
-        parts = [
-            str(run.get("runId")),
-            "cond=" + str(run.get("condition")),
-            "task=" + str(run.get("baseTaskId")),
-            "tipo=" + str(run.get("taskType")),
-            "consulta=" + str(run.get("ontologyQueried")),
-            "conflito=" + str(run.get("reportConflictCalled")),
-            "candidato=" + str(run.get("candidateCreated")),
-            "changeSet=" + str(run.get("changeSetDetected")),
-            "codeBase=" + str(run.get("codeBaseChanged")),
-            "promovido=" + str(run.get("promoted")),
-            "testes=" + str(run.get("testsPassed")),
-            "classe=" + str(run.get("classification")),
-        ]
-        lines.append(" | ".join(parts))
-    return lines
+        rows.append([
+            str(run.get("runId")), str(run.get("baseTaskId")), str(run.get("condition")),
+            str(run.get("replicationIndex") or 1), "violadora" if str(run.get("taskType") or "").lower() in ("violadora", "violating") else "permitida",
+            _tri(run.get("candidateCreated")), _tri(run.get("ontologyQueried")), _tri(run.get("reportConflictCalled")),
+            _testes(run.get("testsPassed")), _promocao(run), _tri(run.get("originChanged")), str(run.get("classification")),
+        ])
+    return rows
 
 
 def _discussion_paragraphs() -> list[str]:
@@ -683,7 +695,7 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
     static = {
         "Introdução": "Este estudo avalia governança semântica em alterações de código propostas por agentes. O objetivo é descrever diferenças observadas entre condições e os limites de inferência, seguindo princípios de experimentação em Engenharia de Software [wohlin2012; kitchenham2002].",
         "Fundamentação": "RDF representa fatos em grafos [rdf2014]; JSON-LD serializa dados ligados [jsonld2020]; OWL formaliza vocabulários [owl2012]; SHACL valida restrições [shacl2017]; SPARQL consulta grafos [sparql2013]. Agentes que raciocinam e agem podem usar ferramentas externas, mas a validação independente exige evidência separada da resposta voluntária do agente [yao2023].",
-        "Arquitetura do BSH": "O agente trabalha em worktree isolada. Uma alteração candidata pode ser reconhecida como operação, materializada em grafo e verificada por SHACL antes dos gates técnicos e da promoção. Consulta ontológica é orientação consultiva; enforcement independente requer um candidato incompatível cujo gate tenha impedido a promoção sem relato voluntário.",
+        "Arquitetura do BSH": "O BSH é um harness semântico independente dos agentes de programação: é uma CLI (bsh) com núcleo compartilhado (src/harness) que coordena a execução. O BSH recebe a solicitação e a configuração da condição, cria um ambiente isolado (worktree) e invoca o agente por um adaptador específico (Codex, Agy ou OpenCode); o adaptador é a ponte entre o BSH e o agente, os adaptadores não dependem uns dos outros e todos se apoiam no núcleo. Codex e OpenCode aceitam o modo consultivo; o adaptador Agy existe com diagnóstico próprio e não foi exercitado nesta campanha. Quem modifica o código é o agente, no ambiente isolado. O BSH disponibiliza conhecimento semântico (ontologia e restrições) por uma interface de consulta, incluindo MCP; na condição consultiva o agente consulta e pode relatar conflito. Após a execução, o BSH reconhece a operação a partir do diff, extrai fatos e materializa o grafo candidato, executa a validação semântica (SHACL/SHACL-SPARQL) e verificações técnicas e decide a promoção à origem. As condições diferem pelo que está habilitado: A/B não usam BSH (B acrescenta regras textuais); C usa o BSH como camada consultiva sem enforcement; D acrescenta o enforcement independente no gate de promoção. Esta campanha utilizou OpenCode; a existência de um componente na arquitetura não implica que tenha sido executado em todas as condições.",
         "Desenho Experimental": "A unidade de execução é a run; a unidade conceitual de generalização é a tarefa-base. Réplicas repetem uma tarefa e não aumentam nBaseTasks. Ordem, bloqueamento e parâmetros são lidos exclusivamente do plano e dos metadados congelados nesta Execução Experimental. Critérios de avaliação dos resultados: o protocolo distingue (i) o resultado esperado da tarefa, definido previamente pelo protocolo (implementar uma consulta permitida ou preservar uma regra diante de uma solicitação violadora); (ii) o comportamento observado (consulta à ontologia, relato de conflito, produção de candidato, alteração da origem e decisão de promoção); e (iii) a correção do candidato e da decisão do gate, que exige examinar a alteração concreta, pois uma solicitação permitida pode resultar em implementação incorreta. expectedOperation e expectedShapes são lidos do manifesto de tarefas congelado no batch; identifiedOperation e identifiedShapes, das evidências da execução. A origem do critério de correção é explícita: SEM_ALTERACAO_CORRETA e REVISAO_HUMANA derivam da categoria da tarefa e da política congelada, não de julgamento independente; a correção semântica verificada é NOT_EVALUATED na ausência de referência independente, situação distinta da adequação ao critério operacional do experimento. A decisão do próprio BSH não serve, isoladamente, como comprovação de que o BSH decidiu corretamente. Classificações originais são preservadas; quando o relatório apresenta um rótulo funcional para A/B, esse rótulo corresponde ao desfecho registrado no log da campanha (critério operacional), não a uma nova verificação independente de conformidade. Revisões analíticas quanto ao denominador (ex.: oportunidades de falso bloqueio) são documentadas separadamente e não alteram os registros brutos.",
         "Condições Experimentais": "A executa o agente diretamente; B adiciona regras textuais; C adiciona ontologia consultiva; D usa o BSH completo. A × D mede efeito conjunto; A × B, B × C e C × D exploram componentes progressivos sem presumir causalidade.",
         "Variáveis e Estimandos": "Condição é a variável independente. Consumo de tokens, duração, correção funcional, correção de governança e desfecho da tarefa são variáveis dependentes distintas. WORKLOAD_TOKEN_REDUCTION é 1 menos a razão entre a soma de tokens D e a soma de tokens A, somente em pares com contabilidade comparável e denominador positivo.",
@@ -807,6 +819,29 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
     figures = [{"id": "paired-tokens", "title": "Consumo observado de tokens por par A × D", "data": ad_plot,
                 "section": "RQ1-A: Consumo Bruto", "source": "paired-a-d.csv", "n": len(ad_plot)}] if ad_plot else []
     figures.extend(_complementary_figures(batch_id))
+    figures.append({"id": "fig-architecture", "title": "Arquitetura do BSH e fluxo de avaliação do candidato",
+                    "section": "Arquitetura do BSH — visão geral", "source": "src/ (bsh)", "n": 0,
+                    "question": "Como o BSH coordena os agentes e avalia o candidato?",
+                    "population": "arquitetura do produto",
+                    "data": {"nodes": [
+                        ["entry", 0.06, 0.82, "Solicitação + config. da condição", "#DDE7F5"],
+                        ["orq", 0.34, 0.82, "Orquestrador do benchmark (infra)", "#ECECEC"],
+                        ["bsh", 0.62, 0.82, "BSH core: CLI, adapters, worktree, gates", "#CFE3CF"],
+                        ["agents", 0.86, 0.82, "Codex | Agy | OpenCode", "#DDE7F5"],
+                        ["mcp", 0.62, 0.56, "Interface de consulta semântica (MCP)", "#CFE3CF"],
+                        ["onto", 0.86, 0.56, "Ontologia, consultas e SHACL", "#CFE3CF"],
+                        ["wt", 0.62, 0.30, "Worktree isolada + candidato", "#F5EFC9"],
+                        ["rec", 0.34, 0.30, "Reconhecimento, fatos, grafo", "#CFE3CF"],
+                        ["val", 0.06, 0.30, "Validação SHACL + gates técnicos", "#CFE3CF"],
+                        ["dec", 0.06, 0.06, "Decisão de promoção → origem", "#CFE3CF"],
+                        ["evi", 0.62, 0.06, "Evidências + instrumentação (infra)", "#ECECEC"],
+                    ], "edges": [
+                        ["entry", "orq", "controle"], ["orq", "bsh", "controle"], ["bsh", "agents", "controle"],
+                        ["bsh", "mcp", "controle"], ["agents", "mcp", "consulta"], ["mcp", "onto", "consulta"],
+                        ["agents", "wt", "artefato"], ["wt", "rec", "artefato"], ["rec", "val", "controle"],
+                        ["val", "dec", "decisao"], ["dec", "evi", "artefato"], ["bsh", "evi", "controle"],
+                    ]},
+                    "interpretation": "Componentes do BSH (verde), agentes externos (azul), infraestrutura de benchmark (cinza) e repositório do candidato (amarelo). Setas: controle (sólida), consulta semântica (tracejada), transferência de artefato (pontilhada) e decisão de promoção (grossa). O fluxo de validação (worktree→reconhecimento→validação→decisão) só é executado com enforcement (condição D); em C a consulta semântica está habilitada sem a decisão de promoção."})
     for figura in [item for item in figures if str(item.get("section", "")).startswith("Figura:")]:
         sections.append({"title": figura["section"],
                          "paragraphs": [figura["title"] + " — pergunta: " + figura["question"] + " População: " + figura["population"] + "."]})
@@ -839,21 +874,46 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
     provenance_table["section"] = "Reprodutibilidade"
     tables.append(provenance_table)
     sections.append({
-        "title": "Escopo da Avaliação do Harness e Limite do Ground Truth",
+        "title": "Escopo da avaliação e ausência de ground truth independente",
         "paragraphs": [
-            "Esta etapa avalia o BSH como harness ontológico por evidência observável do fluxo "
-            "(consulta semântica, acionamento do enforcement, bloqueio, promoção e mudança no código-base). "
-            "Avaliar se o harness atuou não é avaliar se cada decisão semântica estava correta: a correção de "
-            "decisões específicas de enforcement requer ground truth independente e constitui uma etapa distinta. "
-            "Sem esse ground truth, candidateSemanticValidity = INDETERMINATE e enforcementCorrectness = "
-            "NOT_EVALUATED; DENY não implica enforcement correto e ALLOW não implica enforcement correto.",
+            "Esta campanha não dispõe de ground truth independente para verificar a conformidade dos candidatos concretos "
+            "nem a correção das decisões do gate. O manifesto contém expectativas e critérios operacionais definidos pelo "
+            "experimento, mas, por serem definidos pelo próprio experimento, não constituem verificação independente das "
+            "implementações produzidas. Não se afirma ausência de referência de avaliação: existem critérios previamente "
+            "definidos para as tarefas.",
+            "Podem ser descritos diretamente pelos registros: consulta à ontologia, relato de conflito, produção de "
+            "candidato, alteração da origem e negativa de promoção.",
+            "Permanecem sem verificação independente: a conformidade integral do candidato e a correção semântica da decisão "
+            "do gate. Por isso, uma negativa não comprova bloqueio correto e uma promoção não comprova conformidade.",
+            "A ausência dessa referência limita conclusões sobre precisão semântica e sobre a correção das decisões, mas "
+            "permite apresentar os comportamentos observados e o benefício consultivo sustentado pelos registros. Esta "
+            "limitação é referida nas demais seções por remissão, sem repetição integral.",
         ],
     })
+    _arch_index = next((index for index, item in enumerate(sections) if item["title"] == "Arquitetura do BSH"), len(sections))
+    sections.insert(_arch_index, {"title": "Arquitetura do BSH — visão geral", "paragraphs": [
+        "A figura a seguir apresenta os componentes do BSH, os agentes externos, a infraestrutura de benchmark e as relações entre eles. A seção seguinte detalha cada elemento e distingue o fluxo implementado das etapas efetivamente observadas nesta campanha."]})
     sections.insert(0, {"title": "Introdução", "paragraphs": _intro_paragraphs()})
     sections.append({"title": "Conclusão", "paragraphs": _conclusion_paragraphs(stats, verdicts, batch_id)})
-    sections.append({"title": "Auditoria por Execução", "paragraphs": _audit_paragraphs(batch_id)})
+    audit_rows = _audit_rows(batch_id)
+    sections.append({"title": "Auditoria por Execução", "paragraphs": [
+        "Cada execução é identificada por runId. A primeira tabela caracteriza a execução; a segunda registra conflito, testes, promoção e efeito sobre a origem. Estados são apresentados como sim, não, desconhecido e não aplicável; valores ausentes não são convertidos em zero ou falso.",
+        "Legenda: 'Candidato', 'Consulta' e 'Alterou origem' usam sim/não/desconhecido; 'Promoção' usa ALLOW/DENY/desconhecida/não aplicável; 'Testes' usa aprovados/reprovados/desconhecido."]})
+    if audit_rows:
+        _t1 = _table("Auditoria por execução — caracterização",
+                     ["Run", "Tarefa-base", "Condição", "Repetição", "Categoria", "Candidato", "Consulta"],
+                     [[r[0], r[1], r[2], r[3], r[4], r[5], r[6]] for r in audit_rows],
+                     "execuções", "classified-runs.json", len(audit_rows))
+        _t1["section"] = "Auditoria por Execução"
+        tables.append(_t1)
+        _t2 = _table("Auditoria por execução — decisão e efeitos",
+                     ["Run", "Conflito", "Testes", "Promoção", "Alterou origem", "Classe"],
+                     [[r[0], r[7], r[8], r[9], r[10], r[11]] for r in audit_rows],
+                     "execuções", "classified-runs.json", len(audit_rows))
+        _t2["section"] = "Auditoria por Execução"
+        tables.append(_t2)
     sections.append({"title": "Análise de Caso: G4", "paragraphs": _g4_case_paragraphs(batch_id)})
-    sections.append({"title": "Glossário Operacional e Regras de Cálculo", "paragraphs": _glossary_paragraphs()})
+    sections.append({"title": "Apêndice — Glossário e Regras de Cálculo", "paragraphs": _glossary_paragraphs()})
     sections.append({"title": "Indicadores Auditáveis e Decomposição das Negativas",
                      "paragraphs": _auditable_indicators(stats, batch_id) + _denial_decomposition(batch_id)})
     sections.append({"title": "Reconciliação entre Campanhas", "paragraphs": [
@@ -886,11 +946,27 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
         (f"Falsos bloqueios: {fb_resumo['falseBlocksObserved']} em {fb_resumo['falseBlockOpportunities']} oportunidades."),
         "Limitações que afetam a interpretação: correção semântica verificada é NO_AVALIADA sem referência independente; prompts completos por condição não são armazenados; tarefas concentram-se em poucas famílias.",
     ]
+    observed_summary_en = [
+        f"Observed sample: {sample['nRuns']} executions and {sample['nBaseTasks']} base tasks; balanced main comparison with the 12 tasks of the 1st replication across A/B/C/D (48 executions) and 10 additional executions restricted to A and D, analysed as complementary.",
+        "Observed delivery (change effectively applied to origin) for permitted requests: " + ", ".join(entrega_resumo) + ". This is not proven full correctness.",
+        f"Containment of violating requests in C/D: contained={vio_resumo['containedViolations']}, escaped={vio_resumo['escapedViolations']}, undetermined={vio_resumo['undeterminedViolatingRuns']}.",
+        (f"False blocks: 0 confirmed; rate and interval unavailable - there is no candidate with verified semantic validity "
+         f"(blocking opportunities for permitted requests: {fb_resumo['falseBlockOpportunities']}).")
+        if not fb_resumo.get("falseBlockRateComputable") else
+        (f"False blocks: {fb_resumo['falseBlocksObserved']} in {fb_resumo['falseBlockOpportunities']} opportunities."),
+        "Limitations affecting interpretation: verified semantic correctness is NOT_EVALUATED without an independent reference; full per-condition prompts are not stored; tasks concentrate in few families.",
+    ]
     model = {"title": TITLE, "subtitle": subtitle, "batchId": batch_id, "domain": domain,
              "executionDate": metadata.get("startedAt"), "dataOrigin": metadata.get("dataOrigin"),
              "provenance": provenance, "abstract": {"objective": "Descrever o comportamento observado do BSH sob quatro condições, sem inferir correção semântica onde não há verificação independente",
              "design": "Comparação principal equilibrada (12 tarefas × A/B/C/D) e repetições complementares em A/D", "nRuns": sample["nRuns"], "nBaseTasks": sample["nBaseTasks"],
              "observedSummary": observed_summary,
+             "objectiveEn": "Describe the observed behaviour of BSH under four conditions, without inferring semantic correctness where there is no independent verification",
+             "designEn": "Balanced main comparison (12 tasks x A/B/C/D) and complementary replications in A/D",
+             "observedSummaryEn": observed_summary_en,
+             "limitationsEn": ["Generalisation limited to the observed agent, model, domain and tasks",
+                                "Semantic correctness of enforcement decisions is NOT_EVALUATED in the absence of an independent reference",
+                                "The full content sent per condition is not available in the records"],
              "mainResults": {rq: verdicts["researchQuestions"][rq]["verdict"] for rq in ("RQ1_A", "RQ1_B", "RQ5", "RQ10", "RQ11")},
              "limitations": ["Generalização limitada ao agente, modelo, domínio e tarefas observados",
                              "Correção semântica de decisões de enforcement é NOT_EVALUATED na ausência de referência independente",
@@ -1017,6 +1093,21 @@ def render_figures(model: dict[str, Any], batch_dir: Path) -> list[str]:
             ax.set_xticks(list(x), [row["baseTaskId"] for row in data], rotation=45, ha="right")
             ax.set_ylabel("Tokens totais observados")
             ax.legend()
+        elif figure["id"] == "fig-architecture":
+            ax.axis("off")
+            nodos = {item[0]: item for item in data["nodes"]}
+            for key, x, y, label, color in data["nodes"]:
+                ax.add_patch(plt.Rectangle((x, y), 0.28, 0.11, facecolor=color, edgecolor="black", linewidth=0.8))
+                ax.text(x + 0.14, y + 0.055, label, ha="center", va="center", fontsize=11, wrap=True)
+            estilo = {"controle": ("-", "black", 1.2), "consulta": ("--", "#1f77b4", 1.2),
+                      "artefato": (":", "#444444", 1.2), "decisao": ("-", "#d62728", 2.4)}
+            for origem, destino, tipo in data["edges"]:
+                linha, cor, largura = estilo.get(tipo, ("-", "black", 1.0))
+                ax.annotate("", xy=(nodos[destino][1] + 0.14, nodos[destino][2] + 0.055),
+                            xytext=(nodos[origem][1] + 0.14, nodos[origem][2] + 0.055),
+                            arrowprops={"arrowstyle": "-|>", "linestyle": linha, "color": cor, "linewidth": largura})
+            ax.set_xlim(0, 1.2)
+            ax.set_ylim(0, 1)
         elif figure["id"] == "fig-matrix":
             matriz = data["values"]
             image = ax.imshow(matriz, cmap="tab10", aspect="auto", vmin=0, vmax=10)
@@ -1116,7 +1207,6 @@ def verify_report_contract(model: dict[str, Any], tex_text: str) -> list[str]:
 def render_latex(model: dict[str, Any], batch_dir: Path) -> Path:
     report_dir = batch_dir / "report"
     report_dir.mkdir(exist_ok=True)
-    abstract_results = "; ".join(f"{rq}: {verdict}" for rq, verdict in model["abstract"]["mainResults"].items())
     latex = [r"\documentclass[11pt,a4paper]{article}", r"\usepackage[utf8]{inputenc}",
              r"\usepackage[T1]{fontenc}", r"\usepackage[brazil]{babel}",
              r"\usepackage[margin=2.5cm]{geometry}", r"\usepackage{longtable,tabularx,booktabs,array,graphicx,float}",
@@ -1126,7 +1216,7 @@ def render_latex(model: dict[str, Any], batch_dir: Path) -> Path:
              r"\vspace{2cm}{\large " + _latex(model["subtitle"]) + r"\par}",
              r"\vfill " + _latex(model["dataOrigin"]) + r"\end{titlepage}",
              r"\section*{Resumo}", _latex(model["abstract"]["objective"]) + ". " + _latex(model["abstract"]["design"]) + ". " + f"nRuns={model['abstract']['nRuns']}; nBaseTasks={model['abstract']['nBaseTasks']}. " + _latex(" ".join(model["abstract"].get("observedSummary", []))) + " " + _latex("; ".join(model["abstract"]["limitations"])),
-             r"\section*{Abstract}", "Experimental semantic governance assessment of the Business Semantic Harness. " + f"Observed runs: {model['abstract']['nRuns']}; base tasks: {model['abstract']['nBaseTasks']}. " + "Main results: " + _latex(abstract_results) + ". Conclusions are limited to the observed agent, model, domain and tasks.", r"\tableofcontents", r"\clearpage"]
+             r"\section*{Abstract}", _latex(model["abstract"].get("objectiveEn", "")) + ". " + _latex(model["abstract"].get("designEn", "")) + ". " + f"Runs={model['abstract']['nRuns']}; baseTasks={model['abstract']['nBaseTasks']}. " + _latex(" ".join(model["abstract"].get("observedSummaryEn", []))) + " " + _latex("; ".join(model["abstract"].get("limitationsEn", []))), r"\tableofcontents", r"\clearpage"]
     table_sections: dict[str, list[tuple[int, dict[str, Any]]]] = {}
     for table_number, table in enumerate(model["tables"], 1):
         table_sections.setdefault(table["section"], []).append((table_number, table))
@@ -1158,6 +1248,7 @@ def render_latex(model: dict[str, Any], batch_dir: Path) -> Path:
         for figure in figures_by_section.get(section["title"], []):
             latex.extend(_figure_latex(figure))
     latex.append(r"\section*{Referências}\addcontentsline{toc}{section}{Referências}")
+    latex.append(r"\renewcommand{\refname}{}")
     latex.append(r"\begin{thebibliography}{99}")
     for item in model["references"]:
         latex.append(r"\bibitem[" + _latex(item["author"]) + "(" + _latex(item["year"]) + ")]{" + item["key"] + "}" + _latex(item["entry"]))

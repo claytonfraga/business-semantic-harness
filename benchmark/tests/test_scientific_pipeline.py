@@ -23,7 +23,7 @@ from benchmark.core.experimental_results import (
     ScientificUsabilityGate, build_evidence, compute_scientific_statistics,
     pair_runs, recognition_metrics,
 )
-from benchmark.core.experimental_report import PDFLayoutGate, build_number_provenance, build_report_model, compile_and_validate, render_latex
+from benchmark.core.experimental_report import PDFLayoutGate, build_number_provenance, build_report_model, compile_and_validate, render_figures, render_latex
 from benchmark.core.scientific_pipeline import ScientificConsistencyChecker, analyze_experimental_execution
 
 
@@ -337,13 +337,14 @@ class ScientificPipelineRegression(unittest.TestCase):
         unsigned["provenance"].pop("scientificContentHash")
         self.assertEqual(model["scientificContentHash"], hashlib.sha256(canonical_json(unsigned).encode()).hexdigest())
         with TemporaryDirectory() as directory:
+            render_figures(model, Path(directory))
             tex = render_latex(model, Path(directory))
             rendered = tex.read_text(encoding="utf-8")
             result = compile_and_validate(tex, model)
         self.assertEqual(result["status"], "PASS", result["issues"])
         titles = [section["title"] for section in model["sections"]]
         for expected_title in ("Introdução", "Conclusão", "Auditoria por Execução", "Análise de Caso: G4",
-                               "Glossário Operacional e Regras de Cálculo",
+                               "Apêndice — Glossário e Regras de Cálculo",
                                "Indicadores Auditáveis e Decomposição das Negativas",
                                "Reconciliação entre Campanhas"):
             self.assertIn(expected_title, titles)
