@@ -57,6 +57,9 @@ REFERENCES = [
     {"key": "sparql2013", "author": "W3C", "year": "2013", "entry": "W3C. SPARQL 1.1 Query Language. W3C Recommendation, 2013. Disponível em: https://www.w3.org/TR/sparql11-query/."},
     {"key": "jsonld2020", "author": "W3C", "year": "2020", "entry": "W3C. JSON-LD 1.1: A JSON-based Serialization for Linked Data. W3C Recommendation, 2020. Disponível em: https://www.w3.org/TR/json-ld11/."},
     {"key": "yao2023", "author": "YAO et al.", "year": "2023", "entry": "YAO, S. et al. ReAct: Synergizing Reasoning and Acting in Language Models. International Conference on Learning Representations, 2023. Disponível em: https://arxiv.org/abs/2210.03629."},
+    {"key": "weissgerber2015", "author": "WEISSGERBER et al.", "year": "2015", "entry": "WEISSGERBER, T. L.; MILIC, N. M.; WINHAM, S. J.; GAROVIC, V. D. Beyond Bar and Line Graphs: Time for a New Data Presentation Paradigm. PLOS Biology, v. 13, n. 4, e1002128, 2015. DOI: 10.1371/journal.pbio.1002128."},
+    {"key": "mcneil1992", "author": "McNEIL", "year": "1992", "entry": "McNEIL, D. On Graphing Paired Data. The American Statistician, v. 46, n. 4, p. 307–311, 1992. DOI: 10.1080/00031305.1992.10475915."},
+    {"key": "kosara2006", "author": "KOSARA et al.", "year": "2006", "entry": "KOSARA, R.; BENDIX, F.; HAUSER, H. Parallel Sets: interactive exploration and visual analysis of categorical data. IEEE Transactions on Visualization and Computer Graphics, v. 12, n. 4, p. 558–568, 2006. DOI: 10.1109/TVCG.2006.76."},
 ]
 
 
@@ -679,6 +682,62 @@ def _observed_analyses(batch_id: str) -> tuple[list[dict[str, Any]], list[dict[s
     return sections, tables
 
 
+def _add_analytical_figures(figures: list[dict[str, Any]], sections: list[dict[str, Any]],
+                            tables: list[dict[str, Any]], batch_id: str) -> None:
+    from .analytical_figures import construir as construir_analiticas
+    meta = construir_analiticas(batch_id)
+    if not meta.get("amostraPrincipal"):
+        return
+    repeticoes = meta.get("repeticoesComplementares") or []
+    definicoes = [
+        ("fig-resultados-matriz", "Resultados Observados por Tarefa e Condição",
+         "Como o comportamento observado varia entre condições para a mesma tarefa? A população são as 48 execuções da 1ª repetição (12 tarefas em A/B/C/D); as 10 repetições complementares são mantidas à parte.",
+         ["Linhas são as 12 tarefas, ordenadas por família de domínio (consulta, baixa, transferência), com 'P' para solicitação permitida e 'V' para violadora; colunas são A/B/C/D. Cada célula mostra o estado observado: E = alteração aplicada à origem; C = contenção com conflito reportado; N = candidato produzido com promoção negada; ? = sem alteração da origem com candidato/decisão desconhecidos. As colunas de resumo trazem entrega das permitidas (E k/4) e contenção das violadoras (C k/4), com numeradores e denominadores separados.",
+          "Compare uma linha entre as colunas lendo o mesmo estado nas quatro condições. C mostra seletividade: contém violadoras com conflito reportado e entrega as consultas permitidas; D não altera a origem nas permitidas desta campanha.",
+          "As solicitações permitidas desta campanha são consultas de leitura, o que restringe a generalização para operações mutantes. A matriz não ordena categorias por qualidade nem trata indeterminação como falha comprovada."]),
+        ("fig-duracao-pareada", "Duração Pareada por Tarefa",
+         "Quanto tempo cada condição consumiu para processar a mesma solicitação? População: 36 pares da 1ª repetição nos contrastes A–C, B–C e C–D.",
+         ["Cada linha é uma tarefa; o círculo representa a condição à esquerda do contraste e o quadrado, a da direita, ligados por um segmento. O eixo horizontal é a duração em segundos. Verde indica solicitação permitida e vermelho, violadora; os símbolos distinguem entrega, contenção e resultado indeterminado.",
+          "O comprimento e a orientação do segmento mostram a diferença temporal dentro do par. A mesma ordenação de tarefas é mantida nos três painéis, separando permitidas e violadoras.",
+          "A duração aqui é o mesmo intervalo operacional registrado por execução (início a fim do run). Não se atribui a duração ao SHACL, ao modelo ou a retrabalho, pois a cronologia disponível não sustenta essa atribuição. Não se conectam tarefas diferentes nem se acrescentam intervalos de confiança sem plano compatível com a dependência entre tarefas e famílias."]),
+        ("fig-tokens-duracao", "Relação Descritiva entre Tokens Registrados e Duração",
+         "Como consumo registrado de tokens, duração e desfecho se combinam por execução? População: as 48 execuções da 1ª repetição.",
+         ["Quatro painéis, um por condição; o eixo horizontal traz os tokens registrados e o vertical, a duração em segundos. Cada execução é um ponto: círculo para permitida e triângulo para violadora, com cor indicando o resultado observado. A tabela associada preserva a identidade das tarefas e os valores.",
+          "Localizam-se execuções com alto consumo e curta duração (pontos à direita e acima), baixo consumo e longa duração (à esquerda e abaixo) e valores extremos. Trajetórias de contenção e de implementação podem produzir custos distintos.",
+          "A figura é estritamente descritiva enquanto a comparabilidade contábil dos tokens permanece indeterminada: não se apresentam percentuais de economia, fronteira de eficiência, ranking global ou regressão conjunta entre condições, nem se interpreta a posição dos pontos como comparação validada de eficiência."]),
+        ("fig-percursos-cd", "Percursos Observados de Governança em C e D",
+         "Por quais percursos as solicitações foram contidas, entregues ou permaneceram sem entrega? População: as 24 execuções de C e D da 1ª repetição.",
+         ["Dois painéis alinhados, um para C e outro para D. As faixas de cada estágio (categoria, conflito, candidato, promoção, origem) são proporcionais às contagens; cada execução é contada uma única vez por estágio e os totais são conservados. Estados desconhecido, não aplicável e não alcançado são distintos.",
+          "Em C não se representa a ausência de gate como aprovação; em D não se deduz ausência de candidato ou de etapa a partir de campos desconhecidos. Uma solicitação contida consultivamente sem candidato não atravessa validação semântica fictícia, e um candidato negado em reconhecimento não é representado como violação detectada por SHACL.",
+          "As faixas representam associações e percursos sustentados pelos registros, não prova causal independente. A figura evidencia a diferença entre prevenção consultiva (C) e controle de promoção (D), incluindo a ausência de candidatos violadores comprovados submetidos ao gate nesta campanha."]),
+    ]
+    for figura_id, titulo, intro, leitura in definicoes:
+        figures.append({"id": figura_id, "title": titulo, "section": "Figura — " + titulo,
+                        "source": "classified-runs.json (derivado: figures/*.csv)", "n": meta["amostraPrincipal"],
+                        "question": intro, "population": "1ª repetição", "data": {}})
+        recorte = intro.split("População:")[-1].strip().rstrip(".") if "População:" in intro else "1ª repetição"
+        sections.append({"title": "Figura — " + titulo, "paragraphs": [
+            "Recorte desta figura (população observada): " + recorte + ". Os identificadores, campos utilizados e exclusões constam do conjunto derivado em figures/ e do script de geração; a pergunta investigada aparece na referência da figura."]})
+        sections.append({"title": "Leitura da Figura — " + titulo, "paragraphs": leitura + [
+            "Repetições complementares (fora da amostra principal): " + (", ".join(repeticoes) if repeticoes else "nenhuma") + ".",
+            "Decisão metodológica: a exposição de observações individuais segue Weissgerber et al. (2015) [weissgerber2015]; a representação de dados pareados segue McNeil (1992) [mcneil1992]; a exposição de frequências categóricas segue Kosara, Bendix e Hauser (2006) [kosara2006]. A adaptação ao BSH é decisão deste relatório."]})
+    for figura in meta["figuras"]:
+        if figura["id"] == "fig-tokens-duracao":
+            linhas = figura["linhas"]
+            table = _table("Identidade das execuções da Figura 3",
+                           ["Run", "Tarefa", "Condição", "Categoria", "Tokens", "Duração (s)", "Estado"],
+                           linhas, "tokens e segundos", "fig3-tokens-duracao.csv", len(linhas))
+            table["section"] = "Figura — Relação Descritiva entre Tokens Registrados e Duração"
+            tables.append(table)
+        if figura["id"] == "fig-percursos-cd":
+            linhas = figura["linhas"]
+            table = _table("Percursos de governança em C e D — contagens por estágio",
+                           ["Condição", "Estágio", "Valor", "Execuções", "Total da condição"],
+                           linhas, "execuções", "fig4-percursos.csv", len(linhas))
+            table["section"] = "Figura — Percursos Observados de Governança em C e D"
+            tables.append(table)
+
+
 def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str, Any],
                        completion: dict[str, Any], quality: dict[str, Any], isolation: dict[str, Any],
                        usability: dict[str, Any], ground_truth: dict[str, Any], stats: dict[str, Any],
@@ -817,7 +876,8 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
     ad_plot = [{"baseTaskId": row["baseTaskId"], "leftTokens": row["leftTokens"], "rightTokens": row["rightTokens"]}
                for row in pairs["A-D"] if row["status"] == "PAIRED" and row["tokenAccountingComparable"] == "TRUE"]
     figures = [{"id": "paired-tokens", "title": "Consumo observado de tokens por par A × D", "data": ad_plot,
-                "section": "RQ1-A: Consumo Bruto", "source": "paired-a-d.csv", "n": len(ad_plot)}] if ad_plot else []
+                "section": "RQ1-A: Consumo Bruto", "source": "paired-a-d.csv", "n": len(ad_plot),
+                "interpretation": "Os pontos mostram o consumo observado por tarefa-base; linhas conectam medidas dentro de cada condição. Não representam intervalo de confiança."}] if ad_plot else []
     figures.extend(_complementary_figures(batch_id))
     figures.append({"id": "fig-architecture", "title": "Arquitetura do BSH e fluxo de avaliação do candidato",
                     "section": "Arquitetura do BSH — visão geral", "source": "src/ (bsh)", "n": 0,
@@ -842,6 +902,7 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
                         ["val", "dec", "decisao"], ["dec", "evi", "artefato"], ["bsh", "evi", "controle"],
                     ]},
                     "interpretation": "Componentes do BSH (verde), agentes externos (azul), infraestrutura de benchmark (cinza) e repositório do candidato (amarelo). Setas: controle (sólida), consulta semântica (tracejada), transferência de artefato (pontilhada) e decisão de promoção (grossa). O fluxo de validação (worktree→reconhecimento→validação→decisão) só é executado com enforcement (condição D); em C a consulta semântica está habilitada sem a decisão de promoção."})
+    _add_analytical_figures(figures, sections, tables, batch_id)
     for figura in [item for item in figures if str(item.get("section", "")).startswith("Figura:")]:
         sections.append({"title": figura["section"],
                          "paragraphs": [figura["title"] + " — pergunta: " + figura["question"] + " População: " + figura["population"] + "."]})
@@ -1078,6 +1139,8 @@ def render_figures(model: dict[str, Any], batch_dir: Path) -> list[str]:
         manifest = out_dir / "manifest.json"
         if manifest.is_file():
             manifest.unlink()
+    from .analytical_figures import construir as _construir_analiticas
+    _construir_analiticas(model["batchId"], out_dir)
     for figure in model["figures"]:
         data = figure["data"]
         if not data:
@@ -1174,10 +1237,13 @@ def _appendix_prompts(batch_dir: Path) -> list[str]:
 
 
 def _figure_latex(figure: dict[str, Any]) -> list[str]:
-    return ["A Figura~\\ref{fig:" + figure["id"] + "} responde: " + _latex(figure.get("question", "questão desta seção")) + ".",
-            r"\begin{figure}[H]\centering\includegraphics[width=0.84\textwidth]{../figures/" + figure["id"] + r".pdf}",
-            r"\caption{" + _latex(figure["title"]) + "; n=" + str(figure["n"]) + "; fonte: " + _latex(figure["source"]) + r"}\label{fig:" + figure["id"] + r"}\end{figure}",
-            _latex(figure.get("interpretation", "Os pontos mostram o consumo observado por tarefa-base; linhas conectam medidas dentro de cada condição. Não representam intervalo de confiança."))]
+    linhas = ["A Figura~\\ref{fig:" + figure["id"] + "} responde: " + _latex(figure.get("question", "questão desta seção")) + ".",
+              r"\begin{figure}[H]\centering\includegraphics[width=0.84\textwidth]{../figures/" + figure["id"] + r".pdf}",
+              r"\caption{" + _latex(figure["title"]) + "; n=" + str(figure["n"]) + "; fonte: " + _latex(figure["source"]) + r"}\label{fig:" + figure["id"] + r"}\end{figure}"]
+    interpretacao = figure.get("interpretation")
+    if interpretacao:
+        linhas.append(_latex(interpretacao))
+    return linhas
 
 
 def verify_report_contract(model: dict[str, Any], tex_text: str) -> list[str]:
@@ -1210,7 +1276,7 @@ def render_latex(model: dict[str, Any], batch_dir: Path) -> Path:
     latex = [r"\documentclass[11pt,a4paper]{article}", r"\usepackage[utf8]{inputenc}",
              r"\usepackage[T1]{fontenc}", r"\usepackage[brazil]{babel}",
              r"\usepackage[margin=2.5cm]{geometry}", r"\usepackage{longtable,tabularx,booktabs,array,graphicx,float}",
-             r"\usepackage{hyperref}", r"\usepackage[authoryear,round]{natbib}",
+             		     r"\usepackage{hyperref}", r"\usepackage[authoryear,round]{natbib}", r"\hypersetup{hidelinks}",
              r"\setlength{\parskip}{0.55em}", r"\setlength{\parindent}{0pt}", r"\sloppy",
              r"\begin{document}", r"\begin{titlepage}\centering", r"{\LARGE\bfseries " + _latex(model["title"]) + r"\par}",
              r"\vspace{2cm}{\large " + _latex(model["subtitle"]) + r"\par}",
