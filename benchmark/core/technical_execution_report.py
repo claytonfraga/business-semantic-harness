@@ -445,6 +445,51 @@ def _artifact_inventory(batch_dir: Path) -> list[dict[str, Any]]:
              "status": "PRESENT" if (batch_dir / name).is_file() else "MISSING"} for name in names]
 
 
+def _governance_provenance_issues(classified: list[dict[str, Any]], by_raw_id: dict[str, Any],
+                                  batch_dir: Path) -> list[dict[str, Any]]:
+    """Issues de proveniência da decisão de governança, avaliando cada run com o seu próprio registro."""
+    issues: list[dict[str, Any]] = []
+    for run in classified:
+        source = by_raw_id.get(run.get("runId"), {})
+        if run.get("evidenceCollectionStatus") == "INVALID":
+            issues.append({"severity": "EXECUTION_FAIL", "code": "GOVERNANCE_EVIDENCE_INVALID",
+                           "detail": f"{run['runId']}: {run.get('evidenceCollectionIssue')}"})
+        elif run.get("evidenceCollectionStatus") == "VALID":
+            decision = run.get("governanceDecision")
+            expected_source = (f"executions/{run['runId']}/project/.bsh/local/enforcement/"
+                               f"{run.get('sessionId')}.json")
+            source_path = batch_dir / expected_source
+            try:
+                if run["condition"] == "C" and source.get("sessionMode") == "CONSULTATIVE":
+                    report_source = source.get("sessionReportSource")
+                    report_path = batch_dir / report_source if isinstance(report_source, str) else batch_dir
+                    matching = (decision is None and source.get("governanceDecisionSource") is None
+                                and source.get("enforcementPipelineObserved") is False
+                                and report_path.resolve().is_relative_to(batch_dir.resolve())
+                                and report_path.is_file()
+                                and read_json(report_path).get("sessionMode") == "CONSULTATIVE")
+                else:
+                    matching = (isinstance(decision, dict)
+                            and decision.get("validationStatus") in {"CONFORMING", "VIOLATION", "INDETERMINATE", "VALIDATION_ERROR"}
+                            and isinstance(decision.get("validationExecuted"), bool)
+                            and isinstance(decision.get("validationComplete"), bool)
+                            and decision.get("policyDecision") in {"ALLOW", "DENY"}
+                            and decision.get("promotionDecision") in {"ALLOW", "DENY", "REVALIDATION_REQUIRED"}
+                            and source_path.resolve().is_relative_to(batch_dir.resolve())
+                            and run.get("governanceDecisionSource") == expected_source
+                            and run.get("governanceDecisionSha256") == sha256_file(source_path)
+                            and source_path.is_file() and read_json(source_path) == decision)
+            except (ValueError, UnicodeError):
+                matching = False
+            if not matching:
+                issues.append({"severity": "EXECUTION_FAIL", "code": "GOVERNANCE_PROVENANCE_MISMATCH",
+                               "detail": str(run["runId"])})
+        elif run["condition"] == "D" and run.get("evidenceCollectionStatus") != "VALID":
+            issues.append({"severity": "EXECUTION_WARNING", "code": "GOVERNANCE_EVIDENCE_MISSING",
+                           "detail": str(run["runId"])})
+    return issues
+
+
 def _model(batch_dir: Path, config: dict[str, Any], tasks: list[dict[str, Any]], metadata: dict[str, Any],
            raw: list[dict[str, Any]], initial_issues: list[dict[str, Any]],
            isolation: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
@@ -503,44 +548,7 @@ def _model(batch_dir: Path, config: dict[str, Any], tasks: list[dict[str, Any]],
         issues.append({"severity": "EXECUTION_FAIL", "code": "DUPLICATE_RUN", "detail": str(completion["duplicateRunKeys"])})
     if instrument["invalidValues"]:
         issues.append({"severity": "EXECUTION_FAIL", "code": "INVALID_INSTRUMENTATION", "detail": str(instrument["invalidValues"])})
-    for run in classified:
-        source = by_raw_id.get(run.get("runId"), {})
-        if run.get("evidenceCollectionStatus") == "INVALID":
-            issues.append({"severity": "EXECUTION_FAIL", "code": "GOVERNANCE_EVIDENCE_INVALID",
-                           "detail": f"{run['runId']}: {run.get('evidenceCollectionIssue')}"})
-        elif run.get("evidenceCollectionStatus") == "VALID":
-            decision = run.get("governanceDecision")
-            expected_source = (f"executions/{run['runId']}/project/.bsh/local/enforcement/"
-                               f"{run.get('sessionId')}.json")
-            source_path = batch_dir / expected_source
-            try:
-                if run["condition"] == "C" and source.get("sessionMode") == "CONSULTATIVE":
-                    report_source = source.get("sessionReportSource")
-                    report_path = batch_dir / report_source if isinstance(report_source, str) else batch_dir
-                    matching = (decision is None and source.get("governanceDecisionSource") is None
-                                and source.get("enforcementPipelineObserved") is False
-                                and report_path.resolve().is_relative_to(batch_dir.resolve())
-                                and report_path.is_file()
-                                and read_json(report_path).get("sessionMode") == "CONSULTATIVE")
-                else:
-                    matching = (isinstance(decision, dict)
-                            and decision.get("validationStatus") in {"CONFORMING", "VIOLATION", "INDETERMINATE", "VALIDATION_ERROR"}
-                            and isinstance(decision.get("validationExecuted"), bool)
-                            and isinstance(decision.get("validationComplete"), bool)
-                            and decision.get("policyDecision") in {"ALLOW", "DENY"}
-                            and decision.get("promotionDecision") in {"ALLOW", "DENY", "REVALIDATION_REQUIRED"}
-                            and source_path.resolve().is_relative_to(batch_dir.resolve())
-                            and run.get("governanceDecisionSource") == expected_source
-                            and run.get("governanceDecisionSha256") == sha256_file(source_path)
-                            and source_path.is_file() and read_json(source_path) == decision)
-            except (ValueError, UnicodeError):
-                matching = False
-            if not matching:
-                issues.append({"severity": "EXECUTION_FAIL", "code": "GOVERNANCE_PROVENANCE_MISMATCH",
-                               "detail": str(run["runId"])})
-        elif run["condition"] == "D" and run.get("evidenceCollectionStatus") != "VALID":
-            issues.append({"severity": "EXECUTION_WARNING", "code": "GOVERNANCE_EVIDENCE_MISSING",
-                           "detail": str(run["runId"])})
+    issues.extend(_governance_provenance_issues(classified, by_raw_id, batch_dir))
     if worktrees["worktreesResidual"] or worktrees["missingResultFiles"]:
         issues.append({"severity": "EXECUTION_FAIL", "code": "WORKTREE_INTEGRITY_FAILURE", "detail": json.dumps(worktrees, ensure_ascii=False)})
     elif worktrees["missingWorkspaces"]:

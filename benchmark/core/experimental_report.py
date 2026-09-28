@@ -556,7 +556,9 @@ def _observed_analyses(batch_id: str) -> tuple[list[dict[str, Any]], list[dict[s
 
     def rotulo_promocao(run: dict[str, Any]) -> str:
         valor = run.get("promotionDecision")
-        return valor if valor in ("ALLOW", "DENY") else "nao_aplicavel"
+        if valor in ("ALLOW", "DENY"):
+            return valor
+        return "desconhecida" if run.get("candidateCreated") is None else "nao_aplicavel"
 
     linhas_d = []
     for run in permitidas_d:
@@ -639,19 +641,26 @@ def _observed_analyses(batch_id: str) -> tuple[list[dict[str, Any]], list[dict[s
     rep2_conds = sorted({str(run.get("condition")) for run in rep2})
     paired_path = Path(__file__).resolve().parents[1] / "results" / batch_id / "paired-results.csv"
     contrast_paired: dict[str, int] = {}
+    contrast_main: dict[str, int] = {}
     comparabilidade: set[str] = set()
     if paired_path.is_file():
         import csv as _csv
         for row in _csv.DictReader(paired_path.open(encoding="utf-8")):
             if row.get("status") == "PAIRED":
-                contrast_paired[row.get("contrast")] = contrast_paired.get(row.get("contrast"), 0) + 1
+                contrast = row.get("contrast")
+                contrast_paired[contrast] = contrast_paired.get(contrast, 0) + 1
+                if str(row.get("replicationIndex")) == "1":
+                    contrast_main[contrast] = contrast_main.get(contrast, 0) + 1
             comparabilidade.add(str(row.get("tokenAccountingComparable")))
-    contraste_txt = "; ".join(f"{c}={n} pares" for c, n in sorted(contrast_paired.items())) or "sem pares"
+    contraste_txt = "; ".join(
+        f"{c}: principais={contrast_main.get(c, 0)}, complementares={n - contrast_main.get(c, 0)}, total={n}"
+        for c, n in sorted(contrast_paired.items())) or "sem pares"
     comparavel = comparabilidade == {"TRUE"}
+    missing_keys = "adapter, adapterVersion, runtime, telemetrySchemaVersion, tokenAccountingVersion"
     sections.append({"title": "Comparação Principal Equilibrada", "paragraphs": [
-        f"A comparação principal usa as 12 tarefas da 1ª repetição nas quatro condições ({len(rep1)} execuções). 'Entrega observada' = alteração efetivamente aplicada à origem; NÃO é correção integral comprovada.",
-        f"Pareamento por contraste (tarefa, repetição e variante): {contraste_txt}. Contrastes com menos de 12 pares refletem a ausência de execução correspondente na outra condição, registrada como NO_MATCHING_RUN.",
-        f"Comparabilidade contábil de tokens observada nos pares: {', '.join(sorted(comparabilidade)) or 'indeterminada'}. " + ("Diferenças percentuais são publicadas apenas quando a contabilidade é comparável." if not comparavel else "A contabilidade é comparável; diferenças absolutas e percentuais são calculadas sobre os pares elegíveis."),
+        f"A comparação principal usa as 12 tarefas da 1ª repetição nas quatro condições ({len(rep1)} execuções), formando 12 pares por contraste. 'Entrega observada' = alteração efetivamente aplicada à origem; NÃO é correção integral comprovada.",
+        f"Pareamento por contraste (tarefa, repetição e variante): {contraste_txt}. Em A–D o total de 17 pares é o conjunto completo; apenas os 12 da 1ª repetição compõem a comparação principal, e os 5 restantes (2ª repetição) são complementares. Contrastes com menos de 12 principais refletem NO_MATCHING_RUN.",
+        f"Comparabilidade contábil de tokens: {', '.join(sorted(comparabilidade)) or 'indeterminada'}. " + ("Não há comprovação de comparabilidade: faltam nos artefatos os campos " + missing_keys + " (metadata.json, result.json e classified-runs.json). É ausência de comprovação, NÃO incompatibilidade demonstrada; por isso não se publicam diferenças percentuais e mantêm-se os valores observados como limitação." if not comparavel else "A contabilidade é comparável; diferenças absolutas e percentuais são calculadas sobre os pares elegíveis."),
         f"As dez execuções adicionais da 2ª repetição (tarefas {', '.join(rep2_tasks)}, condições {', '.join(rep2_conds)}) são analisadas em caráter complementar e não substituem a comparação equilibrada.",
         "As estatísticas da campanha completa (58 execuções) são mantidas, mas não substituem a comparação equilibrada. As 12 tarefas concentram-se em poucas famílias (consulta, baixa, transferência): variações da mesma solicitação não equivalem a diversidade de problemas funcionalmente distintos."]})
 
@@ -679,7 +688,7 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
         "Condições Experimentais": "A executa o agente diretamente; B adiciona regras textuais; C adiciona ontologia consultiva; D usa o BSH completo. A × D mede efeito conjunto; A × B, B × C e C × D exploram componentes progressivos sem presumir causalidade.",
         "Variáveis e Estimandos": "Condição é a variável independente. Consumo de tokens, duração, correção funcional, correção de governança e desfecho da tarefa são variáveis dependentes distintas. WORKLOAD_TOKEN_REDUCTION é 1 menos a razão entre a soma de tokens D e a soma de tokens A, somente em pares com contabilidade comparável e denominador positivo.",
         "Instrumentação": "O adapter registra runtime, telemetria de tokens, duração, diff, testes, consultas MCP, conflitos e status de enforcement. Valor ausente permanece nulo; zero indica medição explícita de zero. Tokens não cacheados não são derivados sem garantia documentada da semântica do runtime. Cobertura mede registros presentes, não o desfecho: 'cobertura de testes' é o número de execuções com teste executado sobre o total elegível (não o total de runs), e a cobertura de diff distingue diff vazio confirmado (por comparação de conteúdo inicial e final), diff não coletado e medida não aplicável.",
-        "Resultados Funcionais": "Quatro dimensões distintas, com o mesmo padrão em A/B/C/D: 'cumprimentoDoPedido' (a alteração solicitada foi aplicada?), 'alteracaoAplicadaComTestesAprovados' (alteração observada e suíte executada aprovada — NÃO é correção funcional), 'correcaoFuncionalVerificada' (só existe com evidência de atendimento aos requisitos; ausente caso contrário) e 'desfechoCorreto'. 'adequacaoAoCritérioOperacional' mede a interação/decisão face ao BSH (a decisão observada não contradiz o critério operacional) e é NÃO APLICÁVEL em A/B, que não possuem BSH; NÃO é aderência verificada à política nem correção semântica. A validade semântica verificada permanece NOT_EVALUATED sem referência independente.",
+        "Resultados Funcionais": "Dimensões distintas, com o mesmo padrão em A/B/C/D: 'cumprimentoDoPedido' (alteração solicitada aplicada?), 'alteracaoAplicadaComTestesAprovados' (alteração observada e suíte executada aprovada — NÃO é correção funcional), 'correcaoFuncionalVerificada' (só com evidência de atendimento aos requisitos; ausente caso contrário) e 'desfechoCorreto'. Separam-se três coisas: presença de interação com o BSH (campo 'governanceInteraction'), mecanismo de intervenção ('governanceMechanism'/'governanceIntervention') e 'efeitoDaInteracaoComBSH' (a decisão observada não contradiz o critério operacional; NÃO APLICÁVEL em A/B, sem BSH). Nenhuma dessas dimensões é aderência verificada à política nem correção semântica; a validade semântica verificada permanece NOT_EVALUATED sem referência independente, e não se atribui correção a uma execução apenas por haver interação.",
         "Discussão": "Os resultados favoráveis, desfavoráveis e não calculáveis são apresentados separadamente. O relato seletivo de conflitos é evidência de utilidade consultiva, não de precisão semântica além da amostra. A execução de solicitações permitidas sob C/D não deve ser diluída pela contagem de violações evitadas. Zero oportunidades de enforcement independente não é taxa de falha nem sucesso: é ausência de denominador de exposição ao gate. Diferenças de tokens após bloqueio não equivalem a maior eficiência na entrega da mesma funcionalidade. 'Parcialmente sustentado' indica viabilidade da comparação, não eficácia demonstrada. Denominadores são separados por natureza: pareamento estrutural (universo de tarefas comuns) não é o mesmo que elegibilidade analítica (pares com contabilidade comparável); o conjunto completo de D não é o mesmo que o contraste pareado C × D; 'violações implementadas' e 'violações contidas' podem ser conjuntos distintos e devem ser identificados por runId; falha de instrumentação é distinta de falha de execução.",
         "Ameaças à Validade": "Construção: tarefas concentram-se em poucas famílias (consulta, baixa, transferência) e a segunda repetição é parcial. Interna: comparabilidade de telemetria depende de contabilidade idêntica, faltam critérios externos de correção funcional e há falhas concentradas em condições específicas. Externa: um agente, um modelo, um domínio e uma política congelada; 'violadora' refere-se apenas à política congelada. Construto: cobertura mede registros presentes, não qualidade do desfecho; evidência semântica fina e tokens não cacheados podem faltar sem significar ausência de interação.",
     }
@@ -769,7 +778,7 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
     dimension_labels = {"promptFulfillment": "cumprimentoDoPedido",
                         "alteracaoAplicadaComTestes": "alteracaoAplicadaComTestesAprovados",
                         "functionalCorrectness": "correcaoFuncionalVerificada",
-                        "governanceCorrectness": "adequacaoAoCritérioOperacional",
+                        "governanceCorrectness": "efeitoDaInteracaoComBSH",
                         "taskOutcomeCorrect": "desfechoCorreto"}
     functional_rows = [[condition, dimension_labels.get(field, field), counts["true"], counts["false"], counts["missing"]]
                        for condition, outcomes in stats["functionalOutcomesByCondition"].items()

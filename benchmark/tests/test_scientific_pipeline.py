@@ -404,5 +404,40 @@ class ScientificPipelineRegression(unittest.TestCase):
             self.assertEqual(result["status"], "HARD_FAIL")
 
 
+    def test_Given_c_and_d_runs_When_provenance_checked_Then_each_run_uses_its_own_record(self):
+        """codex: Given a C run followed by a D run, When provenance is checked, Then each uses its own record and real divergence is detected."""
+        from benchmark.core.technical_execution_report import _governance_provenance_issues
+        with TemporaryDirectory() as directory:
+            base = Path(directory)
+            report = base / "executions" / "001-C" / "project" / ".bsh" / "local" / "sessions" / "s.json"
+            report.parent.mkdir(parents=True)
+            report.write_text(json.dumps({"sessionMode": "CONSULTATIVE"}), encoding="utf-8")
+            enforcement = base / "executions" / "002-D" / "project" / ".bsh" / "local" / "enforcement"
+            enforcement.mkdir(parents=True)
+            decision = {"validationStatus": "CONFORMING", "validationExecuted": True, "validationComplete": True,
+                        "policyDecision": "ALLOW", "promotionDecision": "ALLOW"}
+            decision_file = enforcement / "s2.json"
+            decision_file.write_text(json.dumps(decision), encoding="utf-8")
+            digest = hashlib.sha256(decision_file.read_bytes()).hexdigest()
+            classified = [
+                {"runId": "001-C", "condition": "C", "evidenceCollectionStatus": "VALID",
+                 "governanceDecision": None, "sessionId": "s"},
+                {"runId": "002-D", "condition": "D", "evidenceCollectionStatus": "VALID",
+                 "governanceDecision": decision, "sessionId": "s2",
+                 "governanceDecisionSource": "executions/002-D/project/.bsh/local/enforcement/s2.json",
+                 "governanceDecisionSha256": digest},
+            ]
+            by_raw = {
+                "001-C": {"sessionMode": "CONSULTATIVE",
+                          "sessionReportSource": "executions/001-C/project/.bsh/local/sessions/s.json",
+                          "governanceDecisionSource": None, "enforcementPipelineObserved": False},
+                "002-D": {"sessionMode": "ENFORCED"},
+            }
+            self.assertEqual(_governance_provenance_issues(classified, by_raw, base), [])
+            classified[0]["governanceDecision"] = {"validationStatus": "CONFORMING"}
+            diverged = _governance_provenance_issues(classified, by_raw, base)
+            self.assertTrue(any(issue["code"] == "GOVERNANCE_PROVENANCE_MISMATCH" and issue["detail"] == "001-C" for issue in diverged))
+
+
 if __name__ == "__main__":
     unittest.main()
