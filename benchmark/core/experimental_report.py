@@ -722,6 +722,17 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
     extra_sections, extra_tables = _observed_analyses(batch_id)
     sections.extend(extra_sections)
     tables.extend(extra_tables)
+    limitacoes_rows = [[rq_id, entry["status"], "; ".join(entry.get("limitations") or ["sem limitação registrada"])]
+                       for rq_id, entry in stats["researchQuestions"].items()
+                       if entry["status"] in ("DADOS_INSUFICIENTES", "NAO_AVALIADA", "DESCRITIVA")]
+    if limitacoes_rows:
+        limitacoes_table = _table("Questões sem dados suficientes ou descritivas",
+                                  ["RQ", "Status", "Limitação"],
+                                  limitacoes_rows, "runs", "statistics.json", sample["nRuns"])
+        limitacoes_table["section"] = "Limitações e Questões sem Dados"
+        tables.append(limitacoes_table)
+        sections.append({"title": "Limitações e Questões sem Dados", "paragraphs": [
+            "Agrega, em uma única tabela, as questões cuja resposta é parcial, descritiva ou indisponível, com o motivo declarado; evita repetir estados internos do gerador ao longo do documento."]})
     ad_plot = [{"baseTaskId": row["baseTaskId"], "leftTokens": row["leftTokens"], "rightTokens": row["rightTokens"]}
                for row in pairs["A-D"] if row["status"] == "PAIRED" and row["tokenAccountingComparable"] == "TRUE"]
     figures = [{"id": "paired-tokens", "title": "Consumo observado de tokens por par A × D", "data": ad_plot,
