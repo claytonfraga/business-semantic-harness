@@ -445,6 +445,22 @@ def _complementary_figures(batch_id: str) -> list[dict[str, Any]]:
                         "data": {"labels": [nome for nome, _ in campos], "values": cobertura},
                         "ylabel": "execuções com campo observado",
                         "interpretation": "Cobertura mede registro presente, não qualidade do desfecho; ausência não é zero."})
+
+    code_map = {"ALTERACAO_CORRETA": 0, "SEM_ALTERACAO_CORRETA": 1, "BLOQUEIO_CORRETO": 2,
+                "SEM_ALTERACAO_INCORRETA": 3, "ALTERACAO_INCORRETA": 4, "FALSO_BLOQUEIO": 5,
+                "REVISAO_HUMANA": 6, "INDETERMINADO": 7, "FALHA_INSTRUMENTACAO": 8, "FALHA_TECNICA": 9}
+    bases = sorted({str(r.get("baseTaskId")) for r in runs})
+    condicoes = list("ABCD")
+    lookup = {(str(r.get("baseTaskId")), r.get("condition")): r.get("classification") for r in runs}
+    matriz = [[code_map.get(lookup.get((base, cond)), -1) for cond in condicoes] for base in bases]
+    if bases:
+        figuras.append({"id": "fig-matrix", "title": "Matriz tarefa-base × condição",
+                        "question": "Como cada tarefa-base se comporta em A, B, C e D?",
+                        "population": "todas as execuções observadas", "section": "Figura: Matriz",
+                        "source": "classified-runs.json", "n": len(runs),
+                        "data": {"rows": bases, "cols": condicoes, "values": matriz, "codes": code_map},
+                        "ylabel": "tarefa-base",
+                        "interpretation": "Permite ver a recorrência por tarefa-base (ex.: G4) e réplica por condição, evitando que agregados ocultem comportamentos específicos."})
     return figuras
 
 
@@ -747,6 +763,13 @@ def render_figures(model: dict[str, Any], batch_dir: Path) -> list[str]:
             ax.set_xticks(list(x), [row["baseTaskId"] for row in data], rotation=45, ha="right")
             ax.set_ylabel("Tokens totais observados")
             ax.legend()
+        elif figure["id"] == "fig-matrix":
+            matriz = data["values"]
+            ax.imshow(matriz, cmap="tab10", aspect="auto", vmin=0, vmax=9)
+            ax.set_xticks(range(len(data["cols"])), data["cols"])
+            ax.set_yticks(range(len(data["rows"])), data["rows"])
+            ax.set_xlabel("condição")
+            ax.set_ylabel("tarefa-base")
         else:
             labels = data.get("labels", [])
             values = data.get("values", [])

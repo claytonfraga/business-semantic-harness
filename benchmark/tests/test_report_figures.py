@@ -48,5 +48,18 @@ class ReportFiguresRegression(unittest.TestCase):
             self.assertTrue((Path(directory) / "figures" / "fig-outcomes.pdf").is_file())
 
 
+    def test_Given_matrix_figure_When_rendered_Then_pdf_and_png(self):
+        """opencode: Given a base-task x condition matrix figure, When rendered, Then PDF/PNG are produced."""
+        model = {"batchId": "b", "scientificContentHash": "h", "figures": [
+            {"id": "fig-matrix", "title": "Matriz", "data": {"rows": ["G4", "V6"], "cols": ["A", "B", "C", "D"],
+             "values": [[1, 1, 2, 1], [1, 1, 0, 1]], "codes": {"ALTERACAO_CORRETA": 0}},
+             "section": "Figura: Matriz", "source": "classified-runs.json", "n": 8, "ylabel": "tarefa-base",
+             "question": "q", "interpretation": "i"}]}
+        with TemporaryDirectory() as directory:
+            ids = render_figures(model, Path(directory))
+            self.assertEqual(ids, ["fig-matrix"])
+            self.assertTrue((Path(directory) / "figures" / "fig-matrix.pdf").is_file())
+
+
 if __name__ == "__main__":
     unittest.main()
