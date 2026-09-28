@@ -731,6 +731,7 @@ def _render_latex(model: dict[str, Any]) -> str:
     by_section: dict[str, list[tuple[int, dict[str, Any]]]] = defaultdict(list)
     for number, table in enumerate(model["tables"], 1):
         by_section[table["section"]].append((number, table))
+    details: list[tuple[str, str, Any]] = []
     for section_number, section in enumerate(model["sections"], 1):
         lines.append(r"\section{" + _latex(section) + r"}\label{sec:" + str(section_number) + "}")
         if section == "Completude":
@@ -749,9 +750,24 @@ def _render_latex(model: dict[str, Any]) -> str:
                          r"}\label{tab:" + str(table_number) + r"}\\")
             lines.append(r"\toprule " + " & ".join(_latex(item) for item in table["headers"]) + r"\\\midrule\endfirsthead")
             lines.append(r"\toprule " + " & ".join(_latex(item) for item in table["headers"]) + r"\\\midrule\endhead")
-            for row in table["rows"]:
-                lines.append(" & ".join(_latex(item) for item in row) + r"\\")
+            for row_number, row in enumerate(table["rows"], 1):
+                cells = []
+                for column_number, value in enumerate(row, 1):
+                    if len(_display(value)) > 600:
+                        reference = "detalhe-" + str(table_number) + "-" + str(row_number) + "-" + str(column_number)
+                        label = "Tabela " + str(table_number) + ", linha " + str(row_number) + ", coluna " + _display(table["headers"][column_number - 1])
+                        details.append((reference, label, value))
+                        cells.append(r"\textit{[valor integral na Seção~\ref{" + reference + "}]}")
+                    else:
+                        cells.append(_latex(value))
+                lines.append(" & ".join(cells) + r"\\")
             lines.extend([r"\bottomrule", r"\end{longtable}"])
+    if details:
+        lines.append(r"\section{Detalhamento de Valores Longos}")
+        lines.append("Esta seção preserva integralmente os valores cujo conteúdo excede a largura de uma célula e não pode ser exibido em uma linha de tabela sem exceder a altura da página.")
+        for reference, label, value in details:
+            lines.append(r"\subsection{" + _latex(label) + r"}\label{" + reference + "}")
+            lines.append(_latex(value))
     lines.append(r"\end{document}")
     return "\n".join(lines) + "\n"
 
