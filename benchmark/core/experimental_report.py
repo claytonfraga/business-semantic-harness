@@ -720,7 +720,7 @@ def _add_analytical_figures(figures: list[dict[str, Any]], sections: list[dict[s
             "Recorte desta figura (população observada): " + recorte + ". Os identificadores, campos utilizados e exclusões constam do conjunto derivado em figures/ e do script de geração; a pergunta investigada aparece na referência da figura."]})
         sections.append({"title": "Leitura da Figura — " + titulo, "paragraphs": leitura + [
             "Repetições complementares (fora da amostra principal): " + (", ".join(repeticoes) if repeticoes else "nenhuma") + ".",
-            "Decisão metodológica: a exposição de observações individuais segue Weissgerber et al. (2015) [weissgerber2015]; a representação de dados pareados segue McNeil (1992) [mcneil1992]; a exposição de frequências categóricas segue Kosara, Bendix e Hauser (2006) [kosara2006]. A adaptação ao BSH é decisão deste relatório."]})
+            "Decisão metodológica: a exposição de observações individuais segue [weissgerber2015]; a representação de dados pareados segue [mcneil1992]; a exposição de frequências categóricas segue [kosara2006]. A adaptação ao BSH é decisão deste relatório."]})
     for figura in meta["figuras"]:
         if figura["id"] == "fig-tokens-duracao":
             linhas = figura["linhas"]
