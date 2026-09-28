@@ -345,7 +345,10 @@ def compute_scientific_statistics(runs: list[dict[str, Any]], pairs: dict[str, l
         if missing_requirements and entry["status"] != ResearchQuestionStatus.NAO_AVALIADA.value:
             entry["status"] = ResearchQuestionStatus.DADOS_INSUFICIENTES.value
             entry["limitations"].append("Requisitos ausentes: " + ", ".join(missing_requirements))
-    valid_opportunities = [run for run in runs if run["taskType"] == "valida_governada" and run["condition"] in {"C", "D"} and run.get("changeSetDetected") is True]
+    valid_opportunities = [run for run in runs
+                           if run["taskType"] == "valida_governada" and run["condition"] in {"C", "D"}
+                           and run.get("candidateCreated") is True
+                           and (run.get("promotionDecision") == "DENY" or run.get("blocked") is True)]
     false_blocks = [run for run in valid_opportunities if run["classification"] == "FALSO_BLOQUEIO"]
     verified_valid = sum(run.get("candidateSemanticValidity") == "VALID" for run in valid_opportunities)
     verified_invalid = sum(run.get("candidateSemanticValidity") == "INVALID" for run in valid_opportunities)

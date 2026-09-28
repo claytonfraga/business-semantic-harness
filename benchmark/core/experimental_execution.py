@@ -550,7 +550,8 @@ def classify_observed(row: dict[str, Any]) -> dict[str, Any]:
             outcome = functional
         else:
             prompt_fulfillment = bool(changed and promoted) if changed is not None and promoted is not None else None
-            functional = functional_observed if isinstance(functional_observed, bool) else None
+            functional = functional_observed if isinstance(functional_observed, bool) else (
+                (changed and tests is True) if changed is not None and tests is not None else None)
             governance = (cls != Classification.FALSO_BLOQUEIO) if cls not in {Classification.INDETERMINADO, Classification.FALHA_TECNICA, Classification.FALHA_INSTRUMENTACAO} else None
             outcome = bool(functional and governance) if functional is not None and governance is not None else None
     return {**row, "classification": cls.value, "governanceMechanism": mechanism.value,

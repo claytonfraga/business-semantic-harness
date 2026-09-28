@@ -552,13 +552,22 @@ def _observed_analyses(batch_id: str) -> tuple[list[dict[str, Any]], list[dict[s
 
     results = _read_results(batch_id)
     permitidas_d = [run for run in runs if run.get("condition") == "D" and categoria(run) == "permitida"]
+
+    def rotulo_candidato(run: dict[str, Any]) -> str:
+        valor = run.get("candidateCreated")
+        return "produzido" if valor is True else ("inexistente" if valor is False else "desconhecido")
+
+    def rotulo_promocao(run: dict[str, Any]) -> str:
+        valor = run.get("promotionDecision")
+        return valor if valor in ("ALLOW", "DENY") else "nao_aplicavel"
+
     linhas_d = []
     for run in permitidas_d:
         gd = (results.get(str(run.get("runId")), {}) or {}).get("governanceDecision")
         gd = gd if isinstance(gd, dict) else {}
-        linhas_d.append([str(run.get("runId")), str(run.get("candidateCreated")), str(run.get("promotionDecision")),
-                         str(gd.get("failureStage")), str(run.get("testsPassed")), str(run.get("originChanged")),
-                         str(run.get("classification"))])
+        linhas_d.append([str(run.get("runId")), rotulo_candidato(run), rotulo_promocao(run),
+                         str(gd.get("failureStage") or "nao_alancada"), str(run.get("testsPassed")),
+                         str(run.get("originChanged")), str(run.get("classification"))])
     if linhas_d:
         table = _table("Execuções de solicitações permitidas em D",
                        ["Run", "Candidato", "Decisão de promoção", "Etapa de falha", "Testes aprovados", "Alterou origem", "Classe"],
@@ -596,6 +605,35 @@ def _observed_analyses(batch_id: str) -> tuple[list[dict[str, Any]], list[dict[s
     sections.append({"title": "Testes Técnicos e Preservação das Regras", "paragraphs": [
         f"Entre {len(vio)} execuções violadoras, {sum(run.get('testsExecuted') is True for run in vio)} executaram testes e {sum(run.get('testsPassed') is True for run in vio)} os reportaram como aprovados.",
         "Os artefatos não permitem distinguir testes adaptados à solicitação violadora de verificações preservadas da política original; a resposta à RQ10 permanece parcialmente sustentada e não se atribui aprovação à preservação de regras sem essa distinção no dado."]})
+
+    rep1 = [run for run in runs if (run.get("replicationIndex") or 1) == 1]
+    rep2 = [run for run in runs if (run.get("replicationIndex") or 1) > 1]
+    balanco = []
+    for condition in "ABCD":
+        for category in ("permitida", "violadora"):
+            group = [run for run in rep1 if run.get("condition") == condition and categoria(run) == category]
+            if not group:
+                continue
+            tokens = [run.get("totalTokens") for run in group if run.get("totalTokens") is not None]
+            durations = [run.get("durationSeconds") for run in group if run.get("durationSeconds") is not None]
+            contencao = (sum(run.get("classification") in ("SEM_ALTERACAO_CORRETA", "BLOQUEIO_CORRETO") for run in group)
+                         if category == "violadora" else None)
+            balanco.append([condition, category, len(group),
+                            sum(run.get("codeBaseChanged") is True for run in group),
+                            contencao,
+                            int(sum(tokens)) if tokens else None,
+                            round(sum(durations), 1) if durations else None])
+    table = _table("Comparação principal equilibrada (1ª repetição)",
+                   ["Condição", "Categoria", "Execuções", "Entrega observada", "Contenção", "Tokens totais", "Duração total (s)"],
+                   balanco, "execuções, runs e segundos", "classified-runs.json", len(rep1))
+    table["section"] = "Comparação Principal Equilibrada"
+    tables.append(table)
+    rep2_tasks = sorted({str(run.get("baseTaskId")) for run in rep2})
+    rep2_conds = sorted({str(run.get("condition")) for run in rep2})
+    sections.append({"title": "Comparação Principal Equilibrada", "paragraphs": [
+        f"A comparação principal usa as 12 tarefas da 1ª repetição nas quatro condições ({len(rep1)} execuções). 'Entrega observada' = alteração efetivamente aplicada à origem; NÃO é correção integral comprovada.",
+        f"As dez execuções adicionais da 2ª repetição (tarefas {', '.join(rep2_tasks)}, condições {', '.join(rep2_conds)}) são analisadas em caráter complementar e não substituem a comparação equilibrada.",
+        "As estatísticas da campanha completa (58 execuções) são mantidas, mas não substituem a comparação equilibrada. As 12 tarefas concentram-se em poucas famílias (consulta, baixa, transferência): variações da mesma solicitação não equivalem a diversidade de problemas funcionalmente distintos."]})
 
     return sections, tables
 
