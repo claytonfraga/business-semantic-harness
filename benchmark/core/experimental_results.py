@@ -239,7 +239,11 @@ def compute_scientific_statistics(runs: list[dict[str, Any]], pairs: dict[str, l
         {"WORKLOAD_TOKEN_REDUCTION": reduction, "sumTokensA": a_sum if comparable else None,
          "sumTokensD": d_sum if comparable else None, "eligiblePairs": len(comparable),
          "confidenceInterval": _cluster_ratio_bootstrap(comparable, policy) if reduction is not None else None},
-        [] if reduction is not None else ["Telemetria ausente, base não positiva ou contabilidade de tokens incomparável"])
+         [] if reduction is not None else (
+             ["Sem pares A-D pareados neste batch: não há base de pareamento"] if not ad
+             else ["Pares A-D existem, mas a contabilidade de tokens não é comparável (não integrada ao cálculo), portanto o consumo bruto não é estimável"] if not comparable
+             else ["Denominador A não positivo entre os pares comparáveis"] if a_sum <= 0
+             else ["Telemetria de tokens ausente em algum par comparável"]))
     equivalent = [pair for pair in eligible_ad if pair["taskType"] == "valida_governada" and pair["functionalCorrectnessLeft"] is True and pair["functionalCorrectnessRight"] is True and pair["behavioralEquivalence"] == "EQUIVALENTE"]
     eq_delta = [(pair["baseTaskId"], pair["leftTokens"] - pair["rightTokens"]) for pair in equivalent]
     eq_status = ResearchQuestionStatus.DADOS_INSUFICIENTES if not equivalent else (ResearchQuestionStatus.DESCRITIVA if len({p["baseTaskId"] for p in equivalent}) < inferential_min else ResearchQuestionStatus.RESPONDIDA)

@@ -409,7 +409,7 @@ def _complementary_figures(batch_id: str) -> list[dict[str, Any]]:
     values = ([sum(1 for r in runs if r.get("condition") == cond and not violadora(r)) for cond in "ABCD"]
               + [sum(1 for r in runs if r.get("condition") == cond and violadora(r)) for cond in "ABCD"])
     if any(values):
-        figuras.append({"id": "fig-outcomes", "title": "Desfechos por condição e categoria",
+        figuras.append({"id": "fig-outcomes", "title": "Execuções por condição e categoria",
                         "question": "Quantas execuções por condição e categoria de solicitação?",
                         "population": "todas as execuções observadas", "section": "Figura: Desfechos",
                         "source": "classified-runs.json", "n": len(runs), "data": {"labels": labels, "values": values},
@@ -463,16 +463,27 @@ def _complementary_figures(batch_id: str) -> list[dict[str, Any]]:
                 "REVISAO_HUMANA": 6, "INDETERMINADO": 7, "FALHA_INSTRUMENTACAO": 8, "FALHA_TECNICA": 9}
     bases = sorted({str(r.get("baseTaskId")) for r in runs})
     condicoes = list("ABCD")
-    lookup = {(str(r.get("baseTaskId")), r.get("condition")): r.get("classification") for r in runs}
-    matriz = [[code_map.get(lookup.get((base, cond)), -1) for cond in condicoes] for base in bases]
+    code_map["MISTO"] = 10
+    grupos: dict[tuple[str, Any], list[Any]] = {}
+    for run in runs:
+        grupos.setdefault((str(run.get("baseTaskId")), run.get("condition")), []).append(run.get("classification"))
+
+    def _celula(base: str, cond: str) -> int:
+        valores = grupos.get((base, cond), [])
+        distintos = set(valores)
+        if not distintos:
+            return -1
+        return 10 if len(distintos) > 1 else code_map.get(sorted(distintos)[0], -1)
+
+    matriz = [[_celula(base, cond) for cond in condicoes] for base in bases]
     if bases:
-        figuras.append({"id": "fig-matrix", "title": "Matriz tarefa-base × condição",
+        figuras.append({"id": "fig-matrix", "title": "Matriz tarefa-base × condição (réplicas agregadas)",
                         "question": "Como cada tarefa-base se comporta em A, B, C e D?",
                         "population": "todas as execuções observadas", "section": "Figura: Matriz",
                         "source": "classified-runs.json", "n": len(runs),
                         "data": {"rows": bases, "cols": condicoes, "values": matriz, "codes": code_map},
                         "ylabel": "tarefa-base",
-                        "interpretation": "Permite ver a recorrência por tarefa-base (ex.: G4) e réplica por condição, evitando que agregados ocultem comportamentos específicos."})
+                        "interpretation": "Cada célula é a classificação da tarefa-base na condição; quando as réplicas divergem a célula é marcada como MISTO, de modo que agregados não ocultem comportamentos específicos. As réplicas da 2ª repetição são incluídas na agregação."})
     return figuras
 
 
@@ -558,6 +569,34 @@ def _observed_analyses(batch_id: str) -> tuple[list[dict[str, Any]], list[dict[s
             "Reúne as execuções de solicitações permitidas em D, distinguindo existência de candidato, decisão, etapa alcançada, testes e efeito sobre a origem.",
             "Existência de candidato desconhecida, negativa por reconhecimento e validade semântica não verificada são situações distintas e não devem ser tratadas como um único tipo de bloqueio."]})
 
+    cond_counts = {condition: sum(1 for run in runs if run.get("condition") == condition) for condition in "ABCD"}
+    bases = sorted({str(run.get("baseTaskId")) for run in runs})
+    rep_runs = [run for run in runs if (run.get("replicationIndex") or 1) > 1]
+    rep_conds = sorted({str(run.get("condition")) for run in rep_runs})
+    sections.append({"title": "Comparação Principal e Repetições", "paragraphs": [
+        f"Execuções por condição: A={cond_counts['A']}, B={cond_counts['B']}, C={cond_counts['C']}, D={cond_counts['D']}; tarefas-base distintas: {len(bases)}.",
+        f"As repetições ({len(rep_runs)} execuções) ocorrem apenas em {', '.join(rep_conds) if rep_conds else 'nenhuma condição'}, portanto não compõem a comparação principal equilibrada e são apresentadas em caráter complementar.",
+        "As tarefas concentram-se em poucas famílias (consulta, baixa, transferência); variações da mesma solicitação não representam diversidade equivalente à de problemas funcionalmente distintos."]})
+
+    c_viol = [run for run in runs if run.get("condition") == "C" and categoria(run) == "violadora"]
+    c_perm = [run for run in runs if run.get("condition") == "C" and categoria(run) == "permitida"]
+    d_viol = [run for run in runs if run.get("condition") == "D" and categoria(run) == "violadora"]
+    d_perm = [run for run in runs if run.get("condition") == "D" and categoria(run) == "permitida"]
+    sections.append({"title": "Benefício Consultivo de C e Benefício Adicional do Gate em D", "paragraphs": [
+        f"Em C, entre {len(c_viol)} solicitações violadoras houve {sum(run.get('reportConflictCalled') is True for run in c_viol)} relatos de conflito; entre {len(c_perm)} permitidas, {sum(run.get('codeBaseChanged') is True for run in c_perm)} alteraram a origem — contenção consultiva combinada à entrega do permitido.",
+        f"Em D, entre {len(d_viol)} violadoras houve {sum(run.get('promotionDecision') == 'DENY' for run in d_viol)} negativas de promoção; entre {len(d_perm)} permitidas, {sum(run.get('originChanged') is True for run in d_perm)} alteraram a origem. A negativa em D não comprova, por si só, bloqueio independente de candidato inválido.",
+        "Separa-se o benefício consultivo observado (C) da demonstração do benefício adicional do gate (D); a decisão do próprio BSH não é usada como prova de sua própria correção."]})
+
+    sections.append({"title": "Limitação de Associação Tarefa × Caso Semântico", "paragraphs": [
+        "As tarefas governadas válidas G4/G5/G6 têm operação de consulta (ConsultaAtivo) associada, no manifesto congelado, a caso semântico de transferência (CASE-TRANSF-VALID-002/003/004), e a materialização carrega shapes de transferência.",
+        "A relação com o reconhecimento vazio em D permanece delimitada à evidência: para uma operação de consulta foram carregados shapes de transferência e nenhuma operação foi reconhecida; não se afirma causalidade além disso.",
+        "O apêndice contém o prompt base do manifesto; o conteúdo efetivamente enviado por condição (instruções específicas do adapter) não é armazenado por run e não é auditável a partir dos artefatos."]})
+
+    vio = [run for run in runs if categoria(run) == "violadora"]
+    sections.append({"title": "Testes Técnicos e Preservação das Regras", "paragraphs": [
+        f"Entre {len(vio)} execuções violadoras, {sum(run.get('testsExecuted') is True for run in vio)} executaram testes e {sum(run.get('testsPassed') is True for run in vio)} os reportaram como aprovados.",
+        "Os artefatos não permitem distinguir testes adaptados à solicitação violadora de verificações preservadas da política original; a resposta à RQ10 permanece parcialmente sustentada e não se atribui aprovação à preservação de regras sem essa distinção no dado."]})
+
     return sections, tables
 
 
@@ -582,7 +621,7 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
         "Condições Experimentais": "A executa o agente diretamente; B adiciona regras textuais; C adiciona ontologia consultiva; D usa o BSH completo. A × D mede efeito conjunto; A × B, B × C e C × D exploram componentes progressivos sem presumir causalidade.",
         "Variáveis e Estimandos": "Condição é a variável independente. Consumo de tokens, duração, correção funcional, correção de governança e desfecho da tarefa são variáveis dependentes distintas. WORKLOAD_TOKEN_REDUCTION é 1 menos a razão entre a soma de tokens D e a soma de tokens A, somente em pares com contabilidade comparável e denominador positivo.",
         "Instrumentação": "O adapter registra runtime, telemetria de tokens, duração, diff, testes, consultas MCP, conflitos e status de enforcement. Valor ausente permanece nulo; zero indica medição explícita de zero. Tokens não cacheados não são derivados sem garantia documentada da semântica do runtime. Cobertura mede registros presentes, não o desfecho: 'cobertura de testes' é o número de execuções com teste executado sobre o total elegível (não o total de runs), e a cobertura de diff distingue diff vazio confirmado (por comparação de conteúdo inicial e final), diff não coletado e medida não aplicável.",
-        "Resultados Funcionais": "Cumprimento do pedido, correção funcional, correção de governança e correção do desfecho são dimensões independentes. Uma violação evitada pode ter desfecho correto sem entregar o pedido literal. Os denominadores são explícitos por condição: contagens não devem ser lidas como proporções do total de runs quando o conjunto elegível for menor.",
+        "Resultados Funcionais": "Cumprimento do pedido, correção funcional, adequação ao critério operacional e correção do desfecho são dimensões independentes. A dimensão 'adequacaoAoCritérioOperacional' registra apenas que a decisão observada não contradiz o critério operacional do experimento; NÃO é correção semântica verificada, que permanece NOT_EVALUATED na ausência de referência independente (reportada como candidateSemanticValidity/enforcementCorrectness). Uma violação evitada pode ter desfecho correto sem entregar o pedido literal. Os denominadores são explícitos por condição: contagens não devem ser lidas como proporções do total de runs quando o conjunto elegível for menor.",
         "Discussão": "Os resultados favoráveis, desfavoráveis e não calculáveis são apresentados separadamente. O relato seletivo de conflitos é evidência de utilidade consultiva, não de precisão semântica além da amostra. A execução de solicitações permitidas sob C/D não deve ser diluída pela contagem de violações evitadas. Zero oportunidades de enforcement independente não é taxa de falha nem sucesso: é ausência de denominador de exposição ao gate. Diferenças de tokens após bloqueio não equivalem a maior eficiência na entrega da mesma funcionalidade. 'Parcialmente sustentado' indica viabilidade da comparação, não eficácia demonstrada. Denominadores são separados por natureza: pareamento estrutural (universo de tarefas comuns) não é o mesmo que elegibilidade analítica (pares com contabilidade comparável); o conjunto completo de D não é o mesmo que o contraste pareado C × D; 'violações implementadas' e 'violações contidas' podem ser conjuntos distintos e devem ser identificados por runId; falha de instrumentação é distinta de falha de execução.",
         "Ameaças à Validade": "Construção: tarefas concentram-se em poucas famílias (consulta, baixa, transferência) e a segunda repetição é parcial. Interna: comparabilidade de telemetria depende de contabilidade idêntica, faltam critérios externos de correção funcional e há falhas concentradas em condições específicas. Externa: um agente, um modelo, um domínio e uma política congelada; 'violadora' refere-se apenas à política congelada. Construto: cobertura mede registros presentes, não qualidade do desfecho; evidência semântica fina e tokens não cacheados podem faltar sem significar ausência de interação.",
     }
@@ -668,10 +707,14 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
                           "statistics.json", sample["nRuns"])
     sample_table["section"] = "Desenho Experimental"
     tables.append(sample_table)
-    functional_rows = [[condition, field, counts["true"], counts["false"], counts["missing"]]
+    dimension_labels = {"promptFulfillment": "cumprimentoDoPedido",
+                        "functionalCorrectness": "correcaoFuncional",
+                        "governanceCorrectness": "adequacaoAoCritérioOperacional",
+                        "taskOutcomeCorrect": "desfechoCorreto"}
+    functional_rows = [[condition, dimension_labels.get(field, field), counts["true"], counts["false"], counts["missing"]]
                        for condition, outcomes in stats["functionalOutcomesByCondition"].items()
                        for field, counts in outcomes.items()]
-    functional_table = _table("Desfechos funcionais e de governança por condição",
+    functional_table = _table("Desfechos funcionais e de adequação operacional por condição",
                               ["Condição", "Dimensão", "Verdadeiro", "Falso", "Ausente"],
                               functional_rows, "runs", "classified-runs.json", sample["nRuns"])
     functional_table["section"] = "Resultados Funcionais"
@@ -872,11 +915,14 @@ def render_figures(model: dict[str, Any], batch_dir: Path) -> list[str]:
             ax.legend()
         elif figure["id"] == "fig-matrix":
             matriz = data["values"]
-            ax.imshow(matriz, cmap="tab10", aspect="auto", vmin=0, vmax=9)
+            image = ax.imshow(matriz, cmap="tab10", aspect="auto", vmin=0, vmax=10)
             ax.set_xticks(range(len(data["cols"])), data["cols"])
             ax.set_yticks(range(len(data["rows"])), data["rows"])
             ax.set_xlabel("condição")
             ax.set_ylabel("tarefa-base")
+            codes = data.get("codes", {})
+            bar = fig.colorbar(image, ax=ax, ticks=list(codes.values()))
+            bar.ax.set_yticklabels(list(codes.keys()))
         else:
             labels = data.get("labels", [])
             values = data.get("values", [])
