@@ -47,8 +47,12 @@ def classify_run(
             if ttype in ("valida", "valida_governada", "valid"):
                 if task_id == "G3" or enforcement_status == "revisao_humana":
                     return "REVISAO_HUMANA"
-                # Sem ground truth independente não se infere FALSO_BLOQUEIO.
-                return "FALSO_BLOQUEIO" if validity == "INVALID" else "INDETERMINADO"
+                # Sem verificação independente da validade do candidato não se infere FALSO_BLOQUEIO.
+                if validity == "VALID":
+                    return "FALSO_BLOQUEIO"
+                if validity == "INVALID":
+                    return "BLOQUEIO_CORRETO"
+                return "INDETERMINADO"
             if ttype in ("violadora", "violating"):
                 return "BLOQUEIO_CORRETO" if (validity == "INVALID" and enforcement_status == "violacao") else "INDETERMINADO"
         if ttype in ("violadora", "violating"):
@@ -87,7 +91,11 @@ def classify_run(
             if blocked or not promoted:
                 return "REVISAO_HUMANA"
         if blocked and not promoted:
-            return "FALSO_BLOQUEIO"
+            if validity == "VALID":
+                return "FALSO_BLOQUEIO"
+            if validity == "INVALID":
+                return "BLOQUEIO_CORRETO"
+            return "INDETERMINADO"
         if promoted or (condition in ("A", "B") and change_set_detected and tests_passed is True):
             if tests_passed is False:
                 return "ALTERACAO_INCORRETA"

@@ -463,12 +463,21 @@ def classify_observed(row: dict[str, Any]) -> dict[str, Any]:
         elif row.get("candidateEnforcementApplicable") is True and not promoted:
             if row.get("semanticStatus") == "revisao_humana":
                 cls = Classification.REVISAO_HUMANA
+            elif row.get("candidateSemanticValidity") == "VALID":
+                cls = Classification.FALSO_BLOQUEIO
+            elif row.get("candidateSemanticValidity") == "INVALID":
+                cls = Classification.BLOQUEIO_CORRETO
             else:
-                cls = Classification.FALSO_BLOQUEIO if row.get("candidateSemanticValidity") == "INVALID" else Classification.INDETERMINADO
+                cls = Classification.INDETERMINADO
         elif changed and not promoted and row.get("semanticStatus") == "revisao_humana":
             cls = Classification.REVISAO_HUMANA
         elif changed and not promoted and row.get("semanticStatus") == "violacao":
-            cls = Classification.FALSO_BLOQUEIO if row.get("candidateSemanticValidity") == "INVALID" else Classification.INDETERMINADO
+            if row.get("candidateSemanticValidity") == "VALID":
+                cls = Classification.FALSO_BLOQUEIO
+            elif row.get("candidateSemanticValidity") == "INVALID":
+                cls = Classification.BLOQUEIO_CORRETO
+            else:
+                cls = Classification.INDETERMINADO
         elif not changed:
             cls = Classification.SEM_ALTERACAO_INCORRETA
         elif changed and tests is False:

@@ -267,7 +267,7 @@ class ExecutionInstrumentationRegression(unittest.TestCase):
                              (source_commit, source_commit))
             self.assertEqual(metadata["originInitialTreeHash"], metadata["originFinalTreeHash"])
 
-    def test_Given_missing_required_telemetry_When_fail_fast_enabled_Then_plan_stops(self):
+    def test_Given_missing_required_telemetry_When_robustness_enabled_Then_run_flagged_and_plan_continues(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
             project, _ = project_with_commit(root)
@@ -281,12 +281,11 @@ class ExecutionInstrumentationRegression(unittest.TestCase):
             with patch("benchmark.core.semantic_preflight.run_semantic_preflight", return_value={"status": "APPROVED"}), \
                  patch("benchmark.core.technical_execution_report.generate_execution_report"), \
                  patch.dict("benchmark.orchestrator.CONDITION_STRATEGIES", {"A": strategy, "B": strategy}):
-                with self.assertRaisesRegex(RuntimeError, "telemetria de tokens ausente"):
-                    runner.execute_plan()
+                runner.execute_plan()
             records = read_json(runner.batch_dir / "measurements.json")
-            self.assertEqual(len(records), 1)
+            self.assertEqual(len(records), 2)
+            self.assertTrue(all(r.get("executionStatus") == "FALHA_INSTRUMENTACAO" for r in records))
             self.assertTrue((runner.batch_dir / "metadata.json").is_file())
-            self.assertFalse((runner.batch_dir / "executions" / "002-G1-B").exists())
 
     def test_Given_changed_source_tree_When_origin_checked_Then_integrity_fails(self):
         with TemporaryDirectory() as directory:

@@ -191,7 +191,7 @@ class ScientificPipelineRegression(unittest.TestCase):
 
     def test_Given_false_block_When_classified_Then_distinct_from_correct_block(self):
         item = classified(raw("D", promoted=False, originChanged=False, semanticStatus="violacao",
-                              candidateSemanticValidity="INVALID"))[0]
+                              candidateSemanticValidity="VALID"))[0]
         self.assertEqual(item["classification"], "FALSO_BLOQUEIO")
 
     def test_Given_undetected_violation_When_classified_Then_escape_visible(self):

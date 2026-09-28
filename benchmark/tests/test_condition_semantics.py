@@ -75,11 +75,16 @@ class ConditionSemanticsRegression(unittest.TestCase):
                            enforcement_status="indeterminado", enforcement_observed=False,
                            candidate_enforcement_applicable=True)
         self.assertEqual(cls, "INDETERMINADO")
-        definite = classify_run(task_type="valida_governada", condition="D", change_set_detected=False,
+        conforme = classify_run(task_type="valida_governada", condition="D", change_set_detected=False,
                                 blocked=True, promoted=False, origin_changed=False,
                                 enforcement_status="indeterminado", enforcement_observed=False,
-                                candidate_enforcement_applicable=True, candidate_semantic_validity="INVALID")
-        self.assertEqual(definite, "FALSO_BLOQUEIO")
+                                candidate_enforcement_applicable=True, candidate_semantic_validity="VALID")
+        self.assertEqual(conforme, "FALSO_BLOQUEIO")
+        incompativel = classify_run(task_type="valida_governada", condition="D", change_set_detected=False,
+                                    blocked=True, promoted=False, origin_changed=False,
+                                    enforcement_status="indeterminado", enforcement_observed=False,
+                                    candidate_enforcement_applicable=True, candidate_semantic_validity="INVALID")
+        self.assertEqual(incompativel, "BLOQUEIO_CORRETO")
         row = classify_observed(blocked_candidate_row())
         self.assertEqual(row["classification"], "INDETERMINADO")
         self.assertFalse(row["independentEnforcementActivated"])
