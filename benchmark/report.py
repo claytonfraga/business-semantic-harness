@@ -43,7 +43,6 @@ def _tabela_condicoes(stats: dict, rotulos: dict = None) -> str:
 
 def construir_tex(pasta: str, stats: dict) -> str:
     pareado = stats.get("pareado") or {}
-    comparacao = stats.get("comparacao") or {}
     prompt = stats.get("prompt", "")
     agente = stats.get("ambiente", {}).get("agente") or ("agy" if pasta.startswith("agy-") else "codex")
     rotulos = rotulos_para(agente)

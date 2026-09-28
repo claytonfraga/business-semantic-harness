@@ -23,7 +23,7 @@ from .experimental_results import (
     export_pairs, pair_runs,
 )
 from .experimental_report import (
-    PDFLayoutGate, build_number_provenance, build_report_model, compile_and_validate,
+    build_number_provenance, build_report_model, compile_and_validate,
     render_figures, render_latex,
 )
 from .technical_execution_report import generate_execution_report

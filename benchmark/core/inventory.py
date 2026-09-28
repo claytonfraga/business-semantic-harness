@@ -11,7 +11,7 @@ Exporta:
 import csv
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 from benchmark.core.enums import CapabilityStatus
 
 

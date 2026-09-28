@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import hashlib
 from pathlib import Path
-from typing import Any, Optional
+from typing import Optional
 
 CHANGE_DISPOSITIONS = (
     "NO_CHANGE_PRODUCED", "CHANGE_PRODUCED_NOT_APPLIED", "CHANGE_BLOCKED",

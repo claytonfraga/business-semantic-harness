@@ -760,8 +760,6 @@ def fig_22_enforcement_matrix(paired: List[Dict[str, Any]], batch_dir: Path) -> 
     fig, ax = plt.subplots(figsize=(8.2, max(4.0, len(vios) * 0.45)))
     y_pos = np.arange(len(vios))
 
-    cand_vals = [1 if p.get("dChangeSetDetected") else 0 for p in vios]
-    conf_vals = [1 if p.get("dConflictReported") else 0 for p in vios]
     prev_vals = [1 if p.get("governanceMechanismD") == "CONSULTA_PREVENTIVA" else 0 for p in vios]
     enf_vals = [1 if p.get("governanceMechanismD") == "ENFORCEMENT_INDEPENDENTE" else 0 for p in vios]
 

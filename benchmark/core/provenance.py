@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 def build_provenance_data(
@@ -16,12 +16,9 @@ def build_provenance_data(
     
     # 1. Identificação dos pares elegíveis por análise
     rq1_a_pairs = [p["taskId"] for p in paired if p.get("eligibleForTokenAnalysis")]
-    rq1_b_pairs = [p["taskId"] for p in paired if p.get("behavioralEquivalence") == "EQUIVALENTE"]
     rq2_over_pairs = [p["taskId"] for p in paired if str(p.get("taskType", "")).lower() in ("valida_governada", "valida", "valid") and p.get("behavioralEquivalence") == "EQUIVALENTE"]
     rq2_avoid_pairs = [p["taskId"] for p in paired if str(p.get("taskType", "")).lower() in ("violadora", "violating") and p.get("dOutcomeCorrect") and p.get("aImplementedViolation")]
     rq6_runs = [r["runId"] for r in runs if (r.get("condition") or r.get("condicao")) == "D" and (r.get("taskType") or r.get("tipo")) in ("valida_governada", "violadora", "valid", "violating")]
-    time_pairs = [p["taskId"] for p in paired if p.get("durationA") is not None and p.get("durationD") is not None]
-    non_cached_pairs = [p["taskId"] for p in paired if p.get("nonCachedTokensA") is not None and p.get("nonCachedTokensD") is not None]
 
     # 2. Tabela exaustiva de elegibilidade por tarefa e análise (Seção 64/65)
     task_eligibility = []
@@ -46,7 +43,6 @@ def build_provenance_data(
             "reason": "Tarefa válida com equivalência comportamental comprovada" if is_rq1_b else ("Tarefa violadora com desfechos divergentes por desenho" if ttype in ("violadora", "violating") else (p.get("exclusionReason") or "Não equivalente funcionalmente"))
         })
         # RQ2 Overhead
-        is_rq2_over = bool(is_rq1_b and p.get("tokensD") is not None and p.get("tokensA") is not None and (p.get("tokensD") > p.get("tokensA")))
         task_eligibility.append({
             "taskId": tid,
             "analysis": "RQ2 (Overhead Válidas)",
@@ -84,7 +80,6 @@ def build_provenance_data(
         })
 
     # 3. Mapeamento de Proveniência de Métricas Principais (Seção 3 e 5)
-    rq1 = stats.get("rq1", {})
     rq2 = stats.get("rq2", {})
     rq6 = stats.get("rq6", {})
 

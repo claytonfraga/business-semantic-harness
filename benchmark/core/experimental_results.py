@@ -10,7 +10,6 @@ import random
 from statistics import NormalDist, mean, median, stdev, variance
 from typing import Any
 
-import yaml
 
 from .enums import EvidenceStrength, EvidenceVerdict, ResearchQuestionStatus, ScientificUsability
 from .experimental_execution import token_accounting_comparability

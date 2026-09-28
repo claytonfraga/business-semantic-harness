@@ -379,7 +379,6 @@ def build_latex_document(
     data_origin = metadata.get("dataOrigin") or quality.get("dataOrigin", "REAL_EXECUTION")
     bsh_commit = str(metadata.get("bshProductTreeHash", metadata.get("commitBsh", "estável")))[:10]
 
-    rq1 = stats.get("rq1", {})
     rq2 = stats.get("rq2", {})
     rq6 = stats.get("rq6", {})
     rq8 = stats.get("rq8", {})
@@ -406,7 +405,6 @@ def build_latex_document(
     custo_evitado_total = 0.0
     n_vio_gov = 0
     tok_a_elegiveis_total = 0.0
-    vio_test_pass_list = []
 
     for p in paired:
         ttype = str(p.get("taskType", "")).lower()
@@ -428,8 +426,6 @@ def build_latex_document(
         elif ttype in ("violadora", "violating"):
             pursued_in_a = p.get("classificationA") in ("ALTERACAO_INCORRETA", "VIOLACAO_NAO_DETECTADA", "REVISAO_HUMANA", "ALTERACAO_CORRETA")
             governed_in_d = p.get("classificationD") in ("BLOQUEIO_CORRETO", "SEM_ALTERACAO_CORRETA", "REVISAO_HUMANA")
-            if p.get("semanticViolationWithTechnicalTestsPassing"):
-                vio_test_pass_list.append(p)
             if pursued_in_a and governed_in_d:
                 n_vio_gov += 1
                 tok_a_elegiveis_total += tok_a
@@ -459,17 +455,6 @@ def build_latex_document(
         disclaimer_box = r"""\noindent\textbf{Origem dos dados: Execução real} \\
 Todas as medições deste lote foram obtidas diretamente pela execução dos agentes no ambiente experimental, sem fixtures sintéticas de desfechos.
 \vspace{{0.3cm}}"""
-
-    # Violações que passaram nos testes técnicos
-    if vio_test_pass_list:
-        v_linhas = []
-        for vp in vio_test_pass_list:
-            v_linhas.append(
-                rf"\item \textbf{{{_esc(vp.get('taskId'))}}}: Implementou alteração inválida na Condição A com testes aprovados; na Condição D, foi governada preventivamente por \texttt{{{_esc(vp.get('governanceMechanismD'))}}} com desfecho \texttt{{{_esc(vp.get('classificationD'))}}}."
-            )
-        sec_viol_list_str = "\\begin{itemize}\n" + "\n".join(v_linhas) + "\n\\end{itemize}"
-    else:
-        sec_viol_list_str = "Nenhuma tarefa violadora apresentou aprovação na suíte de testes existente neste lote."
 
     # Variáveis dinâmicas para eliminação estrita de números hardcoded
     seg_todas = stats.get("segmentos", {}).get("todas", {})
@@ -853,7 +838,6 @@ def build_markdown_report(
     agente = metadata.get("agente", "Agy")
     modelo = metadata.get("modelo", "gemini-3.7-flash-medium")
     data_origin = metadata.get("dataOrigin") or quality.get("dataOrigin", "REAL_EXECUTION")
-    rq1 = stats.get("rq1", {})
     rq2 = stats.get("rq2", {})
     rq6 = stats.get("rq6", {})
     rq8 = stats.get("rq8", {})
@@ -861,7 +845,7 @@ def build_markdown_report(
     fb_data = stats.get("falseBlockAnalysis", {})
 
     md_lines = [
-        f"# Avaliação Científica de Governança Semântica e Eficiência Computacional no Business Semantic Harness (BSH)",
+        "# Avaliação Científica de Governança Semântica e Eficiência Computacional no Business Semantic Harness (BSH)",
         "",
         f"- **Lote Experimental:** `{lote}`",
         f"- **Origem dos dados:** `{data_origin}`",

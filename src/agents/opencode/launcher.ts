@@ -9,7 +9,6 @@ import { validateProject } from '../../ontology/validate.js';
 
 const execFileAsync = promisify(execFile);
 
-const OPENCODE_CONFIG_DIRECTORY = join(homedir(), '.config', 'opencode');
 const OPENCODE_DATA_DIRECTORY = join(homedir(), '.local', 'share', 'opencode');
 
 export interface EstadoOpencode {

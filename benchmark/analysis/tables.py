@@ -7,7 +7,7 @@ Contratos estritos:
 - Tabela de qualidade de dados e disponibilidade de telemetria (Requirements 38 e 39).
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 def _esc(texto: Any) -> str:
@@ -222,7 +222,6 @@ def table_semantic_recognition(tasks: List[Dict[str, Any]], data: Dict[str, Any]
     for t in tasks:
         tid = t.get("id")
         op_esp = t.get("operacao")
-        shape_esp = t.get("shape")
         m = d_runs.get(tid, {})
 
         op_id = m.get("identifiedGovernedOperation") or m.get("operacaoIdentificada")

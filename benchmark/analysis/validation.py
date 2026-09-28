@@ -9,7 +9,7 @@ Contratos estritos:
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional
 
 
 def validate_benchmark_batch(batch_dir: Path, data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:

@@ -8,13 +8,11 @@ Contratos estritos:
 - Exportação de report.md, report.tex, report.pdf e cópia automática para Downloads no WSL.
 """
 
-import json
-import os
 import re
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List
 
 from .load_data import load_dataset, compute_paired_dataset, export_paired_csv
 from .validation import validate_benchmark_batch
@@ -171,9 +169,6 @@ def _build_tex(data: Dict[str, Any], paired: List[Dict[str, Any]], stats: Dict[s
     rq5 = stats.get("rq5", {})
     rq6 = stats.get("rq6", {})
 
-    seg_todas = stats.get("segmentos", {}).get("todas", {})
-    seg_val = stats.get("segmentos", {}).get("validas", {})
-    seg_vio = stats.get("segmentos", {}).get("violadoras", {})
 
     def has_fig(nome: str) -> bool:
         return nome in figures_geradas

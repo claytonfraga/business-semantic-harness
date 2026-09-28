@@ -15,7 +15,6 @@ Verificações obrigatórias:
 
 import json
 from pathlib import Path
-import pytest
 
 from benchmark.adapters.agy import AgyBenchmarkAdapter
 from benchmark.core.classification import classify_run, determine_governance_mechanism, evaluate_run_correctness
@@ -23,7 +22,6 @@ from benchmark.core.models import CanonicalBenchmarkRun
 from benchmark.core.pairing import compute_paired_dataset
 from benchmark.core.report import (
     build_latex_document,
-    package_audit_zip,
     validate_report_content,
     CANONICAL_SECTIONS,
     TEXTO_SINTETICO,

@@ -1,17 +1,15 @@
 """Testes automatizados da arquitetura independente de agentes (Seção 64)."""
 
-import inspect
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
-import pytest
 
 from benchmark.core.capabilities import AgentCapabilityProfile
 from benchmark.core.models import CanonicalBenchmarkRun
-from benchmark.core.classification import classify_run, determine_governance_mechanism
+from benchmark.core.classification import classify_run
 from benchmark.core.pairing import compute_paired_dataset
 from benchmark.core.statistics import compute_statistics
 from benchmark.adapters.base import BenchmarkAgentAdapter, AgentAdapterRegistry
-from benchmark.strategies import DirectConditionStrategy, CONDITION_STRATEGIES
+from benchmark.strategies import CONDITION_STRATEGIES
 import benchmark.core as core_pkg
 
 

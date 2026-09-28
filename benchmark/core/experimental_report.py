@@ -6,16 +6,14 @@ statistical calculation or inference from raw runs.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
 import re
-import shutil
 import subprocess
 from typing import Any
 
-from .experimental_execution import canonical_json, read_json, sha256_file, write_json
+from .experimental_execution import canonical_json, write_json
 
 
 TITLE = "Avaliação Experimental de Governança Semântica no Business Semantic Harness"

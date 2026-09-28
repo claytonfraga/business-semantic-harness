@@ -24,20 +24,17 @@ BENCHMARK_DIR = Path(__file__).resolve().parent.parent
 if str(BENCHMARK_DIR) not in sys.path:
     sys.path.insert(0, str(BENCHMARK_DIR))
 
-from lib.execution_model import classify_execution, ExecutionRecord
+from lib.execution_model import classify_execution
 from analysis.load_data import load_dataset, compute_paired_dataset, export_paired_csv
-from analysis.validation import validate_benchmark_batch
 from analysis.statistics import compute_statistics
 from analysis.figures import (
     fig_01_paired_total_tokens,
     fig_02_token_difference,
     fig_04_net_benefit,
     fig_05_cost_factor,
-    fig_06_distribution_by_task_type,
 )
 from analysis.build_report import (
     validate_report_content,
-    build_and_compile_report,
 )
 from analysis.tables import _esc, _fmt
 from fixtures.generate_fixtures import generate_all_fixtures, FIXTURES_DIR

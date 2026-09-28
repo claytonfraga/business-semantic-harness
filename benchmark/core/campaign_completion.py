@@ -10,8 +10,7 @@ comparando com as execuções observadas para determinar:
 
 import json
 from pathlib import Path
-import shutil
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent

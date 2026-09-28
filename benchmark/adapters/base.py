@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from ..core.capabilities import AgentCapabilityProfile
-from ..core.models import CanonicalBenchmarkRun
 
 
 class BenchmarkAgentAdapter(ABC):

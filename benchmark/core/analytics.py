@@ -8,7 +8,7 @@ tratamento de ausência. `null` nunca é convertido em `false`/zero; denominador
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 IDENTITY_FIELDS = ("batchId", "baseTaskId", "promptVariantId", "replicationIndex", "condition", "runId")
 

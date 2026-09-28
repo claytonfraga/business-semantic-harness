@@ -383,10 +383,10 @@ def fig_10_token_decomposition(data: Dict[str, Any], figures_dir: Path) -> Optio
         raciocinios.append(np.mean(rac))
 
     x = np.arange(len(condicoes_validas))
-    b1 = ax.bar(x, entradas, label="Entrada", color="#4477AA", edgecolor="black", linewidth=0.7, width=0.45)
-    b2 = ax.bar(x, saidas, bottom=entradas, label="Saída", color="#EE6677", edgecolor="black", linewidth=0.7, width=0.45)
+    ax.bar(x, entradas, label="Entrada", color="#4477AA", edgecolor="black", linewidth=0.7, width=0.45)
+    ax.bar(x, saidas, bottom=entradas, label="Saída", color="#EE6677", edgecolor="black", linewidth=0.7, width=0.45)
     bottom_rac = [e + s for e, s in zip(entradas, saidas)]
-    b3 = ax.bar(x, raciocinios, bottom=bottom_rac, label="Raciocínio", color="#CCBB44", edgecolor="black", linewidth=0.7, width=0.45)
+    ax.bar(x, raciocinios, bottom=bottom_rac, label="Raciocínio", color="#CCBB44", edgecolor="black", linewidth=0.7, width=0.45)
 
     ax.set_xticks(x)
     ax.set_xticklabels([f"Condição {c}" for c in condicoes_validas])

@@ -7,7 +7,6 @@ executa inspeção programática de bounding boxes via PyMuPDF/pdfplumber.
 
 import json
 from pathlib import Path
-import re
 from typing import Any, Dict, List, Optional
 
 HERE = Path(__file__).resolve().parent
@@ -81,7 +80,6 @@ def generate_figure_suppression_report(
     """Monitora a disponibilidade de dados e gera figure-suppression.json (Seção 85)."""
     batch_path = Path(batch_dir).resolve()
 
-    rq1 = stats.get("rq1", {})
     decomp = stats.get("tokenDecompositionValid", {})
     paired_runs = stats.get("sampleSize", {}).get("pairedRuns", 0)
 
@@ -194,8 +192,6 @@ def validate_pdf_layout_programmatically(
     # Margem esquerda: ~30mm (~85pt), direita: ~20mm (~56pt)
     min_x = 40.0
     max_x = 555.0
-    min_y = 40.0
-    max_y = 800.0
 
     for page_idx in range(pages_count):
         page = doc[page_idx]

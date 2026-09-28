@@ -9,7 +9,7 @@ Contratos estritos:
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 def build_evidence_matrix_and_verdicts(
@@ -20,13 +20,10 @@ def build_evidence_matrix_and_verdicts(
     harness_data: Dict[str, Any],
 ) -> Dict[str, Any]:
     """Constrói a matriz de evidências e os 15 vereditos formais derivados de statistics.json."""
-    rq1 = stats.get("rq1", {})
     rq2 = stats.get("rq2", {})
     rq6 = stats.get("rq6", {})
     rq8 = stats.get("rq8", {})
-    rq9 = stats.get("rq9", {})
     rq10 = stats.get("rq10", {})
-    rq11 = stats.get("rq11", {})
     decomp = stats.get("tokenDecompositionValid", {})
     fb_data = stats.get("falseBlockAnalysis", {})
     seg_val = stats.get("segmentos", {}).get("validas_equivalentes", {})
@@ -34,11 +31,8 @@ def build_evidence_matrix_and_verdicts(
 
     total_runs_d = len([r for r in runs if (r.get("condition") or r.get("condicao")) == "D"])
     total_bases_d = len(set(r.get("baseTaskId") for r in runs if (r.get("condition") or r.get("condicao")) == "D"))
-    total_pairs = len(paired)
 
     # 1. Métricas de suporte calculadas dinamicamente
-    tok_tot_a = sum(p["tokensA"] for p in paired if p.get("tokensA") is not None)
-    tok_tot_d = sum(p["tokensD"] for p in paired if p.get("tokensD") is not None)
     has_tokens_a = any(p.get("tokensA") is not None for p in paired)
     has_tokens_d = any(p.get("tokensD") is not None for p in paired)
 

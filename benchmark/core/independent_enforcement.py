@@ -8,9 +8,8 @@ Testa candidatos válidos e inválidos derivados diretamente da base semântica 
 import csv
 import json
 from pathlib import Path
-import subprocess
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
@@ -27,7 +26,6 @@ def run_independent_enforcement_challenge(
 ) -> Dict[str, Any]:
     """Executa o track INDEPENDENT_ENFORCEMENT_CHALLENGE e produz os artefatos de auditoria."""
     domain = Path(domain_dir).resolve() if domain_dir else DOMAIN_DIR
-    pilot = Path(pilot_dir).resolve() if pilot_dir else PILOT_DIR
     batch_path = Path(batch_dir).resolve()
 
     print("=== [FASE B2] Executando Desafio de Enforcement Independente ===")
@@ -191,7 +189,7 @@ def run_independent_enforcement_challenge(
         writer.writerows(results)
 
     print(f"      - enforcement-challenge-results.json exportado ({len(results)} candidatos: {inv_count} inválidos / {val_count} válidos).")
-    print(f"      - enforcement-challenge-results.csv exportado.")
+    print("      - enforcement-challenge-results.csv exportado.")
     print(f"      - Taxa de Detecção de Violações: {inv_det_rate:.1f}% | Taxa de Falso Bloqueio: {false_block_rate:.1f}%")
 
     return summary

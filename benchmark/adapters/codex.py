@@ -1,9 +1,7 @@
 """Adaptador do agente Codex para o BSH Benchmark."""
 
 import json
-import os
 from pathlib import Path
-import shutil
 import subprocess
 import time
 from typing import Any, Dict, Optional, Tuple

@@ -7,7 +7,7 @@ qualquer tentativa de contaminação por dados de lotes anteriores.
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
@@ -108,8 +108,8 @@ def validate_batch_isolation(
         raise SystemExit(f"HARD_FAIL: Contaminação entre lotes detectada em {batch_path.name}")
 
     print(f"      - batch-isolation-validation.json exportado: Status={result['status']}.")
-    print(f"      - foreignBatchArtifactsDetected = 0")
-    print(f"      - foreignBatchRunsDetected = 0")
-    print(f"      - foreignBatchReferencesDetected = 0")
+    print("      - foreignBatchArtifactsDetected = 0")
+    print("      - foreignBatchRunsDetected = 0")
+    print("      - foreignBatchReferencesDetected = 0")
 
     return result

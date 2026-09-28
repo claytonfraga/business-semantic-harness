@@ -2,7 +2,7 @@
 
 from pathlib import Path
 import shutil
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 import yaml
 
 from ..adapters.base import AgentAdapterRegistry

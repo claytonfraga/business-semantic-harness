@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 def evaluate_ontology_utility(runs: List[Dict[str, Any]], paired: List[Dict[str, Any]]) -> Dict[str, Any]:

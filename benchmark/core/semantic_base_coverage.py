@@ -25,8 +25,6 @@ def compute_semantic_base_coverage(
 
     cases_path = domain / "semantic-cases.json"
     inventory_path = domain / "semantic-domain-inventory.json"
-    shacl_cov_path = domain / "shacl-coverage-report.json"
-    sparql_cov_path = domain / "sparql-rule-coverage.json"
 
     semantic_cases: List[Dict[str, Any]] = json.loads(cases_path.read_text(encoding="utf-8")) if cases_path.is_file() else []
     domain_inventory: Dict[str, Any] = json.loads(inventory_path.read_text(encoding="utf-8")) if inventory_path.is_file() else {}
@@ -172,6 +170,6 @@ def compute_semantic_base_coverage(
     md_path.write_text(md_content, encoding="utf-8")
 
     print(f"      - semantic-base-coverage.json gerado (Regras: {rule_cov_pct:.1f}%, Shapes: {shape_cov_pct:.1f}%)")
-    print(f"      - semantic-base-coverage.md gerado")
+    print("      - semantic-base-coverage.md gerado")
 
     return coverage_data

@@ -11,7 +11,7 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
@@ -57,12 +57,10 @@ def run_semantic_preflight(
     ontology_path = domain / "ontology.jsonld"
     shapes_path = domain / "shapes.ttl"
     inventory_json_path = domain / "semantic-domain-inventory.json"
-    inventory_md_path = domain / "semantic-domain-inventory.md"
     cases_path = domain / "semantic-cases.json"
     fixtures_dir = domain / "semantic-test-fixtures"
     shacl_rep_path = domain / "shacl-coverage-report.json"
     sparql_rep_path = domain / "sparql-rule-coverage.json"
-    val_rep_path = domain / "semantic-data-validation.json"
 
     # 2. Cálculo dos Hashes Canônicos
     semantic_data_hash = compute_file_sha256(ontology_path)
@@ -144,7 +142,6 @@ def run_semantic_preflight(
     current_tasks = tasks_data.get("tarefas", [])
 
     materialized_records: List[Dict[str, Any]] = []
-    task_map_by_id = {t["id"]: t for t in current_tasks}
 
     # Mapeamento determinístico de tarefas existentes para semanticCaseId
     # V1-V14, G1-G6, U1, I1
@@ -367,8 +364,8 @@ def run_semantic_preflight(
         writer.writerows(materialized_records)
 
     print(f"      - semantic-preflight.json gerado: Status={preflight_data['status']}")
-    print(f"      - semantic-preflight.md gerado")
+    print("      - semantic-preflight.md gerado")
     print(f"      - semantic-task-materialization.json ({len(materialized_records)} registros)")
-    print(f"      - semantic-task-materialization.csv exportado")
+    print("      - semantic-task-materialization.csv exportado")
 
     return preflight_data
