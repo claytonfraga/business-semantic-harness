@@ -250,6 +250,140 @@ def _threats_paragraphs() -> list[str]:
     ]
 
 
+def _read_classified(batch_id: str) -> list[dict[str, Any]]:
+    path = Path(__file__).resolve().parents[1] / "results" / batch_id / "classified-runs.json"
+    if not path.is_file():
+        return []
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (ValueError, OSError):
+        return []
+
+
+def _read_results(batch_id: str) -> dict[str, dict[str, Any]]:
+    base = Path(__file__).resolve().parents[1] / "results" / batch_id / "executions"
+    runs: dict[str, dict[str, Any]] = {}
+    if base.is_dir():
+        for result in base.glob("*/result.json"):
+            try:
+                data = json.loads(result.read_text(encoding="utf-8"))
+            except (ValueError, OSError):
+                continue
+            if data.get("runId"):
+                runs[str(data["runId"])] = data
+    return runs
+
+
+def _denial_stage(result: dict[str, Any]) -> str:
+    decision = result.get("governanceDecision")
+    if isinstance(decision, dict):
+        stage = decision.get("failureStage")
+        if stage:
+            return str(stage)
+        if decision.get("validationStatus") == "VIOLATION":
+            return "SHACL_VIOLATION"
+    return "TECHNICAL_OR_UNKNOWN"
+
+
+def _g4_case_paragraphs(batch_id: str) -> list[str]:
+    classified = _read_classified(batch_id)
+    results = _read_results(batch_id)
+    cases = [r for r in classified if str(r.get("baseTaskId")) == "G4"]
+    if not cases:
+        return ["Sem execuções de G4 neste batch."]
+    lines: list[str] = []
+    for run in cases:
+        run_id = str(run.get("runId"))
+        raw = results.get(run_id, {})
+        gd = raw.get("governanceDecision") if isinstance(raw.get("governanceDecision"), dict) else {}
+        extractor = "disponivel" if isinstance(raw.get("governanceDecision"), dict) and gd.get("candidateGraphHash") else "ausente"
+        parts = [
+            "runId=" + run_id, "cond=" + str(run.get("condition")),
+            "solicitacaoPermitida=" + str(run.get("solicitacaoPermitida")),
+            "candidato=" + str(run.get("candidateCreated")),
+            "changeSet=" + str(run.get("changeSetDetected")),
+            "codeBase=" + str(run.get("codeBaseChanged")),
+            "consulta=" + str(run.get("ontologyQueried")),
+            "conflito=" + str(run.get("reportConflictCalled")),
+            "operacoesReconhecidas=" + str(gd.get("recognizedOperation")),
+            "etapaFalha=" + _denial_stage(raw),
+            "extrator=" + extractor,
+            "validacaoExec=" + str(run.get("validationExecuted")),
+            "validacaoCompleta=" + str(run.get("validationComplete")),
+            "promocao=" + str(run.get("promotionDecision")),
+            "promovido=" + str(run.get("promoted")),
+            "classe=" + str(run.get("classification")),
+        ]
+        lines.append(" | ".join(parts))
+    return lines
+
+
+def _glossary_paragraphs() -> list[str]:
+    items = {
+        "solicitação permitida": "unidade=run; valor=solicitacaoPermitida (oráculo congelado da tarefa); não é validade do candidato.",
+        "candidato produzido": "unidade=run; valor=candidateCreated/changeSetDetected; numerador=1 se houve alteração material no candidato.",
+        "validade semântica do candidato": "unidade=candidato; INDETERMINATE sem verificação independente do diff concreto; VALID/INVALID só com verificação independente.",
+        "reconhecimento": "unidade=run; recognizedOperation não vazio; denominador=execuções com candidateEnforcementApplicable.",
+        "validação executada": "unidade=run; validationExecuted=true quando SHACL rodou sobre fatos fornecidos por extrator.",
+        "validação completa": "unidade=run; validationComplete=true quando todos os shapes selecionados foram executados e não há fatos ausentes.",
+        "INDETERMINATE": "unidade=run; validação/estado não conclusivo; causa indicada em failureStage.",
+        "DENY": "unidade=run; promotionDecision=DENY; promoção impedida.",
+        "bloqueio": "unidade=run; blocked=true; nenhum mecanismo aplicou a alteração ao código-base.",
+        "promoção": "unidade=run; promoted=true; candidato integrado ao origin.",
+        "falso bloqueio": "unidade=candidato conforme; numerador=candidatos comprovadamente conformes com promoção negada; denominador=candidatos conformes submetidos ao gate.",
+        "contenção": "unidade=run violadora; numerador=violadoras impedidas (BLOQUEIO_CORRETO/SEM_ALTERACAO_CORRETA); denominador=violadoras elegíveis.",
+        "escape": "unidade=run violadora; numerador=VIOLACAO_NAO_DETECTADA (ou promoção de candidato incompatível); denominador=violadoras elegíveis.",
+        "oportunidade de enforcement": "unidade=candidato incompatível submetido ao gate; denominador=execuções com candidateEnforcementApplicable e candidato material.",
+        "intervenção independente": "unidade=run; independentEnforcementActivated=true com evidência completa do gate.",
+        "valores ausentes": "null quando não observado; nunca convertido em false/0; INDETERMINATE quando não determinável.",
+    }
+    return [term + ": " + definition for term, definition in items.items()]
+
+
+def _auditable_indicators(stats: dict[str, Any], batch_id: str) -> list[str]:
+    runs = _read_classified(batch_id)
+    conformes = [r for r in runs if r.get("candidateSemanticValidity") == "VALID"
+                 and r.get("candidateEnforcementApplicable") is True]
+    conforme_negados = [r for r in conformes if r.get("promotionDecision") == "DENY"
+                        or r.get("blocked") is True]
+    permitidas = [r for r in runs if r.get("solicitacaoPermitida") is True]
+    entregues = [r for r in permitidas if r.get("codeBaseChanged") is True and r.get("promoted") is True]
+    indeterminadas = [r for r in runs if r.get("candidateSemanticValidity") == "INDETERMINATE"]
+    taxa_fb = (len(conforme_negados) / len(conformes)) if conformes else None
+    taxa_ent = (len(entregues) / len(permitidas)) if permitidas else None
+    return [
+        "Taxa de falsos bloqueios entre candidatos conformes = candidatos comprovadamente conformes com promoção "
+        "negada / candidatos comprovadamente conformes submetidos ao gate = {}/{} = {}".format(
+            len(conforme_negados), len(conformes), "indisponivel" if taxa_fb is None else "{:.3f}".format(taxa_fb)),
+        "Taxa de entrega das solicitações permitidas = solicitações permitidas implementadas, verificadas e "
+        "promovidas / solicitações permitidas executadas = {}/{} = {}".format(
+            len(entregues), len(permitidas), "indisponivel" if taxa_ent is None else "{:.3f}".format(taxa_ent)),
+        "Observações com validade de candidato indeterminada: {} de {} runs.".format(len(indeterminadas), len(runs)),
+    ]
+
+
+def _denial_decomposition(batch_id: str) -> list[str]:
+    results = _read_results(batch_id)
+    contagem: dict[str, int] = {}
+    for result in results.values():
+        denied = False
+        gd = result.get("governanceDecision")
+        if isinstance(gd, dict) and gd.get("promotionDecision") == "DENY":
+            denied = True
+        if result.get("promotionDecision") == "DENY":
+            denied = True
+        if not denied:
+            continue
+        stage = _denial_stage(result)
+        contagem[stage] = contagem.get(stage, 0) + 1
+    if not contagem:
+        return ["Nenhuma negativa de promoção registrada neste batch."]
+    linhas = ["Negativas por etapa (run-level):"]
+    for stage in sorted(contagem):
+        linhas.append("  " + stage + ": " + str(contagem[stage]))
+    return linhas
+
+
 def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str, Any],
                        completion: dict[str, Any], quality: dict[str, Any], isolation: dict[str, Any],
                        usability: dict[str, Any], ground_truth: dict[str, Any], stats: dict[str, Any],
@@ -406,6 +540,18 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
     sections.insert(0, {"title": "Introdução", "paragraphs": _intro_paragraphs()})
     sections.append({"title": "Conclusão", "paragraphs": _conclusion_paragraphs(stats, verdicts, batch_id)})
     sections.append({"title": "Auditoria por Execução", "paragraphs": _audit_paragraphs(batch_id)})
+    sections.append({"title": "Análise de Caso: G4", "paragraphs": _g4_case_paragraphs(batch_id)})
+    sections.append({"title": "Glossário Operacional e Regras de Cálculo", "paragraphs": _glossary_paragraphs()})
+    sections.append({"title": "Indicadores Auditáveis e Decomposição das Negativas",
+                     "paragraphs": _auditable_indicators(stats, batch_id) + _denial_decomposition(batch_id)})
+    sections.append({"title": "Reconciliação entre Campanhas", "paragraphs": [
+        "Os números de falsos bloqueios e de entrega são por campanha e não devem ser somados ou substituídos "
+        "informalmente entre execuções distintas; cada afirmação identifica o batchId e as runIds.",
+        "A validade do candidato é apurada por verificação independente do diff concreto; a permissão da tarefa "
+        "(solicitacaoPermitida) não é prova de validade do candidato.",
+        "No relatório anterior, as oportunidades de falso bloqueio pertenciam a uma única tarefa-base, o que "
+        "restringe a interpretação de intervalos estatísticos que tratem as execuções como independentes.",
+    ]})
     model = {"title": TITLE, "subtitle": subtitle, "batchId": batch_id, "domain": domain,
              "executionDate": metadata.get("startedAt"), "dataOrigin": metadata.get("dataOrigin"),
              "provenance": provenance, "abstract": {"objective": "Avaliar governança semântica observada no BSH",

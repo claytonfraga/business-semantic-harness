@@ -327,8 +327,18 @@ class ScientificPipelineRegression(unittest.TestCase):
         self.assertEqual(model["scientificContentHash"], hashlib.sha256(canonical_json(unsigned).encode()).hexdigest())
         with TemporaryDirectory() as directory:
             tex = render_latex(model, Path(directory))
+            rendered = tex.read_text(encoding="utf-8")
             result = compile_and_validate(tex, model)
         self.assertEqual(result["status"], "PASS", result["issues"])
+        titles = [section["title"] for section in model["sections"]]
+        for expected_title in ("Introdução", "Conclusão", "Auditoria por Execução", "Análise de Caso: G4",
+                               "Glossário Operacional e Regras de Cálculo",
+                               "Indicadores Auditáveis e Decomposição das Negativas",
+                               "Reconciliação entre Campanhas"):
+            self.assertIn(expected_title, titles)
+        for term in ("falso bloqueio", "oportunidade de enforcement", "Taxa de falsos bloqueios",
+                     "Taxa de entrega das solicitações", "solicitacaoPermitida"):
+            self.assertIn(term, rendered)
 
     def test_Given_complete_synthetic_batch_When_analyzed_without_publication_Then_pipeline_is_consistent(self):
         with TemporaryDirectory() as directory:
