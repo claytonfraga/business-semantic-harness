@@ -394,6 +394,60 @@ def _denial_decomposition(batch_id: str) -> list[str]:
     return linhas
 
 
+def _complementary_figures(batch_id: str) -> list[dict[str, Any]]:
+    runs = _read_classified(batch_id)
+    results = _read_results(batch_id)
+    figuras: list[dict[str, Any]] = []
+    if not runs:
+        return figuras
+
+    def violadora(run: dict[str, Any]) -> bool:
+        return str(run.get("taskType") or "").lower() in ("violadora", "violating")
+
+    labels = [cond + "-permitida" for cond in "ABCD"] + [cond + "-violadora" for cond in "ABCD"]
+    values = ([sum(1 for r in runs if r.get("condition") == cond and not violadora(r)) for cond in "ABCD"]
+              + [sum(1 for r in runs if r.get("condition") == cond and violadora(r)) for cond in "ABCD"])
+    if any(values):
+        figuras.append({"id": "fig-outcomes", "title": "Desfechos por condição e categoria",
+                        "question": "Quantas execuções por condição e categoria de solicitação?",
+                        "population": "todas as execuções observadas", "section": "Figura: Desfechos",
+                        "source": "classified-runs.json", "n": len(runs), "data": {"labels": labels, "values": values},
+                        "ylabel": "execuções",
+                        "interpretation": "Painéis por categoria permitem ler contenção e entrega conjuntamente; totais por condição evitam confundir volume com desempenho."})
+
+    etapas: dict[str, int] = {}
+    for run in runs:
+        if run.get("condition") != "D":
+            continue
+        resultado = results.get(str(run.get("runId")), {})
+        gd = resultado.get("governanceDecision") if isinstance(resultado.get("governanceDecision"), dict) else {}
+        if gd.get("promotionDecision") != "DENY":
+            continue
+        stage = gd.get("failureStage") or ("SHACL_VIOLATION" if gd.get("validationStatus") == "VIOLATION" else "DESCONHECIDA")
+        etapas[str(stage)] = etapas.get(str(stage), 0) + 1
+    if etapas:
+        figuras.append({"id": "fig-denials", "title": "Negativas em D por etapa de falha",
+                        "question": "Em que etapa a promoção foi negada em D?",
+                        "population": "execuções D com promotionDecision=DENY", "section": "Figura: Negativas em D",
+                        "source": "executions/*/result.json", "n": sum(etapas.values()),
+                        "data": {"labels": list(etapas), "values": [etapas[k] for k in etapas]},
+                        "ylabel": "negativas",
+                        "interpretation": "Separa proteção semântica demonstrada de negativa por impossibilidade de provar conformidade; etapa não alcançada não recebe causalidade."})
+
+    campos = [("tokens", "totalTokens"), ("testes", "testsPassed"), ("consulta", "ontologyQueried"),
+              ("validacao", "validationComplete"), ("decisao", "promotionDecision")]
+    cobertura = [sum(1 for r in runs if r.get(campo) is not None) for _, campo in campos]
+    if any(cobertura):
+        figuras.append({"id": "fig-coverage", "title": "Cobertura das evidências",
+                        "question": "Quais evidências estão disponíveis?",
+                        "population": "todas as execuções observadas", "section": "Figura: Cobertura",
+                        "source": "classified-runs.json", "n": len(runs),
+                        "data": {"labels": [nome for nome, _ in campos], "values": cobertura},
+                        "ylabel": "execuções com campo observado",
+                        "interpretation": "Cobertura mede registro presente, não qualidade do desfecho; ausência não é zero."})
+    return figuras
+
+
 def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str, Any],
                        completion: dict[str, Any], quality: dict[str, Any], isolation: dict[str, Any],
                        usability: dict[str, Any], ground_truth: dict[str, Any], stats: dict[str, Any],
@@ -508,6 +562,10 @@ def build_report_model(batch_id: str, metadata: dict[str, Any], config: dict[str
                for row in pairs["A-D"] if row["status"] == "PAIRED" and row["tokenAccountingComparable"] == "TRUE"]
     figures = [{"id": "paired-tokens", "title": "Consumo observado de tokens por par A × D", "data": ad_plot,
                 "section": "RQ1-A: Consumo Bruto", "source": "paired-a-d.csv", "n": len(ad_plot)}] if ad_plot else []
+    figures.extend(_complementary_figures(batch_id))
+    for figura in [item for item in figures if str(item.get("section", "")).startswith("Figura:")]:
+        sections.append({"title": figura["section"],
+                         "paragraphs": [figura["title"] + " — pergunta: " + figura["question"] + " População: " + figura["population"] + "."]})
     provenance = {
         "batchId": batch_id, "dataOrigin": metadata.get("dataOrigin"),
         "agent": metadata.get("agente") or agent_cfg.get("id"), "agentVersion": metadata.get("versaoAgente"),
@@ -682,12 +740,21 @@ def render_figures(model: dict[str, Any], batch_dir: Path) -> list[str]:
             continue
         out_dir.mkdir(exist_ok=True)
         fig, ax = plt.subplots(figsize=(7.2, 4.2))
-        x = range(len(data))
-        ax.plot(x, [row["leftTokens"] for row in data], "o-", color="black", label="A: direto")
-        ax.plot(x, [row["rightTokens"] for row in data], "s--", color="#555555", label="D: BSH")
-        ax.set_xticks(list(x), [row["baseTaskId"] for row in data], rotation=45, ha="right")
-        ax.set_ylabel("Tokens totais observados")
-        ax.legend()
+        if figure["id"] == "paired-tokens":
+            x = range(len(data))
+            ax.plot(x, [row["leftTokens"] for row in data], "o-", color="black", label="A: direto")
+            ax.plot(x, [row["rightTokens"] for row in data], "s--", color="#555555", label="D: BSH")
+            ax.set_xticks(list(x), [row["baseTaskId"] for row in data], rotation=45, ha="right")
+            ax.set_ylabel("Tokens totais observados")
+            ax.legend()
+        else:
+            labels = data.get("labels", [])
+            values = data.get("values", [])
+            ax.bar(range(len(labels)), values, color="#4C72B0")
+            ax.set_xticks(range(len(labels)), labels, rotation=45, ha="right")
+            ax.set_ylabel(figure.get("ylabel") or "execuções")
+            for index, value in enumerate(values):
+                ax.text(index, value, str(value), ha="center", va="bottom")
         fig.tight_layout()
         for extension in ("pdf", "png"):
             fig.savefig(out_dir / f"{figure['id']}.{extension}", dpi=300)
@@ -767,10 +834,10 @@ def render_latex(model: dict[str, Any], batch_dir: Path) -> Path:
             latex.extend([r"\bottomrule", r"\end{longtable}"])
         if section["title"] in figures_by_section:
             figure = figures_by_section[section["title"]]
-            latex.extend(["A Figura~\\ref{fig:" + figure["id"] + "} apresenta os pares elegíveis desta questão.",
+            latex.extend(["A Figura~\\ref{fig:" + figure["id"] + "} responde: " + _latex(figure.get("question", "questão desta seção")) + ".",
                           r"\begin{figure}[H]\centering\includegraphics[width=0.84\textwidth]{../figures/" + figure["id"] + r".pdf}",
                           r"\caption{" + _latex(figure["title"]) + "; n=" + str(figure["n"]) + "; fonte: " + _latex(figure["source"]) + r"}\label{fig:" + figure["id"] + r"}\end{figure}",
-                          "Os pontos mostram o consumo observado por tarefa-base; linhas conectam medidas dentro de cada condição. Não representam intervalo de confiança."])
+                          _latex(figure.get("interpretation", "Os pontos mostram o consumo observado por tarefa-base; linhas conectam medidas dentro de cada condição. Não representam intervalo de confiança."))])
     latex.append(r"\section*{Referências}\addcontentsline{toc}{section}{Referências}")
     latex.append(r"\begin{thebibliography}{99}")
     for item in model["references"]:

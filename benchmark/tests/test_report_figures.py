@@ -6,6 +6,7 @@ from tempfile import TemporaryDirectory
 import unittest
 
 from benchmark.core.report_figures import build_figures
+from benchmark.core.experimental_report import render_figures
 
 
 def run(run_id, condition="A", task_type="valida_governada", **fields):
@@ -33,6 +34,18 @@ class ReportFiguresRegression(unittest.TestCase):
                 self.assertTrue(os.path.isfile(figure["path"]))
                 self.assertTrue(figure["question"] and figure["population"] and figure["source"])
             self.assertIn("fig-denials", {figure["id"] for figure in figures})
+
+
+    def test_Given_bar_figure_When_rendered_Then_pdf_and_png(self):
+        """opencode: Given a bar figure, When rendered, Then PDF/PNG and manifest are produced."""
+        model = {"batchId": "b", "scientificContentHash": "h", "figures": [
+            {"id": "fig-outcomes", "title": "t", "data": {"labels": ["A-permitida", "B-violadora"], "values": [2, 1]},
+             "section": "Figura: Desfechos", "source": "classified-runs.json", "n": 3, "ylabel": "execuções",
+             "question": "q", "interpretation": "i"}]}
+        with TemporaryDirectory() as directory:
+            ids = render_figures(model, Path(directory))
+            self.assertEqual(ids, ["fig-outcomes"])
+            self.assertTrue((Path(directory) / "figures" / "fig-outcomes.pdf").is_file())
 
 
 if __name__ == "__main__":
