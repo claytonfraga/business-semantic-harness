@@ -3,8 +3,8 @@
 import unittest
 
 from benchmark.core.analytics import (
-    FIELD_CONTRACT, compute_report_metrics, coverage_metric, delivery_metric, false_block_metric,
-    load_classified, run_identity,
+    FIELD_CONTRACT, METRIC_CATALOG, compute_report_metrics, coverage_metric, delivery_metric,
+    false_block_metric, load_classified, pair_metric, pairing_all, run_identity,
 )
 
 
@@ -69,6 +69,36 @@ class AnalyticsRegression(unittest.TestCase):
     def test_Given_missing_batch_When_loading_Then_empty(self):
         """opencode: Given a missing batch, When loading classified, Then empty without invention."""
         self.assertEqual(load_classified("/tmp/nao-existe-bsh"), [])
+
+
+    def test_Given_paired_runs_When_contrast_Then_delta_and_reason_per_pair(self):
+        """opencode: Given paired runs, When contrast, Then delta and per-pair reason are explicit."""
+        runs = [run("a", condition="A", totalTokens=100), run("d", condition="D", totalTokens=80)]
+        metric = pair_metric(runs, "A", "D")
+        self.assertEqual(metric["estruturais"], 1)
+        self.assertEqual(metric["elegiveis"], 1)
+        self.assertEqual(metric["pares"][0]["deltaTokens"], 20)
+
+    def test_Given_missing_partner_or_tokens_When_contrast_Then_exclusion_reason(self):
+        """opencode: Given missing partner or tokens, When contrast, Then exclusion reason is recorded."""
+        sem_parceiro = pair_metric([run("a", condition="A", totalTokens=100)], "A", "D")
+        self.assertEqual(sem_parceiro["pares"][0]["status"], "NO_MATCHING_RUN")
+        self.assertEqual(sem_parceiro["elegiveis"], 0)
+        sem_tokens = pair_metric([run("a", condition="A", totalTokens=None),
+                                  run("d", condition="D", totalTokens=80)], "A", "D")
+        self.assertEqual(sem_tokens["pares"][0]["status"], "MISSING_REQUIRED_DATA")
+
+    def test_Given_catalog_When_read_Then_metrics_declare_denominators(self):
+        """opencode: Given the metric catalog, When read, Then each metric declares numerator/denominator."""
+        names = {item["metrica"] for item in METRIC_CATALOG}
+        self.assertIn("WORKLOAD_TOKEN_REDUCTION", names)
+        for item in METRIC_CATALOG:
+            self.assertTrue(item["numerador"] and item["denominador"] and item["unidade"])
+
+    def test_Given_pairing_all_When_built_Then_four_contrasts(self):
+        """opencode: Given pairing, When built, Then the four contrasts are present."""
+        pairing = pairing_all([run("a", condition="A", totalTokens=1), run("b", condition="B", totalTokens=2)])
+        self.assertEqual(set(pairing), {"A-B", "B-C", "C-D", "A-D"})
 
 
 if __name__ == "__main__":
