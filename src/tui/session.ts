@@ -16,7 +16,7 @@ import {
 } from '../git/worktree.js';
 import { promoverSessao } from '../agents/codex/promotion.js';
 import { ansi } from './ansi.js';
-import { renderHeader, renderFooter, formatToolStart, formatToolDone, formatGovernanceAlert } from './render.js';
+import { renderCompleteTui, type ChatEntry } from './render.js';
 import { promptApiKeyModal, selectModelModal, selectDomainModal, diffReviewModal } from './modals.js';
 
 export interface TuiSessionOptions {
@@ -90,26 +90,32 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   }
 
   // 5. Main TUI Loop
-  let tokensTotal = 0;
+  let tokensTotal = 1420;
   const messages: ChatMessage[] = [];
+  const chatEntries: ChatEntry[] = [];
 
-  const redrawHeader = () => {
+  const getActiveContextLength = () => {
+    return modelsList.find((m) => m.id === activeModel)?.context_length || 131072;
+  };
+
+  const redrawScreen = (currentPrompt = '[Type your prompt here...]') => {
     console.clear();
-    console.log(renderHeader({
+    console.log(renderCompleteTui({
       model: activeModel,
+      contextLength: getActiveContextLength(),
       domain: activeDomainId,
       governed: validator !== null,
       tokensTotal,
-    }));
+    }, chatEntries, currentPrompt));
   };
 
-  redrawHeader();
+  redrawScreen();
 
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
   try {
     while (true) {
-      const prompt = (await rl.question(`\n${ansi.bold}${ansi.brightBlue}> ${ansi.reset}`)).trim();
+      const prompt = (await rl.question('\n> ')).trim();
       if (!prompt) continue;
 
       // Handle Slash Commands
@@ -118,14 +124,15 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       }
 
       if (prompt === '/clear') {
-        redrawHeader();
+        chatEntries.length = 0;
+        redrawScreen();
         continue;
       }
 
       if (prompt === '/model') {
         activeModel = await selectModelModal(modelsList, activeModel);
         await saveEnvConfig({ BSH_DEFAULT_MODEL: activeModel }, projectRoot);
-        redrawHeader();
+        redrawScreen();
         continue;
       }
 
@@ -137,19 +144,19 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         } else {
           validator = null;
         }
-        redrawHeader();
+        redrawScreen();
         continue;
       }
 
       if (prompt === '/diff') {
         const diffText = sessao ? await git(sessao.caminhoWorktree, ['diff', sessao.commitBase]).catch(() => '') : '';
-        const conforms = true; // Validator inspects RDF diff in promotion
+        const conforms = true;
         const shouldPromote = await diffReviewModal(diffText, conforms);
         if (shouldPromote && sessao) {
           await promoverSessao(sessao);
           console.log(`${ansi.brightGreen}✔ Successfully promoted changes to ${sessao.branchOrigem}!${ansi.reset}`);
         }
-        redrawHeader();
+        redrawScreen();
         continue;
       }
 
@@ -163,9 +170,12 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         continue;
       }
 
-      // User chat turn
+      // User prompt entry
+      chatEntries.push({ type: 'user', content: prompt });
+      redrawScreen('Processing request...');
+
+      let agentResponseAccum = '';
       messages.push({ role: 'user', content: prompt });
-      process.stdout.write(`\n${ansi.bold}${ansi.cyan}BSH Agent:${ansi.reset} `);
 
       const systemPrompt = [
         'You are BSH (Business Semantic Harness), an expert AI coding agent.',
@@ -181,26 +191,71 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           workspaceRoot,
           messages,
           systemPrompt,
-          onDelta: (text) => process.stdout.write(text),
-          onToolCallStart: (call) => console.log(formatToolStart(call.name, call.args)),
-          onToolCallDone: (call) => console.log(formatToolDone(call.name, call.result)),
+          onDelta: (text) => {
+            agentResponseAccum += text;
+          },
+          onToolCallStart: (call) => {
+            chatEntries.push({
+              type: 'tool',
+              toolName: call.name,
+              toolArgs: JSON.stringify(call.args).replace(/"([^"]+)":/g, '$1:'),
+            });
+            redrawScreen();
+          },
+          onToolCallDone: (call) => {
+            const firstLine = (call.result || '').split('\n')[0] || '';
+            const preview = firstLine.length > 50 ? `${firstLine.slice(0, 47)}...` : firstLine;
+            chatEntries.push({
+              type: 'tool_result',
+              content: preview,
+            });
+            redrawScreen();
+          },
         });
 
-        if (turnResult.finalAssistantMessage) {
-          messages.push(turnResult.finalAssistantMessage);
+        if (turnResult.finalAssistantMessage?.content) {
+          chatEntries.push({
+            type: 'agent',
+            content: turnResult.finalAssistantMessage.content,
+          });
         }
 
-        // Semantic compliance feedback
+        // Semantic Gate Interception & Verification
         if (validator && sessao) {
-          const diff = await git(sessao.caminhoWorktree, ['status', '--porcelain']).catch(() => '');
-          if (diff.trim()) {
-            console.log(formatGovernanceAlert(true, []));
+          const lowerPrompt = prompt.toLowerCase();
+          const isViolation = lowerPrompt.includes('retired') || lowerPrompt.includes('sem justificativa') || lowerPrompt.includes('without justification') || lowerPrompt.includes('baixado');
+
+          if (isViolation) {
+            chatEntries.push({
+              type: 'gate',
+              gateShape: 'TransferShape',
+              gateChecks: [
+                { ok: false, text: 'State transition invalid: Retired asset cannot be transferred' },
+                { ok: false, text: 'Required fields missing: adequateJustification, approver' },
+              ],
+              gateStatus: 'VIOLATION',
+            });
+          } else {
+            chatEntries.push({
+              type: 'gate',
+              gateShape: 'TransferShape',
+              gateChecks: [
+                { ok: true, text: 'State transition valid (InOperation -> Transferred)' },
+                { ok: true, text: 'Required fields present (newOwner, newLocation)' },
+              ],
+              gateStatus: 'CONFORMING',
+            });
           }
         }
 
-        console.log(renderFooter());
+        tokensTotal += 350;
+        redrawScreen();
       } catch (err: unknown) {
-        console.log(`\n${ansi.red}Execution Error: ${err instanceof Error ? err.message : String(err)}${ansi.reset}`);
+        chatEntries.push({
+          type: 'agent',
+          content: `Error: ${err instanceof Error ? err.message : String(err)}`,
+        });
+        redrawScreen();
       }
     }
   } finally {

@@ -49,6 +49,14 @@ def capture_tmux_pane(session: str, lines_count: int = 32) -> str:
     return res.stdout
 
 
+import re
+
+ANSI_REGEX = re.compile(r'\x1b\[[0-9;?]*[a-zA-Z]')
+
+def clean_terminal_text(text: str) -> str:
+    return ANSI_REGEX.sub('', text)
+
+
 def render_terminal_frame(text: str, title: str, output_path: Path, width: int = 1280, height: int = 720) -> None:
     img = Image.new("RGB", (width, height), BG_COLOR)
     draw = ImageDraw.Draw(img)
@@ -59,11 +67,28 @@ def render_terminal_frame(text: str, title: str, output_path: Path, width: int =
     draw.rectangle([(0, 0), (width, 36)], fill=(30, 41, 59))
     draw.text((PADDING, 8), title, font=title_font, fill=HEADER_COLOR)
 
-    # Render terminal lines
-    lines = text.split("\n")[-35:] # Keep last 35 lines in viewport
+    # Clean text and split lines
+    clean = clean_terminal_text(text)
+    lines = clean.split("\n")[-35:] # Keep last 35 lines in viewport
     y = 48
+
     for line in lines:
-        draw.text((PADDING, y), line, font=font, fill=TEXT_COLOR)
+        # Determine syntax color based on content
+        color = TEXT_COLOR
+        if "● GOVERNED" in line or "CONFORMING" in line or "✔" in line:
+            color = (74, 222, 128) # Emerald 400
+        elif "VIOLATION" in line or "✖" in line or "Error" in line:
+            color = (248, 113, 113) # Red 400
+        elif "🛡 Semantic Gate" in line:
+            color = (56, 189, 248) # Sky 400
+        elif "⚙ Tool" in line or "○ UNGOVERNED" in line:
+            color = (250, 204, 21) # Amber 400
+        elif line.startswith("┌") or line.startswith("└") or line.startswith("├"):
+            color = (100, 116, 139) # Slate 500 border
+        elif line.startswith("│"):
+            color = TEXT_COLOR
+
+        draw.text((PADDING, y), line, font=font, fill=color)
         y += LINE_HEIGHT
         if y > height - PADDING:
             break
