@@ -8,6 +8,8 @@ export interface RenderState {
   tokensTotal: number;
   sessionCost?: number;
   width?: number;
+  height?: number;
+  scrollOffset?: number;
 }
 
 export interface GateCheckItem {
@@ -225,27 +227,57 @@ export function renderCompleteTui(
   state: RenderState,
   entries: ChatEntry[],
   currentPrompt = '[Type your prompt here...]',
-  customWidth?: number
+  customWidth?: number,
+  customHeight?: number
 ): string {
   const terminalCols = process.stdout.columns && process.stdout.columns > 50 ? process.stdout.columns : 96;
-  const width = Math.min(110, Math.max(85, customWidth || state.width || terminalCols));
+  const terminalRows = process.stdout.rows && process.stdout.rows >= 15 ? process.stdout.rows : 30;
+
+  const width = Math.min(120, Math.max(85, customWidth || state.width || terminalCols));
+  const height = Math.max(15, customHeight || state.height || terminalRows);
 
   const header = renderHeader(state, width);
-  const chatLines: string[] = [];
+  const headerLinesCount = 3;
+  const footerLinesCount = 4;
+  const chromeCount = headerLinesCount + footerLinesCount;
+  const viewportHeight = Math.max(4, height - chromeCount);
 
+  // Render all conversation entries into lines
+  const allContentLines: string[] = [];
   if (entries.length === 0) {
-    chatLines.push(boxedLine('', width));
+    allContentLines.push(boxedLine('', width));
   } else {
     for (const e of entries) {
-      chatLines.push(...renderChatEntry(e, width));
+      allContentLines.push(...renderChatEntry(e, width));
+    }
+  }
+
+  // Calculate scrolled viewport window
+  const totalContent = allContentLines.length;
+  const maxScroll = Math.max(0, totalContent - viewportHeight);
+  const scrollOffset = Math.max(0, Math.min(maxScroll, state.scrollOffset || 0));
+
+  let viewportLines: string[] = [];
+  if (totalContent <= viewportHeight) {
+    viewportLines = [...allContentLines];
+    while (viewportLines.length < viewportHeight) {
+      viewportLines.push(boxedLine('', width));
+    }
+  } else {
+    const endIndex = totalContent - scrollOffset;
+    const startIndex = Math.max(0, endIndex - viewportHeight);
+    viewportLines = allContentLines.slice(startIndex, endIndex);
+    while (viewportLines.length < viewportHeight) {
+      viewportLines.unshift(boxedLine('', width));
     }
   }
 
   const promptLine = boxedLine(`${ansi.bold}> ${ansi.reset}${currentPrompt}`, width);
-  const shortcuts = `${ansi.bold}[Ctrl+M]${ansi.reset} Model  ${ansi.bold}[Ctrl+D]${ansi.reset} Domain/SHACL  ${ansi.bold}[Ctrl+G]${ansi.reset} Diff/Gate  ${ansi.bold}[Ctrl+C]${ansi.reset} Exit`;
+  const scrollIndicator = scrollOffset > 0 ? ` ${ansi.yellow}[▲ Scroll: +${scrollOffset}]${ansi.reset}` : '';
+  const shortcuts = `${ansi.bold}[Ctrl+M]${ansi.reset} Model  ${ansi.bold}[Ctrl+D]${ansi.reset} Domain/SHACL  ${ansi.bold}[Ctrl+G]${ansi.reset} Diff/Gate  ${ansi.bold}[Ctrl+C]${ansi.reset} Exit${scrollIndicator}`;
   const shortcutsLine = boxedLine(shortcuts, width);
   const separator = `├${'─'.repeat(Math.max(0, width - 2))}┤`;
   const bottom = `└${'─'.repeat(Math.max(0, width - 2))}┘`;
 
-  return [header, ...chatLines, separator, promptLine, shortcutsLine, bottom].join('\n');
+  return [header, ...viewportLines, separator, promptLine, shortcutsLine, bottom].join('\n');
 }

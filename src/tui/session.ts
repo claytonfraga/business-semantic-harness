@@ -89,10 +89,11 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     }
   }
 
-  // 5. Main TUI Loop
+  // 5. Main TUI Loop & Alternate Screen Buffer (Maximized)
   let tokensTotal = 1420;
   let lastGateConforming = true;
   let lastGateViolations: string[] = [];
+  let scrollOffset = 0;
   const messages: ChatMessage[] = [];
   const chatEntries: ChatEntry[] = [];
 
@@ -100,25 +101,48 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     return modelsList.find((m) => m.id === activeModel)?.context_length || 131072;
   };
 
-  const redrawScreen = (currentPrompt = '[Type your prompt here...]') => {
-    console.clear();
-    console.log(renderCompleteTui({
+  const redrawScreen = (currentPrompt = '') => {
+    const cols = process.stdout.columns && process.stdout.columns >= 50 ? process.stdout.columns : 96;
+    const rows = process.stdout.rows && process.stdout.rows >= 15 ? process.stdout.rows : 30;
+
+    const frame = renderCompleteTui({
       model: activeModel,
       contextLength: getActiveContextLength(),
       domain: activeDomainId,
       governed: validator !== null,
       tokensTotal,
-    }, chatEntries, currentPrompt));
+      width: cols,
+      height: rows,
+      scrollOffset,
+    }, chatEntries, currentPrompt, cols, rows);
+
+    process.stdout.write(`\x1b[H${frame}`);
+    if (currentPrompt === '') {
+      const promptRow = rows - 2;
+      process.stdout.write(`\x1b[${promptRow};5H`);
+    }
   };
 
-  redrawScreen();
+  // Maximize into Alternate Screen Buffer
+  process.stdout.write('\x1b[?1049h\x1b[2J\x1b[H');
+
+  const onResize = () => {
+    redrawScreen('');
+  };
+  process.stdout.on('resize', onResize);
+
+  redrawScreen('');
 
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
   try {
     while (true) {
-      const prompt = (await rl.question('\n> ')).trim();
+      redrawScreen('');
+      const prompt = (await rl.question('')).trim();
       if (!prompt) continue;
+
+      // Reset scroll on active user prompt
+      scrollOffset = 0;
 
       // Handle Slash Commands
       if (prompt === '/exit' || prompt === '/quit') {
@@ -127,6 +151,31 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
       if (prompt === '/clear') {
         chatEntries.length = 0;
+        scrollOffset = 0;
+        redrawScreen();
+        continue;
+      }
+
+      if (prompt === '/up') {
+        scrollOffset += 5;
+        redrawScreen();
+        continue;
+      }
+
+      if (prompt === '/down') {
+        scrollOffset = Math.max(0, scrollOffset - 5);
+        redrawScreen();
+        continue;
+      }
+
+      if (prompt === '/top') {
+        scrollOffset = 99999;
+        redrawScreen();
+        continue;
+      }
+
+      if (prompt === '/bottom') {
+        scrollOffset = 0;
         redrawScreen();
         continue;
       }
@@ -290,6 +339,8 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       }
     }
   } finally {
+    process.stdout.off('resize', onResize);
+    process.stdout.write('\x1b[?1049l\x1b[?25h');
     rl.close();
     if (sessao) {
       try {

@@ -112,3 +112,86 @@ test('TUI render: ungoverned mode also matches exact visible width', () => {
     );
   }
 });
+
+test('TUI render: height is fixed and invariant regardless of entry count', () => {
+  const width = 96;
+  const height = 28;
+
+  // Test with 0 entries
+  const tui0 = renderCompleteTui(
+    { model: 'deepseek/deepseek-v4.1-flash', governed: true, tokensTotal: 100, width, height },
+    [],
+    '[Type your prompt here...]',
+    width,
+    height
+  );
+  assert.equal(tui0.split('\n').length, height, 'Zero entries should match exact target height');
+
+  // Test with 2 entries
+  const tui2 = renderCompleteTui(
+    { model: 'deepseek/deepseek-v4.1-flash', governed: true, tokensTotal: 200, width, height },
+    [
+      { type: 'user', content: 'Short question' },
+      { type: 'agent', content: 'Short answer' },
+    ],
+    '[Type your prompt here...]',
+    width,
+    height
+  );
+  assert.equal(tui2.split('\n').length, height, 'Small conversation should match exact target height');
+
+  // Test with 40 entries (overflowing viewport)
+  const manyEntries = [];
+  for (let i = 0; i < 20; i++) {
+    manyEntries.push({ type: 'user', content: `Question ${i + 1}` });
+    manyEntries.push({ type: 'agent', content: `Answer ${i + 1} with extensive detail about project implementation and governance.` });
+  }
+  const tuiMany = renderCompleteTui(
+    { model: 'deepseek/deepseek-v4.1-flash', governed: true, tokensTotal: 12000, width, height },
+    manyEntries,
+    '[Type your prompt here...]',
+    width,
+    height
+  );
+  assert.equal(tuiMany.split('\n').length, height, 'Large conversation should still match exact target height');
+
+  // Verify header and footer are anchored at identical line numbers
+  const lines0 = tui0.split('\n');
+  const linesMany = tuiMany.split('\n');
+  assert.equal(lines0[0], linesMany[0], 'Top header border must be identical');
+  assert.equal(lines0[2], linesMany[2], 'Header separator must be identical');
+  assert.equal(lines0[height - 1], linesMany[height - 1], 'Bottom border must be identical');
+  assert.equal(lines0[height - 3], linesMany[height - 3], 'Footer separator must be identical');
+});
+
+test('TUI render: scrolling viewport navigates past entries with scrollOffset', () => {
+  const width = 96;
+  const height = 20;
+
+  const entries = [];
+  for (let i = 1; i <= 30; i++) {
+    entries.push({ type: 'user', content: `MessageNumber-${i}` });
+  }
+
+  // Pinned to bottom (scrollOffset = 0)
+  const bottomTui = renderCompleteTui(
+    { model: 'deepseek/deepseek-v4.1-flash', governed: true, tokensTotal: 100, width, height, scrollOffset: 0 },
+    entries,
+    '>',
+    width,
+    height
+  );
+  assert.ok(bottomTui.includes('MessageNumber-30'), 'Bottom view must include the latest message');
+
+  // Scrolled up (scrollOffset = 20)
+  const scrolledTui = renderCompleteTui(
+    { model: 'deepseek/deepseek-v4.1-flash', governed: true, tokensTotal: 100, width, height, scrollOffset: 20 },
+    entries,
+    '>',
+    width,
+    height
+  );
+  assert.ok(scrolledTui.includes('MessageNumber-18'), 'Scrolled view must include earlier messages');
+  assert.equal(scrolledTui.split('\n').length, height, 'Scrolled view must maintain exact height');
+});
+

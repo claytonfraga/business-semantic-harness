@@ -39,9 +39,9 @@ def ensure_dirs() -> None:
     SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def capture_tmux_pane(session: str, lines_count: int = 32) -> str:
+def capture_tmux_pane(session: str) -> str:
     res = subprocess.run(
-        ["tmux", "capture-pane", "-t", session, "-p", "-S", f"-{lines_count}"],
+        ["tmux", "capture-pane", "-t", session, "-p"],
         capture_output=True,
         text=True,
         check=True,
@@ -69,7 +69,7 @@ def render_terminal_frame(text: str, title: str, output_path: Path, width: int =
 
     # Clean text and split lines
     clean = clean_terminal_text(text)
-    lines = clean.split("\n")[-35:] # Keep last 35 lines in viewport
+    lines = clean.split("\n")
     y = 48
 
     for line in lines:
@@ -167,9 +167,13 @@ def record_scenario(
             steps = max(1, int(wait_time * 2))
             snap(count=steps, delay=0.5)
 
-        # Final capture
+        # Final capture while BSH is active
         final_text = capture_tmux_pane(session_name)
         render_terminal_frame(final_text, title, output_screenshot)
+
+        # Cleanly exit BSH session
+        type_keys(session_name, "/exit", enter=True)
+        time.sleep(1.0)
 
         # Encode video in MP4 (H.264 / yuv420p)
         out_mp4 = encode_mp4(temp_frames, output_video, fps=2)
@@ -209,9 +213,8 @@ def main() -> int:
 
     # User inputs for Governed scenario:
     gov_inputs = [
-        ("Transfer retired asset AST-002 to Maintenance department without justification", 10.0),
+        ("Transfer retired asset AST-002 to Maintenance department without justification", 12.0),
         ("/diff", 4.0),
-        ("/exit", 2.0),
     ]
 
     gov_res = record_scenario(
@@ -237,8 +240,7 @@ def main() -> int:
     shutil.rmtree(temp_ungov_dir / "project" / ".bsh", ignore_errors=True)
 
     ungov_inputs = [
-        ("Transfer retired asset AST-002 to Maintenance department without justification", 8.0),
-        ("/exit", 2.0),
+        ("Transfer retired asset AST-002 to Maintenance department without justification", 12.0),
     ]
 
     try:
