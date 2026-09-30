@@ -11,18 +11,28 @@ export async function avaliarOperacoes(
 ): Promise<ResultadoEnforcementLote> {
   const resultados: ResultadoEnforcement[] = [];
   for (const operacao of operacoes) {
-    resultados.push(await validarOperacao(root, snapshot, operacao));
+    try {
+      resultados.push(await validarOperacao(root, snapshot, operacao));
+    } catch (error) {
+      resultados.push({ status: 'indeterminado', dominio: operacao.dominio,
+        operacao: operacao.operacao, governado: true, requerRevisaoHumana: false,
+        evidencia: [error instanceof Error ? error.message : String(error)],
+        shapesAvaliados: [], selectedShapes: [], executedShapes: [],
+        validationExecuted: false, validationComplete: false, politicas: [],
+        proveniencia: operacao.proveniencia });
+    }
   }
-  let status: ResultadoEnforcementLote['status'] = 'conforme';
+  let status: ResultadoEnforcementLote['status'] = resultados.length === 0 ||
+    resultados.some((resultado) => !PRECEDENCIA.includes(resultado.status)) ? 'indeterminado' : 'conforme';
   for (const candidato of PRECEDENCIA) {
     if (resultados.some((resultado) => resultado.status === candidato)) {
       status = candidato;
       break;
     }
   }
-  return { status, bloquear: status === 'violacao' || status === 'indeterminado', resultados };
+  return { status, bloquear: status !== 'conforme', resultados };
 }
 
 export function operacaoBloqueante(resultado: ResultadoEnforcement): boolean {
-  return resultado.status === 'violacao' || resultado.status === 'indeterminado';
+  return resultado.status !== 'conforme';
 }

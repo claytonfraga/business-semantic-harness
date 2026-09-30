@@ -141,7 +141,7 @@ test('Given identical requester and approver, when checked against segregation r
 // =============================================================================
 
 test('Given an available asset with signed responsibility term, when allocated, then it conforms', async () => {
-  const report = await check('ex:op a ex:AlocacaoUsuario ; ex:estadoAtual ex:Disponivel ; ex:novoResponsavel ex:Lucas ; ex:termoResponsabilidadeAssinado true .');
+  const report = await check('ex:Lucas ex:lotadoEmDepartamento ex:DeptoTI . ex:op a ex:AlocacaoUsuario ; ex:estadoAtual ex:Disponivel ; ex:novoResponsavel ex:Lucas ; ex:termoResponsabilidadeAssinado true .');
   assert.equal(report.conforms, true);
 });
 

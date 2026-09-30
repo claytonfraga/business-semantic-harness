@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { DataFactory } from 'n3';
 import { loadManifest } from '../project/manifest.js';
 import { resolveProjectFile } from '../project/paths.js';
@@ -16,6 +17,7 @@ const SH_TARGET_CLASS = namedNode('http://www.w3.org/ns/shacl#targetClass');
 const SH_PROPERTY = namedNode('http://www.w3.org/ns/shacl#property');
 const SH_PATH = namedNode('http://www.w3.org/ns/shacl#path');
 const SH_MESSAGE = namedNode('http://www.w3.org/ns/shacl#message');
+const SH_MIN_COUNT = namedNode('http://www.w3.org/ns/shacl#minCount');
 
 function shapePorMensagem(shapes: ReturnType<typeof parseShapes>, shapesAvaliados: string[], mensagem: string): string | undefined {
   for (const shape of shapesAvaliados) {
@@ -42,7 +44,9 @@ export async function validarOperacao(
 ): Promise<ResultadoEnforcement> {
   const resultado: ResultadoEnforcement = {
     status: 'indeterminado', dominio: operacao.dominio, operacao: operacao.operacao, governado: false,
-    requerRevisaoHumana: false, evidencia: [], shapesAvaliados: [], politicas: [], proveniencia: operacao.proveniencia,
+    requerRevisaoHumana: false, evidencia: [], shapesAvaliados: [], selectedShapes: [], executedShapes: [],
+    validationExecuted: false, validationComplete: false, missingFacts: [],
+    politicas: [], proveniencia: operacao.proveniencia,
   };
   try {
     await assertOntologySnapshot(root, snapshot);
@@ -75,13 +79,18 @@ export async function validarOperacao(
   }
   resultado.governado = true;
   resultado.shapesAvaliados = shapesAplicaveis.map((q) => q.subject.value);
+  resultado.selectedShapes = resultado.shapesAvaliados;
   resultado.politicas = politicasHumanas.map((q) => q.subject.value);
 
   const caminhosObrigatorios = new Set<string>();
   for (const shape of shapesAplicaveis) {
     for (const propriedade of shapes.getQuads(shape.subject, SH_PROPERTY, null, null)) {
       const caminho = shapes.getQuads(propriedade.object, SH_PATH, null, null)[0];
-      if (caminho) caminhosObrigatorios.add(caminho.object.value);
+      // Só caminhos com sh:minCount >= 1 são obrigatórios para completude do candidato;
+      // constraints como sh:disjoint não exigem presença.
+      const obrigatorio = shapes.getQuads(propriedade.object, SH_MIN_COUNT, null, null)
+        .some((q) => Number(q.object.value) >= 1);
+      if (caminho && obrigatorio) caminhosObrigatorios.add(caminho.object.value);
     }
   }
   const indeterminadosObrigatorios = operacao.fatos.filter((fato) => fato.determinacao === 'indeterminado'
@@ -100,11 +109,36 @@ export async function validarOperacao(
     const valor = individuos.has(`${base}${fato.valor}`) ? `ex:${fato.valor}` : JSON.stringify(fato.valor);
     linhas.push(`ex:operacao ex:${fato.propriedade} ${valor} .`);
   }
-  const fatos = parseShapes(linhas.join('\n'));
+  const candidateTurtle = operacao.candidateGraphTurtle;
+  const fatos = parseShapes(candidateTurtle ?? linhas.join('\n'));
+  resultado.candidateGraphHash = createHash('sha256').update(candidateTurtle ?? linhas.join('\n')).digest('hex');
+
+  if (candidateTurtle !== undefined) {
+    const focus = fatos.getQuads(null, RDF_TYPE, namedNode(classe), null).map((q) => q.subject);
+    if (focus.length === 0) {
+      resultado.evidencia.push('Estado candidato sem foco tipado para a operação reconhecida');
+      return resultado;
+    }
+    const missing = [...caminhosObrigatorios].filter((path) => focus.some((node) =>
+      fatos.countQuads(node, namedNode(path), null, null) === 0));
+    resultado.missingFacts = missing;
+    if (missing.length > 0) {
+      resultado.evidencia.push(`Fatos do estado candidato ausentes: ${missing.join(', ')}`);
+      return resultado;
+    }
+  }
 
   if (shapesAplicaveis.length > 0) {
+    resultado.validationExecuted = true;
     const validacao = await validateData(shapes, fatos);
-    if (!validacao.conforms) {
+    resultado.validationResults = validacao.results;
+    if (validacao.conforms !== true && validacao.conforms !== false) {
+      resultado.evidencia.push('Validador retornou estado sem conformidade explícita');
+      return resultado;
+    }
+    resultado.executedShapes = [...resultado.selectedShapes];
+    resultado.validationComplete = true;
+    if (!validacao.conforms || validacao.results.length > 0) {
       resultado.status = 'violacao';
       const mensagem = validacao.results[0]?.message || 'Violacao SHACL';
       resultado.regra = mensagem;

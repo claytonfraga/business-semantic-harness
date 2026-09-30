@@ -1,22 +1,22 @@
 /**
  * Núcleo compartilhado do Business Semantic Harness.
  *
- * Ponto de entrada único para os adaptadores de agente (Codex, Agy): ciclo de vida de
- * worktree, reconciliacao/promocao Git, enforcement semantico independente, gates,
- * auditoria/alertas e medicao de tokens. Os adaptadores nao devem importar uns aos
- * outros; dependem apenas deste nucleo.
+ * Ciclo de vida de worktree, reconciliacao/promocao Git, enforcement semantico independente,
+ * gates, auditoria/alertas e medicao de tokens.
  */
 export {
   alteracoesNaWorktree, branchAtual, commitAtual, criarSessaoWorktree, estaLimpo, git,
   listarWorktrees, removerSessaoWorktree, resolverRepositorio, type SessaoWorktree,
-} from '../agents/codex/worktree.js';
-export { integrar, reconciliar, type ResultadoPromocao, type StatusPromocao, type ValidadorGates } from '../agents/codex/promotion.js';
-export { finalizeSession, type FinalizeOptions } from '../agents/codex/finalize.js';
-export { gravarSessao, listarSessoes, type RegistroSessao } from '../agents/codex/sessionState.js';
-export { writeAlerts, readConflictAlerts, countLines, type ConflictAlert } from '../agents/codex/alerts.js';
-export { formatUsageReport, type TokenTotals } from '../agents/codex/usage.js';
+} from '../git/worktree.js';
+export { integrar, reconciliar, type ResultadoPromocao, type StatusPromocao, type ValidadorGates } from '../git/promotion.js';
+export { finalizeSession, type FinalizeOptions } from '../git/finalize.js';
+export { gravarSessao, listarSessoes, type RegistroSessao } from '../git/sessionState.js';
+export { writeAlerts, readConflictAlerts, countLines, type ConflictAlert } from '../git/alerts.js';
+export { formatUsageReport, type TokenTotals } from '../git/usage.js';
 export { avaliarOperacoes } from '../enforcement/motorEnforcement.js';
 export { validarOperacao } from '../enforcement/validadorSemantico.js';
 export { aplicarRegras, lerDiff } from '../enforcement/extratorOperacoes.js';
 export { carregarRegrasGovernanca } from '../enforcement/governanca.js';
+export { evaluateGovernance, type CandidateFactsExtractor, type GovernanceDecision,
+  type SemanticStatus, type PromotionDecision } from '../enforcement/governanceDecision.js';
 export type { EstadoValidacao, OperacaoSemantica, ResultadoEnforcement } from '../enforcement/operacaoSemantica.js';

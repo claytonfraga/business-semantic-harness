@@ -4,8 +4,8 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, 
 import { tmpdir } from 'node:os';
 import { join, relative, resolve } from 'node:path';
 import { after, test } from 'node:test';
-import { criarSessaoWorktree, removerSessaoWorktree } from '../../dist/agents/codex/worktree.js';
-import { finalizeSession } from '../../dist/agents/codex/finalize.js';
+import { criarSessaoWorktree, removerSessaoWorktree } from '../../dist/git/worktree.js';
+import { finalizeSession } from '../../dist/git/finalize.js';
 import { createOntologySnapshot } from '../../dist/ontology/query.js';
 
 const FIXTURE = resolve('test/fixtures/enforcement-project');
@@ -164,7 +164,7 @@ test('E2E semantico: no public path promotes without going through the enforceme
     .filter((arquivo) => /promoverSessao\(|integrar\(|reconciliar\(/.test(readFileSync(arquivo, 'utf8')))
     .map((arquivo) => relative(src, arquivo).split('\\').join('/'))
     .sort();
-  assert.deepEqual(comPromocao, ['agents/codex/finalize.ts', 'agents/codex/promotion.ts']);
+  assert.deepEqual(comPromocao, ['git/finalize.ts', 'git/promotion.ts', 'tui/session.ts']);
 });
 
 test('E2E semantico 2: Given the agent reports a conflict, when finalized, then human review is requested and nothing is promoted', async () => {

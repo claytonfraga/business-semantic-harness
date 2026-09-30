@@ -1,6 +1,6 @@
 {
   "name": "business-semantic-harness",
-  "version": "0.2.1-beta",
+  "version": "0.2.3-beta",
   "type": "module",
   "files": [
     "dist/",
@@ -19,7 +19,6 @@
     "test:e2e": "npm run build && node --test --experimental-test-isolation=none test/e2e-live/*.e2e.mjs",
     "test:e2e:semantic": "npm run build && node --test --experimental-test-isolation=none test/e2e-live/*.semantic.mjs",
     "capture": "python3 test/support/tmux-screenshot.py",
-    "benchmark": "python3 -m benchmark.controlled",
     "prepack": "npm run build"
   },
   "engines": {

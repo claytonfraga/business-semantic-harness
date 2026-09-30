@@ -6,10 +6,10 @@ import { join } from 'node:path';
 import { after, test } from 'node:test';
 import {
   alteracoesNaWorktree, branchAtual, commitAtual, criarSessaoWorktree, estaLimpo, removerSessaoWorktree,
-} from '../../dist/agents/codex/worktree.js';
-import { promoverSessao } from '../../dist/agents/codex/promotion.js';
-import { gravarSessao } from '../../dist/agents/codex/sessionState.js';
-import { limparSessao, listarSessoesDoProjeto } from '../../dist/agents/codex/sessions.js';
+} from '../../dist/git/worktree.js';
+import { promoverSessao } from '../../dist/git/promotion.js';
+import { gravarSessao } from '../../dist/git/sessionState.js';
+import { limparSessao, listarSessoesDoProjeto } from '../../dist/git/sessions.js';
 
 const raiz = mkdtempSync(join(tmpdir(), 'bsh-adversarial-'));
 const worktrees = join(raiz, 'worktrees');
@@ -26,8 +26,6 @@ function novoProjeto(caminho) {
   git(repo, ['config', 'user.name', 'Teste']);
   git(repo, ['config', 'user.email', 'teste@example.com']);
   git(repo, ['config', 'commit.gpgsign', 'false']);
-  mkdirSync(join(repo, '.bsh', 'domains', 'ativos'), { recursive: true });
-  writeFileSync(join(repo, '.bsh', 'project.json'), '{}\n');
   writeFileSync(join(repo, 'server.ts'), '// base\n');
   git(repo, ['add', '-A']);
   git(repo, ['commit', '-q', '-m', 'A']);

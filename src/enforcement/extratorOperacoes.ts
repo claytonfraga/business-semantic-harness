@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { git } from '../agents/codex/worktree.js';
+import { git } from '../git/worktree.js';
 import type { OperacaoSemantica } from './operacaoSemantica.js';
 import type { RegraGovernanca } from './governanca.js';
 
@@ -10,7 +10,7 @@ export interface DiffArquivo {
   removido: boolean;
 }
 
-function paraRegex(glob: string): RegExp {
+export function paraRegex(glob: string): RegExp {
   const escapado = glob.replace(/[.+^${}()|[\]\\]/g, '\\$&');
   const corpo = escapado.split('**').map((parte) => parte.replace(/\*/g, '[^/]*')).join('.*');
   return new RegExp(`^${corpo}`);

@@ -1,5 +1,7 @@
 node_modules/
+node_modules
 dist/
+.bin/
 .superpowers/
 .worktrees/
 **/.bsh/local/
@@ -14,8 +16,11 @@ openspec/
 screenshots/
 /evaluation/
 AGENTS.md
+.env
+.env.*
 guia-bsh-harness-autenticacao.md
 
 
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
+*.tgz

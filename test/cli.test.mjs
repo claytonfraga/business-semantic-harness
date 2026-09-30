@@ -35,15 +35,11 @@ test('Given a selected project, when init and domain add run, then the domain is
   }
 });
 
-test('Given a project without ontology, when doctor and codex run, then the governed session is refused before a turn', () => {
-  const root = mkdtempSync(join(tmpdir(), 'bsh-doctor-'));
+test('Given a project without ontology, when ontology validate runs, then it returns exit code 1', () => {
+  const root = mkdtempSync(join(tmpdir(), 'bsh-validate-'));
   const executable = resolve('dist/cli.js');
   try {
-    const doctor = spawnSync(process.execPath, [executable, 'doctor', '--project', root], { encoding: 'utf8' });
-    assert.equal(doctor.status, 1);
-    assert.equal(JSON.parse(doctor.stdout).isolationVerified, false);
-    const codex = spawnSync(process.execPath, [executable, 'codex', '--project', root], { encoding: 'utf8' });
-    assert.equal(codex.status, 1);
-    assert.match(codex.stderr, /Sessão governada indisponível/);
+    const val = spawnSync(process.execPath, [executable, 'ontology', 'validate', '--project', root], { encoding: 'utf8' });
+    assert.equal(val.status, 1);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
