@@ -80,18 +80,43 @@ def type_keys(session: str, text: str, enter: bool = True) -> None:
         subprocess.run(["tmux", "send-keys", "-t", session, "Enter"], check=True)
 
 
-def encode_mpeg(frames_dir: Path, output_file: Path, fps: int = 2) -> None:
-    output_file.parent.mkdir(parents=True, exist_ok=True)
-    cmd = [
+def encode_video_formats(frames_dir: Path, output_mpeg: Path, fps: int = 2) -> tuple[Path, Path]:
+    output_mp4 = output_mpeg.with_suffix(".mp4")
+    output_mpeg.parent.mkdir(parents=True, exist_ok=True)
+
+    # 1. Standard compliant MPEG-2 (.mpeg) with valid buffer parameters and framerate
+    cmd_mpeg = [
         "ffmpeg", "-y",
         "-framerate", str(fps),
         "-i", str(frames_dir / "frame_%04d.png"),
-        "-c:v", "mpeg4",
-        "-q:v", "3",
+        "-c:v", "mpeg2video",
+        "-b:v", "4000k",
+        "-maxrate", "6000k",
+        "-bufsize", "1835k",
+        "-r", "25",
+        "-g", "15",
         "-pix_fmt", "yuv420p",
-        str(output_file),
+        "-f", "mpeg",
+        str(output_mpeg),
     ]
-    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(cmd_mpeg, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    # 2. Universal MP4 (.mp4) with H.264 baseline for 100% native compatibility on Windows 10/11, macOS, and browsers
+    cmd_mp4 = [
+        "ffmpeg", "-y",
+        "-framerate", str(fps),
+        "-i", str(frames_dir / "frame_%04d.png"),
+        "-c:v", "libx264",
+        "-preset", "fast",
+        "-crf", "20",
+        "-r", "25",
+        "-pix_fmt", "yuv420p",
+        "-movflags", "+faststart",
+        str(output_mp4),
+    ]
+    subprocess.run(cmd_mp4, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    return output_mpeg, output_mp4
 
 
 def record_scenario(
@@ -142,19 +167,22 @@ def record_scenario(
         final_text = capture_tmux_pane(session_name)
         render_terminal_frame(final_text, title, output_screenshot)
 
-        # Encode video
-        encode_mpeg(temp_frames, output_video, fps=2)
+        # Encode video in both compliant MPEG-2 (.mpeg) and universal H.264 (.mp4)
+        out_mpeg, out_mp4 = encode_video_formats(temp_frames, output_video, fps=2)
 
         # Calculate sha256
-        sha256 = hashlib.sha256(output_video.read_bytes()).hexdigest()
-        file_size_kb = output_video.stat().st_size / 1024
+        sha256_mpeg = hashlib.sha256(out_mpeg.read_bytes()).hexdigest()
+        sha256_mp4 = hashlib.sha256(out_mp4.read_bytes()).hexdigest()
+        file_size_kb = out_mpeg.stat().st_size / 1024
 
         return {
             "session": session_name,
             "title": title,
-            "video_path": str(output_video),
+            "video_path": str(out_mpeg),
+            "video_mp4_path": str(out_mp4),
             "screenshot_path": str(output_screenshot),
-            "sha256": sha256,
+            "sha256": sha256_mpeg,
+            "sha256_mp4": sha256_mp4,
             "file_size_kb": file_size_kb,
             "frames_recorded": frame_idx,
             "final_text": final_text,
@@ -230,8 +258,10 @@ def main() -> int:
     downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
     if downloads_dir.exists():
         shutil.copy2(gov_video, downloads_dir / "bsh-governed-scenario.mpeg")
+        shutil.copy2(gov_video.with_suffix(".mp4"), downloads_dir / "bsh-governed-scenario.mp4")
         shutil.copy2(ungov_video, downloads_dir / "bsh-ungoverned-scenario.mpeg")
-        print(f"✔ Copied videos to Windows Downloads: {downloads_dir}")
+        shutil.copy2(ungov_video.with_suffix(".mp4"), downloads_dir / "bsh-ungoverned-scenario.mp4")
+        print(f"✔ Copied MPEG and MP4 videos to Windows Downloads: {downloads_dir}")
 
     # Generate Test Report
     report_file = REPORTS_DIR / "relatorio-testes-e2e-openrouter.md"
