@@ -49,7 +49,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   }
 
   // 2. Models Discovery
-  let activeModel = options.model || env.defaultModel || 'deepseek/deepseek-chat';
+  let activeModel = options.model || env.defaultModel || 'deepseek/deepseek-v4.1-flash';
   let modelsList = await client.getModels().catch(() => []);
 
   // 3. Domain & Governance Discovery

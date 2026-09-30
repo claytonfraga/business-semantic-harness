@@ -29,6 +29,7 @@ export async function selectModelModal(
   try {
     // Filter to top popular / coding models for fast selection, plus manual input
     const popularIds = [
+      'deepseek/deepseek-v4.1-flash',
       'deepseek/deepseek-chat',
       'deepseek/deepseek-r1',
       'anthropic/claude-3.5-sonnet',
