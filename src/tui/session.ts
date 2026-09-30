@@ -119,7 +119,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     process.stdout.write(`\x1b[H${frame}`);
     if (currentPrompt === '') {
       const promptRow = rows - 2;
-      process.stdout.write(`\x1b[${promptRow};5H`);
+      process.stdout.write(`\x1b[${promptRow};3H`);
     }
   };
 

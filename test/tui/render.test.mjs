@@ -6,6 +6,7 @@ import {
   formatToolInvocation,
   formatContextLength,
   boxedLine,
+  tuiLine,
 } from '../../dist/tui/render.js';
 import { stripAnsi } from '../../dist/tui/ansi.js';
 
@@ -35,11 +36,16 @@ test('TUI render: formatToolInvocation cleans args', () => {
   );
 });
 
-test('TUI render: boxedLine matches exact width', () => {
-  const line = boxedLine('Hello World', 80);
+test('TUI render: tuiLine and boxedLine match exact width without lateral pipe borders', () => {
+  const line = tuiLine('Hello World', 80);
   assert.equal(stripAnsi(line).length, 80);
-  assert.ok(line.startsWith('│ '));
-  assert.ok(line.endsWith(' │'));
+  assert.ok(!line.startsWith('│'));
+  assert.ok(!line.endsWith('│'));
+
+  const bLine = boxedLine('Hello World', 80);
+  assert.equal(stripAnsi(bLine).length, 80);
+  assert.ok(!bLine.startsWith('│'));
+  assert.ok(!bLine.endsWith('│'));
 });
 
 test('TUI render: all lines in renderCompleteTui have identical visible width', () => {

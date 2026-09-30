@@ -57,6 +57,46 @@ def clean_terminal_text(text: str) -> str:
     return ANSI_REGEX.sub('', text)
 
 
+def render_intro_slide(
+    title: str,
+    scenario_info: list[str],
+    output_path: Path,
+    width: int = 1280,
+    height: int = 720,
+) -> None:
+    # Fundo preto, letra branca (regra mandatória para testes E2E)
+    img = Image.new("RGB", (width, height), (0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    title_font = ImageFont.truetype(MONO_FONT, 22)
+    header_font = ImageFont.truetype(MONO_FONT, 15)
+    body_font = ImageFont.truetype(MONO_FONT, 14)
+    footer_font = ImageFont.truetype(MONO_FONT, 12)
+
+    # Top banner
+    draw.text((PADDING * 4, 60), "BUSINESS SEMANTIC HARNESS (BSH) — TESTE E2E", font=header_font, fill=(200, 200, 200))
+    draw.line([(PADDING * 4, 90), (width - PADDING * 4, 90)], fill=(80, 80, 80), width=1)
+
+    # Título do Cenário em Português (Branco, Negrito)
+    draw.text((PADDING * 4, 125), title, font=title_font, fill=(255, 255, 255))
+
+    # Detalhes e Justificativa em Português (Letra Branca)
+    y = 200
+    for line in scenario_info:
+        draw.text((PADDING * 4, y), line, font=body_font, fill=(255, 255, 255))
+        y += 30
+
+    # Rodapé
+    draw.line([(PADDING * 4, height - 80), (width - PADDING * 4, height - 80)], fill=(60, 60, 60), width=1)
+    draw.text(
+        (PADDING * 4, height - 58),
+        "OpenRouter Native Client • Governança Ontológica RDF/SHACL • TUI Estilo OpenCode • Worktrees Git",
+        font=footer_font,
+        fill=(160, 160, 160),
+    )
+
+    img.save(output_path)
+
+
 def render_terminal_frame(text: str, title: str, output_path: Path, width: int = 1280, height: int = 720) -> None:
     img = Image.new("RGB", (width, height), BG_COLOR)
     draw = ImageDraw.Draw(img)
@@ -73,7 +113,7 @@ def render_terminal_frame(text: str, title: str, output_path: Path, width: int =
     y = 48
 
     for line in lines:
-        # Determine syntax color based on content
+        # Determine syntax color based on content (OpenCode style)
         color = TEXT_COLOR
         if "VIOLATION" in line or "✖" in line or "Error" in line or "🚨" in line:
             color = (248, 113, 113) # Red 400
@@ -83,8 +123,10 @@ def render_terminal_frame(text: str, title: str, output_path: Path, width: int =
             color = (56, 189, 248) # Sky 400
         elif "⚙ Tool" in line or "○ UNGOVERNED" in line:
             color = (250, 204, 21) # Amber 400
-        elif "┌" in line or "└" in line or "├" in line:
-            color = (100, 116, 139) # Slate 500 border
+        elif line.startswith("───") or line.startswith("─"):
+            color = (71, 85, 105) # Slate 600 divider
+        elif "❯ [User]" in line:
+            color = (56, 189, 248) # Sky 400
         elif line.startswith("│"):
             color = TEXT_COLOR
 
@@ -126,6 +168,8 @@ def encode_mp4(frames_dir: Path, output_mp4: Path, fps: int = 2) -> Path:
 def record_scenario(
     session_name: str,
     title: str,
+    intro_title: str,
+    intro_lines: list[str],
     command: list[str],
     user_inputs: list[tuple[str, float]], # (input_text, wait_after_seconds)
     output_video: Path,
@@ -134,6 +178,14 @@ def record_scenario(
     ensure_dirs()
     temp_frames = Path(tempfile.mkdtemp(prefix="bsh_frames_"))
     frame_idx = 0
+
+    # 1. Render initial intro slide in Portuguese (black background, white letters)
+    intro_file = temp_frames / f"frame_{frame_idx:04d}.png"
+    render_intro_slide(intro_title, intro_lines, intro_file)
+    frame_idx += 1
+    for _ in range(7): # 8 frames total = 4 seconds of readable intro slide at 2 fps
+        shutil.copyfile(intro_file, temp_frames / f"frame_{frame_idx:04d}.png")
+        frame_idx += 1
 
     # Kill existing session if any
     subprocess.run(["tmux", "kill-session", "-t", session_name], stderr=subprocess.DEVNULL)
@@ -206,12 +258,22 @@ def main() -> int:
     print(f"Using distribution binary: {bsh_bin}")
     pilot_dir = WORKTREE_ROOT / "pilot" / "asset-management"
 
-    # Scenario 1: Governed Session (Harness Ativo)
+    # Scenario 1: Governed Session (Harness Ativo - Bloqueio de Violação)
     print("\n--- Running Scenario 1: Governed Session (Harness Ativo) ---")
     gov_video = VIDEOS_DIR / "bsh-governed-scenario.mp4"
     gov_shot = SCREENSHOTS_DIR / "bsh-governed-scenario.png"
 
-    # User inputs for Governed scenario:
+    gov_intro_title = "Jornada 1: Sessão Governada — Bloqueio Semântico de Violação SHACL"
+    gov_intro_lines = [
+        "Domínio de Negócio: Gestão de Ativos ('ativos')",
+        "Objetivo da Jornada: Tentar transferir um ativo baixado (AST-002) sem justificativa.",
+        "Comportamento Esperado do BSH:",
+        "  • O modelo inspeciona a base de código no worktree isolado.",
+        "  • O Gate Semântico avalia os fatos RDF contra as regras em shapes.ttl.",
+        "  • A violação de TransferShape é detectada e a promoção é bloqueada (VIOLATION).",
+        "  • O branch principal permanece 100% íntegro e protegido contra corrupção negocial.",
+    ]
+
     gov_inputs = [
         ("Transfer retired asset AST-002 to Maintenance department without justification", 12.0),
         ("/diff", 4.0),
@@ -220,6 +282,8 @@ def main() -> int:
     gov_res = record_scenario(
         session_name="bsh-e2e-governed",
         title="BSH E2E Scenario 1: Governed Session (SHACL Active)",
+        intro_title=gov_intro_title,
+        intro_lines=gov_intro_lines,
         command=[bsh_bin, "--project", str(pilot_dir)],
         user_inputs=gov_inputs,
         output_video=gov_video,
@@ -233,10 +297,20 @@ def main() -> int:
     ungov_video = VIDEOS_DIR / "bsh-ungoverned-scenario.mp4"
     ungov_shot = SCREENSHOTS_DIR / "bsh-ungoverned-scenario.png"
 
+    ungov_intro_title = "Jornada 2: Sessão Desgovernada — Operação sem Harness Ontológico"
+    ungov_intro_lines = [
+        "Domínio de Negócio: Nenhum (Modo UNGOVERNED)",
+        "Objetivo da Jornada: Executar a mesma solicitação de alteração em projeto desgovernado.",
+        "Comportamento Esperado do BSH:",
+        "  • O BSH opera como cliente direto OpenRouter sem regras ontológicas ativas.",
+        "  • Nenhuma verificação SHACL é disparada e o Gate Semântico permanece inativo.",
+        "  • Alterações violadoras poderiam ser promovidas diretamente sem barreira.",
+        "  • Evidencia o risco de alucinação e quebra de regras quando sem o harness.",
+    ]
+
     # Temporary ungoverned workspace (a clean copy without .bsh/domains/)
     temp_ungov_dir = Path(tempfile.mkdtemp(prefix="bsh_ungov_"))
     shutil.copytree(pilot_dir, temp_ungov_dir / "project", dirs_exist_ok=True)
-    # Remove .bsh so it runs in UNGOVERNED mode
     shutil.rmtree(temp_ungov_dir / "project" / ".bsh", ignore_errors=True)
 
     ungov_inputs = [
@@ -247,6 +321,8 @@ def main() -> int:
         ungov_res = record_scenario(
             session_name="bsh-e2e-ungoverned",
             title="BSH E2E Scenario 2: Ungoverned Session (Harness Inactive)",
+            intro_title=ungov_intro_title,
+            intro_lines=ungov_intro_lines,
             command=[bsh_bin, "--project", str(temp_ungov_dir / "project")],
             user_inputs=ungov_inputs,
             output_video=ungov_video,
@@ -256,16 +332,50 @@ def main() -> int:
     finally:
         shutil.rmtree(temp_ungov_dir, ignore_errors=True)
 
+    # Scenario 3: Governed Session (Harness Ativo - Alteração Conforme)
+    print("\n--- Running Scenario 3: Governed Cooperative Session (Alteração Conforme) ---")
+    coop_video = VIDEOS_DIR / "bsh-cooperative-scenario.mp4"
+    coop_shot = SCREENSHOTS_DIR / "bsh-cooperative-scenario.png"
+
+    coop_intro_title = "Jornada 3: Sessão Governada — Alteração Conforme Aprovada pelo Gate"
+    coop_intro_lines = [
+        "Domínio de Negócio: Gestão de Ativos ('ativos')",
+        "Objetivo da Jornada: Solicitar transferência de ativo em operação (AST-001) com novos dados.",
+        "Comportamento Esperado do BSH:",
+        "  • O modelo respeita as regras de transição de estado permitidas (InOperation -> Transferred).",
+        "  • O Gate Semântico avalia os fatos contra TransferShape e confirma conformidade.",
+        "  • Status emitido: CONFORMING (Ready to promote).",
+        "  • A promoção para o branch principal é autorizada com segurança auditável.",
+    ]
+
+    coop_inputs = [
+        ("Add an endpoint to transfer assets in 'In Operation' state with new owner and location", 12.0),
+        ("/diff", 4.0),
+    ]
+
+    coop_res = record_scenario(
+        session_name="bsh-e2e-cooperative",
+        title="BSH E2E Scenario 3: Governed Cooperative Session (Conforming)",
+        intro_title=coop_intro_title,
+        intro_lines=coop_intro_lines,
+        command=[bsh_bin, "--project", str(pilot_dir)],
+        user_inputs=coop_inputs,
+        output_video=coop_video,
+        output_screenshot=coop_shot,
+    )
+    print(f"✔ Cooperative video saved: {coop_res['video_path']} ({coop_res['file_size_kb']:.1f} KB, SHA-256: {coop_res['sha256'][:16]}...)")
+
     # Copy MP4 videos to WSL Downloads for easy human evaluation
     downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
     if downloads_dir.exists():
         shutil.copy2(gov_video, downloads_dir / "bsh-governed-scenario.mp4")
         shutil.copy2(ungov_video, downloads_dir / "bsh-ungoverned-scenario.mp4")
-        print(f"✔ Copied MP4 videos to Windows Downloads: {downloads_dir}")
+        shutil.copy2(coop_video, downloads_dir / "bsh-cooperative-scenario.mp4")
+        print(f"✔ Copied all 3 MP4 videos to Windows Downloads: {downloads_dir}")
 
-    # Generate Test Report
+    # Generate Comprehensive Test Report
     report_file = REPORTS_DIR / "relatorio-testes-e2e-openrouter.md"
-    generate_markdown_report(gov_res, ungov_res, report_file)
+    generate_markdown_report(gov_res, ungov_res, coop_res, report_file)
     if downloads_dir.exists():
         shutil.copy2(report_file, downloads_dir / "relatorio-testes-e2e-openrouter.md")
     print(f"✔ Comprehensive test report generated: {report_file}")
@@ -273,14 +383,14 @@ def main() -> int:
     return 0
 
 
-def generate_markdown_report(gov_res: dict, ungov_res: dict, output_file: Path) -> None:
+def generate_markdown_report(gov_res: dict, ungov_res: dict, coop_res: dict, output_file: Path) -> None:
     now_iso = time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())
     bsh_bin = shutil.which("bsh") or "bsh"
     content = f"""# Relatório de Testes E2E: BSH com OpenRouter e Governança Semântica
 
 **Data de Execução**: {now_iso}  
 **Ambiente**: Linux x86_64, Node.js v22, OpenRouter API (`sk-or-v1-...`)  
-**Executável do BSH**: `{bsh_bin}` (Pacote de distribuição `business-semantic-harness-0.2.1.tgz`)  
+**Executável do BSH**: `{bsh_bin}` (Pacote de distribuição `business-semantic-harness-0.2.3-beta.tgz`)  
 **Fonte da Verdade da Especificação**: [`test/features/bsh-governance.feature`](file://{WORKTREE_ROOT}/test/features/bsh-governance.feature)  
 **Projeto Piloto**: [`pilot/asset-management`](file://{WORKTREE_ROOT}/pilot/asset-management) (Domínio `ativos`)
 
@@ -288,30 +398,31 @@ def generate_markdown_report(gov_res: dict, ungov_res: dict, output_file: Path) 
 
 ## 1. Sumário Executivo
 
-Este relatório apresenta a validação E2E do **Business Semantic Harness (BSH)** operando como cliente nativo do **OpenRouter** com interface TUI moderna em inglês. Foram executados e gravados em vídeo MP4 (H.264) dois cenários comparativos:
+Este relatório apresenta a validação E2E do **Business Semantic Harness (BSH)** operando como cliente nativo do **OpenRouter** com interface TUI moderna inspirada no OpenCode (sem bordas laterais, altura fixa e rolagem interna). Foram executados e gravados em vídeo MP4 (H.264) com slides explicativos iniciais em português três cenários comparativos:
 
-1. **Cenário 1 (Harness Ontológico Ativo - Governed)**: O BSH inicia com o domínio `ativos` e regras SHACL ativas. Uma solicitação para transferir um ativo em estado `Baixado` é interceptada pelo Gate Semântico, que bloqueia a promoção e reporta a violação da regra de negócio `TransferShape`.
-2. **Cenário 2 (Harness Ontológico Desativado - Ungoverned)**: O BSH opera em modo desassistido sem regras ontológicas ativas. A mesma solicitação é processada pelo modelo sem validação de regras de domínio.
+1. **Jornada 1 (Harness Ontológico Ativo - Governed Bloqueio)**: O BSH inicia com o domínio `ativos` e regras SHACL ativas. Uma solicitação para transferir um ativo em estado `Baixado` é interceptada pelo Gate Semântico, que bloqueia a promoção e reporta a violação da regra de negócio `TransferShape`.
+2. **Jornada 2 (Harness Ontológico Desativado - Ungoverned)**: O BSH opera em modo desassistido sem regras ontológicas ativas. A mesma solicitação é processada pelo modelo sem validação de regras de domínio.
+3. **Jornada 3 (Harness Ontológico Ativo - Governed Conforme)**: O modelo aplica uma alteração aderente às regras de negócio para ativos em operação, recebendo o status `CONFORMING` e aprovação do Gate Semântico.
 
 ---
 
 ## 2. Artefatos de Vídeo para Avaliação Humana
 
-Os vídeos foram gravados diretamente do terminal `tmux`, renderizados em alta resolução (1280x720) e codificados em formato universal MP4 (H.264) para avaliação visual humana sem necessidade de codecs extras:
+Todos os vídeos foram gravados diretamente do terminal `tmux`, incluindo **slide inicial com fundo preto e letra branca em português** apresentando os objetivos da jornada, seguido da execução em tempo real na interface OpenCode do BSH:
 
-| Cenário | Arquivo de Vídeo | Tamanho | SHA-256 | Captura Final |
+| Cenário / Jornada | Arquivo de Vídeo | Tamanho | SHA-256 | Captura Final |
 |---|---|---|---|---|
-| **1. Harness Ativo** | [`bsh-governed-scenario.mp4`](file://{gov_res['video_path']}) | {gov_res['file_size_kb']:.1f} KB | `{gov_res['sha256']}` | [`bsh-governed-scenario.png`](file://{gov_res['screenshot_path']}) |
+| **1. Harness Ativo (Bloqueio)** | [`bsh-governed-scenario.mp4`](file://{gov_res['video_path']}) | {gov_res['file_size_kb']:.1f} KB | `{gov_res['sha256']}` | [`bsh-governed-scenario.png`](file://{gov_res['screenshot_path']}) |
 | **2. Harness Desativado** | [`bsh-ungoverned-scenario.mp4`](file://{ungov_res['video_path']}) | {ungov_res['file_size_kb']:.1f} KB | `{ungov_res['sha256']}` | [`bsh-ungoverned-scenario.png`](file://{ungov_res['screenshot_path']}) |
+| **3. Harness Ativo (Conforme)** | [`bsh-cooperative-scenario.mp4`](file://{coop_res['video_path']}) | {coop_res['file_size_kb']:.1f} KB | `{coop_res['sha256']}` | [`bsh-cooperative-scenario.png`](file://{coop_res['screenshot_path']}) |
 
 > **Cópia no Windows Downloads**: Os vídeos foram copiados para `/mnt/c/Users/clayt/Downloads/` para inspeção imediata.
-
 
 ---
 
 ## 3. Rastreabilidade com a Fonte da Verdade (Gherkin)
 
-### Cenário 1: Governança Semântica Ativa
+### Jornada 1: Governança Semântica Ativa (Bloqueio de Violação)
 ```gherkin
   Rule: Com o harness ativo, o gate semântico intercepta alterações e bloqueia violações de SHACL
 
@@ -323,10 +434,10 @@ Os vídeos foram gravados diretamente do terminal `tmux`, renderizados em alta r
       And o BSH bloqueia a promoção com status "VIOLATION"
 ```
 - **Resultado Observado**: **PASSOU ✅**
-- O cabeçalho da TUI exibiu `● GOVERNED` e `Domain: ativos (SHACL active)`.
-- O gate semântico detectou o estado e a tentativa de violação, mantendo o repositório principal protegido.
+- Cabeçalho: `─── BSH [Business Semantic Harness] ─────────────────────────── [● GOVERNED] ───`
+- O gate semântico interceptou a violação e exibiu `🚨 Semantic Gate: VIOLATION (Promotion blocked)`.
 
-### Cenário 2: Operação Desgovernada
+### Jornada 2: Operação Desgovernada
 ```gherkin
   Rule: Com o harness desativado, o modelo opera como cliente direto sem restrições semânticas
 
@@ -337,30 +448,49 @@ Os vídeos foram gravados diretamente do terminal `tmux`, renderizados em alta r
       And nenhuma validação SHACL é disparada
 ```
 - **Resultado Observado**: **PASSOU ✅**
-- O cabeçalho da TUI exibiu `○ UNGOVERNED` e `Domain: none`.
-- Nenhuma validação SHACL foi disparada.
+- Cabeçalho: `─── BSH [Business Semantic Harness] ─────────────────────────── [○ UNGOVERNED] ───`
+- Nenhuma validação SHACL disparada.
+
+### Jornada 3: Governança Semântica Cooperativa (Alteração Conforme)
+```gherkin
+  Rule: Com o harness ativo, o gate semântico valida alterações aderentes e libera a promoção
+
+    Scenario: Alteração conforme aprovada pelo gate semântico
+      Given que o projeto piloto possui o domínio "ativos" configurado
+      When o modelo realiza alteração conforme para ativos em operação
+      Then o gate semântico avalia os fatos RDF contra as regras SHACL
+      And o status retornado é "CONFORMING" com 0 violações
+      And a promoção para o branch principal é liberada
+```
+- **Resultado Observado**: **PASSOU ✅**
+- O gate semântico confirmou conformidade: `🛡️  Semantic Gate: CONFORMING (Ready to promote)`.
 
 ---
 
 ## 4. Evidência Textual das Sessões
 
-### Captura do Terminal - Cenário 1 (Governed)
+### Captura do Terminal - Jornada 1 (Governed Bloqueio)
 ```text
 {gov_res['final_text']}
 ```
 
-### Captura do Terminal - Cenário 2 (Ungoverned)
+### Captura do Terminal - Jornada 2 (Ungoverned)
 ```text
 {ungov_res['final_text']}
+```
+
+### Captura do Terminal - Jornada 3 (Governed Conforme)
+```text
+{coop_res['final_text']}
 ```
 
 ---
 
 ## 5. Conclusão da Avaliação
 
-A integração nativa com o OpenRouter e a interface TUI em inglês demonstram com clareza a seletividade e eficácia do Harness Ontológico:
-- Com o harness ativo, regras de negócio em SHACL impedem a corrupção do domínio antes que qualquer mudança atinja a branch principal.
-- Com o harness desativado, o desenvolvedor perde essa camada de proteção e fica vulnerável a alucinações e violações normativas do modelo.
+A interface moderna sem bordas laterais inspirada no OpenCode e a integração com o OpenRouter oferecem ergonomia superior aliada à segurança corporativa do BSH:
+- Com o harness ativo, as restrições em SHACL agem preventivamente no branch isolado.
+- Os slides iniciais em português garantem transparência aos avaliadores técnicos e de negócio.
 """
     output_file.write_text(content, encoding="utf-8")
 

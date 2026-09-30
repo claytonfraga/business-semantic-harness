@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/claytonfraga/business-semantic-harness/actions/workflows/ci.yml/badge.svg)](https://github.com/claytonfraga/business-semantic-harness/actions/workflows/ci.yml)
 
-The **Business Semantic Harness (BSH)** is an autonomous, ontology-governed coding agent client featuring a native **OpenRouter integration** and a modern, high-performance **Terminal User Interface (TUI)** inspired by OpenTUI.
+The **Business Semantic Harness (BSH)** is an autonomous, ontology-governed coding agent client featuring a native **OpenRouter integration** and a modern, high-performance **Terminal User Interface (TUI)** inspired by OpenCode.
 
 BSH lets AI models modify your codebase **without breaking your business rules**. You describe your business domain once — its entities, states, and business invariants — as a verifiable model (JSON-LD ontology and SHACL constraint shapes) that lives directly inside your repository. Whenever you interact with a coding model through BSH, the harness validates proposed codebase changes against that model **on its own**. It never relies on the model to "remember" or self-police rules: if a proposed change violates a business constraint, BSH blocks promotion and explains why; if the change conforms, it promotes it cleanly to your Git branch.
 
@@ -10,8 +10,9 @@ BSH lets AI models modify your codebase **without breaking your business rules**
 
 ## Key Highlights
 
-- **Direct OpenRouter Client**: Connects directly to [OpenRouter](https://openrouter.ai), supporting hundreds of models (DeepSeek V3/R1, Claude 3.5 Sonnet, GPT-4o, Qwen 2.5 Coder, Llama 3.3, Gemini, etc.) with streaming completions and native function calling. No external CLI wrappers or third-party agent binaries (Codex, Agy, or OpenCode) are required.
-- **Interactive OpenTUI-Inspired Terminal Interface**: 100% English interactive TUI with a live status header, syntax-highlighted diffs, tool execution logs, and searchable model and domain pickers.
+- **Direct OpenRouter Client**: Connects directly to [OpenRouter](https://openrouter.ai), supporting hundreds of models (DeepSeek V3/R1, Claude 3.5 Sonnet, GPT-4o, Qwen 2.5 Coder, Llama 3.3, Gemini, etc.) with streaming completions and native function calling.
+- **Interactive OpenCode-Inspired Terminal Interface**: Sleek, borderless TUI in English with a live status banner, maximized alternate screen buffer (`\x1b[?1049h`), fixed-height viewport, internal content scrolling (`/up`, `/down`), syntax-highlighted diffs, and modal dialogs.
+- **Ephemeral Web OAuth (PKCE)**: Authenticate directly via your web browser without touching an API key or persisting credentials to disk.
 - **Interactive Domain & SHACL Rules Selector**: Select which domain ontology and SHACL ruleset under `.bsh/domains/` will govern the coding session.
 - **Autonomous Tool Execution**: The model is equipped with workspace tools (`read_file`, `write_file`, `replace_file_content`, `list_directory`, `run_bash_command`) strictly scoped to the project.
 - **Guaranteed Workspace Isolation**: Every session executes inside an isolated Git worktree (`bsh/session/<id>`). Your primary working directory and branch remain completely clean and untouched until you explicitly promote an approved change.
@@ -24,7 +25,7 @@ BSH lets AI models modify your codebase **without breaking your business rules**
 - **Operating System**: Linux, macOS, or WSL2.
 - **Node.js**: Version 22 or later (`node >= 22`).
 - **Git**: Installed and available in PATH (sessions run in Git worktrees).
-- **OpenRouter API Key**: A valid API key from [OpenRouter](https://openrouter.ai/keys).
+- **OpenRouter Account**: Connect with or without manual API keys (supports browser OAuth PKCE).
 
 ---
 
@@ -44,7 +45,7 @@ npm link
 
 ```bash
 npm pack --pack-destination /tmp
-npm install -g /tmp/business-semantic-harness-0.2.1.tgz
+npm install -g /tmp/business-semantic-harness-0.2.3-beta.tgz
 bsh --help
 ```
 
@@ -52,23 +53,23 @@ bsh --help
 
 ## Configuration & Authentication
 
-### 1. Setting up your OpenRouter API Key
+### 1. Web OAuth via Browser (Ephemeral & Zero-Storage)
 
-BSH loads your OpenRouter API key automatically from a `.env` file in your project or from the environment:
+BSH features browser-based OAuth with PKCE. When launched without an API key:
+- Select **Web Browser Login (OAuth PKCE)**.
+- BSH generates a cryptographic code verifier, opens OpenRouter's authorization page in your default browser, and exchanges the code for a session token strictly in memory.
+- No API keys are written to `.env` or disk, providing maximum security for shared or ephemeral workstations.
 
-Create or edit `.env` in your project root:
+### 2. Manual OpenRouter API Key via `.env`
+
+Alternatively, provide your key via environment variable or `.env`:
+
 ```dotenv
 OPENROUTER_API_KEY=sk-or-v1-your-key-here
 # Optional defaults:
 BSH_DEFAULT_MODEL=deepseek/deepseek-chat
 BSH_DEFAULT_DOMAIN=ativos
 ```
-
-> **Security Note:** The `.env` file is strictly listed in `.gitignore` and saved with restricted file permissions (`0o600`). BSH never prints or leaks your API key in logs or telemetry.
-
-### 2. First-Run Interactive Prompt
-
-If you run `bsh` without an existing `.env` file or environment variable, BSH will display a secure prompt in the terminal asking for your key, test it against OpenRouter (`/auth/key`), and automatically save it to your local `.env`.
 
 ---
 
@@ -89,30 +90,33 @@ bsh --model deepseek/deepseek-chat --domain ativos
 bsh --project /path/to/my-project
 ```
 
-### The TUI Layout
+### The TUI Layout (OpenCode Style)
 
-When BSH starts, it opens the interactive terminal interface:
+When BSH starts, it opens the maximized, borderless terminal interface:
 
 ```text
-┌─ BSH [Business Semantic Harness] ─────────────────────────── [● GOVERNED] ─┐
-│ Model: deepseek/deepseek-chat   Domain: ativos (SHACL active)   Tokens: 1,420 │
-├─────────────────────────────────────────────────────────────────────────────┤
-│ [User] Add an endpoint to transfer assets in 'In Operation' state.          │
-│                                                                             │
-│ [BSH Agent]                                                                 │
-│ Inspecting asset repository and checking domain business rules...           │
-│                                                                             │
-│ ⚙ Tool Invocation: read_file({"path":"src/domain/asset.ts"})                │
-│ ↳ Result: Read 84 lines.                                                    │
-│                                                                             │
-│ ⚙ Tool Invocation: replace_file_content({"path":"src/domain/asset.ts", ...}) │
-│ ↳ Result: Successfully replaced target content in src/domain/asset.ts       │
-│                                                                             │
-│ 🛡 Semantic Gate: CONFORMING (All SHACL constraints satisfied)              │
-├─────────────────────────────────────────────────────────────────────────────┤
-│ > [Type your prompt here...]                                                │
-│ [Ctrl+M] Model  [Ctrl+D] Domain/SHACL  [Ctrl+G] Diff/Gate  [Ctrl+C] Exit    │
-└─────────────────────────────────────────────────────────────────────────────┘
+─── BSH [Business Semantic Harness] ─────────────────────────── [● GOVERNED] ───
+  Model: deepseek/deepseek-v4.1-flash (1M ctx)   Domain: ativos (SHACL active)   Tokens: 1,420
+─────────────────────────────────────────────────────────────────────────────────
+  ❯ [User] Add an endpoint to transfer assets in 'In Operation' state.
+
+  [BSH Agent]
+  Checking domain rules for 'ativos' and inspecting repository...
+
+  ⚙ Tool: read_file("src/assets/domain/asset.ts")
+  ↳ Read 84 lines.
+
+  ⚙ Tool: replace_file_content("src/assets/domain/asset.ts")
+
+  🛡  Semantic Gate [Evaluating SHACL constraints: TransferShape] [● CONFORMING]
+    ✔ State transition valid (InOperation -> Transferred)
+    ✔ Required fields present (newOwner, newLocation)
+    → Status: CONFORMING (Ready to promote)
+
+─────────────────────────────────────────────────────────────────────────────────
+> [Type your prompt here...]
+  [Ctrl+M] Model  [Ctrl+D] Domain/SHACL  [Ctrl+G] Diff/Gate  [Ctrl+C] Exit
+─────────────────────────────────────────────────────────────────────────────────
 ```
 
 ### Keyboard Shortcuts & Slash Commands
@@ -122,9 +126,11 @@ When BSH starts, it opens the interactive terminal interface:
 | `[Ctrl+M]` or `/model` | Open the **Model Selector modal** to browse or search OpenRouter models. |
 | `[Ctrl+D]` or `/domain` | Open the **Domain & SHACL Selector modal** to switch active ontology governance. |
 | `[Ctrl+G]` or `/diff` | Open the **Diff Review & Semantic Gate** modal to review diffs and promote changes. |
-| `[Ctrl+L]` or `/clear` | Clear the chat viewport and refresh the status header. |
+| `[Ctrl+L]` or `/clear` | Clear the chat history and reset scroll view. |
+| `/up` / `/down` | Scroll the message history viewport up or down by 5 lines. |
+| `/top` / `/bottom` | Jump to the very beginning or restore auto-scroll to the latest message. |
 | `/help` | Print available commands and keyboard shortcuts in English. |
-| `/exit` or `/quit` | Clean up the session worktree and exit BSH. |
+| `/exit` or `/quit` | Clean up the session worktree and exit BSH cleanly. |
 
 ---
 

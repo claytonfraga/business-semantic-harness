@@ -62,20 +62,67 @@ export function wrapText(text: string, maxWidth: number): string[] {
 }
 
 /**
- * Frames a line within vertical borders: │ <text> <pad> │
+ * Safely truncates a string preserving ANSI escape sequences.
  */
-export function boxedLine(text: string, width: number): string {
-  const interior = Math.max(10, width - 4);
+export function truncateAnsi(text: string, maxWidth: number): string {
   const visible = stripAnsi(text);
-
-  if (visible.length > interior) {
-    const truncated = `${text.slice(0, interior - 3)}...`;
-    const pad = ' '.repeat(Math.max(0, interior - stripAnsi(truncated).length));
-    return `│ ${truncated}${pad} │`;
+  if (visible.length <= maxWidth) return text;
+  if (!text.includes('\x1b')) {
+    return `${text.slice(0, maxWidth - 3)}...`;
   }
 
-  const pad = ' '.repeat(Math.max(0, interior - visible.length));
-  return `│ ${text}${pad} │`;
+  let visibleCount = 0;
+  let result = '';
+  let inEscape = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === '\x1b') {
+      inEscape = true;
+      result += ch;
+      continue;
+    }
+    if (inEscape) {
+      result += ch;
+      if (ch === 'm' || ch === 'K' || ch === 'H') {
+        inEscape = false;
+      }
+      continue;
+    }
+    if (visibleCount >= maxWidth - 3) {
+      result += `...${ansi.reset}`;
+      break;
+    }
+    result += ch;
+    visibleCount++;
+  }
+  return result;
+}
+
+/**
+ * Formats a line to exact visible width without lateral borders (OpenCode style).
+ */
+export function tuiLine(text: string, width: number): string {
+  const visibleLen = stripAnsi(text).length;
+  if (visibleLen === width) {
+    return text;
+  }
+  if (visibleLen < width) {
+    return `${text}${' '.repeat(width - visibleLen)}`;
+  }
+  const truncated = truncateAnsi(text, width);
+  const truncatedLen = stripAnsi(truncated).length;
+  if (truncatedLen < width) {
+    return `${truncated}${' '.repeat(width - truncatedLen)}`;
+  }
+  return truncated;
+}
+
+/**
+ * Backward-compatible alias for line formatting.
+ */
+export function boxedLine(text: string, width: number): string {
+  return tuiLine(text, width);
 }
 
 export function formatToolInvocation(name: string, args: Record<string, unknown> | string): string {
@@ -110,9 +157,9 @@ export function renderHeader(state: RenderState, width: number): string {
 
   const visibleLogo = 'BSH [Business Semantic Harness]';
   const visibleStatus = state.governed ? '[● GOVERNED]' : '[○ UNGOVERNED]';
-  const fixedChars = 3 + visibleLogo.length + 1 + 1 + visibleStatus.length + 3;
-  const topBorderLen = Math.max(2, width - fixedChars);
-  const firstLine = `┌─ ${logo} ${'─'.repeat(topBorderLen)} ${statusBadge} ─┐`;
+  const fixedChars = 4 + visibleLogo.length + 2 + visibleStatus.length + 4;
+  const dashCount = Math.max(2, width - fixedChars);
+  const firstLine = `─── ${logo} ${'─'.repeat(dashCount)} ${statusBadge} ───`;
 
   const ctxStr = state.contextLength ? ` (${formatContextLength(state.contextLength)})` : ' (128k ctx)';
   const modelStr = `${state.model}${ctxStr}`;
@@ -123,99 +170,78 @@ export function renderHeader(state: RenderState, width: number): string {
 
   const tokensStr = state.tokensTotal.toLocaleString();
   const costStr = state.sessionCost !== undefined ? ` ($${state.sessionCost.toFixed(4)})` : '';
-  const infoLine = `Model: ${ansi.cyan}${modelStr}${ansi.reset}   Domain: ${domainStr}   Tokens: ${tokensStr}${costStr}`;
-  const secondLine = boxedLine(infoLine, width);
-  const separator = `├${'─'.repeat(Math.max(0, width - 2))}┤`;
+  const infoLine = `  Model: ${ansi.cyan}${modelStr}${ansi.reset}   Domain: ${domainStr}   Tokens: ${tokensStr}${costStr}`;
+  const secondLine = tuiLine(infoLine, width);
+  const separator = '─'.repeat(width);
 
-  return [firstLine, secondLine, separator].join('\n');
+  return [tuiLine(firstLine, width), secondLine, separator].join('\n');
 }
 
 export function renderChatEntry(entry: ChatEntry, width: number): string[] {
   const lines: string[] = [];
-  const interior = Math.max(10, width - 4);
 
   switch (entry.type) {
     case 'blank':
-      lines.push(boxedLine('', width));
+      lines.push(tuiLine('', width));
       break;
 
     case 'user': {
-      const wrapped = wrapText(entry.content || '', interior - 8);
-      lines.push(boxedLine(`${ansi.bold}[User]${ansi.reset} ${wrapped[0] || ''}`, width));
+      const wrapped = wrapText(entry.content || '', width - 12);
+      lines.push(tuiLine(`  ${ansi.bold}${ansi.cyan}❯ [User]${ansi.reset} ${wrapped[0] || ''}`, width));
       for (let i = 1; i < wrapped.length; i++) {
-        lines.push(boxedLine(`       ${wrapped[i]}`, width));
+        lines.push(tuiLine(`           ${wrapped[i]}`, width));
       }
-      lines.push(boxedLine('', width));
+      lines.push(tuiLine('', width));
       break;
     }
 
     case 'agent': {
-      lines.push(boxedLine(`${ansi.bold}${ansi.cyan}[BSH Agent]${ansi.reset}`, width));
+      lines.push(tuiLine(`  ${ansi.bold}${ansi.cyan}[BSH Agent]${ansi.reset}`, width));
       for (const rawLine of (entry.content || '').split('\n')) {
-        const wrapped = wrapText(rawLine, interior);
+        const wrapped = wrapText(rawLine, width - 4);
         for (const w of wrapped) {
-          lines.push(boxedLine(w, width));
+          lines.push(tuiLine(`  ${w}`, width));
         }
       }
-      lines.push(boxedLine('', width));
+      lines.push(tuiLine('', width));
       break;
     }
 
     case 'tool': {
       const inv = formatToolInvocation(entry.toolName || '', entry.toolArgs || {});
-      lines.push(boxedLine(`${ansi.yellow}⚙ Tool:${ansi.reset} ${ansi.bold}${inv}${ansi.reset}`, width));
+      lines.push(tuiLine(`  ${ansi.yellow}⚙ Tool:${ansi.reset} ${ansi.bold}${inv}${ansi.reset}`, width));
       break;
     }
 
     case 'tool_result': {
-      lines.push(boxedLine(`${ansi.green}↳${ansi.reset} ${entry.content || ''}`, width));
-      lines.push(boxedLine('', width));
+      lines.push(tuiLine(`  ${ansi.green}↳${ansi.reset} ${entry.content || ''}`, width));
+      lines.push(tuiLine('', width));
       break;
     }
 
     case 'gate': {
       const isViolation = entry.gateStatus === 'VIOLATION';
       const shape = entry.gateShape || 'TransferShape';
-      const title = `${ansi.bold}${isViolation ? `${ansi.brightRed}🚨 Semantic Gate` : `${ansi.brightCyan}🛡️  Semantic Gate`}${ansi.reset} ${ansi.dim}[Evaluating SHACL constraints: ${ansi.reset}${ansi.bold}${shape}${ansi.reset}${ansi.dim}]${ansi.reset}`;
+      const icon = isViolation ? `${ansi.brightRed}🚨` : `${ansi.brightCyan}🛡️ `;
+      const title = `${icon} ${ansi.bold}Semantic Gate${ansi.reset} ${ansi.dim}[Evaluating SHACL constraints: ${ansi.reset}${ansi.bold}${shape}${ansi.reset}${ansi.dim}]${ansi.reset}`;
       const badge = isViolation
         ? `${ansi.bold}${ansi.brightRed}[✖ VIOLATION]${ansi.reset}`
         : `${ansi.bold}${ansi.brightGreen}[● CONFORMING]${ansi.reset}`;
 
-      const topPrefix = `┌─ ${title} `;
-      const topSuffix = ` ${badge} ─┐`;
-      const dashCount = Math.max(2, interior - stripAnsi(topPrefix).length - stripAnsi(topSuffix).length);
-      const topBorder = `┌─ ${title} ${ansi.dim}${'─'.repeat(dashCount)}${ansi.reset} ${badge} ─┐`;
-
-      lines.push(boxedLine(topBorder, width));
-
-      const innerContentWidth = Math.max(4, interior - 4);
+      lines.push(tuiLine(`  ${title} ${badge}`, width));
 
       if (entry.gateChecks && entry.gateChecks.length > 0) {
         for (const check of entry.gateChecks) {
-          const icon = check.ok ? `${ansi.brightGreen}✔${ansi.reset}` : `${ansi.brightRed}✖${ansi.reset}`;
-          const text = `  ${icon} ${check.text}`;
-          const visible = stripAnsi(text);
-          if (visible.length > innerContentWidth) {
-            const truncated = `${text.slice(0, innerContentWidth - 3)}...`;
-            const pad = ' '.repeat(Math.max(0, innerContentWidth - stripAnsi(truncated).length));
-            lines.push(boxedLine(`│ ${truncated}${pad} │`, width));
-          } else {
-            const pad = ' '.repeat(Math.max(0, innerContentWidth - visible.length));
-            lines.push(boxedLine(`│ ${text}${pad} │`, width));
-          }
+          const checkIcon = check.ok ? `${ansi.brightGreen}✔${ansi.reset}` : `${ansi.brightRed}✖${ansi.reset}`;
+          lines.push(tuiLine(`    ${checkIcon} ${check.text}`, width));
         }
       }
 
       const statusText = isViolation
-        ? `  ${ansi.bold}${ansi.brightRed}→ Status: VIOLATION (Promotion blocked)${ansi.reset}`
-        : `  ${ansi.bold}${ansi.brightGreen}→ Status: CONFORMING (Ready to promote)${ansi.reset}`;
-      const visibleStatus = stripAnsi(statusText);
-      const statusPad = ' '.repeat(Math.max(0, innerContentWidth - visibleStatus.length));
-      lines.push(boxedLine(`│ ${statusText}${statusPad} │`, width));
-
-      const bottomBorder = `└${ansi.dim}${'─'.repeat(Math.max(2, interior - 2))}${ansi.reset}┘`;
-      lines.push(boxedLine(bottomBorder, width));
-      lines.push(boxedLine('', width));
+        ? `    ${ansi.bold}${ansi.brightRed}→ Status: VIOLATION (Promotion blocked)${ansi.reset}`
+        : `    ${ansi.bold}${ansi.brightGreen}→ Status: CONFORMING (Ready to promote)${ansi.reset}`;
+      lines.push(tuiLine(statusText, width));
+      lines.push(tuiLine('', width));
       break;
     }
   }
@@ -245,7 +271,7 @@ export function renderCompleteTui(
   // Render all conversation entries into lines
   const allContentLines: string[] = [];
   if (entries.length === 0) {
-    allContentLines.push(boxedLine('', width));
+    allContentLines.push(tuiLine('', width));
   } else {
     for (const e of entries) {
       allContentLines.push(...renderChatEntry(e, width));
@@ -261,23 +287,23 @@ export function renderCompleteTui(
   if (totalContent <= viewportHeight) {
     viewportLines = [...allContentLines];
     while (viewportLines.length < viewportHeight) {
-      viewportLines.push(boxedLine('', width));
+      viewportLines.push(tuiLine('', width));
     }
   } else {
     const endIndex = totalContent - scrollOffset;
     const startIndex = Math.max(0, endIndex - viewportHeight);
     viewportLines = allContentLines.slice(startIndex, endIndex);
     while (viewportLines.length < viewportHeight) {
-      viewportLines.unshift(boxedLine('', width));
+      viewportLines.unshift(tuiLine('', width));
     }
   }
 
-  const promptLine = boxedLine(`${ansi.bold}> ${ansi.reset}${currentPrompt}`, width);
+  const promptLine = tuiLine(`> ${currentPrompt}`, width);
   const scrollIndicator = scrollOffset > 0 ? ` ${ansi.yellow}[▲ Scroll: +${scrollOffset}]${ansi.reset}` : '';
-  const shortcuts = `${ansi.bold}[Ctrl+M]${ansi.reset} Model  ${ansi.bold}[Ctrl+D]${ansi.reset} Domain/SHACL  ${ansi.bold}[Ctrl+G]${ansi.reset} Diff/Gate  ${ansi.bold}[Ctrl+C]${ansi.reset} Exit${scrollIndicator}`;
-  const shortcutsLine = boxedLine(shortcuts, width);
-  const separator = `├${'─'.repeat(Math.max(0, width - 2))}┤`;
-  const bottom = `└${'─'.repeat(Math.max(0, width - 2))}┘`;
+  const shortcuts = `  ${ansi.bold}[Ctrl+M]${ansi.reset} Model  ${ansi.bold}[Ctrl+D]${ansi.reset} Domain/SHACL  ${ansi.bold}[Ctrl+G]${ansi.reset} Diff/Gate  ${ansi.bold}[Ctrl+C]${ansi.reset} Exit${scrollIndicator}`;
+  const shortcutsLine = tuiLine(shortcuts, width);
+  const separator = '─'.repeat(width);
+  const bottom = '─'.repeat(width);
 
   return [header, ...viewportLines, separator, promptLine, shortcutsLine, bottom].join('\n');
 }
