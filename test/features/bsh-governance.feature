@@ -45,3 +45,25 @@ Feature: Governança Semântica e Execução Autônoma no BSH
       Then o gate semântico permanece inativo
       And nenhuma validação SHACL é disparada
       And o diff é apresentado diretamente ao usuário sem verificação ontológica
+
+  # Regra de autenticação web efêmera (OAuth/PKCE) sem persistência
+  Rule: O usuário pode se autenticar via navegador web sem fornecer chave manual nem persistir credenciais em disco
+
+    Scenario: Autenticação bem-sucedida via Web OAuth PKCE em memória
+      Given que o BSH é iniciado sem chave de API em variáveis de ambiente ou arquivo
+      When o usuário escolhe a opção de autenticação via navegador web
+      Then o sistema gera os parâmetros PKCE (code_verifier e code_challenge)
+      And inicializa um servidor local efêmero de callback
+      And exibe o link de autorização do OpenRouter para o usuário
+      When o navegador completa a autorização e redireciona com o código
+      Then o BSH troca o código pela chave temporária de API via POST no endpoint "/auth/keys"
+      And a chave de API é mantida estritamente em memória
+      And nenhum arquivo ".env" ou dado persistente é gravado em disco
+      And a sessão é inicializada com sucesso no modelo selecionado
+
+    Scenario: Falha ou cancelamento na autenticação web
+      Given que o servidor local de callback está aguardando autorização
+      When a requisição de callback é recebida com erro ou timeout
+      Then o BSH encerra o servidor local efêmero
+      And notifica o usuário sobre a falha na autenticação
+      And garante que nenhum dado sensível foi gravado

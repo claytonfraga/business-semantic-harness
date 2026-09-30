@@ -33,12 +33,15 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   let apiKey = env.openRouterApiKey;
 
   if (!apiKey) {
-    apiKey = await promptApiKeyModal();
-    if (!apiKey) {
-      console.log(`${ansi.red}OpenRouter API key is required to use BSH. Exiting.${ansi.reset}`);
+    const auth = await promptApiKeyModal();
+    if (!auth || !auth.apiKey) {
+      console.log(`${ansi.red}OpenRouter authentication is required to use BSH. Exiting.${ansi.reset}`);
       return;
     }
-    await saveEnvConfig({ OPENROUTER_API_KEY: apiKey }, projectRoot);
+    apiKey = auth.apiKey;
+    if (!auth.ephemeral) {
+      await saveEnvConfig({ OPENROUTER_API_KEY: apiKey }, projectRoot);
+    }
   }
 
   const client = new OpenRouterClient({ apiKey });

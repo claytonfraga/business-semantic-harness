@@ -3,23 +3,68 @@ import { ansi, box } from './ansi.js';
 import type { OpenRouterModel } from '../client/openrouter/types.js';
 import type { DomainSummary } from '../governance/domainRegistry.js';
 
-export async function promptApiKeyModal(): Promise<string> {
+import { spawn } from 'node:child_process';
+import { authenticateViaWebBrowser } from '../client/openrouter/pkce.js';
+
+export interface AuthResult {
+  apiKey: string;
+  ephemeral: boolean;
+}
+
+export async function promptApiKeyModal(): Promise<AuthResult> {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   try {
     process.stdout.write('\n');
     console.log(box('OpenRouter Authentication Required', [
       'No OPENROUTER_API_KEY found in environment or .env file.',
       '',
-      'Please enter your OpenRouter API Key (e.g. sk-or-v1-...):',
-      'The key will be verified and securely saved to your local .env file.',
+      'Choose an authentication method:',
+      `  ${ansi.bold}1.${ansi.reset} ${ansi.brightGreen}Login via Web Browser${ansi.reset} (OAuth/PKCE, ephemeral - zero disk storage)`,
+      `  ${ansi.bold}2.${ansi.reset} Enter API Key manually (saved securely to local .env)`,
     ], 76));
 
-    const key = await rl.question(`\n${ansi.bold}OpenRouter API Key: ${ansi.reset}`);
-    return key.trim();
+    const choice = (await rl.question(`\n${ansi.bold}Select method [1/2, default 1]: ${ansi.reset}`)).trim();
+
+    if (choice === '2') {
+      const key = await rl.question(`\n${ansi.bold}Enter OpenRouter API Key: ${ansi.reset}`);
+      return { apiKey: key.trim(), ephemeral: false };
+    }
+
+    // Default: Web Browser Authentication (OAuth/PKCE)
+    console.log(`\n${ansi.dim}Starting local OAuth callback listener...${ansi.reset}`);
+    const authPromise = authenticateViaWebBrowser({
+      onUrlReady: (url) => {
+        console.log('\n' + box('Complete Authentication in Browser', [
+          'Opening OpenRouter in your browser...',
+          '',
+          'If it did not open automatically, visit this URL:',
+          `  ${ansi.cyan}${url}${ansi.reset}`,
+          '',
+          'Once authorized, this session will start immediately.',
+          'Your credentials will remain strictly in memory and will NOT be saved to disk.',
+        ], 76));
+
+        // Attempt opening default browser on Linux/WSL/macOS
+        try {
+          if (process.platform === 'linux') {
+            spawn('xdg-open', [url], { detached: true, stdio: 'ignore' }).unref();
+          } else if (process.platform === 'darwin') {
+            spawn('open', [url], { detached: true, stdio: 'ignore' }).unref();
+          }
+        } catch {
+          // Fallback to manual link click
+        }
+      },
+    });
+
+    const result = await authPromise;
+    console.log(`\n${ansi.brightGreen}✔ Web authentication verified! Session key loaded in memory.${ansi.reset}`);
+    return { apiKey: result.apiKey, ephemeral: true };
   } finally {
     rl.close();
   }
 }
+
 
 export async function selectModelModal(
   models: OpenRouterModel[],
