@@ -15,6 +15,7 @@ import { runAgySession } from './agents/agy/session.js';
 import { runOpencodeSession } from './agents/opencode/session.js';
 import { resolverRepositorio } from './agents/codex/worktree.js';
 import { limparSessao, listarSessoesDoProjeto } from './agents/codex/sessions.js';
+import { startTuiSession } from './tui/session.js';
 
 export async function main(argv: string[]): Promise<number> {
   if (argv.length === 1 && argv[0] === '--help') {
@@ -39,8 +40,24 @@ export async function main(argv: string[]): Promise<number> {
   if (modelFlag >= 0) {
     model = argsWithoutProject[modelFlag + 1];
   }
-  let command = modelFlag >= 0
-    ? argsWithoutProject.filter((_, index) => index !== modelFlag && index !== modelFlag + 1)
+
+  const domainFlag = argsWithoutProject.findIndex((arg) => arg === '--domain' || arg === '-d');
+  let domain: string | undefined;
+  if (domainFlag >= 0 && !argsWithoutProject[domainFlag + 1]) {
+    process.stderr.write('Domínio ausente após --domain.\n');
+    return 2;
+  }
+  if (domainFlag >= 0) {
+    domain = argsWithoutProject[domainFlag + 1];
+  }
+
+  const flagsToRemove = [
+    modelFlag >= 0 ? [modelFlag, modelFlag + 1] : [],
+    domainFlag >= 0 ? [domainFlag, domainFlag + 1] : [],
+  ].flat();
+
+  let command = flagsToRemove.length > 0
+    ? argsWithoutProject.filter((_, index) => !flagsToRemove.includes(index))
     : argsWithoutProject;
 
   const promptFlag = command.findIndex((arg) => arg === '--prompt');
@@ -57,9 +74,15 @@ export async function main(argv: string[]): Promise<number> {
   const promptFileValue = promptFileFlag >= 0 ? command[promptFileFlag + 1] : undefined;
   const promptIndexes = [promptFlag, promptFileFlag].filter((index) => index >= 0).flatMap((index) => [index, index + 1]);
   command = command.filter((_, index) => !promptIndexes.includes(index));
+
   try {
     let prompt = promptValue;
     if (promptFileValue) prompt = (await readFile(resolve(promptFileValue), 'utf8')).trim();
+
+    if (command.length === 0 || (command.length === 1 && command[0] === 'tui')) {
+      await startTuiSession({ projectRoot, model, domain });
+      return 0;
+    }
     if (command.length === 1 && command[0] === 'init') {      await initProject(projectRoot);
       process.stdout.write(`Projeto BSH criado em ${projectRoot}. Adicione ao menos um domínio.\n`);
       return 0;
