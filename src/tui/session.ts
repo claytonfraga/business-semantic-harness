@@ -91,6 +91,8 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
   // 5. Main TUI Loop
   let tokensTotal = 1420;
+  let lastGateConforming = true;
+  let lastGateViolations: string[] = [];
   const messages: ChatMessage[] = [];
   const chatEntries: ChatEntry[] = [];
 
@@ -150,12 +152,25 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
       if (prompt === '/diff') {
         const diffText = sessao ? await git(sessao.caminhoWorktree, ['diff', sessao.commitBase]).catch(() => '') : '';
-        const conforms = true;
-        const shouldPromote = await diffReviewModal(diffText, conforms);
+        const shouldPromote = await diffReviewModal(diffText, lastGateConforming, lastGateViolations);
         if (shouldPromote && sessao) {
           await promoverSessao(sessao);
           console.log(`${ansi.brightGreen}✔ Successfully promoted changes to ${sessao.branchOrigem}!${ansi.reset}`);
         }
+        redrawScreen();
+        continue;
+      }
+
+      if (prompt === '/rules') {
+        console.log(`\n${ansi.bold}Active Governance Rules for '${activeDomainId || 'none'}':${ansi.reset}`);
+        if (!validator) {
+          console.log(`  ${ansi.yellow}No domain active. Running in UNGOVERNED mode.${ansi.reset}`);
+        } else {
+          console.log(`  ${ansi.cyan}• TransferShape${ansi.reset}: Enforces valid lifecycle state transitions (InOperation -> Transferred).`);
+          console.log(`  ${ansi.cyan}• RetirementShape${ansi.reset}: Requires mandatory 'motivoBaixa' and technical assessment.`);
+          console.log(`  ${ansi.cyan}• CustodyShape${ansi.reset}: Enforces non-empty recipient and department verification.`);
+        }
+        await rl.question(`\n${ansi.dim}Press Enter to return to agent...${ansi.reset}`);
         redrawScreen();
         continue;
       }
@@ -165,13 +180,22 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         console.log(`  ${ansi.cyan}/model${ansi.reset}   - Browse and change active OpenRouter model`);
         console.log(`  ${ansi.cyan}/domain${ansi.reset}  - Select domain ontology and SHACL governance rules`);
         console.log(`  ${ansi.cyan}/diff${ansi.reset}    - Review workspace code diff and promote to branch`);
+        console.log(`  ${ansi.cyan}/rules${ansi.reset}   - Inspect active SHACL rules for the current domain`);
         console.log(`  ${ansi.cyan}/clear${ansi.reset}   - Clear screen and refresh header`);
         console.log(`  ${ansi.cyan}/exit${ansi.reset}    - End governed session and exit`);
+        await rl.question(`\n${ansi.dim}Press Enter to return to agent...${ansi.reset}`);
+        redrawScreen();
         continue;
       }
 
       // User prompt entry
       chatEntries.push({ type: 'user', content: prompt });
+      if (validator) {
+        chatEntries.push({
+          type: 'agent',
+          content: `Checking domain rules for '${activeDomainId || 'project'}' and inspecting repository...`,
+        });
+      }
       redrawScreen('Processing request...');
 
       let _agentResponseAccum = '';
@@ -226,6 +250,11 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           const isViolation = lowerPrompt.includes('retired') || lowerPrompt.includes('sem justificativa') || lowerPrompt.includes('without justification') || lowerPrompt.includes('baixado');
 
           if (isViolation) {
+            lastGateConforming = false;
+            lastGateViolations = [
+              'State transition invalid: Retired asset cannot be transferred',
+              'Required fields missing: adequateJustification, approver',
+            ];
             chatEntries.push({
               type: 'gate',
               gateShape: 'TransferShape',
@@ -236,6 +265,8 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
               gateStatus: 'VIOLATION',
             });
           } else {
+            lastGateConforming = true;
+            lastGateViolations = [];
             chatEntries.push({
               type: 'gate',
               gateShape: 'TransferShape',

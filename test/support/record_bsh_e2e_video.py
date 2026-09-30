@@ -75,15 +75,15 @@ def render_terminal_frame(text: str, title: str, output_path: Path, width: int =
     for line in lines:
         # Determine syntax color based on content
         color = TEXT_COLOR
-        if "● GOVERNED" in line or "CONFORMING" in line or "✔" in line:
-            color = (74, 222, 128) # Emerald 400
-        elif "VIOLATION" in line or "✖" in line or "Error" in line:
+        if "VIOLATION" in line or "✖" in line or "Error" in line or "🚨" in line:
             color = (248, 113, 113) # Red 400
-        elif "🛡 Semantic Gate" in line:
+        elif "● GOVERNED" in line or "CONFORMING" in line or "✔" in line:
+            color = (74, 222, 128) # Emerald 400
+        elif "Semantic Gate" in line or "🛡" in line:
             color = (56, 189, 248) # Sky 400
         elif "⚙ Tool" in line or "○ UNGOVERNED" in line:
             color = (250, 204, 21) # Amber 400
-        elif line.startswith("┌") or line.startswith("└") or line.startswith("├"):
+        elif "┌" in line or "└" in line or "├" in line:
             color = (100, 116, 139) # Slate 500 border
         elif line.startswith("│"):
             color = TEXT_COLOR

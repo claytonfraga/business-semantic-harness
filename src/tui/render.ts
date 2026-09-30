@@ -112,7 +112,7 @@ export function renderHeader(state: RenderState, width: number): string {
   const topBorderLen = Math.max(2, width - fixedChars);
   const firstLine = `┌─ ${logo} ${'─'.repeat(topBorderLen)} ${statusBadge} ─┐`;
 
-  const ctxStr = state.contextLength ? ` [${formatContextLength(state.contextLength)}]` : ' [128k ctx]';
+  const ctxStr = state.contextLength ? ` (${formatContextLength(state.contextLength)})` : ' (128k ctx)';
   const modelStr = `${state.model}${ctxStr}`;
 
   const domainStr = state.domain
@@ -120,7 +120,8 @@ export function renderHeader(state: RenderState, width: number): string {
     : `${ansi.yellow}none${ansi.reset} ${ansi.dim}(inactive)${ansi.reset}`;
 
   const tokensStr = state.tokensTotal.toLocaleString();
-  const infoLine = `Model: ${ansi.cyan}${modelStr}${ansi.reset}   Domain: ${domainStr}   Tokens: ${tokensStr}`;
+  const costStr = state.sessionCost !== undefined ? ` ($${state.sessionCost.toFixed(4)})` : '';
+  const infoLine = `Model: ${ansi.cyan}${modelStr}${ansi.reset}   Domain: ${domainStr}   Tokens: ${tokensStr}${costStr}`;
   const secondLine = boxedLine(infoLine, width);
   const separator = `├${'─'.repeat(Math.max(0, width - 2))}┤`;
 
@@ -171,18 +172,47 @@ export function renderChatEntry(entry: ChatEntry, width: number): string[] {
     }
 
     case 'gate': {
-      lines.push(boxedLine(`${ansi.bold}${ansi.brightBlue}🛡 Semantic Gate${ansi.reset} [Evaluating SHACL constraints: ${entry.gateShape || 'TransferShape'}]`, width));
-      if (entry.gateChecks) {
+      const isViolation = entry.gateStatus === 'VIOLATION';
+      const shape = entry.gateShape || 'TransferShape';
+      const title = `${ansi.bold}${isViolation ? `${ansi.brightRed}🚨 Semantic Gate` : `${ansi.brightCyan}🛡️  Semantic Gate`}${ansi.reset} ${ansi.dim}[Evaluating SHACL constraints: ${ansi.reset}${ansi.bold}${shape}${ansi.reset}${ansi.dim}]${ansi.reset}`;
+      const badge = isViolation
+        ? `${ansi.bold}${ansi.brightRed}[✖ VIOLATION]${ansi.reset}`
+        : `${ansi.bold}${ansi.brightGreen}[● CONFORMING]${ansi.reset}`;
+
+      const topPrefix = `┌─ ${title} `;
+      const topSuffix = ` ${badge} ─┐`;
+      const dashCount = Math.max(2, interior - stripAnsi(topPrefix).length - stripAnsi(topSuffix).length);
+      const topBorder = `┌─ ${title} ${ansi.dim}${'─'.repeat(dashCount)}${ansi.reset} ${badge} ─┐`;
+
+      lines.push(boxedLine(topBorder, width));
+
+      const innerContentWidth = Math.max(4, interior - 4);
+
+      if (entry.gateChecks && entry.gateChecks.length > 0) {
         for (const check of entry.gateChecks) {
           const icon = check.ok ? `${ansi.brightGreen}✔${ansi.reset}` : `${ansi.brightRed}✖${ansi.reset}`;
-          lines.push(boxedLine(`  ${icon} ${check.text}`, width));
+          const text = `  ${icon} ${check.text}`;
+          const visible = stripAnsi(text);
+          if (visible.length > innerContentWidth) {
+            const truncated = `${text.slice(0, innerContentWidth - 3)}...`;
+            const pad = ' '.repeat(Math.max(0, innerContentWidth - stripAnsi(truncated).length));
+            lines.push(boxedLine(`│ ${truncated}${pad} │`, width));
+          } else {
+            const pad = ' '.repeat(Math.max(0, innerContentWidth - visible.length));
+            lines.push(boxedLine(`│ ${text}${pad} │`, width));
+          }
         }
       }
-      if (entry.gateStatus === 'CONFORMING') {
-        lines.push(boxedLine(`  ${ansi.brightGreen}→ Status: CONFORMING (Ready to promote)${ansi.reset}`, width));
-      } else if (entry.gateStatus === 'VIOLATION') {
-        lines.push(boxedLine(`  ${ansi.brightRed}→ Status: VIOLATION (Promotion blocked)${ansi.reset}`, width));
-      }
+
+      const statusText = isViolation
+        ? `  ${ansi.bold}${ansi.brightRed}→ Status: VIOLATION (Promotion blocked)${ansi.reset}`
+        : `  ${ansi.bold}${ansi.brightGreen}→ Status: CONFORMING (Ready to promote)${ansi.reset}`;
+      const visibleStatus = stripAnsi(statusText);
+      const statusPad = ' '.repeat(Math.max(0, innerContentWidth - visibleStatus.length));
+      lines.push(boxedLine(`│ ${statusText}${statusPad} │`, width));
+
+      const bottomBorder = `└${ansi.dim}${'─'.repeat(Math.max(2, interior - 2))}${ansi.reset}┘`;
+      lines.push(boxedLine(bottomBorder, width));
       lines.push(boxedLine('', width));
       break;
     }
