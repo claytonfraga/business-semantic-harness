@@ -105,43 +105,22 @@ def type_keys(session: str, text: str, enter: bool = True) -> None:
         subprocess.run(["tmux", "send-keys", "-t", session, "Enter"], check=True)
 
 
-def encode_video_formats(frames_dir: Path, output_mpeg: Path, fps: int = 2) -> tuple[Path, Path]:
-    output_mp4 = output_mpeg.with_suffix(".mp4")
-    output_mpeg.parent.mkdir(parents=True, exist_ok=True)
-
-    # 1. Standard compliant MPEG-2 (.mpeg) with valid buffer parameters and framerate
-    cmd_mpeg = [
-        "ffmpeg", "-y",
-        "-framerate", str(fps),
-        "-i", str(frames_dir / "frame_%04d.png"),
-        "-c:v", "mpeg2video",
-        "-b:v", "4000k",
-        "-maxrate", "6000k",
-        "-bufsize", "1835k",
-        "-r", "25",
-        "-g", "15",
-        "-pix_fmt", "yuv420p",
-        "-f", "mpeg",
-        str(output_mpeg),
-    ]
-    subprocess.run(cmd_mpeg, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-    # 2. Universal MP4 (.mp4) with H.264 baseline for 100% native compatibility on Windows 10/11, macOS, and browsers
-    cmd_mp4 = [
+def encode_mp4(frames_dir: Path, output_mp4: Path, fps: int = 2) -> Path:
+    output_mp4.parent.mkdir(parents=True, exist_ok=True)
+    cmd = [
         "ffmpeg", "-y",
         "-framerate", str(fps),
         "-i", str(frames_dir / "frame_%04d.png"),
         "-c:v", "libx264",
         "-preset", "fast",
-        "-crf", "20",
+        "-crf", "18",
         "-r", "25",
         "-pix_fmt", "yuv420p",
         "-movflags", "+faststart",
         str(output_mp4),
     ]
-    subprocess.run(cmd_mp4, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-    return output_mpeg, output_mp4
+    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    return output_mp4
 
 
 def record_scenario(
@@ -192,22 +171,19 @@ def record_scenario(
         final_text = capture_tmux_pane(session_name)
         render_terminal_frame(final_text, title, output_screenshot)
 
-        # Encode video in both compliant MPEG-2 (.mpeg) and universal H.264 (.mp4)
-        out_mpeg, out_mp4 = encode_video_formats(temp_frames, output_video, fps=2)
+        # Encode video in MP4 (H.264 / yuv420p)
+        out_mp4 = encode_mp4(temp_frames, output_video, fps=2)
 
         # Calculate sha256
-        sha256_mpeg = hashlib.sha256(out_mpeg.read_bytes()).hexdigest()
-        sha256_mp4 = hashlib.sha256(out_mp4.read_bytes()).hexdigest()
-        file_size_kb = out_mpeg.stat().st_size / 1024
+        sha256 = hashlib.sha256(out_mp4.read_bytes()).hexdigest()
+        file_size_kb = out_mp4.stat().st_size / 1024
 
         return {
             "session": session_name,
             "title": title,
-            "video_path": str(out_mpeg),
-            "video_mp4_path": str(out_mp4),
+            "video_path": str(out_mp4),
             "screenshot_path": str(output_screenshot),
-            "sha256": sha256_mpeg,
-            "sha256_mp4": sha256_mp4,
+            "sha256": sha256,
             "file_size_kb": file_size_kb,
             "frames_recorded": frame_idx,
             "final_text": final_text,
@@ -227,13 +203,10 @@ def main() -> int:
 
     # Scenario 1: Governed Session (Harness Ativo)
     print("\n--- Running Scenario 1: Governed Session (Harness Ativo) ---")
-    gov_video = VIDEOS_DIR / "bsh-governed-scenario.mpeg"
+    gov_video = VIDEOS_DIR / "bsh-governed-scenario.mp4"
     gov_shot = SCREENSHOTS_DIR / "bsh-governed-scenario.png"
 
     # User inputs for Governed scenario:
-    # 1. Ask a question about retired asset transfer
-    # 2. Check /diff
-    # 3. /exit
     gov_inputs = [
         ("Transfer retired asset AST-002 to Maintenance department without justification", 10.0),
         ("/diff", 4.0),
@@ -248,11 +221,12 @@ def main() -> int:
         output_video=gov_video,
         output_screenshot=gov_shot,
     )
+
     print(f"✔ Governed video saved: {gov_res['video_path']} ({gov_res['file_size_kb']:.1f} KB, SHA-256: {gov_res['sha256'][:16]}...)")
 
     # Scenario 2: Ungoverned Session (Harness Desativado)
     print("\n--- Running Scenario 2: Ungoverned Session (Harness Desativado) ---")
-    ungov_video = VIDEOS_DIR / "bsh-ungoverned-scenario.mpeg"
+    ungov_video = VIDEOS_DIR / "bsh-ungoverned-scenario.mp4"
     ungov_shot = SCREENSHOTS_DIR / "bsh-ungoverned-scenario.png"
 
     # Temporary ungoverned workspace (a clean copy without .bsh/domains/)
@@ -279,18 +253,18 @@ def main() -> int:
     finally:
         shutil.rmtree(temp_ungov_dir, ignore_errors=True)
 
-    # Copy videos to WSL Downloads for easy human evaluation
+    # Copy MP4 videos to WSL Downloads for easy human evaluation
     downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
     if downloads_dir.exists():
-        shutil.copy2(gov_video, downloads_dir / "bsh-governed-scenario.mpeg")
-        shutil.copy2(gov_video.with_suffix(".mp4"), downloads_dir / "bsh-governed-scenario.mp4")
-        shutil.copy2(ungov_video, downloads_dir / "bsh-ungoverned-scenario.mpeg")
-        shutil.copy2(ungov_video.with_suffix(".mp4"), downloads_dir / "bsh-ungoverned-scenario.mp4")
-        print(f"✔ Copied MPEG and MP4 videos to Windows Downloads: {downloads_dir}")
+        shutil.copy2(gov_video, downloads_dir / "bsh-governed-scenario.mp4")
+        shutil.copy2(ungov_video, downloads_dir / "bsh-ungoverned-scenario.mp4")
+        print(f"✔ Copied MP4 videos to Windows Downloads: {downloads_dir}")
 
     # Generate Test Report
     report_file = REPORTS_DIR / "relatorio-testes-e2e-openrouter.md"
     generate_markdown_report(gov_res, ungov_res, report_file)
+    if downloads_dir.exists():
+        shutil.copy2(report_file, downloads_dir / "relatorio-testes-e2e-openrouter.md")
     print(f"✔ Comprehensive test report generated: {report_file}")
 
     return 0
@@ -309,7 +283,7 @@ def generate_markdown_report(gov_res: dict, ungov_res: dict, output_file: Path) 
 
 ## 1. Sumário Executivo
 
-Este relatório apresenta a validação E2E do **Business Semantic Harness (BSH)** operando como cliente nativo do **OpenRouter** com interface TUI moderna em inglês. Foram executados e gravados em vídeo MPEG dois cenários comparativos:
+Este relatório apresenta a validação E2E do **Business Semantic Harness (BSH)** operando como cliente nativo do **OpenRouter** com interface TUI moderna em inglês. Foram executados e gravados em vídeo MP4 (H.264) dois cenários comparativos:
 
 1. **Cenário 1 (Harness Ontológico Ativo - Governed)**: O BSH inicia com o domínio `ativos` e regras SHACL ativas. Uma solicitação para transferir um ativo em estado `Baixado` é interceptada pelo Gate Semântico, que bloqueia a promoção e reporta a violação da regra de negócio `TransferShape`.
 2. **Cenário 2 (Harness Ontológico Desativado - Ungoverned)**: O BSH opera em modo desassistido sem regras ontológicas ativas. A mesma solicitação é processada pelo modelo sem validação de regras de domínio.
@@ -318,14 +292,15 @@ Este relatório apresenta a validação E2E do **Business Semantic Harness (BSH)
 
 ## 2. Artefatos de Vídeo para Avaliação Humana
 
-Os vídeos foram gravados diretamente do terminal `tmux`, renderizados em alta resolução (1280x720) e codificados em formato MPEG para avaliação visual humana:
+Os vídeos foram gravados diretamente do terminal `tmux`, renderizados em alta resolução (1280x720) e codificados em formato universal MP4 (H.264) para avaliação visual humana sem necessidade de codecs extras:
 
 | Cenário | Arquivo de Vídeo | Tamanho | SHA-256 | Captura Final |
 |---|---|---|---|---|
-| **1. Harness Ativo** | [`bsh-governed-scenario.mpeg`](file://{gov_res['video_path']}) | {gov_res['file_size_kb']:.1f} KB | `{gov_res['sha256']}` | [`bsh-governed-scenario.png`](file://{gov_res['screenshot_path']}) |
-| **2. Harness Desativado** | [`bsh-ungoverned-scenario.mpeg`](file://{ungov_res['video_path']}) | {ungov_res['file_size_kb']:.1f} KB | `{ungov_res['sha256']}` | [`bsh-ungoverned-scenario.png`](file://{ungov_res['screenshot_path']}) |
+| **1. Harness Ativo** | [`bsh-governed-scenario.mp4`](file://{gov_res['video_path']}) | {gov_res['file_size_kb']:.1f} KB | `{gov_res['sha256']}` | [`bsh-governed-scenario.png`](file://{gov_res['screenshot_path']}) |
+| **2. Harness Desativado** | [`bsh-ungoverned-scenario.mp4`](file://{ungov_res['video_path']}) | {ungov_res['file_size_kb']:.1f} KB | `{ungov_res['sha256']}` | [`bsh-ungoverned-scenario.png`](file://{ungov_res['screenshot_path']}) |
 
-> **Cópia no Windows Downloads**: Os vídeos também foram copiados para `/mnt/c/Users/clayt/Downloads/` para inspeção imediata.
+> **Cópia no Windows Downloads**: Os vídeos foram copiados para `/mnt/c/Users/clayt/Downloads/` para inspeção imediata.
+
 
 ---
 
