@@ -14,7 +14,7 @@ import {
   resolverRepositorio,
   type SessaoWorktree,
 } from '../git/worktree.js';
-import { promoverSessao } from '../agents/codex/promotion.js';
+import { promoverSessao } from '../git/promotion.js';
 import { ansi } from './ansi.js';
 import { renderCompleteTui, type ChatEntry } from './render.js';
 import { promptApiKeyModal, selectModelModal, selectDomainModal, diffReviewModal } from './modals.js';
@@ -29,12 +29,12 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   const projectRoot = options.projectRoot || process.cwd();
 
   // 1. Authentication & Config
-  let env = await loadEnvConfig(projectRoot);
+  const env = await loadEnvConfig(projectRoot);
   let apiKey = env.openRouterApiKey;
 
   if (!apiKey) {
     const auth = await promptApiKeyModal();
-    if (!auth || !auth.apiKey) {
+    if (!auth?.apiKey) {
       console.log(`${ansi.red}OpenRouter authentication is required to use BSH. Exiting.${ansi.reset}`);
       return;
     }
@@ -53,7 +53,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
   // 2. Models Discovery
   let activeModel = options.model || env.defaultModel || 'deepseek/deepseek-v4.1-flash';
-  let modelsList = await client.getModels().catch(() => []);
+  const modelsList = await client.getModels().catch(() => []);
 
   // 3. Domain & Governance Discovery
   const availableDomains = await getAvailableDomains(projectRoot);
@@ -161,7 +161,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       }
 
       if (prompt === '/help') {
-        console.log('\n' + ansi.bold + 'BSH Available Commands:' + ansi.reset);
+        console.log(`\n${ansi.bold}BSH Available Commands:${ansi.reset}`);
         console.log(`  ${ansi.cyan}/model${ansi.reset}   - Browse and change active OpenRouter model`);
         console.log(`  ${ansi.cyan}/domain${ansi.reset}  - Select domain ontology and SHACL governance rules`);
         console.log(`  ${ansi.cyan}/diff${ansi.reset}    - Review workspace code diff and promote to branch`);
@@ -174,7 +174,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       chatEntries.push({ type: 'user', content: prompt });
       redrawScreen('Processing request...');
 
-      let agentResponseAccum = '';
+      let _agentResponseAccum = '';
       messages.push({ role: 'user', content: prompt });
 
       const systemPrompt = [
@@ -192,7 +192,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           messages,
           systemPrompt,
           onDelta: (text) => {
-            agentResponseAccum += text;
+            _agentResponseAccum += text;
           },
           onToolCallStart: (call) => {
             chatEntries.push({

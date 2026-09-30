@@ -71,7 +71,7 @@ test('Given unverifiable evidence, when an MCP proposal is submitted, then it is
   }
 });
 
-test('Given a governed Codex session, when the agent queries and reports a conflict, then MCP records no project mutation', async () => {
+test('Given a governed BSH session, when the agent queries and reports a conflict, then MCP records no project mutation', async () => {
   const root = await project();
   const transport = new StdioClientTransport({ command: process.execPath, args: [resolve('dist/mcp/server.js'), root, 'governed'] });
   const client = new Client({ name: 'bsh-quality', version: '0.1.0' });

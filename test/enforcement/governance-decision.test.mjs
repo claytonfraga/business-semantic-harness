@@ -5,9 +5,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { test } from 'node:test';
-import { criarSessaoWorktree, git, removerSessaoWorktree } from '../../dist/agents/codex/worktree.js';
-import { promoverSessao } from '../../dist/agents/codex/promotion.js';
-import { finalizeSession } from '../../dist/agents/codex/finalize.js';
+import { criarSessaoWorktree, git, removerSessaoWorktree } from '../../dist/git/worktree.js';
+import { promoverSessao } from '../../dist/git/promotion.js';
+import { finalizeSession } from '../../dist/git/finalize.js';
 import { evaluateGovernance } from '../../dist/enforcement/governanceDecision.js';
 import { avaliarOperacoes } from '../../dist/enforcement/motorEnforcement.js';
 
@@ -182,7 +182,7 @@ test('Given an enforcement disable environment flag, When promotion is attempted
   }
 });
 
-test('codex: Given consultative condition, When finalized, Then no semantic enforcement decision is created', async () => {
+test('Given consultative condition, When finalized, Then no semantic enforcement decision is created', async () => {
   const f = await fixture();
   try {
     const result = await finalizeSession({

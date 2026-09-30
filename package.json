@@ -14,13 +14,11 @@
     "check": "tsc --noEmit",
     "lint": "biome lint src",
     "quality": "npm run check && npm run lint",
-    "quality:agent": "node scripts/agent-quality-gate.mjs",
     "pretest": "npm run quality",
     "test": "npm run build && node --test test/*.test.mjs test/*/*.test.mjs",
     "test:e2e": "npm run build && node --test --experimental-test-isolation=none test/e2e-live/*.e2e.mjs",
     "test:e2e:semantic": "npm run build && node --test --experimental-test-isolation=none test/e2e-live/*.semantic.mjs",
     "capture": "python3 test/support/tmux-screenshot.py",
-    "benchmark": "python3 -m benchmark.controlled",
     "prepack": "npm run build"
   },
   "engines": {

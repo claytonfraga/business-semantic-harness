@@ -198,7 +198,8 @@ def main() -> int:
     ensure_dirs()
     print("=== Starting BSH E2E Test Scenarios & Video Recording ===")
 
-    cli_path = WORKTREE_ROOT / "dist" / "cli.js"
+    bsh_bin = shutil.which("bsh") or str(WORKTREE_ROOT / "dist" / "cli.js")
+    print(f"Using distribution binary: {bsh_bin}")
     pilot_dir = WORKTREE_ROOT / "pilot" / "asset-management"
 
     # Scenario 1: Governed Session (Harness Ativo)
@@ -216,7 +217,7 @@ def main() -> int:
     gov_res = record_scenario(
         session_name="bsh-e2e-governed",
         title="BSH E2E Scenario 1: Governed Session (SHACL Active)",
-        command=["node", str(cli_path), "--project", str(pilot_dir)],
+        command=[bsh_bin, "--project", str(pilot_dir)],
         user_inputs=gov_inputs,
         output_video=gov_video,
         output_screenshot=gov_shot,
@@ -244,7 +245,7 @@ def main() -> int:
         ungov_res = record_scenario(
             session_name="bsh-e2e-ungoverned",
             title="BSH E2E Scenario 2: Ungoverned Session (Harness Inactive)",
-            command=["node", str(cli_path), "--project", str(temp_ungov_dir / "project")],
+            command=[bsh_bin, "--project", str(temp_ungov_dir / "project")],
             user_inputs=ungov_inputs,
             output_video=ungov_video,
             output_screenshot=ungov_shot,
@@ -272,10 +273,12 @@ def main() -> int:
 
 def generate_markdown_report(gov_res: dict, ungov_res: dict, output_file: Path) -> None:
     now_iso = time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())
+    bsh_bin = shutil.which("bsh") or "bsh"
     content = f"""# Relatório de Testes E2E: BSH com OpenRouter e Governança Semântica
 
 **Data de Execução**: {now_iso}  
 **Ambiente**: Linux x86_64, Node.js v22, OpenRouter API (`sk-or-v1-...`)  
+**Executável do BSH**: `{bsh_bin}` (Pacote de distribuição `business-semantic-harness-0.2.1.tgz`)  
 **Fonte da Verdade da Especificação**: [`test/features/bsh-governance.feature`](file://{WORKTREE_ROOT}/test/features/bsh-governance.feature)  
 **Projeto Piloto**: [`pilot/asset-management`](file://{WORKTREE_ROOT}/pilot/asset-management) (Domínio `ativos`)
 

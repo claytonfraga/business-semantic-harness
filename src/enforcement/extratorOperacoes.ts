@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { git } from '../agents/codex/worktree.js';
+import { git } from '../git/worktree.js';
 import type { OperacaoSemantica } from './operacaoSemantica.js';
 import type { RegraGovernanca } from './governanca.js';
 

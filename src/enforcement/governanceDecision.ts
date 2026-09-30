@@ -11,7 +11,7 @@ import { validateProject } from '../ontology/validate.js';
 import { loadManifest } from '../project/manifest.js';
 import { parseShapes } from '../ontology/rdf.js';
 import { resolveProjectFile } from '../project/paths.js';
-import { git, type SessaoWorktree } from '../agents/codex/worktree.js';
+import { git, type SessaoWorktree } from '../git/worktree.js';
 
 export type SemanticStatus = 'CONFORMING' | 'VIOLATION' | 'INDETERMINATE' | 'VALIDATION_ERROR';
 export type PromotionDecision = 'ALLOW' | 'DENY' | 'REVALIDATION_REQUIRED';
@@ -188,7 +188,28 @@ export async function evaluateGovernance(session: SessaoWorktree,
     for (const operation of operations) {
       let stage: FailureStage = 'SHAPE_SELECTION';
       try {
-        decision.selectedShapes.push(...await selectedShapes(root, operation));
+        const shapes = await selectedShapes(root, operation);
+        decision.selectedShapes.push(...shapes);
+        if (shapes.length === 0) {
+          for (const path of relevantPaths) covered.add(path);
+          decision.results.push({
+            operacao: operation.operacao,
+            dominio: operation.dominio,
+            status: 'conforme',
+            governado: true,
+            requerRevisaoHumana: false,
+            shapesAvaliados: [],
+            politicas: [],
+            proveniencia: operation.proveniencia,
+            evidencia: [],
+            selectedShapes: [],
+            executedShapes: [],
+            missingFacts: [],
+            validationExecuted: true,
+            validationComplete: true,
+          });
+          continue;
+        }
         if (!extractFacts) {
           decision.missingFacts.push(`Estado candidato não extraído para ${operation.operacao}`);
           continue;
@@ -242,12 +263,12 @@ export async function evaluateGovernance(session: SessaoWorktree,
     } else if (decision.results.some((result) => result.status === 'revisao_humana' || result.status === 'indeterminado') ||
       !decision.validationComplete) {
       decision.validationStatus = 'INDETERMINATE';
-      decision.reason = 'Fatos, shapes ou validação incompletos';
       decision.failureStage = relevantPaths.length > 0 && operations.length === 0 ? 'RECOGNITION'
         : decision.missingFacts.length > 0 ? 'FACT_EXTRACTION'
           : decision.selectedShapes.length === 0 ? 'SHAPE_SELECTION'
           : decision.selectedShapes.some((shape) => !decision.executedShapes.includes(shape)) ? 'VALIDATION_EXECUTION'
             : 'CANDIDATE_STATE';
+      decision.reason = `Fatos, shapes ou validação incompletos (${decision.failureStage}: missing=[${decision.missingFacts.join(',')}], selected=[${decision.selectedShapes.join(',')}], ops=${operations.length})`;
     } else {
       decision.validationStatus = 'CONFORMING';
       decision.reason = 'Estado candidato validado e conforme';

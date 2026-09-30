@@ -1,25 +1,18 @@
 #!/usr/bin/env node
 
 import { realpathSync } from 'node:fs';
-import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import { addDomain, initProject } from './project/scaffold.js';
 import { queryOntology } from './ontology/query.js';
 import { validateProject } from './ontology/validate.js';
-import { diagnoseCodex, diagnoseCodexRuntime } from './agents/codex/doctor.js';
-import { diagnoseAgy, diagnoseAgyRuntime } from './agents/agy/launcher.js';
-import { diagnoseOpencode, diagnoseOpencodeRuntime } from './agents/opencode/launcher.js';
-import { runCodexSession } from './agents/codex/session.js';
-import { runAgySession } from './agents/agy/session.js';
-import { runOpencodeSession } from './agents/opencode/session.js';
-import { resolverRepositorio } from './agents/codex/worktree.js';
-import { limparSessao, listarSessoesDoProjeto } from './agents/codex/sessions.js';
+import { resolverRepositorio } from './git/worktree.js';
+import { limparSessao, listarSessoesDoProjeto } from './git/sessions.js';
 import { startTuiSession } from './tui/session.js';
 
 export async function main(argv: string[]): Promise<number> {
   if (argv.length === 1 && argv[0] === '--help') {
-    process.stdout.write('bsh: init | domain add | ontology validate | ontology show | doctor [agy|opencode] | code base | codex [--consultative] | agy [--model <nome>] | opencode [--model <nome>] [--consultative] [--prompt <texto>|--prompt-file <arquivo>] | sessions list|clean | benchmark <run|validate|smoke|analyze|report>\n');
+    process.stdout.write('bsh: [tui] [--model <nome>] [--domain <nome>] | init | domain add <nome> | ontology validate | ontology show <dominio> | sessions list|clean <id>\n');
     return 0;
   }
 
@@ -70,20 +63,16 @@ export async function main(argv: string[]): Promise<number> {
     process.stderr.write('Caminho ausente após --prompt-file.\n');
     return 2;
   }
-  const promptValue = promptFlag >= 0 ? command[promptFlag + 1] : undefined;
-  const promptFileValue = promptFileFlag >= 0 ? command[promptFileFlag + 1] : undefined;
   const promptIndexes = [promptFlag, promptFileFlag].filter((index) => index >= 0).flatMap((index) => [index, index + 1]);
   command = command.filter((_, index) => !promptIndexes.includes(index));
 
   try {
-    let prompt = promptValue;
-    if (promptFileValue) prompt = (await readFile(resolve(promptFileValue), 'utf8')).trim();
-
     if (command.length === 0 || (command.length === 1 && command[0] === 'tui')) {
       await startTuiSession({ projectRoot, model, domain });
       return 0;
     }
-    if (command.length === 1 && command[0] === 'init') {      await initProject(projectRoot);
+    if (command.length === 1 && command[0] === 'init') {
+      await initProject(projectRoot);
       process.stdout.write(`Projeto BSH criado em ${projectRoot}. Adicione ao menos um domínio.\n`);
       return 0;
     }
@@ -108,50 +97,6 @@ export async function main(argv: string[]): Promise<number> {
       process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
       return 0;
     }
-    if (command.length === 1 && command[0] === 'doctor') {
-      const report = await diagnoseCodex(projectRoot);
-      process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
-      return report.ready ? 0 : 1;
-    }
-    if (command.length === 2 && command[0] === 'doctor' && command[1] === 'agy') {
-      const report = await diagnoseAgy(projectRoot);
-      process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
-      return report.ready ? 0 : 1;
-    }
-    if (command.length === 2 && command[0] === 'doctor' && command[1] === 'opencode') {
-      const report = await diagnoseOpencode(projectRoot);
-      process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
-      return report.ready ? 0 : 1;
-    }
-    if ((command.length === 1 && command[0] === 'codex') ||
-        (command.length === 2 && command[0] === 'codex' && command[1] === '--consultative') ||
-        (command.length === 2 && command[0] === 'code' && command[1] === 'base')) {
-      const report = await diagnoseCodexRuntime(projectRoot);
-      if (!report.ready) {
-        process.stderr.write(`Sessão governada indisponível: ${report.reasons.join('; ')}\n`);
-        return 1;
-      }
-      await runCodexSession(projectRoot, { consultative: command.includes('--consultative') });
-      return 0;
-    }
-    if (command.length === 1 && command[0] === 'agy') {
-      const report = await diagnoseAgyRuntime(projectRoot);
-      if (!report.ready) {
-        process.stderr.write(`Sessão governada indisponível: ${report.reasons.join('; ')}\n`);
-        return 1;
-      }
-      await runAgySession(projectRoot, { model });
-      return 0;
-    }
-    if (command.length >= 1 && command[0] === 'opencode' && command.slice(1).every((arg) => arg === '--consultative')) {
-      const report = await diagnoseOpencodeRuntime(projectRoot);
-      if (!report.ready) {
-        process.stderr.write(`Sessão governada indisponível: ${report.reasons.join('; ')}\n`);
-        return 1;
-      }
-      await runOpencodeSession(projectRoot, { model, consultative: command.includes('--consultative'), prompt });
-      return 0;
-    }
     if (command.length === 2 && command[0] === 'sessions' && command[1] === 'list') {
       const repositorio = await resolverRepositorio(projectRoot);
       const sessoes = await listarSessoesDoProjeto(repositorio);
@@ -169,13 +114,6 @@ export async function main(argv: string[]): Promise<number> {
       const resultado = await limparSessao(repositorio, command[2]);
       process.stdout.write(`${resultado.detalhes}\n`);
       return resultado.removida ? 0 : 1;
-    }
-    if (command.length >= 1 && command[0] === 'benchmark') {
-      const { spawnSync } = await import('node:child_process');
-      const result = spawnSync('python3', ['-m', 'benchmark.controlled', ...command.slice(1)], {
-        stdio: 'inherit',
-      });
-      return result.status ?? 0;
     }
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);

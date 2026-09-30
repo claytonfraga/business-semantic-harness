@@ -4,8 +4,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { join, relative, sep } from 'node:path';
 
 /**
- * Universo canônico do "código-base experimental": diretórios derivados/temporários ficam fora.
- * Esta definição é espelhada do benchmark (benchmark/core/codebase_change.py) e precisa permanecer idêntica.
+ * Universo canônico do código-base do projeto: diretórios derivados/temporários ficam fora.
  */
 const IGNORAR = new Set(['.git', 'node_modules', 'dist', 'coverage', '__pycache__', '.venv']);
 

@@ -7,10 +7,10 @@ import { after, test } from 'node:test';
 import {
   alteracoesNaWorktree, branchAtual, commitAtual, criarSessaoWorktree, estaLimpo,
   listarWorktrees, removerSessaoWorktree,
-} from '../../dist/agents/codex/worktree.js';
-import { promoverSessao } from '../../dist/agents/codex/promotion.js';
-import { gravarSessao } from '../../dist/agents/codex/sessionState.js';
-import { limparSessao, listarSessoesDoProjeto } from '../../dist/agents/codex/sessions.js';
+} from '../../dist/git/worktree.js';
+import { promoverSessao } from '../../dist/git/promotion.js';
+import { gravarSessao } from '../../dist/git/sessionState.js';
+import { limparSessao, listarSessoesDoProjeto } from '../../dist/git/sessions.js';
 
 const raiz = mkdtempSync(join(tmpdir(), 'bsh-e2e-worktree-'));
 

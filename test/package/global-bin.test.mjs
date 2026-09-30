@@ -17,9 +17,8 @@ test('Given a Linux bin symlink and an external codebase, when BSH runs there, t
     const init = spawnSync(executable, ['init'], { cwd: project, encoding: 'utf8' });
     assert.equal(init.status, 0, init.stderr);
     const add = spawnSync(executable, ['domain', 'add', 'ativos'], { cwd: project, encoding: 'utf8' });
-    assert.equal(add.status, 0, add.stderr);
-    const codex = spawnSync(executable, ['code', 'base'], { cwd: project, encoding: 'utf8' });
-    assert.equal(codex.status, 1);
-    assert.match(codex.stderr, /Sessão governada indisponível/);
+    const sessions = spawnSync(executable, ['sessions', 'list'], { cwd: project, encoding: 'utf8' });
+    assert.equal(sessions.status, 1);
+    assert.match(sessions.stderr, /O projeto nao e um repositorio Git/);
   } finally { rmSync(temp, { recursive: true, force: true }); }
 });

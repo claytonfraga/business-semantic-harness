@@ -34,7 +34,7 @@ export async function promptApiKeyModal(): Promise<AuthResult> {
     console.log(`\n${ansi.dim}Starting local OAuth callback listener...${ansi.reset}`);
     const authPromise = authenticateViaWebBrowser({
       onUrlReady: (url) => {
-        console.log('\n' + box('Complete Authentication in Browser', [
+        console.log(`\n${box('Complete Authentication in Browser', [
           'Opening OpenRouter in your browser...',
           '',
           'If it did not open automatically, visit this URL:',
@@ -42,7 +42,7 @@ export async function promptApiKeyModal(): Promise<AuthResult> {
           '',
           'Once authorized, this session will start immediately.',
           'Your credentials will remain strictly in memory and will NOT be saved to disk.',
-        ], 76));
+        ], 76)}`);
 
         // Attempt opening default browser on Linux/WSL/macOS
         try {
@@ -101,7 +101,7 @@ export async function selectModelModal(
       `Type number (1-${displayModels.length}), a model name to search, or press Enter to keep current.`,
     ];
 
-    console.log('\n' + box('Select OpenRouter Model', lines, 76));
+    console.log(`\n${box('Select OpenRouter Model', lines, 76)}`);
 
     const answer = (await rl.question(`\n${ansi.bold}Model choice or ID [${currentModel}]: ${ansi.reset}`)).trim();
     if (!answer) {
@@ -109,7 +109,7 @@ export async function selectModelModal(
     }
 
     const num = parseInt(answer, 10);
-    if (!isNaN(num) && num >= 1 && num <= displayModels.length) {
+    if (!Number.isNaN(num) && num >= 1 && num <= displayModels.length) {
       return displayModels[num - 1].id;
     }
 
@@ -150,7 +150,7 @@ export async function selectDomainModal(
       `Type number (1-${domains.length}) or press Enter to keep current:`,
     ];
 
-    console.log('\n' + box('Select Business Domain & Governance Rules', lines, 76));
+    console.log(`\n${box('Select Business Domain & Governance Rules', lines, 76)}`);
 
     const answer = (await rl.question(`\n${ansi.bold}Domain selection: ${ansi.reset}`)).trim();
     if (!answer && currentDomain) {
@@ -158,7 +158,7 @@ export async function selectDomainModal(
     }
 
     const num = parseInt(answer, 10);
-    if (!isNaN(num) && num >= 1 && num <= domains.length) {
+    if (!Number.isNaN(num) && num >= 1 && num <= domains.length) {
       return domains[num - 1].id;
     }
 
@@ -176,9 +176,9 @@ export async function diffReviewModal(
 ): Promise<boolean> {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   try {
-    console.log('\n' + ansi.bold + '=== Workspace Diff & Semantic Review ===' + ansi.reset);
+    console.log(`\n${ansi.bold}=== Workspace Diff & Semantic Review ===${ansi.reset}`);
     if (!diffText.trim()) {
-      console.log(ansi.dim + 'No modified files detected in session workspace.' + ansi.reset);
+      console.log(`${ansi.dim}No modified files detected in session workspace.${ansi.reset}`);
       return false;
     }
 
@@ -196,7 +196,7 @@ export async function diffReviewModal(
     }
 
     if (diffText.split('\n').length > 50) {
-      console.log(ansi.dim + '... [remaining diff truncated for review]' + ansi.reset);
+      console.log(`${ansi.dim}... [remaining diff truncated for review]${ansi.reset}`);
     }
 
     console.log('');
@@ -205,7 +205,7 @@ export async function diffReviewModal(
       for (const v of violations) {
         console.log(`  ${ansi.red}• ${v}${ansi.reset}`);
       }
-      console.log(ansi.yellow + '\nCannot promote to primary branch while domain rules are violated.' + ansi.reset);
+      console.log(`${ansi.yellow}\nCannot promote to primary branch while domain rules are violated.${ansi.reset}`);
       await rl.question(`\n${ansi.dim}Press Enter to return to agent...${ansi.reset}`);
       return false;
     }

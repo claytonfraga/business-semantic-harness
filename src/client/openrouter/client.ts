@@ -2,7 +2,6 @@ import type {
   ChatMessage,
   OpenRouterModel,
   StreamChunk,
-  ToolCall,
   ToolDefinition,
 } from './types.js';
 
@@ -125,9 +124,7 @@ export class OpenRouterClient {
     if (typeof options.temperature === 'number') {
       body.temperature = options.temperature;
     }
-    if (typeof options.maxTokens === 'number') {
-      body.max_tokens = options.maxTokens;
-    }
+    body.max_tokens = typeof options.maxTokens === 'number' ? options.maxTokens : 4096;
 
     const response = await fetch(`${this.baseUrl}/chat/completions`, {
       method: 'POST',

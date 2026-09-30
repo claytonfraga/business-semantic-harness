@@ -10,13 +10,18 @@ export interface RenderState {
   width?: number;
 }
 
+export interface GateCheckItem {
+  ok: boolean;
+  text: string;
+}
+
 export interface ChatEntry {
   type: 'user' | 'agent' | 'tool' | 'tool_result' | 'gate' | 'blank';
   content?: string;
   toolName?: string;
-  toolArgs?: string;
+  toolArgs?: Record<string, unknown> | string;
   gateShape?: string;
-  gateChecks?: Array<{ ok: boolean; text: string }>;
+  gateChecks?: GateCheckItem[];
   gateStatus?: 'CONFORMING' | 'VIOLATION';
 }
 
@@ -26,34 +31,93 @@ export function formatContextLength(ctx?: number): string {
   return `${Math.round(ctx / 1024)}k ctx`;
 }
 
-export function boxedLine(text: string, width = 79): string {
-  const visibleLen = stripAnsi(text).length;
-  if (visibleLen > width - 4) {
-    // Truncate if overflowing
-    const truncated = text.slice(0, width - 7) + '...';
-    const pad = ' '.repeat(Math.max(0, width - stripAnsi(truncated).length - 4));
+/**
+ * Word-wraps text preserving ANSI color codes so content flows naturally inside terminal borders.
+ */
+export function wrapText(text: string, maxWidth: number): string[] {
+  const lines: string[] = [];
+  for (const rawLine of text.split('\n')) {
+    if (!rawLine.trim()) {
+      lines.push('');
+      continue;
+    }
+
+    const words = rawLine.split(' ');
+    let current = '';
+
+    for (const word of words) {
+      const candidate = current ? `${current} ${word}` : word;
+      if (stripAnsi(candidate).length <= maxWidth) {
+        current = candidate;
+      } else {
+        if (current) lines.push(current);
+        current = word;
+      }
+    }
+    if (current) lines.push(current);
+  }
+  return lines;
+}
+
+/**
+ * Frames a line within vertical borders: │ <text> <pad> │
+ */
+export function boxedLine(text: string, width: number): string {
+  const interior = Math.max(10, width - 4);
+  const visible = stripAnsi(text);
+
+  if (visible.length > interior) {
+    const truncated = `${text.slice(0, interior - 3)}...`;
+    const pad = ' '.repeat(Math.max(0, interior - stripAnsi(truncated).length));
     return `│ ${truncated}${pad} │`;
   }
-  const pad = ' '.repeat(Math.max(0, width - visibleLen - 4));
+
+  const pad = ' '.repeat(Math.max(0, interior - visible.length));
   return `│ ${text}${pad} │`;
 }
 
-export function renderHeader(state: RenderState): string {
-  const width = state.width || (process.stdout.columns && process.stdout.columns > 90 ? process.stdout.columns : 100);
+export function formatToolInvocation(name: string, args: Record<string, unknown> | string): string {
+  if (typeof args === 'string') {
+    return `${name}("${args}")`;
+  }
+
+  switch (name) {
+    case 'read_file':
+      return `read_file("${String(args.path || '')}")`;
+    case 'write_file':
+      return `write_file("${String(args.path || '')}")`;
+    case 'replace_file_content':
+      return `replace_file_content("${String(args.path || '')}")`;
+    case 'list_directory':
+      return `list_directory("${String(args.path || '.')}")`;
+    case 'run_bash_command': {
+      const cmd = String(args.command || '');
+      const brief = cmd.length > 55 ? `${cmd.slice(0, 52)}...` : cmd;
+      return `run_bash("${brief}")`;
+    }
+    default:
+      return `${name}(${JSON.stringify(args).slice(0, 50)})`;
+  }
+}
+
+export function renderHeader(state: RenderState, width: number): string {
   const logo = `${ansi.bold}${ansi.brightBlue}BSH${ansi.reset} ${ansi.dim}[Business Semantic Harness]${ansi.reset}`;
   const statusBadge = state.governed
     ? `${ansi.bold}${ansi.brightGreen}[● GOVERNED]${ansi.reset}`
     : `${ansi.bold}${ansi.yellow}[○ UNGOVERNED]${ansi.reset}`;
 
-  const topBorderLen = Math.max(2, width - 52);
+  const visibleLogo = 'BSH [Business Semantic Harness]';
+  const visibleStatus = state.governed ? '[● GOVERNED]' : '[○ UNGOVERNED]';
+  const fixedChars = 3 + visibleLogo.length + 1 + 1 + visibleStatus.length + 3;
+  const topBorderLen = Math.max(2, width - fixedChars);
   const firstLine = `┌─ ${logo} ${'─'.repeat(topBorderLen)} ${statusBadge} ─┐`;
 
   const ctxStr = state.contextLength ? ` [${formatContextLength(state.contextLength)}]` : ' [128k ctx]';
   const modelStr = `${state.model}${ctxStr}`;
 
   const domainStr = state.domain
-    ? `${ansi.green}${state.domain}${ansi.reset} ${ansi.dim}(SHACL active)${ansi.reset}`
-    : `${ansi.dim}none${ansi.reset}`;
+    ? `${ansi.brightGreen}${state.domain}${ansi.reset} ${ansi.dim}(SHACL active)${ansi.reset}`
+    : `${ansi.yellow}none${ansi.reset} ${ansi.dim}(inactive)${ansi.reset}`;
 
   const tokensStr = state.tokensTotal.toLocaleString();
   const infoLine = `Model: ${ansi.cyan}${modelStr}${ansi.reset}   Domain: ${domainStr}   Tokens: ${tokensStr}`;
@@ -63,48 +127,51 @@ export function renderHeader(state: RenderState): string {
   return [firstLine, secondLine, separator].join('\n');
 }
 
-export function renderFooter(promptText = '[Type your prompt here...]', width = 96): string {
-  const separator = `├${'─'.repeat(Math.max(0, width - 2))}┤`;
-  const promptLine = boxedLine(`${ansi.bold}> ${ansi.reset}${promptText}`, width);
-  const shortcuts = `${ansi.bold}[Ctrl+M]${ansi.reset} Model  ${ansi.bold}[Ctrl+D]${ansi.reset} Domain/SHACL  ${ansi.bold}[Ctrl+G]${ansi.reset} Diff/Gate  ${ansi.bold}[Ctrl+C]${ansi.reset} Exit`;
-  const shortcutsLine = boxedLine(shortcuts, width);
-  const bottom = `└${'─'.repeat(Math.max(0, width - 2))}┘`;
-
-  return [separator, promptLine, shortcutsLine, bottom].join('\n');
-}
-
-export function renderChatEntry(entry: ChatEntry, width = 96): string[] {
+export function renderChatEntry(entry: ChatEntry, width: number): string[] {
   const lines: string[] = [];
+  const interior = Math.max(10, width - 4);
 
   switch (entry.type) {
     case 'blank':
       lines.push(boxedLine('', width));
       break;
 
-    case 'user':
-      lines.push(boxedLine(`${ansi.bold}[User]${ansi.reset} ${entry.content || ''}`, width));
-      lines.push(boxedLine('', width));
-      break;
-
-    case 'agent':
-      lines.push(boxedLine(`${ansi.bold}${ansi.cyan}[BSH Agent]${ansi.reset}`, width));
-      for (const line of (entry.content || '').split('\n')) {
-        lines.push(boxedLine(line, width));
+    case 'user': {
+      const wrapped = wrapText(entry.content || '', interior - 8);
+      lines.push(boxedLine(`${ansi.bold}[User]${ansi.reset} ${wrapped[0] || ''}`, width));
+      for (let i = 1; i < wrapped.length; i++) {
+        lines.push(boxedLine(`       ${wrapped[i]}`, width));
       }
       lines.push(boxedLine('', width));
       break;
+    }
 
-    case 'tool':
-      lines.push(boxedLine(`${ansi.yellow}⚙ Tool:${ansi.reset} ${ansi.bold}${entry.toolName}${ansi.reset}(${entry.toolArgs || ''})`, width));
+    case 'agent': {
+      lines.push(boxedLine(`${ansi.bold}${ansi.cyan}[BSH Agent]${ansi.reset}`, width));
+      for (const rawLine of (entry.content || '').split('\n')) {
+        const wrapped = wrapText(rawLine, interior);
+        for (const w of wrapped) {
+          lines.push(boxedLine(w, width));
+        }
+      }
+      lines.push(boxedLine('', width));
       break;
+    }
 
-    case 'tool_result':
+    case 'tool': {
+      const inv = formatToolInvocation(entry.toolName || '', entry.toolArgs || {});
+      lines.push(boxedLine(`${ansi.yellow}⚙ Tool:${ansi.reset} ${ansi.bold}${inv}${ansi.reset}`, width));
+      break;
+    }
+
+    case 'tool_result': {
       lines.push(boxedLine(`${ansi.green}↳${ansi.reset} ${entry.content || ''}`, width));
       lines.push(boxedLine('', width));
       break;
+    }
 
     case 'gate': {
-      lines.push(boxedLine(`${ansi.bold}${ansi.brightBlue}🛡 Semantic Gate${ansi.reset} [Evaluating SHACL constraints: ${entry.gateShape || 'DomainShapes'}]`, width));
+      lines.push(boxedLine(`${ansi.bold}${ansi.brightBlue}🛡 Semantic Gate${ansi.reset} [Evaluating SHACL constraints: ${entry.gateShape || 'TransferShape'}]`, width));
       if (entry.gateChecks) {
         for (const check of entry.gateChecks) {
           const icon = check.ok ? `${ansi.brightGreen}✔${ansi.reset}` : `${ansi.brightRed}✖${ansi.reset}`;
@@ -130,18 +197,20 @@ export function renderCompleteTui(
   currentPrompt = '[Type your prompt here...]',
   customWidth?: number
 ): string {
-  const width = customWidth || state.width || (process.stdout.columns && process.stdout.columns > 90 ? process.stdout.columns : 100);
-  const headerState = { ...state, width };
-  const header = renderHeader(headerState);
+  const terminalCols = process.stdout.columns && process.stdout.columns > 50 ? process.stdout.columns : 96;
+  const width = Math.min(110, Math.max(85, customWidth || state.width || terminalCols));
+
+  const header = renderHeader(state, width);
   const chatLines: string[] = [];
+
   if (entries.length === 0) {
-    // Add an empty boxed line so there is space between header and footer
     chatLines.push(boxedLine('', width));
   } else {
     for (const e of entries) {
       chatLines.push(...renderChatEntry(e, width));
     }
   }
+
   const promptLine = boxedLine(`${ansi.bold}> ${ansi.reset}${currentPrompt}`, width);
   const shortcuts = `${ansi.bold}[Ctrl+M]${ansi.reset} Model  ${ansi.bold}[Ctrl+D]${ansi.reset} Domain/SHACL  ${ansi.bold}[Ctrl+G]${ansi.reset} Diff/Gate  ${ansi.bold}[Ctrl+C]${ansi.reset} Exit`;
   const shortcutsLine = boxedLine(shortcuts, width);
@@ -150,4 +219,3 @@ export function renderCompleteTui(
 
   return [header, ...chatLines, separator, promptLine, shortcutsLine, bottom].join('\n');
 }
-

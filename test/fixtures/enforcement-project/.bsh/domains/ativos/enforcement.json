@@ -1,5 +1,7 @@
 {
   "regras": [
+    { "id": "consulta-ativo", "operacao": "ConsultaAtivo", "quando": { "caminho": "src/**", "adicionou": "consultarAtivo" },
+      "fatos": [] },
     { "id": "transf-baixado", "operacao": "TransferenciaAtivo", "quando": { "caminho": "src/**", "removeu": "nao pode ser transferido" },
       "fatos": [ { "propriedade": "estadoAtual", "valor": "Baixado", "determinacao": "observado", "origem": "diff" },
                  { "propriedade": "novoResponsavel", "valor": "x", "determinacao": "observado", "origem": "diff" } ] },
