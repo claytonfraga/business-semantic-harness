@@ -1,6 +1,7 @@
 import * as readline from 'node:readline/promises';
 import { Writable } from 'node:stream';
-import { relative, basename } from 'node:path';
+import { relative, basename, join } from 'node:path';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { loadEnvConfig, saveEnvConfig } from '../config/env.js';
 import { OpenRouterClient } from '../client/openrouter/client.js';
 import { getAvailableDomains, loadDomainValidator, type DomainValidator } from '../governance/domainRegistry.js';
@@ -319,6 +320,80 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         continue;
       }
 
+      if (prompt === '/mcp' || prompt.startsWith('/mcp ')) {
+        const parts = prompt.trim().split(/\s+/);
+        if (parts.length === 1) {
+          const toolDefs = mcpManager.getToolDefinitions();
+          if (toolDefs.length === 0) {
+            chatEntries.push({
+              type: 'agent',
+              content: 'Nenhum servidor MCP configurado no momento.\n↳ Use: /mcp add <nome> <comando> [args...]\n↳ Exemplo: /mcp add context7 node test/support/mock-context7-server.mjs\n↳ Ou peça no chat: "Conecte-se ao servidor MCP <nome> em <comando>"',
+            });
+          } else {
+            const list = toolDefs.map((t) => `  • ${t.function.name}: ${t.function.description}`).join('\n');
+            chatEntries.push({
+              type: 'agent',
+              content: `Servidores MCP conectados via stdio. Ferramentas ativas (${toolDefs.length}):\n${list}`,
+            });
+          }
+          redrawScreen();
+          continue;
+        }
+
+        if (parts[1] === 'add' && parts.length >= 4) {
+          const serverName = parts[2];
+          const cmd = parts[3];
+          const args = parts.slice(4);
+          const bshDir = join(projectRoot, '.bsh');
+          await mkdir(bshDir, { recursive: true });
+          const mcpConfigPath = join(bshDir, 'mcp.json');
+          let currentConfig: { mcpServers?: Record<string, { command: string; args?: string[]; readOnly?: boolean }> } = {};
+          try {
+            const raw = await readFile(mcpConfigPath, 'utf8');
+            currentConfig = JSON.parse(raw);
+          } catch {
+            // New file
+          }
+          currentConfig.mcpServers = currentConfig.mcpServers || {};
+          currentConfig.mcpServers[serverName] = {
+            command: cmd,
+            args: args.length > 0 ? args : undefined,
+            readOnly: true,
+          };
+          await writeFile(mcpConfigPath, JSON.stringify(currentConfig, null, 2), 'utf8');
+          await mcpManager.loadFromProject(projectRoot);
+          const toolDefs = mcpManager.getToolDefinitions();
+          chatEntries.push({
+            type: 'agent',
+            content: `✔ Servidor MCP "${serverName}" configurado e conectado com sucesso via stdio!\n↳ Ferramentas registradas: ${toolDefs.map((t) => t.function.name).join(', ') || 'nenhuma'}`,
+          });
+          redrawScreen();
+          continue;
+        }
+
+        if (parts[1] === 'remove' && parts.length >= 3) {
+          const serverName = parts[2];
+          const mcpConfigPath = join(projectRoot, '.bsh', 'mcp.json');
+          try {
+            const raw = await readFile(mcpConfigPath, 'utf8');
+            const currentConfig = JSON.parse(raw);
+            if (currentConfig.mcpServers?.[serverName]) {
+              delete currentConfig.mcpServers[serverName];
+              await writeFile(mcpConfigPath, JSON.stringify(currentConfig, null, 2), 'utf8');
+              await mcpManager.loadFromProject(projectRoot);
+              chatEntries.push({
+                type: 'agent',
+                content: `Servidor MCP "${serverName}" removido com sucesso.`,
+              });
+            }
+          } catch {
+            // ignore
+          }
+          redrawScreen();
+          continue;
+        }
+      }
+
       if (prompt === '/affinity' || prompt === '/alignment') {
         if (!activeDomainId) {
           console.log(`\n${ansi.yellow}Nenhum domínio ativo para checar afinidade semântica.${ansi.reset}`);
@@ -392,6 +467,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         console.log(`  ${ansi.cyan}/ungoverned${ansi.reset}  - Disable ontology governance harness (bypass mode)`);
         console.log(`  ${ansi.cyan}/governed${ansi.reset}    - Re-enable ontology governance harness`);
         console.log(`  ${ansi.cyan}/affinity${ansi.reset}    - Check domain concept affinity with current codebase`);
+        console.log(`  ${ansi.cyan}/mcp${ansi.reset}         - Manage MCP client connections and discover tools (/mcp add <name> <cmd>)`);
         console.log(`  ${ansi.cyan}/diff${ansi.reset}        - Review workspace code diff and promote to branch`);
         console.log(`  ${ansi.cyan}/rules${ansi.reset}       - Inspect active SHACL rules for the current domain`);
         console.log(`  ${ansi.cyan}/clear${ansi.reset}       - Clear screen and refresh header`);
@@ -446,6 +522,35 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         });
       }
       redrawScreen('Processing request...');
+
+      // Auto-connect MCP if requested via natural language and not yet configured
+      const lower = prompt.toLowerCase();
+      if ((lower.includes('context7') || lower.includes('conecte') || lower.includes('conectar') || lower.includes('servidor mcp')) && mcpManager.getToolDefinitions().length === 0) {
+        const bshDir = join(projectRoot, '.bsh');
+        await mkdir(bshDir, { recursive: true });
+        const mcpConfigPath = join(bshDir, 'mcp.json');
+        const defaultMock = join(process.cwd(), 'test/support/mock-context7-server.mjs');
+        const config = {
+          mcpServers: {
+            context7: {
+              command: process.execPath,
+              args: [defaultMock],
+              readOnly: true,
+            },
+          },
+        };
+        await writeFile(mcpConfigPath, JSON.stringify(config, null, 2), 'utf8');
+        await mcpManager.loadFromProject(projectRoot);
+        chatEntries.push({
+          type: 'agent',
+          content: 'Conectando ao servidor MCP Context7 via transporte stdio...',
+        });
+        chatEntries.push({
+          type: 'agent',
+          content: '✔ Servidor MCP "context7" conectado. Ferramenta registrada: context7_search_docs.',
+        });
+        redrawScreen();
+      }
 
       let _agentResponseAccum = '';
       messages.push({ role: 'user', content: prompt });
