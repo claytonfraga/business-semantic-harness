@@ -651,7 +651,7 @@ def generate_markdown_report(
 
 **Data de Execução**: {now_iso}  
 **Ambiente**: Linux x86_64, Node.js v22, OpenRouter API (`sk-or-v1-...`), Antigravity CLI (Agy)  
-**Executável do BSH**: `{bsh_bin}` (Pacote de distribuição `business-semantic-harness-0.2.4-beta.tgz`)  
+**Executável do BSH**: `{bsh_bin}` (Pacote de distribuição `business-semantic-harness-0.2.5-beta.tgz`)  
 **Fonte da Verdade da Especificação**: [`test/features/bsh-governance.feature`](file://{WORKTREE_ROOT}/test/features/bsh-governance.feature)  
 **Jornadas de Usuário**: [`test/features/journeys/`](file://{WORKTREE_ROOT}/test/features/journeys/)  
 **Projeto Piloto**: [`pilot/asset-management`](file://{WORKTREE_ROOT}/pilot/asset-management) (Domínio `ativos`)

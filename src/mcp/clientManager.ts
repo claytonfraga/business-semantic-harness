@@ -63,7 +63,7 @@ export class McpClientManager {
 
         const client = new Client({
           name: `bsh-client-${serverName}`,
-          version: '0.2.4-beta',
+          version: '0.2.5-beta',
         });
 
         await client.connect(transport);

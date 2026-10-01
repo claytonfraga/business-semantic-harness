@@ -11,6 +11,10 @@ import { limparSessao, listarSessoesDoProjeto } from './git/sessions.js';
 import { startTuiSession } from './tui/session.js';
 
 export async function main(argv: string[]): Promise<number> {
+  if (argv.length === 1 && (argv[0] === '--version' || argv[0] === '-v')) {
+    process.stdout.write('0.2.5-beta\n');
+    return 0;
+  }
   if (argv.length === 1 && argv[0] === '--help') {
     process.stdout.write('bsh: [tui] [--model <nome>] [--domain <nome>] | init | domain add <nome> | ontology validate | ontology show <dominio> | sessions list|clean <id> | mcp [--governed]\n');
     return 0;
