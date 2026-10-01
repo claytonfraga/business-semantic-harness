@@ -12,7 +12,7 @@ import { startTuiSession } from './tui/session.js';
 
 export async function main(argv: string[]): Promise<number> {
   if (argv.length === 1 && argv[0] === '--help') {
-    process.stdout.write('bsh: [tui] [--model <nome>] [--domain <nome>] | init | domain add <nome> | ontology validate | ontology show <dominio> | sessions list|clean <id>\n');
+    process.stdout.write('bsh: [tui] [--model <nome>] [--domain <nome>] | init | domain add <nome> | ontology validate | ontology show <dominio> | sessions list|clean <id> | mcp [--governed]\n');
     return 0;
   }
 
@@ -69,6 +69,12 @@ export async function main(argv: string[]): Promise<number> {
   try {
     if (command.length === 0 || (command.length === 1 && command[0] === 'tui')) {
       await startTuiSession({ projectRoot, model, domain });
+      return 0;
+    }
+    if (command.length >= 1 && command[0] === 'mcp') {
+      const governed = command.includes('--governed') || argsWithoutProject.includes('--governed');
+      const { main: runMcpServer } = await import('./mcp/server.js');
+      await runMcpServer(projectRoot, governed);
       return 0;
     }
     if (command.length === 1 && command[0] === 'init') {

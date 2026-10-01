@@ -209,6 +209,59 @@ To prevent mismatched governance (e.g. applying banking shapes to a graphic util
 
 ---
 
+## Model Context Protocol (MCP) Server
+
+BSH can run as an **MCP Server (Model Context Protocol)** over standard I/O (`stdio`), allowing external AI coding assistants and IDEs (Cursor, Claude Desktop, Antigravity CLI, Windsurf, Aider) to query business ontologies, check prompt intent, and validate changes against SHACL constraints deterministically.
+
+### Launching the MCP Server
+
+```bash
+# Run directly with npx (zero install):
+npx business-semantic-harness mcp --project /path/to/project
+
+# Or using globally installed bsh:
+bsh mcp --project /path/to/project
+
+# Run in governed mode:
+bsh mcp --project /path/to/project --governed
+```
+
+### Configuration Examples
+
+#### Claude Desktop (`claude_desktop_config.json`)
+```json
+{
+  "mcpServers": {
+    "bsh": {
+      "command": "npx",
+      "args": ["-y", "business-semantic-harness", "mcp", "--project", "/absolute/path/to/my-project"]
+    }
+  }
+}
+```
+
+#### Cursor (`.cursor/mcp.json`)
+```json
+{
+  "mcpServers": {
+    "bsh-governance": {
+      "command": "npx",
+      "args": ["-y", "business-semantic-harness", "mcp", "--project", "/absolute/path/to/my-project"]
+    }
+  }
+}
+```
+
+### Available MCP Tools
+- **`bsh_query_ontology`**: Query concepts, classes, properties, and constraint shapes of declared domains.
+- **`bsh_check_prompt_intent`**: Pre-flight check to verify if a user prompt violates domain business rules before execution.
+- **`bsh_validate_shacl`**: Deterministically validate RDF/Turtle candidate facts against domain SHACL shapes.
+- **`bsh_check_affinity`**: Calculate concept affinity between ontology terms and codebase identifiers.
+- **`bsh_report_conflict`**: Report ontology conflicts and request human confirmation (*governed mode*).
+- **`bsh_propose_patch`**: Propose file changes with SHA-256 integrity proofs (*governed mode*).
+
+---
+
 ## Code Quality & CI Verification
 
 BSH maintains strict engineering standards:
