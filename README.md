@@ -262,6 +262,31 @@ bsh mcp --project /path/to/project --governed
 - **`bsh_report_conflict`**: Report ontology conflicts and request human confirmation (*governed mode*).
 - **`bsh_propose_patch`**: Propose file changes with SHA-256 integrity proofs (*governed mode*).
 
+### Consuming Third-Party MCP Servers in BSH
+
+BSH can also act as an **MCP Client**, connecting to third-party MCP servers (such as Context7 for live documentation lookup, database query engines, or web search tools) and making their tools directly available to the AI agent during governed sessions.
+
+Declare external MCP servers inside `<project>/.bsh/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "context7-mcp"],
+      "readOnly": true
+    },
+    "fetch": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"],
+      "readOnly": true
+    }
+  }
+}
+```
+
+When an interactive session starts, BSH automatically connects to declared servers, registers their tools with namespaces (e.g. `context7_search_docs`), and streams results directly into the agent's turn context while maintaining strict Git worktree sandboxing.
+
 ---
 
 ## Code Quality & CI Verification

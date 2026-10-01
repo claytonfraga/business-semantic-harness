@@ -22,6 +22,7 @@ import { ansi } from './ansi.js';
 import { renderCompleteTui, type ChatEntry } from './render.js';
 import { promptApiKeyModal, selectModelModal, selectDomainModal, diffReviewModal, settingsModal } from './modals.js';
 import { detectPromptViolation } from '../enforcement/promptGuard.js';
+import { McpClientManager } from '../mcp/clientManager.js';
 
 export interface TuiSessionOptions {
   projectRoot?: string;
@@ -73,6 +74,10 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       activeDomainId = undefined;
     }
   }
+
+  // MCP Client Manager (.bsh/mcp.json)
+  const mcpManager = new McpClientManager();
+  await mcpManager.loadFromProject(projectRoot);
 
   // 4. Git Worktree Isolation
   let sessao: SessaoWorktree | null = null;
@@ -459,6 +464,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           workspaceRoot,
           messages,
           systemPrompt,
+          mcpManager,
           onDelta: (text) => {
             _agentResponseAccum += text;
           },
@@ -537,6 +543,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     process.stdout.off('resize', onResize);
     process.stdout.write('\x1b[?1049l\x1b[?25h');
     rl.close();
+    await mcpManager.close().catch(() => undefined);
     if (sessao) {
       try {
         await removerSessaoWorktree(sessao);
