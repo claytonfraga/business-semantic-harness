@@ -177,6 +177,9 @@ def record_scenario(
     user_inputs: list[tuple[str, float]], # (input_text, wait_after_seconds)
     output_video: Path,
     output_screenshot: Path,
+    completion_marker: str | None = None,
+    max_wait: float = 60.0,
+    is_interactive_tui: bool = True,
 ) -> dict:
     ensure_dirs()
     temp_frames = Path(tempfile.mkdtemp(prefix="bsh_frames_"))
@@ -257,6 +260,15 @@ def record_scenario(
                 steps = max(1, int(wait_time * 2))
                 snap(count=steps, delay=0.6)
 
+        # If waiting for a completion marker in terminal output
+        if completion_marker:
+            start_t = time.time()
+            while time.time() - start_t < max_wait:
+                snap(count=1, delay=0.5)
+                pane_text = capture_tmux_pane(session_name)
+                if completion_marker in pane_text:
+                    break
+
         # Hold final resting screen for 20.0 seconds (40 frames) so human can comfortably inspect all details
         snap(count=40, delay=0.5)
 
@@ -264,9 +276,10 @@ def record_scenario(
         final_text = capture_tmux_pane(session_name)
         render_terminal_frame(final_text, title, output_screenshot)
 
-        # Cleanly exit BSH session
-        type_keys(session_name, "/exit", enter=True)
-        time.sleep(1.0)
+        # Cleanly exit BSH session if interactive TUI
+        if is_interactive_tui:
+            type_keys(session_name, "/exit", enter=True)
+            time.sleep(1.0)
 
         # Encode video in MP4 (H.264 / yuv420p)
         out_mp4 = encode_mp4(temp_frames, output_video, fps=2)
@@ -500,19 +513,82 @@ def main() -> int:
     )
     print(f"✔ Model search video saved: {model_res['video_path']} ({model_res['file_size_kb']:.1f} KB, SHA-256: {model_res['sha256'][:16]}...)")
 
+    # Scenario 6: BSH as MCP Server for External Agents
+    print("\n--- Running Scenario 6: BSH as MCP Server (External Agent Governance) ---")
+    mcp_server_video = VIDEOS_DIR / "bsh-mcp-server-scenario.mp4"
+    mcp_server_shot = SCREENSHOTS_DIR / "bsh-mcp-server-scenario.png"
+
+    mcp_server_intro_title = "Jornada 6: BSH como Servidor MCP — Governança de Agentes Externos"
+    mcp_server_intro_lines = [
+        "Domínio de Negócio: Gestão de Ativos ('ativos')",
+        "Protocolo: Model Context Protocol (MCP) via transporte stdio",
+        "Objetivo da Jornada: Agentes externos (Claude, Cursor, Agy) consomem governança semântica via MCP.",
+        "Comportamento Esperado do BSH:",
+        "  • BSH inicializa em modo servidor MCP com ferramentas ontológicas e SHACL.",
+        "  • O cliente lista e descobre ferramentas (bsh_query_ontology, bsh_validate_shacl, etc).",
+        "  • bsh_check_prompt_intent intercepta solicitações violadoras em pré-voo.",
+        "  • bsh_query_ontology recupera definições formais de classes e propriedades.",
+        "  • bsh_validate_shacl valida fatos RDF e bloqueia violações negociais no Gate Semântico.",
+    ]
+
+    mcp_server_res = record_scenario(
+        session_name="bsh-e2e-mcp-server",
+        title="BSH E2E Scenario 6: MCP Server Governance for External Agents",
+        intro_title=mcp_server_intro_title,
+        intro_lines=mcp_server_intro_lines,
+        command=["node", str(WORKTREE_ROOT / "test" / "support" / "run-jornada-06-mcp-server.mjs")],
+        user_inputs=[],
+        output_video=mcp_server_video,
+        output_screenshot=mcp_server_shot,
+        completion_marker="─── MCP Session Completed",
+        max_wait=60.0,
+        is_interactive_tui=False,
+    )
+    print(f"✔ MCP Server video saved: {mcp_server_res['video_path']} ({mcp_server_res['file_size_kb']:.1f} KB, SHA-256: {mcp_server_res['sha256'][:16]}...)")
+
+    # Scenario 7: BSH as MCP Client Consuming Third-Party Tools (Context7)
+    print("\n--- Running Scenario 7: BSH as MCP Client (Third-Party Context7 Tools) ---")
+    mcp_client_video = VIDEOS_DIR / "bsh-mcp-client-scenario.mp4"
+    mcp_client_shot = SCREENSHOTS_DIR / "bsh-mcp-client-scenario.png"
+
+    mcp_client_intro_title = "Jornada 7: BSH como Cliente MCP — Consumo de Ferramentas de Terceiros"
+    mcp_client_intro_lines = [
+        "Configuração: .bsh/mcp.json com servidor externo 'context7'",
+        "Protocolo: Model Context Protocol (MCP) via transporte stdio",
+        "Objetivo da Jornada: Integrar ferramentas de terceiros (busca documental) ao agente BSH.",
+        "Comportamento Esperado do BSH:",
+        "  • BSH carrega a configuração e conecta-se ao servidor Context7.",
+        "  • Ferramenta context7_search_docs é descoberta e registrada.",
+        "  • Durante o turno do agente, a ferramenta é acionada para recuperar documentação técnica.",
+        "  • O agente sintetiza a resposta final fundamentada na documentação recebida.",
+    ]
+
+    mcp_client_res = record_scenario(
+        session_name="bsh-e2e-mcp-client",
+        title="BSH E2E Scenario 7: MCP Client Consuming Third-Party Tools (Context7)",
+        intro_title=mcp_client_intro_title,
+        intro_lines=mcp_client_intro_lines,
+        command=["node", str(WORKTREE_ROOT / "test" / "support" / "run-jornada-07-mcp-client.mjs")],
+        user_inputs=[],
+        output_video=mcp_client_video,
+        output_screenshot=mcp_client_shot,
+        completion_marker="─── MCP Client Execution Finished",
+        max_wait=60.0,
+        is_interactive_tui=False,
+    )
+    print(f"✔ MCP Client video saved: {mcp_client_res['video_path']} ({mcp_client_res['file_size_kb']:.1f} KB, SHA-256: {mcp_client_res['sha256'][:16]}...)")
+
     # Copy MP4 videos to WSL Downloads for easy human evaluation
     downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
     if downloads_dir.exists():
-        shutil.copy2(gov_video, downloads_dir / "bsh-governed-scenario.mp4")
-        shutil.copy2(ungov_video, downloads_dir / "bsh-ungoverned-scenario.mp4")
-        shutil.copy2(coop_video, downloads_dir / "bsh-cooperative-scenario.mp4")
-        shutil.copy2(mismatch_video, downloads_dir / "bsh-domain-mismatch-scenario.mp4")
-        shutil.copy2(model_video, downloads_dir / "bsh-model-search-scenario.mp4")
-        print(f"✔ Copied all 5 MP4 videos to Windows Downloads: {downloads_dir}")
+        for vid in [gov_video, ungov_video, coop_video, mismatch_video, model_video, mcp_server_video, mcp_client_video]:
+            if vid.exists():
+                shutil.copy2(vid, downloads_dir / vid.name)
+        print(f"✔ Copied all MP4 videos to Windows Downloads: {downloads_dir}")
 
     # Generate Comprehensive Test Report
     report_file = REPORTS_DIR / "relatorio-testes-e2e-openrouter.md"
-    generate_markdown_report(gov_res, ungov_res, coop_res, mismatch_res, model_res, report_file)
+    generate_markdown_report(gov_res, ungov_res, coop_res, mismatch_res, model_res, mcp_server_res, mcp_client_res, report_file)
     if downloads_dir.exists():
         shutil.copy2(report_file, downloads_dir / "relatorio-testes-e2e-openrouter.md")
     print(f"✔ Comprehensive test report generated: {report_file}")
@@ -520,10 +596,19 @@ def main() -> int:
     return 0
 
 
-def generate_markdown_report(gov_res: dict, ungov_res: dict, coop_res: dict, mismatch_res: dict, model_res: dict, output_file: Path) -> None:
+def generate_markdown_report(
+    gov_res: dict,
+    ungov_res: dict,
+    coop_res: dict,
+    mismatch_res: dict,
+    model_res: dict,
+    mcp_server_res: dict,
+    mcp_client_res: dict,
+    output_file: Path,
+) -> None:
     now_iso = time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())
     bsh_bin = shutil.which("bsh") or "bsh"
-    content = f"""# Relatório de Testes E2E: BSH com OpenRouter e Governança Semântica
+    content = f"""# Relatório de Testes E2E: BSH com OpenRouter, Governança Semântica e Protocolo MCP
 
 **Data de Execução**: {now_iso}  
 **Ambiente**: Linux x86_64, Node.js v22, OpenRouter API (`sk-or-v1-...`)  
@@ -536,19 +621,21 @@ def generate_markdown_report(gov_res: dict, ungov_res: dict, coop_res: dict, mis
 
 ## 1. Sumário Executivo
 
-Este relatório apresenta a validação E2E do **Business Semantic Harness (BSH)** operando como cliente nativo do **OpenRouter** com interface TUI moderna no padrão OpenTUI (altura fixa, rolagem interna, telemetria em tempo real e sem bordas laterais). Foram executados e gravados em vídeo MP4 (H.264) com slides explicativos iniciais em português e repouso final de 20 segundos cinco cenários representativos das regras de negócio:
+Este relatório apresenta a validação E2E do **Business Semantic Harness (BSH)** cobrindo todos os fluxos críticos de governança, integração de modelos via OpenRouter, e interoperabilidade através do Model Context Protocol (MCP) como servidor e como cliente. Foram executados e gravados em vídeo MP4 (H.264) com slides explicativos iniciais em português sete cenários representativos das regras de negócio:
 
-1. **Jornada 1 (Harness Ontológico Ativo - Detecção e Confirmação de Prompt Violador + Bloqueio)**: O BSH inicia com o domínio `ativos` e regras SHACL ativas. Uma solicitação para transferir um ativo em estado `Baixado` é interceptada na entrada pela guarda pré-execução, que destaca o prompt com `[!] VIOLATION DETECTED`, exibe alerta ontológico detalhado e solicita confirmação via `[Enter]`. Após confirmação do usuário, o modelo executa no worktree isolado e o Gate Semântico bloqueia a promoção reportando `[X] VIOLATION` da regra `TransferShape`.
-2. **Jornada 2 (Harness Ontológico Desativado - Ungoverned)**: O BSH opera em modo desassistido sem regras ontológicas ativas. A mesma solicitação é processada pelo modelo sem validação de regras de domínio.
-3. **Jornada 3 (Harness Ontológico Ativo - Governed Conforme)**: O modelo aplica uma alteração aderente às regras de negócio para ativos em operação, recebendo o status `CONFORMING` e aprovação do Gate Semântico.
-4. **Jornada 4 (Detecção Proativa de Desalinhamento - Domain Mismatch)**: Ao iniciar em um projeto cujos conceitos não possuem relação com a ontologia ativa, o BSH alerta preventivamente o usuário via `[!] DOMAIN MISMATCH` e permite ao usuário alternar a ontologia ou desativar o mecanismo (`/ungoverned`).
-5. **Jornada 5 (Busca e Alternância de Modelos - OpenRouter Model Search)**: O usuário busca modelos pelo comando `/model gpt`, visualiza a listagem real com limites de contexto retornada da API do OpenRouter e cancela com `q`, preservando o modelo inicial intacto.
+1. **Jornada 1 (Harness Ontológico Ativo - Detecção e Confirmação de Prompt Violador + Bloqueio)**: Detecção de prompt violador contra `TransferShape`, confirmação de prosseguimento e bloqueio de promoção pelo Gate Semântico.
+2. **Jornada 2 (Harness Ontológico Desativado - Ungoverned)**: Operação em modo desassistido sem regras de governança ativas.
+3. **Jornada 3 (Harness Ontológico Ativo - Governed Conforme)**: Alteração conforme aprovada pelo Gate Semântico com emissão de status `CONFORMING`.
+4. **Jornada 4 (Detecção Proativa de Desalinhamento - Domain Mismatch)**: Detecção preventiva de incompatibilidade entre ontologia e código do projeto.
+5. **Jornada 5 (Busca e Alternância de Modelos - OpenRouter Model Search)**: Pesquisa de modelos no catálogo OpenRouter e cancelamento seguro sem alterar modelo ativo.
+6. **Jornada 6 (BSH como Servidor MCP de Governança)**: Exposição das ferramentas ontológicas e SHACL (`bsh_query_ontology`, `bsh_check_prompt_intent`, `bsh_validate_shacl`, `bsh_check_affinity`) para agentes e IDEs externas via stdio.
+7. **Jornada 7 (BSH como Cliente MCP Consumindo Terceiros)**: Integração e execução de ferramentas especializadas externas (ex: `context7_search_docs`) configuradas em `.bsh/mcp.json`.
 
 ---
 
 ## 2. Artefatos de Vídeo para Avaliação Humana
 
-Todos os vídeos foram gravados diretamente do terminal `tmux`, incluindo **slide inicial com fundo preto e letra branca em português** apresentando os objetivos da jornada, seguido da digitação interativa do prompt e execução em tempo real na interface OpenTUI do BSH, com repouso estendido de 20 segundos na tela final:
+Todos os vídeos foram gravados diretamente do terminal `tmux`, incluindo **slide inicial com fundo preto e letra branca em português** apresentando os objetivos da jornada, seguido da execução em tempo real e captura final:
 
 | Cenário / Jornada | Arquivo de Vídeo | Tamanho | SHA-256 | Captura Final |
 |---|---|---|---|---|
@@ -557,87 +644,99 @@ Todos os vídeos foram gravados diretamente do terminal `tmux`, incluindo **slid
 | **3. Harness Ativo (Conforme)** | [`bsh-cooperative-scenario.mp4`](file://{coop_res['video_path']}) | {coop_res['file_size_kb']:.1f} KB | `{coop_res['sha256']}` | [`bsh-cooperative-scenario.png`](file://{coop_res['screenshot_path']}) |
 | **4. Alerta de Afinidade (Mismatch)** | [`bsh-domain-mismatch-scenario.mp4`](file://{mismatch_res['video_path']}) | {mismatch_res['file_size_kb']:.1f} KB | `{mismatch_res['sha256']}` | [`bsh-domain-mismatch-scenario.png`](file://{mismatch_res['screenshot_path']}) |
 | **5. Busca de Modelos (Safe Cancel)** | [`bsh-model-search-scenario.mp4`](file://{model_res['video_path']}) | {model_res['file_size_kb']:.1f} KB | `{model_res['sha256']}` | [`bsh-model-search-scenario.png`](file://{model_res['screenshot_path']}) |
-
-> **Cópia no Windows Downloads**: Os 5 vídeos MP4 e este relatório foram copiados para `/mnt/c/Users/clayt/Downloads/` para inspeção imediata.
-
----
-
-## 3. Rastreabilidade com a Fonte da Verdade (Gherkin)
-
-### Jornada 1: Governança Semântica Ativa (Detecção de Prompt Violador e Bloqueio de Promoção)
-- **Arquivo Feature**: [`test/features/journeys/jornada-01-governado-bloqueio.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-01-governado-bloqueio.feature)
-- **Resultado Observado**: **PASSOU ✅**
-- Cabeçalho: `─── BSH [Business Semantic Harness] ─────────────────────────── [*] GOVERNED ───`
-- Interceptação de Prompt: O BSH detectou violação de `TransferShape` no prompt, exibiu o alerta `[!] [PROMPT VIOLATION DETECTED]` e pausou aguardando `[Enter]`.
-- Confirmação do Usuário: O usuário confirmou via `[Enter]`.
-- Bloqueio no Gate: O gate semântico interceptou a violação pós-execução e exibiu `[X] VIOLATION -> Status: VIOLATION (Promotion blocked)`.
-
-### Jornada 2: Operação Desgovernada
-- **Arquivo Feature**: [`test/features/journeys/jornada-02-desgovernado-sem-harness.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-02-desgovernado-sem-harness.feature)
-- **Resultado Observado**: **PASSOU ✅**
-- Cabeçalho: `─── BSH [Business Semantic Harness] ─────────────────────────── [o] UNGOVERNED ───`
-- Nenhuma validação SHACL disparada.
-
-### Jornada 3: Governança Semântica Cooperativa (Alteração Conforme)
-- **Arquivo Feature**: [`test/features/journeys/jornada-03-governado-conforme.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-03-governado-conforme.feature)
-- **Resultado Observado**: **PASSOU ✅**
-- O gate semântico confirmou conformidade: `[OK] CONFORMING -> Status: CONFORMING (Ready to promote)`.
-
-### Jornada 4: Detecção Proativa de Desalinhamento Ontológico (Domain Mismatch)
-- **Arquivo Feature**: [`test/features/journeys/jornada-04-desalinhamento-afinidade.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-04-desalinhamento-afinidade.feature)
-- **Resultado Observado**: **PASSOU ✅**
-- Cabeçalho: `─── BSH [Business Semantic Harness] ──────────────────── [!] DOMAIN MISMATCH ───`
-- Alerta emitido: `[!] [Semantic Domain Alert]: Baixa afinidade semântica...`
-- O usuário desativou o harness via `/ungoverned`, transicionando para `[o] UNGOVERNED` e prosseguindo sem bloqueios.
-
-### Jornada 5: Busca de Modelos no OpenRouter com Cancelamento Seguro
-- **Arquivo Feature**: [`test/features/journeys/jornada-05-busca-e-troca-modelos.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-05-busca-e-troca-modelos.feature)
-- **Resultado Observado**: **PASSOU ✅**
-- Comando digitado: `/model gpt`
-- Modal exibido: `Search OpenRouter Models: "gpt"` com modelos reais retornados da API (`openai/gpt-4o`, `openai/gpt-4o-mini`).
-- Tecla digitada: `q` para fechar sem alterar.
-- Modelo ativo preservado: `deepseek/deepseek-v4.1-flash`.
+| **6. Servidor MCP (Governança Externa)** | [`bsh-mcp-server-scenario.mp4`](file://{mcp_server_res['video_path']}) | {mcp_server_res['file_size_kb']:.1f} KB | `{mcp_server_res['sha256']}` | [`bsh-mcp-server-scenario.png`](file://{mcp_server_res['screenshot_path']}) |
+| **7. Cliente MCP (Consumo de Terceiros)** | [`bsh-mcp-client-scenario.mp4`](file://{mcp_client_res['video_path']}) | {mcp_client_res['file_size_kb']:.1f} KB | `{mcp_client_res['sha256']}` | [`bsh-mcp-client-scenario.png`](file://{mcp_client_res['screenshot_path']}) |
 
 ---
 
-## 4. Evidência Textual das Sessões
+## 3. Rastreabilidade com as Especificações Gherkin
 
-### Captura do Terminal - Jornada 1 (Governed Bloqueio)
-```text
-{gov_res['final_text']}
-```
-
-### Captura do Terminal - Jornada 2 (Ungoverned)
-```text
-{ungov_res['final_text']}
-```
-
-### Captura do Terminal - Jornada 3 (Governed Conforme)
-```text
-{coop_res['final_text']}
-```
-
-### Captura do Terminal - Jornada 4 (Alerta de Mismatch e Bypass)
-```text
-{mismatch_res['final_text']}
-```
-
-### Captura do Terminal - Jornada 5 (Busca de Modelos e Cancelamento Seguro)
-```text
-{model_res['final_text']}
-```
+- **Jornada 1**: [`test/features/journeys/jornada-01-governado-bloqueio.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-01-governado-bloqueio.feature) — PASSOU ✅
+- **Jornada 2**: [`test/features/journeys/jornada-02-desgovernado-sem-harness.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-02-desgovernado-sem-harness.feature) — PASSOU ✅
+- **Jornada 3**: [`test/features/journeys/jornada-03-governado-conforme.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-03-governado-conforme.feature) — PASSOU ✅
+- **Jornada 4**: [`test/features/journeys/jornada-04-desalinhamento-afinidade.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-04-desalinhamento-afinidade.feature) — PASSOU ✅
+- **Jornada 5**: [`test/features/journeys/jornada-05-busca-e-troca-modelos.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-05-busca-e-troca-modelos.feature) — PASSOU ✅
+- **Jornada 6**: [`test/features/journeys/jornada-06-mcp-servidor-governanca.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-06-mcp-servidor-governanca.feature) — PASSOU ✅
+- **Jornada 7**: [`test/features/journeys/jornada-07-mcp-cliente-terceiros.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-07-mcp-cliente-terceiros.feature) — PASSOU ✅
 
 ---
 
-## 5. Conclusão da Avaliação
+## 4. Conclusão da Avaliação
 
-A interface moderna no padrão OpenTUI aliada à integração direta com o catálogo do OpenRouter oferece ergonomia superior e total segurança negocial:
-- Com o harness ativo, as restrições em SHACL agem preventivamente no branch isolado.
-- Os slides iniciais em português e o repouso final de 20 segundos garantem total legibilidade aos avaliadores técnicos e de negócio.
-- Todos os 5 vídeos e o relatório Markdown estão sincronizados na pasta Downloads do Windows.
+A padronização obrigatória de especificação em `.feature` e geração de evidência em vídeo `.mp4` consolida a rastreabilidade científica e a reprodutibilidade do BSH em todos os seus pontos de contato operacionais.
 """
     output_file.write_text(content, encoding="utf-8")
 
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="BSH E2E Video Recorder")
+    parser.add_argument("--scenario", choices=["1", "2", "3", "4", "5", "6", "7", "all"], default="all")
+    parsed_args = parser.parse_args()
+
+    ensure_dirs()
+    pilot_dir = WORKTREE_ROOT / "pilot" / "asset-management"
+    bsh_bin = shutil.which("bsh") or str(WORKTREE_ROOT / "dist" / "cli.js")
+
+    if parsed_args.scenario == "6":
+        # Run only Scenario 6
+        mcp_server_video = VIDEOS_DIR / "bsh-mcp-server-scenario.mp4"
+        mcp_server_shot = SCREENSHOTS_DIR / "bsh-mcp-server-scenario.png"
+        intro_lines = [
+            "Domínio de Negócio: Gestão de Ativos ('ativos')",
+            "Protocolo: Model Context Protocol (MCP) via transporte stdio",
+            "Objetivo da Jornada: Agentes externos consomem governança semântica via MCP.",
+            "Comportamento Esperado do BSH:",
+            "  • BSH inicializa em modo servidor MCP com ferramentas ontológicas e SHACL.",
+            "  • O cliente lista e descobre ferramentas (bsh_query_ontology, bsh_validate_shacl, etc).",
+            "  • bsh_check_prompt_intent intercepta solicitações violadoras em pré-voo.",
+            "  • bsh_query_ontology recupera definições formais de classes e propriedades.",
+            "  • bsh_validate_shacl valida fatos RDF e bloqueia violações negociais no Gate Semântico.",
+        ]
+        res = record_scenario(
+            session_name="bsh-e2e-mcp-server",
+            title="BSH E2E Scenario 6: MCP Server Governance for External Agents",
+            intro_title="Jornada 6: BSH como Servidor MCP — Governança de Agentes Externos",
+            intro_lines=intro_lines,
+            command=["node", str(WORKTREE_ROOT / "test" / "support" / "run-jornada-06-mcp-server.mjs")],
+            user_inputs=[],
+            output_video=mcp_server_video,
+            output_screenshot=mcp_server_shot,
+            completion_marker="─── MCP Session Completed",
+            max_wait=60.0,
+            is_interactive_tui=False,
+        )
+        print(f"✔ MCP Server video saved: {res['video_path']} ({res['file_size_kb']:.1f} KB, SHA-256: {res['sha256'][:16]}...)")
+        sys.exit(0)
+
+    elif parsed_args.scenario == "7":
+        # Run only Scenario 7
+        mcp_client_video = VIDEOS_DIR / "bsh-mcp-client-scenario.mp4"
+        mcp_client_shot = SCREENSHOTS_DIR / "bsh-mcp-client-scenario.png"
+        intro_lines = [
+            "Configuração: .bsh/mcp.json com servidor externo 'context7'",
+            "Protocolo: Model Context Protocol (MCP) via transporte stdio",
+            "Objetivo da Jornada: Integrar ferramentas de terceiros (busca documental) ao agente BSH.",
+            "Comportamento Esperado do BSH:",
+            "  • BSH carrega a configuração e conecta-se ao servidor Context7.",
+            "  • Ferramenta context7_search_docs é descoberta e registrada.",
+            "  • Durante o turno do agente, a ferramenta é acionada para recuperar documentação técnica.",
+            "  • O agente sintetiza a resposta final fundamentada na documentação recebida.",
+        ]
+        res = record_scenario(
+            session_name="bsh-e2e-mcp-client",
+            title="BSH E2E Scenario 7: MCP Client Consuming Third-Party Tools (Context7)",
+            intro_title="Jornada 7: BSH como Cliente MCP — Consumo de Ferramentas de Terceiros",
+            intro_lines=intro_lines,
+            command=["node", str(WORKTREE_ROOT / "test" / "support" / "run-jornada-07-mcp-client.mjs")],
+            user_inputs=[],
+            output_video=mcp_client_video,
+            output_screenshot=mcp_client_shot,
+            completion_marker="─── MCP Client Execution Finished",
+            max_wait=60.0,
+            is_interactive_tui=False,
+        )
+        print(f"✔ MCP Client video saved: {res['video_path']} ({res['file_size_kb']:.1f} KB, SHA-256: {res['sha256'][:16]}...)")
+        sys.exit(0)
+
     raise SystemExit(main())
