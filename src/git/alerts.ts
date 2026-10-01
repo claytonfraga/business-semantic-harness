@@ -57,6 +57,6 @@ export async function writeAlerts(root: string, sessionId: string, alerts: Confl
   const lines = alerts
     .map((alert) => JSON.stringify({ time: new Date().toISOString(), sessionId, severity: 'ALERTA', ...alert }))
     .join('\n');
-  if (lines.length > 0) await appendFile(file, lines + '\n', { mode: 0o600 });
+  if (lines.length > 0) await appendFile(file, `${lines}\n`, { mode: 0o600 });
   return file;
 }

@@ -1,13 +1,16 @@
 {
   "name": "business-semantic-harness",
-  "version": "0.2.3-beta",
+  "version": "0.2.4-beta",
   "type": "module",
+  "license": "Apache-2.0",
   "files": [
     "dist/",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "bin": {
-    "bsh": "./dist/cli.js"
+    "bsh": "dist/cli.js",
+    "business-semantic-harness": "dist/cli.js"
   },
   "scripts": {
     "build": "tsc && node scripts/prepare-bin.mjs",

@@ -15,7 +15,7 @@ import { createProposal } from '../proposals/store.js';
 function recordSessionEvent(fileName: string, entry: Record<string, unknown>): void {
   const directory = process.env.BSH_SESSION_DIR;
   if (!directory) return;
-  const line = JSON.stringify({ time: new Date().toISOString(), ...entry }) + '\n';
+  const line = `${JSON.stringify({ time: new Date().toISOString(), ...entry })}\n`;
   appendFile(join(directory, fileName), line, { mode: 0o600 }).catch(() => undefined);
 }
 

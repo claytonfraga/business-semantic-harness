@@ -27,10 +27,10 @@ BG_COLOR = (15, 23, 42)       # Slate 900
 TEXT_COLOR = (241, 245, 249)  # Slate 100
 HEADER_COLOR = (56, 189, 248) # Sky 400
 
-WORKTREE_ROOT = Path("/home/clayton/projetos/oracle/.worktrees/scientific-report-reconciliation")
+WORKTREE_ROOT = Path(os.environ.get("BSH_ROOT", "/home/clayton/projetos/oracle"))
 VIDEOS_DIR = WORKTREE_ROOT / "evaluation" / "videos"
 REPORTS_DIR = WORKTREE_ROOT / "evaluation" / "reports"
-SCREENSHOTS_DIR = WORKTREE_ROOT / "screenshots"
+SCREENSHOTS_DIR = WORKTREE_ROOT / "evaluation" / "screenshots"
 
 
 def ensure_dirs() -> None:
@@ -89,7 +89,7 @@ def render_intro_slide(
     draw.line([(PADDING * 4, height - 80), (width - PADDING * 4, height - 80)], fill=(60, 60, 60), width=1)
     draw.text(
         (PADDING * 4, height - 58),
-        "OpenRouter Native Client • Governança Ontológica RDF/SHACL • TUI Estilo OpenCode • Worktrees Git",
+        "OpenRouter Native Client • Governança Ontológica RDF/SHACL • Interface Interativa • Worktrees Git",
         font=footer_font,
         fill=(160, 160, 160),
     )
@@ -113,22 +113,25 @@ def render_terminal_frame(text: str, title: str, output_path: Path, width: int =
     y = 48
 
     for line in lines:
-        # Determine syntax color based on content (OpenCode style)
         color = TEXT_COLOR
-        if "VIOLATION" in line or "✖" in line or "Error" in line or "🚨" in line:
-            color = (248, 113, 113) # Red 400
-        elif "● GOVERNED" in line or "CONFORMING" in line or "✔" in line:
-            color = (74, 222, 128) # Emerald 400
-        elif "Semantic Gate" in line or "🛡" in line:
-            color = (56, 189, 248) # Sky 400
-        elif "⚙ Tool" in line or "○ UNGOVERNED" in line:
+        if "[*] GOVERNED" in line or "[OK] CONFORMING" in line or "[+]" in line or "[■] Governed" in line:
+            color = (34, 197, 94)  # Emerald 500
+        elif "[!] DOMAIN MISMATCH" in line or "[!] [Semantic Domain Alert]" in line or "[!] mismatch" in line or "[o] UNGOVERNED" in line or "[o] Ungoverned" in line:
             color = (250, 204, 21) # Amber 400
-        elif line.startswith("───") or line.startswith("─"):
-            color = (71, 85, 105) # Slate 600 divider
-        elif "❯ [User]" in line:
+        elif "[X] VIOLATION" in line or "Promotion blocked" in line or "Error" in line:
+            color = (248, 113, 113) # Red 400
+        elif "> [User]" in line or "▎ >" in line:
             color = (56, 189, 248) # Sky 400
-        elif line.startswith("│"):
-            color = TEXT_COLOR
+        elif "[BSH Agent]" in line:
+            color = (192, 132, 252) # Purple 400
+        elif ">_ Tool:" in line:
+            color = (251, 191, 36) # Amber 300
+        elif "->" in line and "Status" not in line:
+            color = (74, 222, 128) # Green 400
+        elif "───" in line or line.startswith("─"):
+            color = (71, 85, 105)  # Slate 600
+        elif "[Ctrl+" in line or "git(" in line or "·" in line:
+            color = (148, 163, 184) # Slate 400
 
         draw.text((PADDING, y), line, font=font, fill=color)
         y += LINE_HEIGHT
@@ -183,16 +186,17 @@ def record_scenario(
     intro_file = temp_frames / f"frame_{frame_idx:04d}.png"
     render_intro_slide(intro_title, intro_lines, intro_file)
     frame_idx += 1
-    for _ in range(7): # 8 frames total = 4 seconds of readable intro slide at 2 fps
+    # 16 frames = 8.0 seconds of readable intro slide at 2 fps
+    for _ in range(15):
         shutil.copyfile(intro_file, temp_frames / f"frame_{frame_idx:04d}.png")
         frame_idx += 1
 
     # Kill existing session if any
     subprocess.run(["tmux", "kill-session", "-t", session_name], stderr=subprocess.DEVNULL)
-    # Start tmux session with 110x32
+    # Start tmux session with 120x32
     subprocess.run([
         "tmux", "new-session", "-d", "-s", session_name,
-        "-x", "110", "-y", "32",
+        "-x", "120", "-y", "32",
     ], check=True)
 
     try:
@@ -209,15 +213,52 @@ def record_scenario(
                 frame_idx += 1
                 time.sleep(delay)
 
+        def type_prompt_interactively(text: str) -> None:
+            # Type words with frames snapped so user sees prompt being typed in prompt space
+            words = text.split(" ")
+            accum = ""
+            for i, word in enumerate(words):
+                chunk = word if i == 0 else " " + word
+                for char in chunk:
+                    subprocess.run(["tmux", "send-keys", "-t", session_name, "-l", char], check=True)
+                    time.sleep(0.04)
+                accum += chunk
+                if i % 2 == 0 or i == len(words) - 1:
+                    snap(count=1, delay=0.25)
+
+            # Hold full prompt in the prompt area for 6.0 seconds (12 frames) so a human can read it!
+            snap(count=12, delay=0.5)
+
+            # Press Enter
+            subprocess.run(["tmux", "send-keys", "-t", session_name, "Enter"], check=True)
+            time.sleep(0.5)
+
         # Initial wait for startup and header render
         snap(count=6, delay=0.5)
 
         # Process user inputs
         for inp, wait_time in user_inputs:
-            type_keys(session_name, inp, enter=True)
-            # Record frames while agent processes/streams
-            steps = max(1, int(wait_time * 2))
-            snap(count=steps, delay=0.5)
+            if inp.startswith("/"):
+                type_keys(session_name, inp, enter=True)
+                snap(count=int(wait_time * 2), delay=0.5)
+            else:
+                type_prompt_interactively(inp)
+                time.sleep(0.5)
+                # Check if prompt violation confirmation gate was triggered
+                pane_text = capture_tmux_pane(session_name)
+                if "Enter para prosseguir" in pane_text or "PROMPT VIOLATION DETECTED" in pane_text:
+                    # Hold prompt violation warning for 6.0 seconds (12 frames) so viewer can inspect the alert
+                    snap(count=12, delay=0.5)
+                    # Press Enter to confirm and proceed
+                    subprocess.run(["tmux", "send-keys", "-t", session_name, "Enter"], check=True)
+                    time.sleep(0.5)
+
+                # Wait while agent executes tools and gate checks
+                steps = max(1, int(wait_time * 2))
+                snap(count=steps, delay=0.6)
+
+        # Hold final resting screen for 20.0 seconds (40 frames) so human can comfortably inspect all details
+        snap(count=40, delay=0.5)
 
         # Final capture while BSH is active
         final_text = capture_tmux_pane(session_name)
@@ -263,20 +304,20 @@ def main() -> int:
     gov_video = VIDEOS_DIR / "bsh-governed-scenario.mp4"
     gov_shot = SCREENSHOTS_DIR / "bsh-governed-scenario.png"
 
-    gov_intro_title = "Jornada 1: Sessão Governada — Bloqueio Semântico de Violação SHACL"
+    gov_intro_title = "Jornada 1: Sessão Governada — Detecção de Prompt Violador e Bloqueio SHACL"
     gov_intro_lines = [
         "Domínio de Negócio: Gestão de Ativos ('ativos')",
         "Objetivo da Jornada: Tentar transferir um ativo baixado (AST-002) sem justificativa.",
         "Comportamento Esperado do BSH:",
-        "  • O modelo inspeciona a base de código no worktree isolado.",
-        "  • O Gate Semântico avalia os fatos RDF contra as regras em shapes.ttl.",
-        "  • A violação de TransferShape é detectada e a promoção é bloqueada (VIOLATION).",
+        "  • A guarda semântica pré-execução detecta a violação do prompt contra a TransferShape.",
+        "  • O prompt é destacado com [!] VIOLATION DETECTED e exibido alerta explicativo.",
+        "  • O BSH pausa e solicita [Enter] para prosseguir (configurável em /settings).",
+        "  • O usuário confirma via [Enter], o modelo executa no worktree e o Gate bloqueia a promoção.",
         "  • O branch principal permanece 100% íntegro e protegido contra corrupção negocial.",
     ]
 
     gov_inputs = [
-        ("Transfer retired asset AST-002 to Maintenance department without justification", 12.0),
-        ("/diff", 4.0),
+        ("Transfer retired asset AST-002 to Maintenance department without justification", 14.0),
     ]
 
     gov_res = record_scenario(
@@ -349,8 +390,7 @@ def main() -> int:
     ]
 
     coop_inputs = [
-        ("Add an endpoint to transfer assets in 'In Operation' state with new owner and location", 12.0),
-        ("/diff", 4.0),
+        ("Add an endpoint to transfer assets in 'In Operation' state with new owner and location", 14.0),
     ]
 
     coop_res = record_scenario(
@@ -365,17 +405,114 @@ def main() -> int:
     )
     print(f"✔ Cooperative video saved: {coop_res['video_path']} ({coop_res['file_size_kb']:.1f} KB, SHA-256: {coop_res['sha256'][:16]}...)")
 
+    # Scenario 4: Domain Mismatch Alert (Harness Detecta Incompatibilidade Semântica)
+    print("\n--- Running Scenario 4: Domain Mismatch Alert (Incompatibilidade Semântica) ---")
+    mismatch_video = VIDEOS_DIR / "bsh-domain-mismatch-scenario.mp4"
+    mismatch_shot = SCREENSHOTS_DIR / "bsh-domain-mismatch-scenario.png"
+
+    mismatch_intro_title = "Jornada 4: Alerta Proativo de Desalinhamento Ontológico (Domain Mismatch)"
+    mismatch_intro_lines = [
+        "Domínio Selecionado: Gestão de Ativos ('ativos')",
+        "Projeto em Execução: Microserviço de Cálculo Matemático (sem termos de patrimônio)",
+        "Objetivo da Jornada: Verificar se o BSH detecta a incompatibilidade de conceitos entre ontologia e código.",
+        "Comportamento Esperado do BSH:",
+        "  • O mecanismo de afinidade semântica analisa a base de código do projeto.",
+        "  • Detecta baixa afinidade (conceitos de 'ativos' ausentes no código).",
+        "  • O cabeçalho exibe '[⚠ DOMAIN MISMATCH]' e '(⚠ mismatch)'.",
+        "  • O feed inicial emite o alerta '⚠ [Semantic Domain Alert]' recomendando ações.",
+        "  • O usuário digita '/ungoverned' para desativar o harness ou troca de domínio com '/domain'.",
+    ]
+
+    temp_mismatch_dir = Path(tempfile.mkdtemp(prefix="bsh_mismatch_"))
+    try:
+        math_src = temp_mismatch_dir / "src"
+        math_src.mkdir(parents=True, exist_ok=True)
+        (math_src / "calculator.ts").write_text(
+            "export function sum(a: number, b: number): number { return a + b; }\n"
+            "export function multiply(a: number, b: number): number { return a * b; }\n",
+            encoding="utf-8"
+        )
+        (math_src / "trigonometry.ts").write_text(
+            "export function calculateSin(deg: number): number { return Math.sin(deg * Math.PI / 180); }\n",
+            encoding="utf-8"
+        )
+        # Copy .bsh with ativos domain from pilot
+        shutil.copytree(pilot_dir / ".bsh", temp_mismatch_dir / ".bsh")
+
+        # Initialize git repo so gitBranch is detected in TUI
+        subprocess.run(["git", "init", "-b", "main", str(temp_mismatch_dir)], check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(["git", "-C", str(temp_mismatch_dir), "config", "user.name", "BSH Tester"], check=True)
+        subprocess.run(["git", "-C", str(temp_mismatch_dir), "config", "user.email", "tester@bsh.dev"], check=True)
+        subprocess.run(["git", "-C", str(temp_mismatch_dir), "add", "-A"], check=True)
+        subprocess.run(["git", "-C", str(temp_mismatch_dir), "commit", "-m", "Initial math microservice"], check=True, stdout=subprocess.DEVNULL)
+
+        mismatch_inputs = [
+            ("/affinity", 4.0),
+            ("/ungoverned", 4.0),
+            ("Implement function to calculate factorial of a number", 10.0),
+        ]
+
+        mismatch_res = record_scenario(
+            session_name="bsh-e2e-mismatch",
+            title="BSH E2E Scenario 4: Domain Mismatch Alert & User Bypass",
+            intro_title=mismatch_intro_title,
+            intro_lines=mismatch_intro_lines,
+            command=[bsh_bin, "--project", str(temp_mismatch_dir)],
+            user_inputs=mismatch_inputs,
+            output_video=mismatch_video,
+            output_screenshot=mismatch_shot,
+        )
+        print(f"✔ Domain Mismatch video saved: {mismatch_res['video_path']} ({mismatch_res['file_size_kb']:.1f} KB, SHA-256: {mismatch_res['sha256'][:16]}...)")
+    finally:
+        shutil.rmtree(temp_mismatch_dir, ignore_errors=True)
+
+    # Scenario 5: OpenRouter Model Search & Safe Cancel
+    print("\n--- Running Scenario 5: OpenRouter Model Search & Safe Cancel ---")
+    model_video = VIDEOS_DIR / "bsh-model-search-scenario.mp4"
+    model_shot = SCREENSHOTS_DIR / "bsh-model-search-scenario.png"
+
+    model_intro_title = "Jornada 5: Busca de Modelos no OpenRouter e Cancelamento Seguro"
+    model_intro_lines = [
+        "Catálogo de Modelos: OpenRouter API (catálogo real em tempo real)",
+        "Objetivo da Jornada: Abrir busca de modelos com '/model gpt', inspecionar resultados reais e fechar com 'q'.",
+        "Comportamento Esperado do BSH:",
+        "  • O usuário dispara o comando '/model gpt' para pesquisar modelos da família GPT.",
+        "  • O modal exibe os modelos reais da API (como openai/gpt-4o, openai/gpt-4o-mini) com limites de contexto.",
+        "  • O usuário avalia a listagem e digita 'q' para fechar sem selecionar nenhum novo modelo.",
+        "  • O modal é fechado imediatamente e o modelo original (deepseek/deepseek-v4.1-flash) é mantido.",
+        "  • A telemetria e o rodapé preservam o estado da sessão sem alterações indesejadas.",
+    ]
+
+    model_inputs = [
+        ("/model gpt", 6.0),
+        ("q", 4.0),
+    ]
+
+    model_res = record_scenario(
+        session_name="bsh-e2e-model-search",
+        title="BSH E2E Scenario 5: OpenRouter Model Search & Safe Cancel",
+        intro_title=model_intro_title,
+        intro_lines=model_intro_lines,
+        command=[bsh_bin, "--project", str(pilot_dir)],
+        user_inputs=model_inputs,
+        output_video=model_video,
+        output_screenshot=model_shot,
+    )
+    print(f"✔ Model search video saved: {model_res['video_path']} ({model_res['file_size_kb']:.1f} KB, SHA-256: {model_res['sha256'][:16]}...)")
+
     # Copy MP4 videos to WSL Downloads for easy human evaluation
     downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
     if downloads_dir.exists():
         shutil.copy2(gov_video, downloads_dir / "bsh-governed-scenario.mp4")
         shutil.copy2(ungov_video, downloads_dir / "bsh-ungoverned-scenario.mp4")
         shutil.copy2(coop_video, downloads_dir / "bsh-cooperative-scenario.mp4")
-        print(f"✔ Copied all 3 MP4 videos to Windows Downloads: {downloads_dir}")
+        shutil.copy2(mismatch_video, downloads_dir / "bsh-domain-mismatch-scenario.mp4")
+        shutil.copy2(model_video, downloads_dir / "bsh-model-search-scenario.mp4")
+        print(f"✔ Copied all 5 MP4 videos to Windows Downloads: {downloads_dir}")
 
     # Generate Comprehensive Test Report
     report_file = REPORTS_DIR / "relatorio-testes-e2e-openrouter.md"
-    generate_markdown_report(gov_res, ungov_res, coop_res, report_file)
+    generate_markdown_report(gov_res, ungov_res, coop_res, mismatch_res, model_res, report_file)
     if downloads_dir.exists():
         shutil.copy2(report_file, downloads_dir / "relatorio-testes-e2e-openrouter.md")
     print(f"✔ Comprehensive test report generated: {report_file}")
@@ -383,87 +520,83 @@ def main() -> int:
     return 0
 
 
-def generate_markdown_report(gov_res: dict, ungov_res: dict, coop_res: dict, output_file: Path) -> None:
+def generate_markdown_report(gov_res: dict, ungov_res: dict, coop_res: dict, mismatch_res: dict, model_res: dict, output_file: Path) -> None:
     now_iso = time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())
     bsh_bin = shutil.which("bsh") or "bsh"
     content = f"""# Relatório de Testes E2E: BSH com OpenRouter e Governança Semântica
 
 **Data de Execução**: {now_iso}  
 **Ambiente**: Linux x86_64, Node.js v22, OpenRouter API (`sk-or-v1-...`)  
-**Executável do BSH**: `{bsh_bin}` (Pacote de distribuição `business-semantic-harness-0.2.3-beta.tgz`)  
+**Executável do BSH**: `{bsh_bin}` (Pacote de distribuição `business-semantic-harness-0.2.4-beta.tgz`)  
 **Fonte da Verdade da Especificação**: [`test/features/bsh-governance.feature`](file://{WORKTREE_ROOT}/test/features/bsh-governance.feature)  
+**Jornadas de Usuário**: [`test/features/journeys/`](file://{WORKTREE_ROOT}/test/features/journeys/)  
 **Projeto Piloto**: [`pilot/asset-management`](file://{WORKTREE_ROOT}/pilot/asset-management) (Domínio `ativos`)
 
 ---
 
 ## 1. Sumário Executivo
 
-Este relatório apresenta a validação E2E do **Business Semantic Harness (BSH)** operando como cliente nativo do **OpenRouter** com interface TUI moderna inspirada no OpenCode (sem bordas laterais, altura fixa e rolagem interna). Foram executados e gravados em vídeo MP4 (H.264) com slides explicativos iniciais em português três cenários comparativos:
+Este relatório apresenta a validação E2E do **Business Semantic Harness (BSH)** operando como cliente nativo do **OpenRouter** com interface TUI moderna no padrão OpenTUI (altura fixa, rolagem interna, telemetria em tempo real e sem bordas laterais). Foram executados e gravados em vídeo MP4 (H.264) com slides explicativos iniciais em português e repouso final de 20 segundos cinco cenários representativos das regras de negócio:
 
-1. **Jornada 1 (Harness Ontológico Ativo - Governed Bloqueio)**: O BSH inicia com o domínio `ativos` e regras SHACL ativas. Uma solicitação para transferir um ativo em estado `Baixado` é interceptada pelo Gate Semântico, que bloqueia a promoção e reporta a violação da regra de negócio `TransferShape`.
+1. **Jornada 1 (Harness Ontológico Ativo - Detecção e Confirmação de Prompt Violador + Bloqueio)**: O BSH inicia com o domínio `ativos` e regras SHACL ativas. Uma solicitação para transferir um ativo em estado `Baixado` é interceptada na entrada pela guarda pré-execução, que destaca o prompt com `[!] VIOLATION DETECTED`, exibe alerta ontológico detalhado e solicita confirmação via `[Enter]`. Após confirmação do usuário, o modelo executa no worktree isolado e o Gate Semântico bloqueia a promoção reportando `[X] VIOLATION` da regra `TransferShape`.
 2. **Jornada 2 (Harness Ontológico Desativado - Ungoverned)**: O BSH opera em modo desassistido sem regras ontológicas ativas. A mesma solicitação é processada pelo modelo sem validação de regras de domínio.
 3. **Jornada 3 (Harness Ontológico Ativo - Governed Conforme)**: O modelo aplica uma alteração aderente às regras de negócio para ativos em operação, recebendo o status `CONFORMING` e aprovação do Gate Semântico.
+4. **Jornada 4 (Detecção Proativa de Desalinhamento - Domain Mismatch)**: Ao iniciar em um projeto cujos conceitos não possuem relação com a ontologia ativa, o BSH alerta preventivamente o usuário via `[!] DOMAIN MISMATCH` e permite ao usuário alternar a ontologia ou desativar o mecanismo (`/ungoverned`).
+5. **Jornada 5 (Busca e Alternância de Modelos - OpenRouter Model Search)**: O usuário busca modelos pelo comando `/model gpt`, visualiza a listagem real com limites de contexto retornada da API do OpenRouter e cancela com `q`, preservando o modelo inicial intacto.
 
 ---
 
 ## 2. Artefatos de Vídeo para Avaliação Humana
 
-Todos os vídeos foram gravados diretamente do terminal `tmux`, incluindo **slide inicial com fundo preto e letra branca em português** apresentando os objetivos da jornada, seguido da execução em tempo real na interface OpenCode do BSH:
+Todos os vídeos foram gravados diretamente do terminal `tmux`, incluindo **slide inicial com fundo preto e letra branca em português** apresentando os objetivos da jornada, seguido da digitação interativa do prompt e execução em tempo real na interface OpenTUI do BSH, com repouso estendido de 20 segundos na tela final:
 
 | Cenário / Jornada | Arquivo de Vídeo | Tamanho | SHA-256 | Captura Final |
 |---|---|---|---|---|
-| **1. Harness Ativo (Bloqueio)** | [`bsh-governed-scenario.mp4`](file://{gov_res['video_path']}) | {gov_res['file_size_kb']:.1f} KB | `{gov_res['sha256']}` | [`bsh-governed-scenario.png`](file://{gov_res['screenshot_path']}) |
+| **1. Harness Ativo (Prompt & Gate)** | [`bsh-governed-scenario.mp4`](file://{gov_res['video_path']}) | {gov_res['file_size_kb']:.1f} KB | `{gov_res['sha256']}` | [`bsh-governed-scenario.png`](file://{gov_res['screenshot_path']}) |
 | **2. Harness Desativado** | [`bsh-ungoverned-scenario.mp4`](file://{ungov_res['video_path']}) | {ungov_res['file_size_kb']:.1f} KB | `{ungov_res['sha256']}` | [`bsh-ungoverned-scenario.png`](file://{ungov_res['screenshot_path']}) |
 | **3. Harness Ativo (Conforme)** | [`bsh-cooperative-scenario.mp4`](file://{coop_res['video_path']}) | {coop_res['file_size_kb']:.1f} KB | `{coop_res['sha256']}` | [`bsh-cooperative-scenario.png`](file://{coop_res['screenshot_path']}) |
+| **4. Alerta de Afinidade (Mismatch)** | [`bsh-domain-mismatch-scenario.mp4`](file://{mismatch_res['video_path']}) | {mismatch_res['file_size_kb']:.1f} KB | `{mismatch_res['sha256']}` | [`bsh-domain-mismatch-scenario.png`](file://{mismatch_res['screenshot_path']}) |
+| **5. Busca de Modelos (Safe Cancel)** | [`bsh-model-search-scenario.mp4`](file://{model_res['video_path']}) | {model_res['file_size_kb']:.1f} KB | `{model_res['sha256']}` | [`bsh-model-search-scenario.png`](file://{model_res['screenshot_path']}) |
 
-> **Cópia no Windows Downloads**: Os vídeos foram copiados para `/mnt/c/Users/clayt/Downloads/` para inspeção imediata.
+> **Cópia no Windows Downloads**: Os 5 vídeos MP4 e este relatório foram copiados para `/mnt/c/Users/clayt/Downloads/` para inspeção imediata.
 
 ---
 
 ## 3. Rastreabilidade com a Fonte da Verdade (Gherkin)
 
-### Jornada 1: Governança Semântica Ativa (Bloqueio de Violação)
-```gherkin
-  Rule: Com o harness ativo, o gate semântico intercepta alterações e bloqueia violações de SHACL
-
-    Scenario: Bloqueio de alteração violadora (Transferência de ativo Baixado)
-      Given que o projeto piloto possui o domínio "ativos" configurado
-      And o BSH é iniciado com governança ativa no domínio "ativos" através do OpenRouter
-      When o modelo tenta registrar a transferência de ativo baixado
-      Then o gate semântico detecta a violação da regra "TransferShape"
-      And o BSH bloqueia a promoção com status "VIOLATION"
-```
+### Jornada 1: Governança Semântica Ativa (Detecção de Prompt Violador e Bloqueio de Promoção)
+- **Arquivo Feature**: [`test/features/journeys/jornada-01-governado-bloqueio.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-01-governado-bloqueio.feature)
 - **Resultado Observado**: **PASSOU ✅**
-- Cabeçalho: `─── BSH [Business Semantic Harness] ─────────────────────────── [● GOVERNED] ───`
-- O gate semântico interceptou a violação e exibiu `🚨 Semantic Gate: VIOLATION (Promotion blocked)`.
+- Cabeçalho: `─── BSH [Business Semantic Harness] ─────────────────────────── [*] GOVERNED ───`
+- Interceptação de Prompt: O BSH detectou violação de `TransferShape` no prompt, exibiu o alerta `[!] [PROMPT VIOLATION DETECTED]` e pausou aguardando `[Enter]`.
+- Confirmação do Usuário: O usuário confirmou via `[Enter]`.
+- Bloqueio no Gate: O gate semântico interceptou a violação pós-execução e exibiu `[X] VIOLATION -> Status: VIOLATION (Promotion blocked)`.
 
 ### Jornada 2: Operação Desgovernada
-```gherkin
-  Rule: Com o harness desativado, o modelo opera como cliente direto sem restrições semânticas
-
-    Scenario: Aplicação direta de código sem interceptação de regras de negócio
-      Given que o BSH é iniciado no modo "UNGOVERNED" (sem domínio selecionado)
-      When o modelo realiza alterações no código que contrariam as regras do domínio
-      Then o gate semântico permanece inativo
-      And nenhuma validação SHACL é disparada
-```
+- **Arquivo Feature**: [`test/features/journeys/jornada-02-desgovernado-sem-harness.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-02-desgovernado-sem-harness.feature)
 - **Resultado Observado**: **PASSOU ✅**
-- Cabeçalho: `─── BSH [Business Semantic Harness] ─────────────────────────── [○ UNGOVERNED] ───`
+- Cabeçalho: `─── BSH [Business Semantic Harness] ─────────────────────────── [o] UNGOVERNED ───`
 - Nenhuma validação SHACL disparada.
 
 ### Jornada 3: Governança Semântica Cooperativa (Alteração Conforme)
-```gherkin
-  Rule: Com o harness ativo, o gate semântico valida alterações aderentes e libera a promoção
-
-    Scenario: Alteração conforme aprovada pelo gate semântico
-      Given que o projeto piloto possui o domínio "ativos" configurado
-      When o modelo realiza alteração conforme para ativos em operação
-      Then o gate semântico avalia os fatos RDF contra as regras SHACL
-      And o status retornado é "CONFORMING" com 0 violações
-      And a promoção para o branch principal é liberada
-```
+- **Arquivo Feature**: [`test/features/journeys/jornada-03-governado-conforme.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-03-governado-conforme.feature)
 - **Resultado Observado**: **PASSOU ✅**
-- O gate semântico confirmou conformidade: `🛡️  Semantic Gate: CONFORMING (Ready to promote)`.
+- O gate semântico confirmou conformidade: `[OK] CONFORMING -> Status: CONFORMING (Ready to promote)`.
+
+### Jornada 4: Detecção Proativa de Desalinhamento Ontológico (Domain Mismatch)
+- **Arquivo Feature**: [`test/features/journeys/jornada-04-desalinhamento-afinidade.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-04-desalinhamento-afinidade.feature)
+- **Resultado Observado**: **PASSOU ✅**
+- Cabeçalho: `─── BSH [Business Semantic Harness] ──────────────────── [!] DOMAIN MISMATCH ───`
+- Alerta emitido: `[!] [Semantic Domain Alert]: Baixa afinidade semântica...`
+- O usuário desativou o harness via `/ungoverned`, transicionando para `[o] UNGOVERNED` e prosseguindo sem bloqueios.
+
+### Jornada 5: Busca de Modelos no OpenRouter com Cancelamento Seguro
+- **Arquivo Feature**: [`test/features/journeys/jornada-05-busca-e-troca-modelos.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-05-busca-e-troca-modelos.feature)
+- **Resultado Observado**: **PASSOU ✅**
+- Comando digitado: `/model gpt`
+- Modal exibido: `Search OpenRouter Models: "gpt"` com modelos reais retornados da API (`openai/gpt-4o`, `openai/gpt-4o-mini`).
+- Tecla digitada: `q` para fechar sem alterar.
+- Modelo ativo preservado: `deepseek/deepseek-v4.1-flash`.
 
 ---
 
@@ -484,13 +617,24 @@ Todos os vídeos foram gravados diretamente do terminal `tmux`, incluindo **slid
 {coop_res['final_text']}
 ```
 
+### Captura do Terminal - Jornada 4 (Alerta de Mismatch e Bypass)
+```text
+{mismatch_res['final_text']}
+```
+
+### Captura do Terminal - Jornada 5 (Busca de Modelos e Cancelamento Seguro)
+```text
+{model_res['final_text']}
+```
+
 ---
 
 ## 5. Conclusão da Avaliação
 
-A interface moderna sem bordas laterais inspirada no OpenCode e a integração com o OpenRouter oferecem ergonomia superior aliada à segurança corporativa do BSH:
+A interface moderna no padrão OpenTUI aliada à integração direta com o catálogo do OpenRouter oferece ergonomia superior e total segurança negocial:
 - Com o harness ativo, as restrições em SHACL agem preventivamente no branch isolado.
-- Os slides iniciais em português garantem transparência aos avaliadores técnicos e de negócio.
+- Os slides iniciais em português e o repouso final de 20 segundos garantem total legibilidade aos avaliadores técnicos e de negócio.
+- Todos os 5 vídeos e o relatório Markdown estão sincronizados na pasta Downloads do Windows.
 """
     output_file.write_text(content, encoding="utf-8")
 

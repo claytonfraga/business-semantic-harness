@@ -24,3 +24,6 @@ guia-bsh-harness-autenticacao.md
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
 *.tgz
+image.png
+.codacy/
+diario_de_bordo.md

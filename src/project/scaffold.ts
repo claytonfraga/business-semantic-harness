@@ -18,7 +18,7 @@ export async function initProject(root: string): Promise<void> {
     domains: [],
   };
   try {
-    await writeFile(join(bshDir, 'project.json'), JSON.stringify(manifest, null, 2) + '\n', { flag: 'wx' });
+    await writeFile(join(bshDir, 'project.json'), `${JSON.stringify(manifest, null, 2)}\n`, { flag: 'wx' });
   } catch (error) {
     if (hasCode(error, 'EEXIST')) {
       throw new Error('Manifesto do BSH já existe');
@@ -63,7 +63,7 @@ export async function addDomain(root: string, id: string): Promise<void> {
     },
     '@graph': [{ '@id': 'domain:ontology', '@type': 'bsh:Domain', 'bsh:version': '1.0.0' }],
   };
-  await writeFile(join(domainDir, 'ontology.jsonld'), JSON.stringify(ontology, null, 2) + '\n', { flag: 'wx' });
+  await writeFile(join(domainDir, 'ontology.jsonld'), `${JSON.stringify(ontology, null, 2)}\n`, { flag: 'wx' });
   await writeFile(join(domainDir, 'shapes.ttl'), `@prefix sh: <http://www.w3.org/ns/shacl#> .\n@prefix domain: <${baseIri}> .\n`, { flag: 'wx' });
 
   manifest.domains.push({
@@ -76,13 +76,9 @@ export async function addDomain(root: string, id: string): Promise<void> {
   const manifestPath = join(bshDir, 'project.json');
   const previous = await readFile(manifestPath, 'utf8');
   const tempPath = join(bshDir, `project.json.${process.pid}.tmp`);
-  try {
     if (previous !== await readFile(manifestPath, 'utf8')) {
       throw new Error('Manifesto alterado durante a criação do domínio');
     }
-    await writeFile(tempPath, JSON.stringify(manifest, null, 2) + '\n', { flag: 'wx' });
+    await writeFile(tempPath, `${JSON.stringify(manifest, null, 2)}\n`, { flag: 'wx' });
     await rename(tempPath, manifestPath);
-  } catch (error) {
-    throw error;
-  }
 }
