@@ -12,7 +12,7 @@ import { startTuiSession } from './tui/session.js';
 
 export async function main(argv: string[]): Promise<number> {
   if (argv.length === 1 && (argv[0] === '--version' || argv[0] === '-v')) {
-    process.stdout.write('0.2.6-beta\n');
+    process.stdout.write('0.2.7-beta\n');
     return 0;
   }
   if (argv.length === 1 && argv[0] === '--help') {
