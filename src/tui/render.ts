@@ -109,7 +109,7 @@ export function truncateAnsi(text: string, maxWidth: number): string {
 }
 
 /**
- * Formats a line to exact visible width without lateral borders (OpenCode style).
+ * Formats a line to exact visible width without lateral borders.
  */
 export function tuiLine(text: string, width: number): string {
   const visibleLen = stripAnsi(text).length;

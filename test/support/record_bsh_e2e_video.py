@@ -89,7 +89,7 @@ def render_intro_slide(
     draw.line([(PADDING * 4, height - 80), (width - PADDING * 4, height - 80)], fill=(60, 60, 60), width=1)
     draw.text(
         (PADDING * 4, height - 58),
-        "OpenRouter Native Client • Governança Ontológica RDF/SHACL • TUI Estilo OpenCode • Worktrees Git",
+        "OpenRouter Native Client • Governança Ontológica RDF/SHACL • Interface Interativa • Worktrees Git",
         font=footer_font,
         fill=(160, 160, 160),
     )
