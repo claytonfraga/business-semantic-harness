@@ -28,6 +28,30 @@ export interface AgentTurnResult {
   toolCallsExecuted: number;
 }
 
+export function isActionPrompt(prompt: string): boolean {
+  if (!prompt || typeof prompt !== 'string') return false;
+  const p = prompt.trim().toLowerCase();
+  if (!p) return false;
+
+  const imperativeKeywords = [
+    /\b(faça|faca|crie|adicione|implemente|altere|modifique|transfira|remova|delete|deletar|corrija|ajuste|atualize|escreva|coloque|insira)\b/i,
+    /\b(make|create|add|implement|modify|change|remove|delete|fix|update|write|put|insert)\b/i,
+  ];
+  const hasImperative = imperativeKeywords.some((r) => r.test(p));
+
+  const codingTargetKeywords = [
+    /\b(endpoint|rota|route|função|funcao|handler|controller|service|api)\b/i,
+  ];
+  const hasCodingTarget = codingTargetKeywords.some((r) => r.test(p));
+
+  const isQuestion = /^(como|onde|qual|quais|o que|por que|porque|quantos|quantas|what|where|how|why|which)\b/i.test(p) || p.endsWith('?');
+  if (isQuestion && !hasImperative) {
+    return false;
+  }
+
+  return hasImperative || hasCodingTarget;
+}
+
 export function buildCodingAgentSystemPrompt(options: {
   workspaceSummary?: WorkspaceSummary;
   domainId?: string;
@@ -46,13 +70,13 @@ export function buildCodingAgentSystemPrompt(options: {
 
   parts.push(
     '',
-    'MANDATORY CODING METHODOLOGY & AUTONOMOUS LOOP:',
-    '1. DISCOVER & LOCATE: Use `search_code` or `find_files` to find relevant files, symbols, functions, or shapes. Do not make blind assumptions about paths.',
-    '2. READ & UNDERSTAND: Use `read_file` to inspect code and surrounding context before editing.',
-    '3. SURGICAL EDIT: Modify code directly using `replace_file_content` (for precision edits) or `write_file` (for new files or full rewrites).',
-    '4. SELF-VERIFY (RUN TESTS): After editing files, ALWAYS verify your work! Use `run_bash_command` to execute the project tests or quality checks (always invoke commands via `/usr/bin/rtk`, e.g. `/usr/bin/rtk npm test` or `/usr/bin/rtk pytest`) to ensure the changes compile and pass.',
-    '5. ACTION OVER THEORY: When asked to implement, fix, refactor, or perform domain operations (such as asset transfer or retirement), YOU MUST MODIFY THE CODE IN THE WORKSPACE. Never stop at theoretical explanations or recitation of shapes without applying the requested code changes.',
-    '6. CONCISE DELIVERY: Present a concise explanation of what was modified, the test results, and reference the git diff.'
+    'MANDATORY CODING METHODOLOGY & AUTONOMOUS ACTION LOOP:',
+    '1. AUTONOMOUS END-TO-END EXECUTION: You are an autonomous coding agent, NOT a conversational Q&A bot. When the user asks you to create an endpoint, implement a feature, modify code, or perform an operation, YOU MUST COMPLETE THE TASK BY MODIFYING THE FILES IN THE WORKSPACE DIRECTLY.',
+    '2. NEVER STOP WITHOUT WRITING CODE: If the user asked for an action, endpoint, or code change, DO NOT just inspect files and print code snippets in the chat. You must call `replace_file_content` or `write_file` to write the changes directly to disk.',
+    '3. LOCATE TARGET FILES: Check the workspace context or use `find_files`/`list_directory` to find where endpoints, routes, controllers, or models are defined (e.g. `src/assets/infrastructure/asset-http-server.ts`, `src/server.ts`). When using `search_code`, specify concise query keywords.',
+    '4. SURGICAL EDITS: Read the file with `read_file` to understand the exact context, then apply edits with `replace_file_content` or `write_file`.',
+    '5. SELF-VERIFY: Run test commands with `run_bash_command` (using `/usr/bin/rtk npm test` or `/usr/bin/rtk`) to ensure your modifications compile and pass tests.',
+    '6. CONCISE COMPLETION: Explain what files you modified and what endpoint/feature was implemented.'
   );
 
   if (options.workspaceSummary?.formattedContext) {
@@ -135,8 +159,23 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
     };
     conversation.push(assistantMsg);
 
-    // If no tool calls, model finished its response
+    // If no tool calls in this turn
     if (toolCallsList.length === 0) {
+      // Find the user's task request in conversation
+      const lastUserMsg = conversation.slice().reverse().find((m) => m.role === 'user');
+      const userPrompt = typeof lastUserMsg?.content === 'string' ? lastUserMsg.content : '';
+      const isActionRequest = isActionPrompt(userPrompt);
+
+      // If user requested an action/endpoint/code modification, but the model has not modified any files yet,
+      // and we haven't exhausted turns, prompt the model to proceed with file edits rather than stopping.
+      if (isActionRequest && modifiedFilesSet.size === 0 && turns < maxTurns) {
+        conversation.push({
+          role: 'user',
+          content: 'You investigated the codebase or presented code in chat, but NO files have been modified in the workspace yet. The user explicitly requested an implementation or code change. As an autonomous coding agent, you must execute the changes directly: locate the target file (such as routes, controllers, or domain services) and call `replace_file_content` or `write_file` to apply the implementation in the code now.',
+        });
+        continue;
+      }
+
       return {
         completed: true,
         finalAssistantMessage: assistantMsg,

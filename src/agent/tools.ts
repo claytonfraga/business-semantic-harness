@@ -222,9 +222,13 @@ export class WorkspaceToolExecutor {
 
         let regex: RegExp;
         try {
-          regex = isRegex ? new RegExp(query) : new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-        } catch (err: unknown) {
-          throw new Error(`Invalid search regex: ${err instanceof Error ? err.message : String(err)}`);
+          if (isRegex || (args.is_regex === undefined && query.includes('|'))) {
+            regex = new RegExp(query, 'i');
+          } else {
+            regex = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+          }
+        } catch {
+          regex = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
         }
 
         const results: string[] = [];

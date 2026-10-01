@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { WorkspaceToolExecutor } from '../../dist/agent/tools.js';
-import { runAgentTurn } from '../../dist/agent/agentLoop.js';
+import { runAgentTurn, isActionPrompt } from '../../dist/agent/agentLoop.js';
 
 test('Given WorkspaceToolExecutor, when write_file, read_file and replace_file_content are called, then operations succeed inside workspace', async () => {
   const tempDir = mkdtempSync(join(tmpdir(), 'bsh-tools-test-'));
@@ -102,3 +102,109 @@ test('Given runAgentTurn, when model emits a tool call, then tool is executed an
     rmSync(tempDir, { recursive: true, force: true });
   }
 });
+
+test('Given isActionPrompt, when evaluating imperative coding requests vs informational questions, then classifies correctly', () => {
+  // Imperative action requests
+  assert.equal(isActionPrompt('faça um endpoint pra transferir um ativo não baixado'), true);
+  assert.equal(isActionPrompt('crie uma rota de exclusão no servidor HTTP'), true);
+  assert.equal(isActionPrompt('implemente a regra de compatibilidade no código'), true);
+  assert.equal(isActionPrompt('adicione a função transferAsset em asset-service.ts'), true);
+  assert.equal(isActionPrompt('make an endpoint to transfer assets'), true);
+  assert.equal(isActionPrompt('create a delete route for retired assets'), true);
+
+  // Informational or pure questions
+  assert.equal(isActionPrompt('como funciona a regra de transferência de ativos?'), false);
+  assert.equal(isActionPrompt('onde fica o arquivo ontology.jsonld?'), false);
+  assert.equal(isActionPrompt('quantos shapes existem no domínio ativos?'), false);
+  assert.equal(isActionPrompt(''), false);
+});
+
+test('Given runAgentTurn with an action prompt, when model stops after reading without modifying files, then loop re-engages autonomously until changes are applied', async () => {
+  const tempDir = mkdtempSync(join(tmpdir(), 'bsh-loop-test-'));
+  try {
+    let callIndex = 0;
+    const streamCalls = [];
+
+    const mockClient = {
+      async *streamChat(params) {
+        callIndex++;
+        streamCalls.push(params);
+
+        if (callIndex === 1) {
+          // Turn 1: Model inspects file using read_file
+          yield {
+            delta: {
+              tool_calls: [
+                {
+                  index: 0,
+                  id: 'call_read_1',
+                  type: 'function',
+                  function: {
+                    name: 'read_file',
+                    arguments: JSON.stringify({ path: 'nonexistent.txt' }),
+                  },
+                },
+              ],
+            },
+          };
+        } else if (callIndex === 2) {
+          // Turn 2: Model emits text with NO tool calls, trying to stop without modifying files
+          yield {
+            delta: {
+              content: 'Here is what the code should look like:\n```typescript\napp.post(...)\n```',
+            },
+          };
+        } else if (callIndex === 3) {
+          // Turn 3: Model receives the continuation prompt and actually writes the file!
+          yield {
+            delta: {
+              tool_calls: [
+                {
+                  index: 0,
+                  id: 'call_write_1',
+                  type: 'function',
+                  function: {
+                    name: 'write_file',
+                    arguments: JSON.stringify({ path: 'endpoint.ts', content: 'export const transferEndpoint = () => {};' }),
+                  },
+                },
+              ],
+            },
+          };
+        } else {
+          // Turn 4: Model confirms the file modification
+          yield {
+            delta: {
+              content: 'Successfully created the transfer endpoint in endpoint.ts.',
+            },
+          };
+        }
+      },
+    };
+
+    const toolEvents = [];
+    const result = await runAgentTurn({
+      client: mockClient,
+      model: 'deepseek/deepseek-chat',
+      workspaceRoot: tempDir,
+      messages: [{ role: 'user', content: 'faça um endpoint pra transferir um ativo não baixado' }],
+      onToolCallDone: (e) => toolEvents.push(e),
+    });
+
+    // Verify that loop did NOT terminate at turn 2! It continued to turn 4!
+    assert.equal(result.completed, true);
+    assert.equal(result.turnsExecuted, 4, 'Must execute 4 turns with autonomous continuation');
+    assert.equal(result.modifiedFiles.length, 1);
+    assert.equal(result.modifiedFiles[0], 'endpoint.ts');
+    assert.ok(result.allMessages.length >= 6);
+
+    // Verify continuation prompt was injected
+    const continuationMsg = result.allMessages.find(
+      (m) => m.role === 'user' && typeof m.content === 'string' && m.content.includes('NO files have been modified')
+    );
+    assert.ok(continuationMsg, 'Continuation prompt must be injected into conversation');
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+

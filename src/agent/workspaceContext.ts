@@ -1,5 +1,5 @@
 import { readdir, readFile } from 'node:fs/promises';
-import { join, basename } from 'node:path';
+import { join, basename, relative } from 'node:path';
 
 export interface WorkspaceSummary {
   projectName: string;
@@ -8,6 +8,7 @@ export interface WorkspaceSummary {
   manifests: string[];
   scripts: Record<string, string>;
   topLevelEntries: string[];
+  keySourceFiles?: string[];
   formattedContext: string;
 }
 
@@ -22,6 +23,29 @@ const IGNORED_DIRS = new Set([
   '.bin',
   '__pycache__',
 ]);
+
+async function collectSourceFiles(
+  dir: string,
+  baseDir: string,
+  files: string[],
+  max = 30,
+  currentDepth = 0
+): Promise<void> {
+  if (currentDepth > 6 || files.length >= max) return;
+  const entries = await readdir(dir, { withFileTypes: true }).catch(() => []);
+  for (const entry of entries) {
+    if (files.length >= max) break;
+    if (IGNORED_DIRS.has(entry.name)) continue;
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      await collectSourceFiles(full, baseDir, files, max, currentDepth + 1);
+    } else if (entry.isFile()) {
+      if (/\.(ts|js|mjs|cjs|py|java|go|rs|jsonld|ttl)$/i.test(entry.name)) {
+        files.push(relative(baseDir, full));
+      }
+    }
+  }
+}
 
 export async function inspectWorkspace(workspaceRoot: string): Promise<WorkspaceSummary> {
   let projectName = basename(workspaceRoot);
@@ -86,6 +110,14 @@ export async function inspectWorkspace(workspaceRoot: string): Promise<Workspace
   // Deduplicate tech
   const uniqueTech = Array.from(new Set(detectedTechnologies));
 
+  // Collect key source files so the model immediately knows real paths
+  const keySourceFiles: string[] = [];
+  const srcDir = join(workspaceRoot, 'src');
+  await collectSourceFiles(srcDir, workspaceRoot, keySourceFiles, 25);
+  if (keySourceFiles.length === 0) {
+    await collectSourceFiles(workspaceRoot, workspaceRoot, keySourceFiles, 25);
+  }
+
   const lines: string[] = [
     `## Workspace Context (${projectName}):`,
     uniqueTech.length > 0 ? `- Technologies: ${uniqueTech.join(', ')}` : '',
@@ -96,6 +128,9 @@ export async function inspectWorkspace(workspaceRoot: string): Promise<Workspace
       : '',
     '- Top-Level Tree Structure:',
     ...topLevelEntries.slice(0, 20).map((e) => `  • ${e}`),
+    keySourceFiles.length > 0
+      ? `- Key Source Files:\n${keySourceFiles.map((f) => `  • ${f}`).join('\n')}`
+      : '',
   ].filter(Boolean);
 
   return {
@@ -105,6 +140,7 @@ export async function inspectWorkspace(workspaceRoot: string): Promise<Workspace
     manifests,
     scripts,
     topLevelEntries,
+    keySourceFiles,
     formattedContext: lines.join('\n'),
   };
 }

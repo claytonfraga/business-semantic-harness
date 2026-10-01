@@ -720,14 +720,6 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
               gateChecks: checks,
               gateStatus: 'CONFORMING',
             });
-
-            const lowerPrompt = prompt.toLowerCase();
-            if (!diffGateResult.hasChanges && (lowerPrompt.includes('transfer') || lowerPrompt.includes('transfira') || lowerPrompt.includes('alter') || lowerPrompt.includes('modifi') || lowerPrompt.includes('implement'))) {
-              chatEntries.push({
-                type: 'agent',
-                content: '↳ Nota: Nenhuma alteração foi gravada nos arquivos ainda. Você pode pedir "aplique as alterações no código" ou informar o arquivo alvo para o agente modificar diretamente.',
-              });
-            }
           }
         }
 
