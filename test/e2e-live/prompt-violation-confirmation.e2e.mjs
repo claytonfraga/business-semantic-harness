@@ -72,3 +72,81 @@ test('Given project settings, when user toggles confirmPromptViolations, then th
     rmSync(tempProject, { recursive: true, force: true });
   }
 });
+
+test('Given a user prompt requesting to remove an active (non-retired) asset, when prompt guard evaluates it, then it conforms and does not trigger false positive violation', async () => {
+  const prompt = 'faça um endpoint pra remover um ativo nao baixado';
+  const domain = 'ativos';
+
+  // When evaluated
+  const violation = detectPromptViolation(prompt, domain);
+
+  // Then it must NOT flag violation
+  assert.equal(violation.isViolating, false, 'Non-retired asset removal must not trigger violation');
+  assert.equal(violation.shape, undefined);
+
+  // And when rendered in TUI, it must display normally without violation badge
+  const tui = renderCompleteTui(
+    {
+      model: 'deepseek/deepseek-v4.1-flash',
+      contextLength: 1048576,
+      domain: 'ativos',
+      governed: true,
+      tokensTotal: 120,
+      width: 90,
+      height: 22,
+    },
+    [{ type: 'user', content: prompt, isViolating: false }],
+    '>',
+    90,
+    22
+  );
+
+  assert.ok(!tui.includes('[!] VIOLATION DETECTED'), 'Must not display violation detected badge');
+  assert.ok(!tui.includes('[PROMPT VIOLATION DETECTED]'), 'Must not display prompt violation warning');
+});
+
+test('Given a user prompt explicitly transferring a retired asset, when prompt guard evaluates it, then it detects TransferShape violation', async () => {
+  const prompt = 'faça um endpoint pra transferir um ativo baixado';
+  const domain = 'ativos';
+
+  const violation = detectPromptViolation(prompt, domain);
+
+  assert.equal(violation.isViolating, true, 'Transferring a retired asset must trigger violation');
+  assert.ok(violation.shape?.includes('TransferShape'));
+  assert.ok(violation.rule?.includes('Ativo baixado'));
+});
+
+test('Given prompt history navigation and confirmation banners, when rendered, then the prompt input line is strictly 1 single line and maintains exact terminal height', async () => {
+  const width = 88;
+  const height = 24;
+
+  const longPrompt = 'faça um endpoint pra remover um ativo nao baixado com critérios adicionais de validação organizacional';
+
+  const tui = renderCompleteTui(
+    {
+      model: 'deepseek/deepseek-v4.1-flash',
+      contextLength: 1048576,
+      domain: 'ativos',
+      governed: true,
+      tokensTotal: 340,
+      width,
+      height,
+    },
+    [
+      { type: 'user', content: 'Primeiro prompt de consulta', isViolating: false },
+      { type: 'agent', content: 'Resposta do agente com análise de código.' },
+    ],
+    `[Enter para prosseguir /cancel para abortar] > ${longPrompt}`,
+    width,
+    height
+  );
+
+  const lines = tui.split('\n');
+  assert.equal(lines.length, height, `TUI height must strictly equal ${height}`);
+
+  // The prompt input line is line index 20 (height - 4 in 24-line layout)
+  // Check that the prompt input appears in only 1 line
+  const promptLines = lines.filter((l) => l.includes('[Enter para prosseguir'));
+  assert.equal(promptLines.length, 1, 'Prompt input with prefix must appear on exactly 1 line');
+});
+

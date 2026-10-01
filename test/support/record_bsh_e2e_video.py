@@ -716,6 +716,43 @@ def run_scenario_9(pilot_dir: Path, bsh_bin: str) -> dict:
     return res
 
 
+def run_scenario_10(pilot_dir: Path, bsh_bin: str) -> dict:
+    print("\n--- Running Scenario 10: Semantic Guard Negations & Single-Line History Navigation ---")
+    guard_video = VIDEOS_DIR / "bsh-prompt-guard-negation-scenario.mp4"
+    guard_shot = SCREENSHOTS_DIR / "bsh-prompt-guard-negation-scenario.png"
+
+    intro_title = "Jornada 10: Guarda Semântica com Negação e Navegação em Linha Única"
+    intro_lines = [
+        "Interface: BSH OpenTUI com Guarda Semântica Refinada e Navegação de Histórico Estabilizada",
+        "Objetivo 1 (Prevenção de Falso Positivo): 'remover um ativo nao baixado' não deve acionar TransferShape.",
+        "Objetivo 2 (Guarda Ontológica Legítima): 'transferir um ativo baixado' deve acionar TransferShape e pausar.",
+        "Objetivo 3 (Estabilização da TUI): Navegação com setas cima/baixo mantém estritamente uma única linha de prompt.",
+        "Comportamento Esperado:",
+        "  • Prompt com negação e verbo 'remover' é aceito sem falso positivo nem alerta de violação.",
+        "  • Prompt violador genuíno ativa a guarda pré-execução com alerta explicativo.",
+        "  • A navegação pelo histórico não quebra a moldura visual nem gera duplicação horizontal de prefixos.",
+    ]
+
+    user_inputs = [
+        ("faça um endpoint pra remover um ativo nao baixado", 8.0),
+        ("faça um endpoint pra transferir um ativo baixado", 8.0),
+        ("/cancel", 4.0),
+    ]
+
+    res = record_scenario(
+        session_name="bsh-e2e-negation-guard",
+        title="BSH: Semantic Guard Negations & Single-Line Prompt History",
+        intro_title=intro_title,
+        intro_lines=intro_lines,
+        command=["env", "OPENROUTER_API_KEY=sk-or-v1-mock-test", bsh_bin, "--project", str(pilot_dir)],
+        user_inputs=user_inputs,
+        output_video=guard_video,
+        output_screenshot=guard_shot,
+        is_interactive_tui=True,
+    )
+    print(f"✔ Semantic Guard & Single-Line History video saved: {res['video_path']} ({res['file_size_kb']:.1f} KB, SHA-256: {res['sha256'][:16]}...)")
+    return res
+
 
 def generate_markdown_report(
     gov_res: dict,
@@ -796,7 +833,7 @@ A padronização mandatória de especificação em `.feature` e geração de evi
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="BSH E2E Video Recorder")
-    parser.add_argument("--scenario", choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "all"], default="all")
+    parser.add_argument("--scenario", choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "all"], default="all")
     parsed_args = parser.parse_args()
 
     ensure_dirs()
@@ -833,4 +870,14 @@ if __name__ == "__main__":
                 shutil.copy2(Path(res["screenshot_path"]), downloads_dir / Path(res["screenshot_path"]).name)
         sys.exit(0)
 
+    elif parsed_args.scenario == "10":
+        res = run_scenario_10(pilot_dir, bsh_bin)
+        downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
+        if downloads_dir.exists():
+            shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
+            if Path(res["screenshot_path"]).exists():
+                shutil.copy2(Path(res["screenshot_path"]), downloads_dir / Path(res["screenshot_path"]).name)
+        sys.exit(0)
+
     raise SystemExit(main())
+
