@@ -208,7 +208,11 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   const filterOut = new Writable({
     write(chunk, _encoding, cb) {
       const s = chunk.toString();
-      const replaced = s.replaceAll('\x1b[0J', '\x1b[K').replaceAll('\x1b[J', '\x1b[K');
+      const replaced = s
+        .replaceAll('\x1b[0J', '\x1b[K')
+        .replaceAll('\x1b[J', '\x1b[K')
+        .replaceAll('\r\n', '\r')
+        .replaceAll('\n', '');
       process.stdout.write(replaced);
       cb();
     },
@@ -225,7 +229,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     historySize: 1000,
   });
 
-  // Keypress listener for PageUp, PageDown, Shift+Up, Shift+Down
+  // Keypress listener for PageUp, PageDown, Shift+Up, Shift+Down and History Up/Down
   const onKeypress = (_str: string, key: Key) => {
     if (!key) return;
     if (key.name === 'pageup') {
@@ -240,6 +244,10 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     } else if (key.name === 'down' && (key.shift || key.ctrl)) {
       scrollOffset = Math.max(0, scrollOffset - 1);
       redrawScreen(rl.line);
+    } else if ((key.name === 'up' || key.name === 'down') && !key.shift && !key.ctrl) {
+      setImmediate(() => {
+        redrawScreen(rl.line);
+      });
     }
   };
   process.stdin.on('keypress', onKeypress);
@@ -536,8 +544,16 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
         if (confirmPromptViolations) {
           redrawScreen('Aguardando confirmação do usuário...');
+          process.stdout.write('\r\x1b[2K');
+          const savedHistory = [...(((rl as unknown as { history?: string[] }).history) || [])];
+          (rl as unknown as { history?: string[] }).history = [];
           const confirmPrefix = `  \x1b[31m▎\x1b[39m \x1b[1m\x1b[93m[Enter para prosseguir /cancel para abortar] >\x1b[39m\x1b[22m `;
-          const answer = (await rl.question(confirmPrefix)).trim();
+          let answer = '';
+          try {
+            answer = (await rl.question(confirmPrefix)).trim();
+          } finally {
+            (rl as unknown as { history?: string[] }).history = savedHistory;
+          }
           if (answer === '/cancel' || answer === 'cancel' || answer === '/abort' || answer === 'q') {
             chatEntries.push({
               type: 'agent',

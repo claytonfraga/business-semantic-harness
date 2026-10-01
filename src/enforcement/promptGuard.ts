@@ -22,32 +22,27 @@ export function detectPromptViolation(
 
   const normalized = prompt.toLowerCase();
 
-  if (domainId === 'ativos' || domainId.includes('asset')) {
-    // Check 1: Transfer of retired / baixado assets (TransferShape)
-    const mentionsTransfer =
-      normalized.includes('transfer') ||
-      normalized.includes('transferir') ||
-      normalized.includes('transferência') ||
-      normalized.includes('movimentar') ||
-      normalized.includes('mover');
+  if (domainId === 'ativos' || domainId === 'patrimonio' || domainId.includes('asset')) {
+    // 1. Check for explicit negations of retired state:
+    // e.g. "não baixado", "nao baixado", "sem ser baixado", "não está baixado", "not retired"
+    const hasNegatedRetired = /\b(não|nao|not|sem\s+ser|sem\s+estar|nunca)\s+(está\s+|esteja\s+)?(baixado|inativo|retired|decommissioned)\b/i.test(normalized);
 
-    const mentionsRetired =
-      normalized.includes('retired') ||
-      normalized.includes('baixado') ||
-      normalized.includes('baixa') ||
-      normalized.includes('decommissioned') ||
-      normalized.includes('inativo');
+    // 2. Mentions actual retired status (only if NOT negated)
+    const mentionsRetired = !hasNegatedRetired && (
+      /\b(retired|baixado|decommissioned|inativo)\b/i.test(normalized) ||
+      /\b(ativo\s+já\s+baixado|estado\s+baixado|status\s+retired)\b/i.test(normalized)
+    );
 
+    // 3. Transfer action (must use word boundaries so 'remover' does NOT match 'mover'!)
+    const mentionsTransfer = /\b(transferir|transferência|transferencia|transfer|transfira|movimentar|movimentação|movimentacao|mover)\b/i.test(normalized);
+
+    // 4. Missing justification on sensitive operations
     const mentionsNoJustification =
-      normalized.includes('without justification') ||
-      normalized.includes('sem justificativa') ||
-      normalized.includes('no justification') ||
-      normalized.includes('sem aprovação') ||
-      normalized.includes('sem aprovador') ||
-      normalized.includes('sem motivo');
+      /\b(without\s+justification|sem\s+justificativa|no\s+justification|sem\s+aprovação|sem\s+aprovacao|sem\s+aprovador|sem\s+motivo)\b/i.test(normalized);
 
+    // Check 1: Transfer of retired / baixado assets (TransferShape)
     if (mentionsTransfer && mentionsRetired) {
-      const keywords = ['transfer', mentionsRetired ? 'retired/baixado' : ''].filter(Boolean);
+      const keywords = ['transfer', 'retired/baixado'];
       if (mentionsNoJustification) keywords.push('sem justificativa');
 
       return {
@@ -61,10 +56,7 @@ export function detectPromptViolation(
 
     // Check 2: Double retirement / baixa on retired asset (BaixaShape)
     const mentionsBaixaAction =
-      normalized.includes('retire asset') ||
-      normalized.includes('dar baixa') ||
-      normalized.includes('baixar ativo') ||
-      normalized.includes('efetuar baixa');
+      /\b(retire\s+asset|dar\s+baixa|baixar\s+ativo|efetuar\s+baixa|fazer\s+baixa)\b/i.test(normalized);
 
     if (mentionsBaixaAction && mentionsRetired) {
       return {
