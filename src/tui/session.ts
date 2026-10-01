@@ -669,30 +669,39 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
             projectRoot,
           });
 
-          const lowerPrompt = prompt.toLowerCase();
-          const isViolation = !diffGateResult.conforming ||
-            lowerPrompt.includes('retired') ||
-            lowerPrompt.includes('sem justificativa') ||
-            lowerPrompt.includes('without justification') ||
-            lowerPrompt.includes('baixado');
+          const isViolation = !diffGateResult.conforming || promptViolation.isViolating;
 
           if (isViolation) {
             lastGateConforming = false;
-            lastGateViolations = diffGateResult.violations.length > 0
+            const violationsList = diffGateResult.violations.length > 0
               ? diffGateResult.violations
-              : [
-                'State transition invalid: Retired asset cannot be transferred',
-                'Required fields missing: adequateJustification, approver',
+              : promptViolation.isViolating && promptViolation.rule
+                ? [promptViolation.rule]
+                : [
+                  'State transition invalid: Retired asset cannot be transferred',
+                  'Required fields missing: adequateJustification, approver',
+                ];
+            lastGateViolations = violationsList;
+
+            // Ensure there is at least one failing check so the gate never contradicts its status
+            let checks = diffGateResult.checks;
+            const hasFailingCheck = checks.some((c) => !c.ok);
+            if (!hasFailingCheck) {
+              const failureText = promptViolation.isViolating && promptViolation.rule
+                ? `${promptViolation.shape || 'DomainShape'}: ${promptViolation.rule}`
+                : violationsList[0] || 'Violação ontológica detectada no Gate Semântico';
+              checks = [
+                ...checks,
+                { ok: false, text: failureText },
               ];
+            }
+
             chatEntries.push({
               type: 'gate',
-              gateShape: diffGateResult.shapeName || 'TransferShape',
-              gateChecks: diffGateResult.checks.length > 0
-                ? diffGateResult.checks
-                : [
-                  { ok: false, text: 'State transition invalid: Retired asset cannot be transferred' },
-                  { ok: false, text: 'Required fields missing: adequateJustification, approver' },
-                ],
+              gateShape: promptViolation.isViolating
+                ? (promptViolation.shape || diffGateResult.shapeName || 'TransferShape')
+                : (diffGateResult.shapeName || 'TransferShape'),
+              gateChecks: checks,
               gateStatus: 'VIOLATION',
             });
           } else {
@@ -712,6 +721,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
               gateStatus: 'CONFORMING',
             });
 
+            const lowerPrompt = prompt.toLowerCase();
             if (!diffGateResult.hasChanges && (lowerPrompt.includes('transfer') || lowerPrompt.includes('transfira') || lowerPrompt.includes('alter') || lowerPrompt.includes('modifi') || lowerPrompt.includes('implement'))) {
               chatEntries.push({
                 type: 'agent',

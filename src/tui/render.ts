@@ -263,7 +263,7 @@ export function renderChatEntry(entry: ChatEntry, width: number): string[] {
       const isViolation = entry.gateStatus === 'VIOLATION';
       const shape = entry.gateShape || 'TransferShape';
       const barColor = isViolation ? ansi.brightRed : ansi.brightGreen;
-      const title = `${ansi.bold}${ansi.cyan}[#] Semantic Gate${ansi.reset} ${ansi.dim}[Evaluating SHACL constraints: ${ansi.reset}${ansi.bold}${shape}${ansi.reset}${ansi.dim}]${ansi.reset}`;
+      const title = `${ansi.bold}${ansi.cyan}[#] Semantic Gate${ansi.reset} ${ansi.dim}[SHACL: ${ansi.reset}${ansi.bold}${shape}${ansi.reset}${ansi.dim}]${ansi.reset}`;
       const badge = isViolation
         ? `${ansi.bold}${ansi.brightRed}[X] VIOLATION${ansi.reset}`
         : `${ansi.bold}${ansi.brightGreen}[OK] CONFORMING${ansi.reset}`;

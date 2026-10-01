@@ -150,3 +150,81 @@ test('Given prompt history navigation and confirmation banners, when rendered, t
   assert.equal(promptLines.length, 1, 'Prompt input with prefix must appear on exactly 1 line');
 });
 
+test('Given a conforming prompt ("faça um endpoint pra remover um ativo nao baixado") and conforming code diff, when gate evaluates, then it emits [OK] CONFORMING with all [+] checks', async () => {
+  const prompt = 'faça um endpoint pra remover um ativo nao baixado';
+  const domain = 'ativos';
+
+  const violation = detectPromptViolation(prompt, domain);
+  assert.equal(violation.isViolating, false);
+
+  const checks = [
+    { ok: true, text: 'Modificações concretas aplicadas (7 arquivos, +154 / -4 linhas)' },
+    { ok: true, text: 'Transição de código e propriedades semânticas válidas' },
+  ];
+
+  const tui = renderCompleteTui(
+    {
+      model: 'deepseek/deepseek-v4.1-flash',
+      contextLength: 1048576,
+      domain: 'ativos',
+      governed: true,
+      tokensTotal: 1770,
+      width: 90,
+      height: 24,
+    },
+    [
+      { type: 'user', content: prompt, isViolating: false },
+      {
+        type: 'gate',
+        gateShape: 'AtivosGovernanceShape',
+        gateChecks: checks,
+        gateStatus: 'CONFORMING',
+      },
+    ],
+    '>',
+    90,
+    24
+  );
+
+  assert.ok(tui.includes('[OK] CONFORMING'), 'Gate must display [OK] CONFORMING');
+  assert.ok(tui.includes('Status: CONFORMING (Ready to promote)'), 'Gate must display Ready to promote');
+  assert.ok(!tui.includes('[X] VIOLATION'), 'Gate must NOT display [X] VIOLATION');
+  assert.ok(!tui.includes('Promotion blocked'), 'Gate must NOT display Promotion blocked');
+});
+
+test('Given a session with violation status, when gate renders, then it strictly contains [X] failing checks and never contradicts itself with only [+] checks', async () => {
+  const checksWithFailure = [
+    { ok: true, text: 'Modificações concretas aplicadas (3 arquivos, +42 / -2 linhas)' },
+    { ok: false, text: 'TransferShape: Invariante de Ciclo de Vida: Ativo baixado não pode ser transferido.' },
+  ];
+
+  const tui = renderCompleteTui(
+    {
+      model: 'deepseek/deepseek-v4.1-flash',
+      contextLength: 1048576,
+      domain: 'ativos',
+      governed: true,
+      tokensTotal: 1200,
+      width: 90,
+      height: 24,
+    },
+    [
+      {
+        type: 'gate',
+        gateShape: 'TransferShape',
+        gateChecks: checksWithFailure,
+        gateStatus: 'VIOLATION',
+      },
+    ],
+    '>',
+    90,
+    24
+  );
+
+  assert.ok(tui.includes('[X] VIOLATION'), 'Must display [X] VIOLATION');
+  assert.ok(tui.includes('Status: VIOLATION (Promotion blocked)'), 'Must display Promotion blocked');
+  assert.ok(tui.includes('[X]'), 'Must display failing check [X] icon');
+  assert.ok(tui.includes('TransferShape: Invariante de Ciclo de Vida'), 'Must display failing check explanation');
+});
+
+
