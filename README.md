@@ -4,6 +4,7 @@
 [![npm version](https://img.shields.io/npm/v/business-semantic-harness.svg)](https://www.npmjs.com/package/business-semantic-harness)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Install with npx](https://img.shields.io/badge/npx-business--semantic--harness-informational.svg)](https://www.npmjs.com/package/business-semantic-harness)
+[![MCP Server](https://img.shields.io/badge/MCP-Server-brightgreen.svg)](https://modelcontextprotocol.io)
 
 The **Business Semantic Harness (BSH)** is an autonomous, ontology-governed AI software engineering client with direct **OpenRouter integration**. 
 
@@ -22,6 +23,7 @@ BSH implements a **multi-layer semantic defense** that governs agent execution f
 3. **Autonomous Scoped Tooling**: The model inspects and edits code through sandboxed workspace tools (`read_file`, `write_file`, `replace_file_content`, `list_directory`, `run_bash_command`) with strict path guards.
 4. **Independent Semantic Gate**: Validates proposed code diffs against domain RDF facts and SHACL constraint shapes (`shapes.ttl`) using a local validation engine before promotion.
 5. **Deterministic Promotion**: Conforming changes are cleanly promoted to the primary Git branch; non-conforming changes are strictly blocked with auditable violation reports.
+6. **Universal MCP Server**: Runs as a standard Model Context Protocol (MCP) server over `stdio`, empowering external agents and IDEs (Cursor, Claude Desktop, Antigravity, Windsurf) with native semantic governance.
 
 ---
 
