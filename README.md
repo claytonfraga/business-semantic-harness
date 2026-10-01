@@ -3,6 +3,7 @@
 [![CI](https://github.com/claytonfraga/business-semantic-harness/actions/workflows/ci.yml/badge.svg)](https://github.com/claytonfraga/business-semantic-harness/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/business-semantic-harness.svg)](https://www.npmjs.com/package/business-semantic-harness)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Install with npx](https://img.shields.io/badge/npx-business--semantic--harness-informational.svg)](https://www.npmjs.com/package/business-semantic-harness)
 
 The **Business Semantic Harness (BSH)** is an autonomous, ontology-governed AI software engineering client with direct **OpenRouter integration**. 
 
@@ -26,30 +27,33 @@ BSH implements a **multi-layer semantic defense** that governs agent execution f
 
 ## Quick Start
 
-### 1. Run Instantly with `npx` (Zero Install)
+### 1. Run Instantly with `npx` (No Installation Required)
 
-You can launch BSH in any repository immediately without installing it globally:
+You can launch and run BSH in any repository immediately without prior global installation:
 
 ```bash
-# Launch interactive governed session in current directory:
+# Launch interactive governed session in your current project:
 npx business-semantic-harness
 
-# Pre-select domain and model:
+# Pre-select domain and model directly:
 npx business-semantic-harness --domain assets --model deepseek/deepseek-v4.1-flash
 
-# Target a specific project directory:
+# Run against any target project path:
 npx business-semantic-harness --project /path/to/my-project
 ```
 
-### 2. Global Installation
+### 2. Global Installation via npm
 
-Install BSH globally via npm:
+If you prefer having the `bsh` command available globally in your PATH:
 
 ```bash
 npm install -g business-semantic-harness
 
-# Run anywhere:
+# Once installed, launch with:
 bsh
+
+# View CLI options:
+bsh --help
 ```
 
 ### 3. Build from Source
