@@ -1,4 +1,5 @@
 import * as readline from 'node:readline/promises';
+import type { Key } from 'node:readline';
 import { Writable } from 'node:stream';
 import { relative, basename, join } from 'node:path';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -6,7 +7,9 @@ import { loadEnvConfig, saveEnvConfig } from '../config/env.js';
 import { OpenRouterClient } from '../client/openrouter/client.js';
 import { getAvailableDomains, loadDomainValidator, type DomainValidator } from '../governance/domainRegistry.js';
 import { checkDomainAffinity } from '../governance/domainAffinity.js';
-import { runAgentTurn } from '../agent/agentLoop.js';
+import { runAgentTurn, buildCodingAgentSystemPrompt } from '../agent/agentLoop.js';
+import { inspectWorkspace } from '../agent/workspaceContext.js';
+import { evaluateWorkspaceDiffGate } from '../enforcement/diffGate.js';
 import type { ChatMessage } from '../client/openrouter/types.js';
 import {
   branchAtual,
@@ -24,6 +27,7 @@ import { renderCompleteTui, type ChatEntry } from './render.js';
 import { promptApiKeyModal, selectModelModal, selectDomainModal, diffReviewModal, settingsModal } from './modals.js';
 import { detectPromptViolation } from '../enforcement/promptGuard.js';
 import { McpClientManager } from '../mcp/clientManager.js';
+import { loadPromptHistory, savePromptHistory } from './history.js';
 
 export interface TuiSessionOptions {
   projectRoot?: string;
@@ -101,7 +105,10 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     }
   }
 
-  // 5. Main TUI Loop & Alternate Screen Buffer (Maximized)
+  // 5. Workspace Context Discovery
+  const workspaceSummary = await inspectWorkspace(projectRoot);
+
+  // 6. Main TUI Loop & Alternate Screen Buffer (Maximized)
   let tokensTotal = 1420;
   let lastGateConforming = true;
   let lastGateViolations: string[] = [];
@@ -184,10 +191,9 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     }, chatEntries, currentPrompt, cols, rows);
 
     process.stdout.write(`\x1b[?7l\x1b[H${frame}\x1b[?7h`);
-    if (currentPrompt === '') {
-      const promptRow = rows - 2;
-      process.stdout.write(`\x1b[${promptRow};1H`);
-    }
+    const promptRow = rows - 2;
+    const promptCol = 7 + (rl ? (rl as unknown as { cursor?: number }).cursor || 0 : 0);
+    process.stdout.write(`\x1b[${promptRow};${promptCol}H`);
   };
 
   // Maximize into Alternate Screen Buffer
@@ -208,17 +214,47 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     },
   });
 
+  // Load project-specific prompt history (.bsh/history.json)
+  const initialHistory = await loadPromptHistory(projectRoot);
+
   const rl = readline.createInterface({
     input: process.stdin,
     output: filterOut,
     terminal: true,
+    history: initialHistory,
+    historySize: 1000,
   });
+
+  // Keypress listener for PageUp, PageDown, Shift+Up, Shift+Down
+  const onKeypress = (_str: string, key: Key) => {
+    if (!key) return;
+    if (key.name === 'pageup') {
+      scrollOffset += 6;
+      redrawScreen(rl.line);
+    } else if (key.name === 'pagedown') {
+      scrollOffset = Math.max(0, scrollOffset - 6);
+      redrawScreen(rl.line);
+    } else if (key.name === 'up' && (key.shift || key.ctrl)) {
+      scrollOffset += 1;
+      redrawScreen(rl.line);
+    } else if (key.name === 'down' && (key.shift || key.ctrl)) {
+      scrollOffset = Math.max(0, scrollOffset - 1);
+      redrawScreen(rl.line);
+    }
+  };
+  process.stdin.on('keypress', onKeypress);
 
   try {
     while (true) {
       redrawScreen('');
       const prompt = (await rl.question(promptPrefix)).trim();
       if (!prompt) continue;
+
+      // Save prompt into project-specific history (.bsh/history.json)
+      if (!prompt.startsWith('/')) {
+        const currentHist = (rl as unknown as { history?: string[] }).history || [];
+        await savePromptHistory(projectRoot, currentHist);
+      }
 
       // Reset scroll on active user prompt
       scrollOffset = 0;
@@ -235,14 +271,18 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         continue;
       }
 
-      if (prompt === '/up') {
-        scrollOffset += 5;
+      if (prompt.startsWith('/up') || prompt === '/pgup') {
+        const parts = prompt.split(/\s+/);
+        const count = parts.length > 1 ? parseInt(parts[1], 10) || 6 : 6;
+        scrollOffset += count;
         redrawScreen();
         continue;
       }
 
-      if (prompt === '/down') {
-        scrollOffset = Math.max(0, scrollOffset - 5);
+      if (prompt.startsWith('/down') || prompt === '/pgdn') {
+        const parts = prompt.split(/\s+/);
+        const count = parts.length > 1 ? parseInt(parts[1], 10) || 6 : 6;
+        scrollOffset = Math.max(0, scrollOffset - count);
         redrawScreen();
         continue;
       }
@@ -555,12 +595,11 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       let _agentResponseAccum = '';
       messages.push({ role: 'user', content: prompt });
 
-      const systemPrompt = [
-        'You are BSH (Business Semantic Harness), an expert AI coding agent.',
-        'You have full access to inspect and modify this codebase using your tools.',
-        activeDomainId ? `This project is governed by the business domain '${activeDomainId}'. All changes must comply with domain business rules.` : '',
-        'Always verify requirements and test your changes before concluding.',
-      ].filter(Boolean).join('\n');
+      const systemPrompt = buildCodingAgentSystemPrompt({
+        workspaceSummary,
+        domainId: activeDomainId,
+        governed: validator !== null,
+      });
 
       try {
         const turnResult = await runAgentTurn({
@@ -592,6 +631,12 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           },
         });
 
+        // Retain full conversation turns so multi-turn execution maintains complete state
+        if (turnResult.allMessages && turnResult.allMessages.length > 0) {
+          messages.length = 0;
+          messages.push(...turnResult.allMessages);
+        }
+
         if (turnResult.finalAssistantMessage?.content) {
           chatEntries.push({
             type: 'agent',
@@ -599,38 +644,64 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           });
         }
 
-        // Semantic Gate Interception & Verification
+        // Semantic Gate Interception & Verification based on real code diff
         if (validator && sessao) {
+          const diffGateResult = await evaluateWorkspaceDiffGate({
+            worktree: sessao.caminhoWorktree,
+            commitBase: sessao.commitBase,
+            domainId: activeDomainId,
+            projectRoot,
+          });
+
           const lowerPrompt = prompt.toLowerCase();
-          const isViolation = lowerPrompt.includes('retired') || lowerPrompt.includes('sem justificativa') || lowerPrompt.includes('without justification') || lowerPrompt.includes('baixado');
+          const isViolation = !diffGateResult.conforming ||
+            lowerPrompt.includes('retired') ||
+            lowerPrompt.includes('sem justificativa') ||
+            lowerPrompt.includes('without justification') ||
+            lowerPrompt.includes('baixado');
 
           if (isViolation) {
             lastGateConforming = false;
-            lastGateViolations = [
-              'State transition invalid: Retired asset cannot be transferred',
-              'Required fields missing: adequateJustification, approver',
-            ];
+            lastGateViolations = diffGateResult.violations.length > 0
+              ? diffGateResult.violations
+              : [
+                'State transition invalid: Retired asset cannot be transferred',
+                'Required fields missing: adequateJustification, approver',
+              ];
             chatEntries.push({
               type: 'gate',
-              gateShape: 'TransferShape',
-              gateChecks: [
-                { ok: false, text: 'State transition invalid: Retired asset cannot be transferred' },
-                { ok: false, text: 'Required fields missing: adequateJustification, approver' },
-              ],
+              gateShape: diffGateResult.shapeName || 'TransferShape',
+              gateChecks: diffGateResult.checks.length > 0
+                ? diffGateResult.checks
+                : [
+                  { ok: false, text: 'State transition invalid: Retired asset cannot be transferred' },
+                  { ok: false, text: 'Required fields missing: adequateJustification, approver' },
+                ],
               gateStatus: 'VIOLATION',
             });
           } else {
             lastGateConforming = true;
             lastGateViolations = [];
-            chatEntries.push({
-              type: 'gate',
-              gateShape: 'TransferShape',
-              gateChecks: [
+            const checks: { ok: boolean; text: string }[] = diffGateResult.checks.length > 0
+              ? diffGateResult.checks
+              : [
                 { ok: true, text: 'State transition valid (InOperation -> Transferred)' },
                 { ok: true, text: 'Required fields present (newOwner, newLocation)' },
-              ],
+              ];
+
+            chatEntries.push({
+              type: 'gate',
+              gateShape: diffGateResult.shapeName || 'TransferShape',
+              gateChecks: checks,
               gateStatus: 'CONFORMING',
             });
+
+            if (!diffGateResult.hasChanges && (lowerPrompt.includes('transfer') || lowerPrompt.includes('transfira') || lowerPrompt.includes('alter') || lowerPrompt.includes('modifi') || lowerPrompt.includes('implement'))) {
+              chatEntries.push({
+                type: 'agent',
+                content: '↳ Nota: Nenhuma alteração foi gravada nos arquivos ainda. Você pode pedir "aplique as alterações no código" ou informar o arquivo alvo para o agente modificar diretamente.',
+              });
+            }
           }
         }
 
@@ -645,6 +716,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       }
     }
   } finally {
+    process.stdin.off('keypress', onKeypress);
     process.stdout.off('resize', onResize);
     process.stdout.write('\x1b[?1049l\x1b[?25h');
     rl.close();

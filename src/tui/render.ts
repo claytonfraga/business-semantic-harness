@@ -372,6 +372,18 @@ export function renderCompleteTui(
     while (viewportLines.length < viewportHeight) {
       viewportLines.unshift(tuiLine('', width));
     }
+
+    // Render vertical scrollbar on the rightmost column of each viewport row
+    const thumbHeight = Math.max(1, Math.min(viewportHeight, Math.round((viewportHeight / totalContent) * viewportHeight)));
+    const scrollProgress = maxScroll > 0 ? (maxScroll - scrollOffset) / maxScroll : 1;
+    const thumbTop = Math.max(0, Math.min(viewportHeight - thumbHeight, Math.round(scrollProgress * (viewportHeight - thumbHeight))));
+
+    viewportLines = viewportLines.map((line, idx) => {
+      const isThumb = idx >= thumbTop && idx < thumbTop + thumbHeight;
+      const scrollChar = isThumb ? `${ansi.cyan}█${ansi.reset}` : `${ansi.dim}│${ansi.reset}`;
+      const baseLine = tuiLine(line, width - 1);
+      return `${baseLine}${scrollChar}`;
+    });
   }
 
   // Rich prompt box inspired by image.png and OpenTUI standards
@@ -402,9 +414,12 @@ export function renderCompleteTui(
   const ctxStr = `${(ctxUsed / 1000).toFixed(1)}k (${ctxPct}%)`;
   const costStr = state.sessionCost !== undefined ? `$${state.sessionCost.toFixed(2)}` : '$0.00';
   const scrollIndicator = scrollOffset > 0 ? ` ${ansi.yellow}[^ Scroll: +${scrollOffset}]${ansi.reset}` : '';
+  const shortcuts = width >= 105
+    ? `${ansi.bold}[Ctrl+M]${ansi.reset} Model ${ansi.bold}[Ctrl+D]${ansi.reset} Domain ${ansi.bold}[Ctrl+G]${ansi.reset} Diff ${ansi.bold}[PgUp/PgDn]${ansi.reset} Scroll`
+    : `${ansi.bold}[Ctrl+M]${ansi.reset} ${ansi.bold}[Ctrl+D]${ansi.reset} ${ansi.bold}[Ctrl+G]${ansi.reset} ${ansi.bold}[PgUp/Dn]${ansi.reset}`;
 
   const leftPart = `  ${ansi.dim}${projectFolder}${ansi.reset} ${ansi.magenta}${branchStr}${ansi.reset}`;
-  const rightPart = `${ansi.cyan}${ctxStr}${ansi.reset} ${ansi.dim}·${ansi.reset} ${ansi.green}${costStr}${ansi.reset} ${ansi.dim}·${ansi.reset} ${ansi.bold}[Ctrl+M]${ansi.reset} Model ${ansi.bold}[Ctrl+D]${ansi.reset} Domain ${ansi.bold}[Ctrl+G]${ansi.reset} Diff${scrollIndicator}`;
+  const rightPart = `${ansi.cyan}${ctxStr}${ansi.reset} ${ansi.dim}·${ansi.reset} ${ansi.green}${costStr}${ansi.reset}${scrollIndicator} ${ansi.dim}·${ansi.reset} ${shortcuts}`;
   
   const leftVis = stripAnsi(leftPart).length;
   const rightVis = stripAnsi(rightPart).length;

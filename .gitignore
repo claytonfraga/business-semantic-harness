@@ -5,6 +5,7 @@ dist/
 .superpowers/
 .worktrees/
 **/.bsh/local/
+**/.bsh/history.json
 benchmark/.venv/
 benchmark/results/
 __pycache__/
