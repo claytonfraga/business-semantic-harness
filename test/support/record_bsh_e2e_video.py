@@ -525,17 +525,20 @@ def main() -> int:
     # Scenario 7: BSH as MCP Client Consuming Third-Party Tools (Context7) in BSH TUI
     mcp_client_res = run_scenario_7(pilot_dir, bsh_bin)
 
+    # Scenario 8: TUI Visual Scrollbar, Project History & Concrete Agent Execution
+    scroll_res = run_scenario_8(pilot_dir, bsh_bin)
+
     # Copy MP4 videos to WSL Downloads for easy human evaluation
     downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
     if downloads_dir.exists():
-        for vid in [gov_video, ungov_video, coop_video, mismatch_video, model_video, Path(mcp_server_res["video_path"]), Path(mcp_client_res["video_path"])]:
+        for vid in [gov_video, ungov_video, coop_video, mismatch_video, model_video, Path(mcp_server_res["video_path"]), Path(mcp_client_res["video_path"]), Path(scroll_res["video_path"])]:
             if vid.exists():
                 shutil.copy2(vid, downloads_dir / vid.name)
         print(f"✔ Copied all MP4 videos to Windows Downloads: {downloads_dir}")
 
     # Generate Comprehensive Test Report
     report_file = REPORTS_DIR / "relatorio-testes-e2e-openrouter.md"
-    generate_markdown_report(gov_res, ungov_res, coop_res, mismatch_res, model_res, mcp_server_res, mcp_client_res, report_file)
+    generate_markdown_report(gov_res, ungov_res, coop_res, mismatch_res, model_res, mcp_server_res, mcp_client_res, scroll_res, report_file)
     if downloads_dir.exists():
         shutil.copy2(report_file, downloads_dir / "relatorio-testes-e2e-openrouter.md")
     print(f"✔ Comprehensive test report generated: {report_file}")
@@ -635,6 +638,85 @@ def run_scenario_7(pilot_dir: Path, bsh_bin: str) -> dict:
             mcp_json.unlink()
 
 
+def run_scenario_8(pilot_dir: Path, bsh_bin: str) -> dict:
+    print("\n--- Running Scenario 8: TUI Visual Scrollbar, Project History & Concrete Agent Execution ---")
+    scroll_video = VIDEOS_DIR / "bsh-scrollbar-history-loop-scenario.mp4"
+    scroll_shot = SCREENSHOTS_DIR / "bsh-scrollbar-history-loop-scenario.png"
+
+    intro_title = "Jornada 8: Barra de Rolagem Visual, Histórico por Projeto e Execução Concreta"
+    intro_lines = [
+        "Interface: OpenTUI moderna nativa do BSH (binário compilado)",
+        "Navegação: Histórico de prompts em .bsh/history.json acessível por setas para cima/baixo",
+        "Rolagem: Barra visual com thumb '█' e trilha '│', navegável por teclado (/up, /down, /pgup, /pgdn, PageUp/PageDown)",
+        "Comportamento Esperado:",
+        "  • O usuário digita comandos que alimentam o histórico persistente do projeto.",
+        "  • O usuário aciona comandos de rolagem para inspecionar mensagens anteriores.",
+        "  • A barra de rolagem vertical (thumb e trilha) é desenhada na borda direita com alinhamento rigoroso.",
+        "  • O agente mantém a continuidade multi-turno e executa alterações concretas no workspace.",
+    ]
+
+    user_inputs = [
+        ("Inscreva o histórico inicial e consulte as regras ativas do projeto", 6.0),
+        ("/up 8", 4.0),
+        ("/down 8", 4.0),
+        ("Execute a transferência do ativo AST-001 para a Unidade Vitória sob responsabilidade de Maria Silva", 12.0),
+    ]
+
+    res = record_scenario(
+        session_name="bsh-e2e-scroll-history",
+        title="BSH OpenTUI: Visual Scrollbar, Project Prompt History & Active Loop",
+        intro_title=intro_title,
+        intro_lines=intro_lines,
+        command=["env", "OPENROUTER_API_KEY=sk-or-v1-mock-test", bsh_bin, "--project", str(pilot_dir)],
+        user_inputs=user_inputs,
+        output_video=scroll_video,
+        output_screenshot=scroll_shot,
+        is_interactive_tui=True,
+    )
+    print(f"✔ Scrollbar & History video saved: {res['video_path']} ({res['file_size_kb']:.1f} KB, SHA-256: {res['sha256'][:16]}...)")
+    return res
+
+
+def run_scenario_9(pilot_dir: Path, bsh_bin: str) -> dict:
+    print("\n--- Running Scenario 9: Autonomous Coding Agent with Specialized Tools & Real Diff Gate ---")
+    coding_video = VIDEOS_DIR / "bsh-autonomous-coding-agent-scenario.mp4"
+    coding_shot = SCREENSHOTS_DIR / "bsh-autonomous-coding-agent-scenario.png"
+
+    intro_title = "Jornada 9: Agente de Codificação Autônomo com Ferramentas Especializadas e Diff Gate"
+    intro_lines = [
+        "Interface: BSH OpenTUI com Agente de Codificação Autônomo (binário compilado bsh)",
+        "Contexto Inicial: Ingestão automática da topologia do workspace e manifestos do projeto",
+        "Ferramentas Especializadas: search_code, find_files, read_file, replace_file_content, write_file, run_bash_command",
+        "Metodologia: 'Action Over Theory' (Localizar -> Modificar -> Auto-Verificar via /usr/bin/rtk -> Diff)",
+        "Comportamento Esperado:",
+        "  • O agente localiza cirurgicamente arquivos e funções de domínio via search_code.",
+        "  • O agente não se limita a recitar regras ontológicas; ele executa as modificações no código.",
+        "  • O loop multi-turno retém histórico e rastreia arquivos modificados no workspace.",
+        "  • O Gate Semântico inspeciona o diff de código real gerado no Git antes da promoção.",
+    ]
+
+    user_inputs = [
+        ("Localize a implementação de transferência de ativos usando search_code e verifique os shapes de governança", 8.0),
+        ("Implemente a validação de compatibilidade organizacional na transferência do ativo AST-001 e aplique no código", 12.0),
+        ("/diff", 5.0),
+    ]
+
+    res = record_scenario(
+        session_name="bsh-e2e-coding-agent",
+        title="BSH: Autonomous Coding Agent with Specialized Tools & Real Diff Gate",
+        intro_title=intro_title,
+        intro_lines=intro_lines,
+        command=["env", "OPENROUTER_API_KEY=sk-or-v1-mock-test", bsh_bin, "--project", str(pilot_dir)],
+        user_inputs=user_inputs,
+        output_video=coding_video,
+        output_screenshot=coding_shot,
+        is_interactive_tui=True,
+    )
+    print(f"✔ Autonomous Coding Agent video saved: {res['video_path']} ({res['file_size_kb']:.1f} KB, SHA-256: {res['sha256'][:16]}...)")
+    return res
+
+
+
 def generate_markdown_report(
     gov_res: dict,
     ungov_res: dict,
@@ -643,6 +725,7 @@ def generate_markdown_report(
     model_res: dict,
     mcp_server_res: dict,
     mcp_client_res: dict,
+    scroll_res: dict,
     output_file: Path,
 ) -> None:
     now_iso = time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())
@@ -669,6 +752,7 @@ Este relatório apresenta a validação E2E do **Business Semantic Harness (BSH)
 5. **Jornada 5 (Busca e Alternância de Modelos - OpenRouter Model Search)**: Pesquisa de modelos no catálogo OpenRouter e cancelamento seguro sem alterar modelo ativo.
 6. **Jornada 6 (BSH como Servidor MCP de Governança para Agente Agy)**: Integração com o agente autônomo Agy via MCP stdio, detectando violações ontológicas e exibindo regras SHACL.
 7. **Jornada 7 (BSH como Cliente MCP Consumindo Context7)**: Gerenciamento de servidores via comando `/mcp add` e consumo de documentação oficial no turno do agente na interface TUI do BSH.
+8. **Jornada 8 (Barra de Rolagem Visual, Histórico por Projeto e Execução Concreta)**: Exibição da barra de rolagem vertical (thumb e trilha), histórico persistido em `.bsh/history.json` nas setas, rolagem de mensagens e continuidade multi-turno com execução no workspace.
 
 ---
 
@@ -685,6 +769,7 @@ Todos os vídeos foram gravados diretamente do terminal `tmux`, incluindo **slid
 | **5. Busca de Modelos (Safe Cancel)** | [`bsh-model-search-scenario.mp4`](file://{model_res['video_path']}) | {model_res['file_size_kb']:.1f} KB | `{model_res['sha256']}` | [`bsh-model-search-scenario.png`](file://{model_res['screenshot_path']}) |
 | **6. Servidor MCP (Agente Agy)** | [`bsh-mcp-server-scenario.mp4`](file://{mcp_server_res['video_path']}) | {mcp_server_res['file_size_kb']:.1f} KB | `{mcp_server_res['sha256']}` | [`bsh-mcp-server-scenario.png`](file://{mcp_server_res['screenshot_path']}) |
 | **7. Cliente MCP (BSH TUI com Context7)** | [`bsh-mcp-client-scenario.mp4`](file://{mcp_client_res['video_path']}) | {mcp_client_res['file_size_kb']:.1f} KB | `{mcp_client_res['sha256']}` | [`bsh-mcp-client-scenario.png`](file://{mcp_client_res['screenshot_path']}) |
+| **8. Rolagem, Histórico & Execução** | [`bsh-scrollbar-history-loop-scenario.mp4`](file://{scroll_res['video_path']}) | {scroll_res['file_size_kb']:.1f} KB | `{scroll_res['sha256']}` | [`bsh-scrollbar-history-loop-scenario.png`](file://{scroll_res['screenshot_path']}) |
 
 ---
 
@@ -697,6 +782,7 @@ Todos os vídeos foram gravados diretamente do terminal `tmux`, incluindo **slid
 - **Jornada 5**: [`test/features/journeys/jornada-05-busca-e-troca-modelos.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-05-busca-e-troca-modelos.feature) — PASSOU ✅
 - **Jornada 6**: [`test/features/journeys/jornada-06-mcp-servidor-governanca.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-06-mcp-servidor-governanca.feature) — PASSOU ✅
 - **Jornada 7**: [`test/features/journeys/jornada-07-mcp-cliente-terceiros.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-07-mcp-cliente-terceiros.feature) — PASSOU ✅
+- **Jornada 8**: [`test/features/journeys/jornada-08-rolagem-historico-loop-agente.feature`](file://{WORKTREE_ROOT}/test/features/journeys/jornada-08-rolagem-historico-loop-agente.feature) — PASSOU ✅
 
 ---
 
@@ -710,7 +796,7 @@ A padronização mandatória de especificação em `.feature` e geração de evi
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="BSH E2E Video Recorder")
-    parser.add_argument("--scenario", choices=["1", "2", "3", "4", "5", "6", "7", "all"], default="all")
+    parser.add_argument("--scenario", choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "all"], default="all")
     parsed_args = parser.parse_args()
 
     ensure_dirs()
@@ -729,6 +815,22 @@ if __name__ == "__main__":
         downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
         if downloads_dir.exists():
             shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
+        sys.exit(0)
+
+    elif parsed_args.scenario == "8":
+        res = run_scenario_8(pilot_dir, bsh_bin)
+        downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
+        if downloads_dir.exists():
+            shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
+        sys.exit(0)
+
+    elif parsed_args.scenario == "9":
+        res = run_scenario_9(pilot_dir, bsh_bin)
+        downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
+        if downloads_dir.exists():
+            shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
+            if Path(res["screenshot_path"]).exists():
+                shutil.copy2(Path(res["screenshot_path"]), downloads_dir / Path(res["screenshot_path"]).name)
         sys.exit(0)
 
     raise SystemExit(main())

@@ -278,4 +278,46 @@ test('TUI render: renders prompt violation badge and warning entry with Enter pr
   assert.equal(tui.split('\n').length, height, 'Must maintain exact fixed height');
 });
 
+test('TUI render: renders visual scrollbar track and thumb when content exceeds viewport', () => {
+  const width = 80;
+  const height = 20; // 4 header lines + 5 footer lines = 9 chrome lines => viewportHeight = 11
+
+  const entries = [];
+  for (let i = 1; i <= 25; i++) {
+    entries.push({ type: 'user', content: `Message #${i}` });
+  }
+
+  // Render bottom (scrollOffset = 0)
+  const bottomTui = renderCompleteTui(
+    { model: 'deepseek/deepseek-v4.1-flash', governed: true, tokensTotal: 100, width, height, scrollOffset: 0 },
+    entries,
+    '>',
+    width,
+    height
+  );
+
+  // Must contain thumb block '█' and track '│'
+  assert.ok(bottomTui.includes('█'), 'Must render scrollbar thumb block');
+  assert.ok(bottomTui.includes('│'), 'Must render scrollbar track');
+
+  // Verify all lines preserve width
+  const lines = bottomTui.split('\n');
+  assert.equal(lines.length, height);
+  for (const l of lines) {
+    assert.equal(stripAnsi(l).length, width);
+  }
+
+  // When scrolled to top (scrollOffset = 99999 clamped to maxScroll)
+  const topTui = renderCompleteTui(
+    { model: 'deepseek/deepseek-v4.1-flash', governed: true, tokensTotal: 100, width, height, scrollOffset: 99999 },
+    entries,
+    '>',
+    width,
+    height
+  );
+  const topLines = topTui.split('\n');
+  // First viewport line is line 4 (0-indexed: lines 0..3 are header)
+  assert.ok(topLines[4].includes('█'), 'Top of viewport must contain thumb when scrolled to top');
+});
+
 

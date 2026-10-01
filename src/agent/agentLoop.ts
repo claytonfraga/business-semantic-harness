@@ -2,6 +2,7 @@ import type { OpenRouterClient } from '../client/openrouter/client.js';
 import type { ChatMessage, ToolCall } from '../client/openrouter/types.js';
 import { AGENT_TOOLS, WorkspaceToolExecutor } from './tools.js';
 import type { McpClientManager } from '../mcp/clientManager.js';
+import type { WorkspaceSummary } from './workspaceContext.js';
 
 export interface AgentLoopOptions {
   client: OpenRouterClient;
@@ -22,12 +23,51 @@ export interface AgentTurnResult {
   completed: boolean;
   finalAssistantMessage: ChatMessage;
   turnsExecuted: number;
+  allMessages: ChatMessage[];
+  modifiedFiles: string[];
+  toolCallsExecuted: number;
+}
+
+export function buildCodingAgentSystemPrompt(options: {
+  workspaceSummary?: WorkspaceSummary;
+  domainId?: string;
+  governed?: boolean;
+}): string {
+  const parts: string[] = [
+    'You are BSH (Business Semantic Harness), an autonomous AI pair programming assistant and expert software engineer.',
+    'You are equipped with workspace tools: `search_code`, `find_files`, `read_file`, `write_file`, `replace_file_content`, `list_directory`, `run_bash_command`.',
+  ];
+
+  if (options.domainId && options.governed !== false) {
+    parts.push(
+      `GOVERNANCE: This project is strictly governed by the business domain '${options.domainId}'. All changes, state transitions, and properties must comply with the domain ontology and SHACL shapes.`
+    );
+  }
+
+  parts.push(
+    '',
+    'MANDATORY CODING METHODOLOGY & AUTONOMOUS LOOP:',
+    '1. DISCOVER & LOCATE: Use `search_code` or `find_files` to find relevant files, symbols, functions, or shapes. Do not make blind assumptions about paths.',
+    '2. READ & UNDERSTAND: Use `read_file` to inspect code and surrounding context before editing.',
+    '3. SURGICAL EDIT: Modify code directly using `replace_file_content` (for precision edits) or `write_file` (for new files or full rewrites).',
+    '4. SELF-VERIFY (RUN TESTS): After editing files, ALWAYS verify your work! Use `run_bash_command` to execute the project tests or quality checks (always invoke commands via `/usr/bin/rtk`, e.g. `/usr/bin/rtk npm test` or `/usr/bin/rtk pytest`) to ensure the changes compile and pass.',
+    '5. ACTION OVER THEORY: When asked to implement, fix, refactor, or perform domain operations (such as asset transfer or retirement), YOU MUST MODIFY THE CODE IN THE WORKSPACE. Never stop at theoretical explanations or recitation of shapes without applying the requested code changes.',
+    '6. CONCISE DELIVERY: Present a concise explanation of what was modified, the test results, and reference the git diff.'
+  );
+
+  if (options.workspaceSummary?.formattedContext) {
+    parts.push('', options.workspaceSummary.formattedContext);
+  }
+
+  return parts.join('\n');
 }
 
 export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurnResult> {
   const executor = new WorkspaceToolExecutor(options.workspaceRoot);
   const maxTurns = options.maxTurns ?? 10;
   let turns = 0;
+  let toolCallsExecuted = 0;
+  const modifiedFilesSet = new Set<string>();
 
   const conversation: ChatMessage[] = [];
   if (options.systemPrompt && !options.messages.some((m) => m.role === 'system')) {
@@ -101,16 +141,26 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
         completed: true,
         finalAssistantMessage: assistantMsg,
         turnsExecuted: turns,
+        allMessages: conversation.filter((m) => m.role !== 'system'),
+        modifiedFiles: Array.from(modifiedFilesSet),
+        toolCallsExecuted,
       };
     }
 
     // Execute each tool call and append tool responses to conversation
     for (const tc of toolCallsList) {
+      toolCallsExecuted++;
       let parsedArgs: Record<string, unknown> = {};
       try {
         parsedArgs = JSON.parse(tc.function.arguments || '{}');
       } catch {
         parsedArgs = {};
+      }
+
+      if (tc.function.name === 'write_file' || tc.function.name === 'replace_file_content') {
+        if (parsedArgs.path) {
+          modifiedFilesSet.add(String(parsedArgs.path));
+        }
       }
 
       options.onToolCallStart?.({ name: tc.function.name, args: parsedArgs });
@@ -141,5 +191,8 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
     completed: false,
     finalAssistantMessage: conversation[conversation.length - 1],
     turnsExecuted: turns,
+    allMessages: conversation.filter((m) => m.role !== 'system'),
+    modifiedFiles: Array.from(modifiedFilesSet),
+    toolCallsExecuted,
   };
 }

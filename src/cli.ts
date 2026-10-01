@@ -12,7 +12,7 @@ import { startTuiSession } from './tui/session.js';
 
 export async function main(argv: string[]): Promise<number> {
   if (argv.length === 1 && (argv[0] === '--version' || argv[0] === '-v')) {
-    process.stdout.write('0.2.5-beta\n');
+    process.stdout.write('0.2.6-beta\n');
     return 0;
   }
   if (argv.length === 1 && argv[0] === '--help') {
@@ -67,10 +67,30 @@ export async function main(argv: string[]): Promise<number> {
     process.stderr.write('Caminho ausente após --prompt-file.\n');
     return 2;
   }
+
+  let promptText: string | undefined;
+  if (promptFlag >= 0) {
+    promptText = command[promptFlag + 1];
+  } else if (promptFileFlag >= 0) {
+    const filePath = resolve(projectRoot, command[promptFileFlag + 1]);
+    const { readFile } = await import('node:fs/promises');
+    promptText = await readFile(filePath, 'utf8');
+  }
+
   const promptIndexes = [promptFlag, promptFileFlag].filter((index) => index >= 0).flatMap((index) => [index, index + 1]);
   command = command.filter((_, index) => !promptIndexes.includes(index));
 
   try {
+    if (promptText) {
+      const { runHeadlessCodingSession } = await import('./agent/headless.js');
+      return await runHeadlessCodingSession({
+        projectRoot,
+        prompt: promptText,
+        model,
+        domain,
+      });
+    }
+
     if (command.length === 0 || (command.length === 1 && command[0] === 'tui')) {
       await startTuiSession({ projectRoot, model, domain });
       return 0;
