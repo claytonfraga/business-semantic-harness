@@ -11,6 +11,10 @@ import * as z from 'zod/v4';
 import { queryOntology } from '../ontology/query.js';
 import { validateProject } from '../ontology/validate.js';
 import { createProposal } from '../proposals/store.js';
+import { detectPromptViolation } from '../enforcement/promptGuard.js';
+import { getAvailableDomains, loadDomainValidator } from '../governance/domainRegistry.js';
+import { checkDomainAffinity } from '../governance/domainAffinity.js';
+import { parseShapes } from '../ontology/rdf.js';
 
 function recordSessionEvent(fileName: string, entry: Record<string, unknown>): void {
   const directory = process.env.BSH_SESSION_DIR;
@@ -21,9 +25,10 @@ function recordSessionEvent(fileName: string, entry: Record<string, unknown>): v
 
 export function createBSHMcpServer(root: string, governed = false): McpServer {
   const server = new McpServer(
-    { name: 'bsh', version: '0.0.2-beta' },
-    { instructions: 'Consulte a ontologia do domínio antes de propor alterações. Declare descobertas como propostas com evidência. As propostas não alteram a ontologia aprovada.' },
+    { name: 'bsh', version: '0.2.4-beta' },
+    { instructions: 'Consulte a ontologia do domínio e valide propostas com regras SHACL antes de alterar o código do projeto.' },
   );
+
   server.registerTool('bsh_query_ontology', {
     description: 'Consulta conceitos, relações, shapes e regras de um domínio com origem verificável.',
     annotations: { readOnlyHint: true, destructiveHint: false },
@@ -37,6 +42,51 @@ export function createBSHMcpServer(root: string, governed = false): McpServer {
       return { isError: true, content: [{ type: 'text', text: error instanceof Error ? error.message : String(error) }] };
     }
   });
+
+  server.registerTool('bsh_check_prompt_intent', {
+    description: 'Verifica em pré-voo se a intenção ou solicitação do usuário viola regras de negócio e restrições SHACL do domínio.',
+    annotations: { readOnlyHint: true, destructiveHint: false },
+    inputSchema: { prompt: z.string(), domain: z.string().optional() },
+  }, async ({ prompt, domain }) => {
+    try {
+      const result = detectPromptViolation(prompt, domain ?? 'ativos');
+      return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+    } catch (error) {
+      return { isError: true, content: [{ type: 'text', text: error instanceof Error ? error.message : String(error) }] };
+    }
+  });
+
+  server.registerTool('bsh_validate_shacl', {
+    description: 'Valida fatos em formato Turtle/RDF contra as regras e shapes SHACL do domínio indicado.',
+    annotations: { readOnlyHint: true, destructiveHint: false },
+    inputSchema: { domain: z.string(), factsTurtle: z.string() },
+  }, async ({ domain, factsTurtle }) => {
+    try {
+      const validator = await loadDomainValidator(root, domain);
+      const dataStore = parseShapes(factsTurtle);
+      const report = await validator.validateChanges(dataStore);
+      return { content: [{ type: 'text', text: JSON.stringify(report) }] };
+    } catch (error) {
+      return { isError: true, content: [{ type: 'text', text: error instanceof Error ? error.message : String(error) }] };
+    }
+  });
+
+  server.registerTool('bsh_check_affinity', {
+    description: 'Calcula a afinidade semântica entre os conceitos da ontologia do domínio e os identificadores do código do projeto.',
+    annotations: { readOnlyHint: true, destructiveHint: false },
+    inputSchema: { domain: z.string() },
+  }, async ({ domain }) => {
+    try {
+      const domains = await getAvailableDomains(root);
+      const target = domains.find((d) => d.id === domain);
+      if (!target) throw new Error(`Domínio '${domain}' não encontrado no projeto.`);
+      const aff = await checkDomainAffinity(root, target.ontologyPath, target.shapesPath, domain);
+      return { content: [{ type: 'text', text: JSON.stringify(aff) }] };
+    } catch (error) {
+      return { isError: true, content: [{ type: 'text', text: error instanceof Error ? error.message : String(error) }] };
+    }
+  });
+
   if (governed) {
     server.registerTool('bsh_report_conflict', {
       description: 'Quando o pedido conflita com a ontologia, relate as regras e aguarde o BSH perguntar ao usuário se deve preparar uma proposta de exceção. Não aplica nem autoriza mudança.',

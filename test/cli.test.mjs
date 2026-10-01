@@ -5,13 +5,14 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { test } from 'node:test';
 
-test('Given the help flag, when the CLI runs, then project and ontology commands are shown', () => {
+test('Given the help flag, when the CLI runs, then project, ontology, and mcp commands are shown', () => {
   const result = spawnSync(process.execPath, ['dist/cli.js', '--help'], { encoding: 'utf8' });
   assert.equal(result.status, 0);
   assert.match(result.stdout, /bsh/);
   assert.match(result.stdout, /init/);
   assert.match(result.stdout, /domain/);
   assert.match(result.stdout, /ontology/);
+  assert.match(result.stdout, /mcp/);
 });
 
 test('Given an unknown command, when the CLI runs, then it exits with code 2', () => {
@@ -41,5 +42,15 @@ test('Given a project without ontology, when ontology validate runs, then it ret
   try {
     const val = spawnSync(process.execPath, [executable, 'ontology', 'validate', '--project', root], { encoding: 'utf8' });
     assert.equal(val.status, 1);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('Given a project without ready ontology, when bsh mcp runs, then it exits with non-zero code and reports error on stderr', () => {
+  const root = mkdtempSync(join(tmpdir(), 'bsh-mcp-unready-'));
+  const executable = resolve('dist/cli.js');
+  try {
+    const val = spawnSync(process.execPath, [executable, 'mcp', '--project', root], { encoding: 'utf8' });
+    assert.notEqual(val.status, 0);
+    assert.match(val.stderr, /Ontologia/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
