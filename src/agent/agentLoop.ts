@@ -1,6 +1,7 @@
 import type { OpenRouterClient } from '../client/openrouter/client.js';
 import type { ChatMessage, ToolCall } from '../client/openrouter/types.js';
 import { AGENT_TOOLS, WorkspaceToolExecutor } from './tools.js';
+import type { McpClientManager } from '../mcp/clientManager.js';
 
 export interface AgentLoopOptions {
   client: OpenRouterClient;
@@ -10,6 +11,7 @@ export interface AgentLoopOptions {
   systemPrompt?: string;
   maxTurns?: number;
   signal?: AbortSignal;
+  mcpManager?: McpClientManager;
   onDelta?: (text: string) => void;
   onReasoningDelta?: (text: string) => void;
   onToolCallStart?: (call: { name: string; args: Record<string, unknown> }) => void;
@@ -42,10 +44,15 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
     let assistantContent = '';
     const pendingToolCalls: Map<number, { id: string; name: string; arguments: string }> = new Map();
 
+    const tools = [
+      ...AGENT_TOOLS,
+      ...(options.mcpManager ? options.mcpManager.getToolDefinitions() : []),
+    ];
+
     for await (const chunk of options.client.streamChat({
       model: options.model,
       messages: conversation,
-      tools: AGENT_TOOLS,
+      tools,
       signal: options.signal,
     })) {
       if (chunk.delta?.content) {
@@ -110,7 +117,11 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
 
       let resultText = '';
       try {
-        resultText = await executor.executeTool(tc.function.name, parsedArgs);
+        if (options.mcpManager?.hasTool(tc.function.name)) {
+          resultText = await options.mcpManager.callTool(tc.function.name, parsedArgs);
+        } else {
+          resultText = await executor.executeTool(tc.function.name, parsedArgs);
+        }
       } catch (err: unknown) {
         resultText = `Error executing ${tc.function.name}: ${err instanceof Error ? err.message : String(err)}`;
       }
