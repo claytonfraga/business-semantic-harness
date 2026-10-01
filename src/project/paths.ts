@@ -14,7 +14,7 @@ export async function resolveProjectFile(root: string, relative: string): Promis
 
   const canonicalTarget = await realpath(lexicalTarget);
   const fromRoot = relativePath(canonicalRoot, canonicalTarget);
-  if (!fromRoot || fromRoot === '..' || fromRoot.startsWith('..' + sep) || isAbsolute(fromRoot)) {
+  if (!fromRoot || fromRoot === '..' || fromRoot.startsWith(`..${sep}`) || isAbsolute(fromRoot)) {
     throw new Error(`Caminho fora do projeto: ${relative}`);
   }
   return canonicalTarget;
@@ -24,7 +24,7 @@ export async function assertProjectDirectory(root: string, directory: string): P
   const canonicalRoot = await realpath(root);
   const canonicalDirectory = await realpath(directory);
   const fromRoot = relativePath(canonicalRoot, canonicalDirectory);
-  if (!fromRoot || fromRoot === '..' || fromRoot.startsWith('..' + sep) || isAbsolute(fromRoot)) {
+  if (!fromRoot || fromRoot === '..' || fromRoot.startsWith(`..${sep}`) || isAbsolute(fromRoot)) {
     throw new Error(`Diretório fora do projeto: ${directory}`);
   }
 }

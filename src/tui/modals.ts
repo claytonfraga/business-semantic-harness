@@ -66,59 +66,114 @@ export async function promptApiKeyModal(): Promise<AuthResult> {
 }
 
 
+export function searchModels(
+  models: OpenRouterModel[],
+  query: string,
+  limit = 12
+): OpenRouterModel[] {
+  const clean = query.trim().toLowerCase();
+  if (!clean) return [];
+  return models
+    .filter((m) => {
+      const idMatch = m.id.toLowerCase().includes(clean);
+      const nameMatch = m.name ? m.name.toLowerCase().includes(clean) : false;
+      const descMatch = m.description ? m.description.toLowerCase().includes(clean) : false;
+      return idMatch || nameMatch || descMatch;
+    })
+    .slice(0, limit);
+}
+
 export async function selectModelModal(
   models: OpenRouterModel[],
-  currentModel: string
+  currentModel: string,
+  initialQuery?: string
 ): Promise<string> {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   try {
-    // Filter to top popular / coding models for fast selection, plus manual input
-    const popularIds = [
-      'deepseek/deepseek-v4.1-flash',
-      'deepseek/deepseek-chat',
-      'deepseek/deepseek-r1',
-      'anthropic/claude-3.5-sonnet',
-      'openai/gpt-4o',
-      'openai/gpt-4o-mini',
-      'qwen/qwen-2.5-coder-32b-instruct',
-      'meta-llama/llama-3.3-70b-instruct',
-      'google/gemini-2.0-flash-001',
-    ];
+    let currentFilter = (initialQuery || '').trim();
 
-    const displayModels = models
-      .filter((m) => popularIds.includes(m.id))
-      .slice(0, 10);
+    while (true) {
+      let displayModels: OpenRouterModel[];
+      let title: string;
 
-    const lines = [
-      'Select a model from the list below or type any model ID:',
-      '',
-      ...displayModels.map((m, idx) => {
-        const marker = m.id === currentModel ? `${ansi.brightGreen}* (current)${ansi.reset}` : '';
-        const ctx = m.context_length ? ` [${Math.round(m.context_length / 1024)}k ctx]` : '';
-        return `  ${ansi.bold}${idx + 1}.${ansi.reset} ${ansi.cyan}${m.id}${ansi.reset}${ctx} ${marker}`;
-      }),
-      '',
-      `Type number (1-${displayModels.length}), a model name to search, or press Enter to keep current.`,
-    ];
+      if (currentFilter) {
+        displayModels = searchModels(models, currentFilter, 12);
+        title = `Search OpenRouter Models: "${currentFilter}" (${displayModels.length} matches)`;
+      } else {
+        const popularIds = [
+          'deepseek/deepseek-v4.1-flash',
+          'deepseek/deepseek-chat',
+          'deepseek/deepseek-r1',
+          'anthropic/claude-3.5-sonnet',
+          'openai/gpt-4o',
+          'openai/gpt-4o-mini',
+          'qwen/qwen-2.5-coder-32b-instruct',
+          'meta-llama/llama-3.3-70b-instruct',
+          'google/gemini-2.0-flash-001',
+        ];
+        displayModels = models.filter((m) => popularIds.includes(m.id)).slice(0, 10);
+        if (displayModels.length === 0 && models.length > 0) {
+          displayModels = models.slice(0, 10);
+        }
+        title = 'Select OpenRouter Model';
+      }
 
-    console.log(`\n${box('Select OpenRouter Model', lines, 76)}`);
+      const lines: string[] = [
+        currentFilter
+          ? `Models matching search query '${ansi.bold}${currentFilter}${ansi.reset}':`
+          : 'Popular frontier & coding models on OpenRouter:',
+        '',
+      ];
 
-    const answer = (await rl.question(`\n${ansi.bold}Model choice or ID [${currentModel}]: ${ansi.reset}`)).trim();
-    if (!answer) {
-      return currentModel;
+      if (displayModels.length === 0) {
+        lines.push(`  ${ansi.yellow}No models found matching '${currentFilter}'.${ansi.reset}`);
+        lines.push('');
+      } else {
+        for (let idx = 0; idx < displayModels.length; idx++) {
+          const m = displayModels[idx];
+          const isCurrent = m.id === currentModel;
+          const marker = isCurrent ? ` ${ansi.brightGreen}* (current)${ansi.reset}` : '';
+          const ctx = m.context_length ? ` ${ansi.dim}[${Math.round(m.context_length / 1024)}k ctx]${ansi.reset}` : '';
+          lines.push(`  ${ansi.bold}${idx + 1}.${ansi.reset} ${ansi.cyan}${m.id}${ansi.reset}${ctx}${marker}`);
+        }
+        lines.push('');
+      }
+
+      lines.push(`${ansi.dim}Options:${ansi.reset}`);
+      if (displayModels.length > 0) {
+        lines.push(`  • Type ${ansi.bold}1-${displayModels.length}${ansi.reset} to select a model`);
+      }
+      lines.push(`  • Type a search query (e.g. ${ansi.cyan}gpt${ansi.reset}, ${ansi.cyan}claude${ansi.reset}) to search OpenRouter`);
+      lines.push(`  • Press ${ansi.bold}Enter${ansi.reset} or type ${ansi.bold}'q'${ansi.reset} / ${ansi.bold}'cancel'${ansi.reset} to close without changing`);
+
+      console.log(`\n${box(title, lines, 80)}`);
+
+      const answer = (
+        await rl.question(
+          `\n${ansi.bold}Choice, search query, or 'q' to close [current: ${currentModel}]: ${ansi.reset}`
+        )
+      ).trim();
+
+      // Cancel / Close without modifying
+      if (!answer || answer.toLowerCase() === 'q' || answer.toLowerCase() === 'cancel' || answer.toLowerCase() === 'exit') {
+        return currentModel;
+      }
+
+      // Check number selection
+      const num = parseInt(answer, 10);
+      if (!Number.isNaN(num) && num >= 1 && num <= displayModels.length) {
+        return displayModels[num - 1].id;
+      }
+
+      // Exact ID match in full models catalog
+      const exactMatch = models.find((m) => m.id.toLowerCase() === answer.toLowerCase());
+      if (exactMatch) {
+        return exactMatch.id;
+      }
+
+      // Query OpenRouter model catalog with new search term
+      currentFilter = answer;
     }
-
-    const num = parseInt(answer, 10);
-    if (!Number.isNaN(num) && num >= 1 && num <= displayModels.length) {
-      return displayModels[num - 1].id;
-    }
-
-    // Direct match or search
-    const found = models.find((m) => m.id.toLowerCase() === answer.toLowerCase());
-    if (found) return found.id;
-
-    // Custom model ID entered by user
-    return answer;
   } finally {
     rl.close();
   }

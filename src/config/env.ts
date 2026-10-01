@@ -83,5 +83,5 @@ export async function saveEnvConfig(
   }
 
   const newLines = Object.entries(envMap).map(([k, v]) => `${k}=${v}`);
-  await writeFile(envPath, newLines.join('\n') + '\n', { mode: 0o600 });
+  await writeFile(envPath, `${newLines.join('\n')}\n`, { mode: 0o600 });
 }

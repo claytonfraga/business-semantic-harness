@@ -165,9 +165,9 @@ test('TUI render: height is fixed and invariant regardless of entry count', () =
   const lines0 = tui0.split('\n');
   const linesMany = tuiMany.split('\n');
   assert.equal(lines0[0], linesMany[0], 'Top header border must be identical');
-  assert.equal(lines0[2], linesMany[2], 'Header separator must be identical');
+  assert.equal(lines0[3], linesMany[3], 'Header separator must be identical');
   assert.equal(lines0[height - 1], linesMany[height - 1], 'Bottom border must be identical');
-  assert.equal(lines0[height - 3], linesMany[height - 3], 'Footer separator must be identical');
+  assert.equal(lines0[height - 5], linesMany[height - 5], 'Footer separator must be identical');
 });
 
 test('TUI render: scrolling viewport navigates past entries with scrollOffset', () => {
@@ -199,5 +199,42 @@ test('TUI render: scrolling viewport navigates past entries with scrollOffset', 
   );
   assert.ok(scrolledTui.includes('MessageNumber-18'), 'Scrolled view must include earlier messages');
   assert.equal(scrolledTui.split('\n').length, height, 'Scrolled view must maintain exact height');
+});
+
+test('TUI render: renders DOMAIN MISMATCH badge and alert entry correctly', () => {
+  const width = 96;
+  const height = 24;
+
+  const tui = renderCompleteTui(
+    {
+      model: 'deepseek/deepseek-v4.1-flash',
+      contextLength: 1048576,
+      domain: 'ativos',
+      ontologySummary: 'ativos v1.0.0 (4 classes, 2 shapes)',
+      projectFolder: 'pilot/calculator',
+      gitBranch: 'main',
+      governed: true,
+      alignmentStatus: 'MISMATCH',
+      tokensTotal: 1420,
+      width,
+      height,
+    },
+    [
+      {
+        type: 'alert',
+        content: 'Baixa afinidade semântica: conceitos do domínio ativos não foram encontrados no projeto.\nPressione [Ctrl+D] para trocar ontologia ou [Ctrl+G] para desabilitar o harness.',
+      },
+      { type: 'user', content: 'Calcular raiz quadrada de 144' },
+    ],
+    '[Type your prompt here...]',
+    width,
+    height
+  );
+
+  assert.ok(tui.includes('[!] DOMAIN MISMATCH'), 'Must render DOMAIN MISMATCH badge');
+  assert.ok(tui.includes('[!] mismatch'), 'Must render mismatch indicator in ontology line');
+  assert.ok(tui.includes('[!] [Semantic Domain Alert]'), 'Must render alert chat entry header');
+  assert.ok(tui.includes('Baixa afinidade semântica'), 'Must render alert chat content');
+  assert.equal(tui.split('\n').length, height, 'Must maintain exact fixed height');
 });
 

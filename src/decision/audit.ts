@@ -44,7 +44,7 @@ export async function appendAudit(root: string, event: AuditEvent, secrets: read
       actor: event.actor ? redact(event.actor, secrets) : undefined,
       reason: redact(event.reason, secrets),
     };
-    const line = JSON.stringify(clean) + '\n';
+    const line = `${JSON.stringify(clean)}\n`;
     await handle.writeFile(line, 'utf8');
     await handle.sync();
   } finally {

@@ -27,10 +27,10 @@ BG_COLOR = (15, 23, 42)       # Slate 900
 TEXT_COLOR = (241, 245, 249)  # Slate 100
 HEADER_COLOR = (56, 189, 248) # Sky 400
 
-WORKTREE_ROOT = Path("/home/clayton/projetos/oracle/.worktrees/scientific-report-reconciliation")
+WORKTREE_ROOT = Path(os.environ.get("BSH_ROOT", "/home/clayton/projetos/oracle"))
 VIDEOS_DIR = WORKTREE_ROOT / "evaluation" / "videos"
 REPORTS_DIR = WORKTREE_ROOT / "evaluation" / "reports"
-SCREENSHOTS_DIR = WORKTREE_ROOT / "screenshots"
+SCREENSHOTS_DIR = WORKTREE_ROOT / "evaluation" / "screenshots"
 
 
 def ensure_dirs() -> None:
@@ -113,22 +113,25 @@ def render_terminal_frame(text: str, title: str, output_path: Path, width: int =
     y = 48
 
     for line in lines:
-        # Determine syntax color based on content (OpenCode style)
         color = TEXT_COLOR
-        if "VIOLATION" in line or "✖" in line or "Error" in line or "🚨" in line:
-            color = (248, 113, 113) # Red 400
-        elif "● GOVERNED" in line or "CONFORMING" in line or "✔" in line:
-            color = (74, 222, 128) # Emerald 400
-        elif "Semantic Gate" in line or "🛡" in line:
-            color = (56, 189, 248) # Sky 400
-        elif "⚙ Tool" in line or "○ UNGOVERNED" in line:
+        if "[*] GOVERNED" in line or "[OK] CONFORMING" in line or "[+]" in line or "[■] Governed" in line:
+            color = (34, 197, 94)  # Emerald 500
+        elif "[!] DOMAIN MISMATCH" in line or "[!] [Semantic Domain Alert]" in line or "[!] mismatch" in line or "[o] UNGOVERNED" in line or "[o] Ungoverned" in line:
             color = (250, 204, 21) # Amber 400
-        elif line.startswith("───") or line.startswith("─"):
-            color = (71, 85, 105) # Slate 600 divider
-        elif "❯ [User]" in line:
+        elif "[X] VIOLATION" in line or "Promotion blocked" in line or "Error" in line:
+            color = (248, 113, 113) # Red 400
+        elif "> [User]" in line or "▎ >" in line:
             color = (56, 189, 248) # Sky 400
-        elif line.startswith("│"):
-            color = TEXT_COLOR
+        elif "[BSH Agent]" in line:
+            color = (192, 132, 252) # Purple 400
+        elif ">_ Tool:" in line:
+            color = (251, 191, 36) # Amber 300
+        elif "->" in line and "Status" not in line:
+            color = (74, 222, 128) # Green 400
+        elif "───" in line or line.startswith("─"):
+            color = (71, 85, 105)  # Slate 600
+        elif "[Ctrl+" in line or "git(" in line or "·" in line:
+            color = (148, 163, 184) # Slate 400
 
         draw.text((PADDING, y), line, font=font, fill=color)
         y += LINE_HEIGHT
@@ -183,16 +186,17 @@ def record_scenario(
     intro_file = temp_frames / f"frame_{frame_idx:04d}.png"
     render_intro_slide(intro_title, intro_lines, intro_file)
     frame_idx += 1
-    for _ in range(7): # 8 frames total = 4 seconds of readable intro slide at 2 fps
+    # 16 frames = 8.0 seconds of readable intro slide at 2 fps
+    for _ in range(15):
         shutil.copyfile(intro_file, temp_frames / f"frame_{frame_idx:04d}.png")
         frame_idx += 1
 
     # Kill existing session if any
     subprocess.run(["tmux", "kill-session", "-t", session_name], stderr=subprocess.DEVNULL)
-    # Start tmux session with 110x32
+    # Start tmux session with 120x32
     subprocess.run([
         "tmux", "new-session", "-d", "-s", session_name,
-        "-x", "110", "-y", "32",
+        "-x", "120", "-y", "32",
     ], check=True)
 
     try:
@@ -209,15 +213,42 @@ def record_scenario(
                 frame_idx += 1
                 time.sleep(delay)
 
+        def type_prompt_interactively(text: str) -> None:
+            # Type words with frames snapped so user sees prompt being typed in prompt space
+            words = text.split(" ")
+            accum = ""
+            for i, word in enumerate(words):
+                chunk = word if i == 0 else " " + word
+                for char in chunk:
+                    subprocess.run(["tmux", "send-keys", "-t", session_name, "-l", char], check=True)
+                    time.sleep(0.04)
+                accum += chunk
+                if i % 2 == 0 or i == len(words) - 1:
+                    snap(count=1, delay=0.25)
+
+            # Hold full prompt in the prompt area for 6.0 seconds (12 frames) so a human can read it!
+            snap(count=12, delay=0.5)
+
+            # Press Enter
+            subprocess.run(["tmux", "send-keys", "-t", session_name, "Enter"], check=True)
+            time.sleep(0.5)
+
         # Initial wait for startup and header render
         snap(count=6, delay=0.5)
 
         # Process user inputs
         for inp, wait_time in user_inputs:
-            type_keys(session_name, inp, enter=True)
-            # Record frames while agent processes/streams
-            steps = max(1, int(wait_time * 2))
-            snap(count=steps, delay=0.5)
+            if inp.startswith("/"):
+                type_keys(session_name, inp, enter=True)
+                snap(count=int(wait_time * 2), delay=0.5)
+            else:
+                type_prompt_interactively(inp)
+                # Wait while agent executes tools and gate checks
+                steps = max(1, int(wait_time * 2))
+                snap(count=steps, delay=0.6)
+
+        # Hold final resting screen for 20.0 seconds (40 frames) so human can comfortably inspect all details
+        snap(count=40, delay=0.5)
 
         # Final capture while BSH is active
         final_text = capture_tmux_pane(session_name)
@@ -275,8 +306,7 @@ def main() -> int:
     ]
 
     gov_inputs = [
-        ("Transfer retired asset AST-002 to Maintenance department without justification", 12.0),
-        ("/diff", 4.0),
+        ("Transfer retired asset AST-002 to Maintenance department without justification", 14.0),
     ]
 
     gov_res = record_scenario(
@@ -349,8 +379,7 @@ def main() -> int:
     ]
 
     coop_inputs = [
-        ("Add an endpoint to transfer assets in 'In Operation' state with new owner and location", 12.0),
-        ("/diff", 4.0),
+        ("Add an endpoint to transfer assets in 'In Operation' state with new owner and location", 14.0),
     ]
 
     coop_res = record_scenario(
@@ -365,17 +394,79 @@ def main() -> int:
     )
     print(f"✔ Cooperative video saved: {coop_res['video_path']} ({coop_res['file_size_kb']:.1f} KB, SHA-256: {coop_res['sha256'][:16]}...)")
 
+    # Scenario 4: Domain Mismatch Alert (Harness Detecta Incompatibilidade Semântica)
+    print("\n--- Running Scenario 4: Domain Mismatch Alert (Incompatibilidade Semântica) ---")
+    mismatch_video = VIDEOS_DIR / "bsh-domain-mismatch-scenario.mp4"
+    mismatch_shot = SCREENSHOTS_DIR / "bsh-domain-mismatch-scenario.png"
+
+    mismatch_intro_title = "Jornada 4: Alerta Proativo de Desalinhamento Ontológico (Domain Mismatch)"
+    mismatch_intro_lines = [
+        "Domínio Selecionado: Gestão de Ativos ('ativos')",
+        "Projeto em Execução: Microserviço de Cálculo Matemático (sem termos de patrimônio)",
+        "Objetivo da Jornada: Verificar se o BSH detecta a incompatibilidade de conceitos entre ontologia e código.",
+        "Comportamento Esperado do BSH:",
+        "  • O mecanismo de afinidade semântica analisa a base de código do projeto.",
+        "  • Detecta baixa afinidade (conceitos de 'ativos' ausentes no código).",
+        "  • O cabeçalho exibe '[⚠ DOMAIN MISMATCH]' e '(⚠ mismatch)'.",
+        "  • O feed inicial emite o alerta '⚠ [Semantic Domain Alert]' recomendando ações.",
+        "  • O usuário digita '/ungoverned' para desativar o harness ou troca de domínio com '/domain'.",
+    ]
+
+    temp_mismatch_dir = Path(tempfile.mkdtemp(prefix="bsh_mismatch_"))
+    try:
+        math_src = temp_mismatch_dir / "src"
+        math_src.mkdir(parents=True, exist_ok=True)
+        (math_src / "calculator.ts").write_text(
+            "export function sum(a: number, b: number): number { return a + b; }\n"
+            "export function multiply(a: number, b: number): number { return a * b; }\n",
+            encoding="utf-8"
+        )
+        (math_src / "trigonometry.ts").write_text(
+            "export function calculateSin(deg: number): number { return Math.sin(deg * Math.PI / 180); }\n",
+            encoding="utf-8"
+        )
+        # Copy .bsh with ativos domain from pilot
+        shutil.copytree(pilot_dir / ".bsh", temp_mismatch_dir / ".bsh")
+
+        # Initialize git repo so gitBranch is detected in TUI
+        subprocess.run(["git", "init", "-b", "main", str(temp_mismatch_dir)], check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(["git", "-C", str(temp_mismatch_dir), "config", "user.name", "BSH Tester"], check=True)
+        subprocess.run(["git", "-C", str(temp_mismatch_dir), "config", "user.email", "tester@bsh.dev"], check=True)
+        subprocess.run(["git", "-C", str(temp_mismatch_dir), "add", "-A"], check=True)
+        subprocess.run(["git", "-C", str(temp_mismatch_dir), "commit", "-m", "Initial math microservice"], check=True, stdout=subprocess.DEVNULL)
+
+        mismatch_inputs = [
+            ("/affinity", 4.0),
+            ("/ungoverned", 4.0),
+            ("Implement function to calculate factorial of a number", 10.0),
+        ]
+
+        mismatch_res = record_scenario(
+            session_name="bsh-e2e-mismatch",
+            title="BSH E2E Scenario 4: Domain Mismatch Alert & User Bypass",
+            intro_title=mismatch_intro_title,
+            intro_lines=mismatch_intro_lines,
+            command=[bsh_bin, "--project", str(temp_mismatch_dir)],
+            user_inputs=mismatch_inputs,
+            output_video=mismatch_video,
+            output_screenshot=mismatch_shot,
+        )
+        print(f"✔ Domain Mismatch video saved: {mismatch_res['video_path']} ({mismatch_res['file_size_kb']:.1f} KB, SHA-256: {mismatch_res['sha256'][:16]}...)")
+    finally:
+        shutil.rmtree(temp_mismatch_dir, ignore_errors=True)
+
     # Copy MP4 videos to WSL Downloads for easy human evaluation
     downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
     if downloads_dir.exists():
         shutil.copy2(gov_video, downloads_dir / "bsh-governed-scenario.mp4")
         shutil.copy2(ungov_video, downloads_dir / "bsh-ungoverned-scenario.mp4")
         shutil.copy2(coop_video, downloads_dir / "bsh-cooperative-scenario.mp4")
-        print(f"✔ Copied all 3 MP4 videos to Windows Downloads: {downloads_dir}")
+        shutil.copy2(mismatch_video, downloads_dir / "bsh-domain-mismatch-scenario.mp4")
+        print(f"✔ Copied all 4 MP4 videos to Windows Downloads: {downloads_dir}")
 
     # Generate Comprehensive Test Report
     report_file = REPORTS_DIR / "relatorio-testes-e2e-openrouter.md"
-    generate_markdown_report(gov_res, ungov_res, coop_res, report_file)
+    generate_markdown_report(gov_res, ungov_res, coop_res, mismatch_res, report_file)
     if downloads_dir.exists():
         shutil.copy2(report_file, downloads_dir / "relatorio-testes-e2e-openrouter.md")
     print(f"✔ Comprehensive test report generated: {report_file}")
@@ -383,14 +474,14 @@ def main() -> int:
     return 0
 
 
-def generate_markdown_report(gov_res: dict, ungov_res: dict, coop_res: dict, output_file: Path) -> None:
+def generate_markdown_report(gov_res: dict, ungov_res: dict, coop_res: dict, mismatch_res: dict, output_file: Path) -> None:
     now_iso = time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())
     bsh_bin = shutil.which("bsh") or "bsh"
     content = f"""# Relatório de Testes E2E: BSH com OpenRouter e Governança Semântica
 
 **Data de Execução**: {now_iso}  
 **Ambiente**: Linux x86_64, Node.js v22, OpenRouter API (`sk-or-v1-...`)  
-**Executável do BSH**: `{bsh_bin}` (Pacote de distribuição `business-semantic-harness-0.2.3-beta.tgz`)  
+**Executável do BSH**: `{bsh_bin}` (Pacote de distribuição `business-semantic-harness-0.2.4-beta.tgz`)  
 **Fonte da Verdade da Especificação**: [`test/features/bsh-governance.feature`](file://{WORKTREE_ROOT}/test/features/bsh-governance.feature)  
 **Projeto Piloto**: [`pilot/asset-management`](file://{WORKTREE_ROOT}/pilot/asset-management) (Domínio `ativos`)
 
@@ -398,25 +489,27 @@ def generate_markdown_report(gov_res: dict, ungov_res: dict, coop_res: dict, out
 
 ## 1. Sumário Executivo
 
-Este relatório apresenta a validação E2E do **Business Semantic Harness (BSH)** operando como cliente nativo do **OpenRouter** com interface TUI moderna inspirada no OpenCode (sem bordas laterais, altura fixa e rolagem interna). Foram executados e gravados em vídeo MP4 (H.264) com slides explicativos iniciais em português três cenários comparativos:
+Este relatório apresenta a validação E2E do **Business Semantic Harness (BSH)** operando como cliente nativo do **OpenRouter** com interface TUI moderna inspirada no OpenCode (sem bordas laterais, altura fixa e rolagem interna). Foram executados e gravados em vídeo MP4 (H.264) com slides explicativos iniciais em português quatro cenários representativos das regras de negócio:
 
 1. **Jornada 1 (Harness Ontológico Ativo - Governed Bloqueio)**: O BSH inicia com o domínio `ativos` e regras SHACL ativas. Uma solicitação para transferir um ativo em estado `Baixado` é interceptada pelo Gate Semântico, que bloqueia a promoção e reporta a violação da regra de negócio `TransferShape`.
 2. **Jornada 2 (Harness Ontológico Desativado - Ungoverned)**: O BSH opera em modo desassistido sem regras ontológicas ativas. A mesma solicitação é processada pelo modelo sem validação de regras de domínio.
 3. **Jornada 3 (Harness Ontológico Ativo - Governed Conforme)**: O modelo aplica uma alteração aderente às regras de negócio para ativos em operação, recebendo o status `CONFORMING` e aprovação do Gate Semântico.
+4. **Jornada 4 (Detecção Proativa de Desalinhamento - Domain Mismatch)**: Ao iniciar em um projeto cujos conceitos não possuem relação com a ontologia ativa, o BSH alerta preventivamente o usuário via `[⚠ DOMAIN MISMATCH]` e permite ao usuário alternar a ontologia ou desativar o mecanismo (`/ungoverned`).
 
 ---
 
 ## 2. Artefatos de Vídeo para Avaliação Humana
 
-Todos os vídeos foram gravados diretamente do terminal `tmux`, incluindo **slide inicial com fundo preto e letra branca em português** apresentando os objetivos da jornada, seguido da execução em tempo real na interface OpenCode do BSH:
+Todos os vídeos foram gravados diretamente do terminal `tmux`, incluindo **slide inicial com fundo preto e letra branca em português** apresentando os objetivos da jornada, seguido da digitação interativa do prompt e execução em tempo real na interface OpenCode do BSH:
 
 | Cenário / Jornada | Arquivo de Vídeo | Tamanho | SHA-256 | Captura Final |
 |---|---|---|---|---|
 | **1. Harness Ativo (Bloqueio)** | [`bsh-governed-scenario.mp4`](file://{gov_res['video_path']}) | {gov_res['file_size_kb']:.1f} KB | `{gov_res['sha256']}` | [`bsh-governed-scenario.png`](file://{gov_res['screenshot_path']}) |
 | **2. Harness Desativado** | [`bsh-ungoverned-scenario.mp4`](file://{ungov_res['video_path']}) | {ungov_res['file_size_kb']:.1f} KB | `{ungov_res['sha256']}` | [`bsh-ungoverned-scenario.png`](file://{ungov_res['screenshot_path']}) |
 | **3. Harness Ativo (Conforme)** | [`bsh-cooperative-scenario.mp4`](file://{coop_res['video_path']}) | {coop_res['file_size_kb']:.1f} KB | `{coop_res['sha256']}` | [`bsh-cooperative-scenario.png`](file://{coop_res['screenshot_path']}) |
+| **4. Alerta de Afinidade (Mismatch)** | [`bsh-domain-mismatch-scenario.mp4`](file://{mismatch_res['video_path']}) | {mismatch_res['file_size_kb']:.1f} KB | `{mismatch_res['sha256']}` | [`bsh-domain-mismatch-scenario.png`](file://{mismatch_res['screenshot_path']}) |
 
-> **Cópia no Windows Downloads**: Os vídeos foram copiados para `/mnt/c/Users/clayt/Downloads/` para inspeção imediata.
+> **Cópia no Windows Downloads**: Os 4 vídeos MP4 e este relatório foram copiados para `/mnt/c/Users/clayt/Downloads/` para inspeção imediata.
 
 ---
 
@@ -465,6 +558,24 @@ Todos os vídeos foram gravados diretamente do terminal `tmux`, incluindo **slid
 - **Resultado Observado**: **PASSOU ✅**
 - O gate semântico confirmou conformidade: `🛡️  Semantic Gate: CONFORMING (Ready to promote)`.
 
+### Jornada 4: Detecção Proativa de Desalinhamento Ontológico (Domain Mismatch)
+```gherkin
+  Rule: O BSH verifica se a ontologia ativa tem relação com os conceitos do projeto e alerta o usuário em caso de incompatibilidade
+
+    Scenario: Alerta de baixa afinidade semântica em projeto não aderente
+      Given um projeto sem entidades de ativos (ex: serviço de cálculo)
+      And a ontologia ativa selecionada é "ativos"
+      When o usuário inicia a TUI do produto "bsh" no projeto
+      Then o mecanismo ontológico analisa a correspondência de conceitos
+      And o BSH detecta baixa afinidade e exibe "[⚠ DOMAIN MISMATCH]"
+      And o feed inicial exibe "⚠ [Semantic Domain Alert]"
+      And o usuário pode alternar domínio com "/domain" ou desativar com "/ungoverned"
+```
+- **Resultado Observado**: **PASSOU ✅**
+- Cabeçalho: `─── BSH [Business Semantic Harness] ──────────────────── [⚠ DOMAIN MISMATCH] ───`
+- Alerta emitido: `⚠ [Semantic Domain Alert]: Baixa afinidade semântica...`
+- O usuário desativou o harness via `/ungoverned`, transicionando para `[○ UNGOVERNED]` e prosseguindo sem bloqueios.
+
 ---
 
 ## 4. Evidência Textual das Sessões
@@ -482,6 +593,11 @@ Todos os vídeos foram gravados diretamente do terminal `tmux`, incluindo **slid
 ### Captura do Terminal - Jornada 3 (Governed Conforme)
 ```text
 {coop_res['final_text']}
+```
+
+### Captura do Terminal - Jornada 4 (Alerta de Mismatch e Bypass)
+```text
+{mismatch_res['final_text']}
 ```
 
 ---

@@ -21,6 +21,7 @@ export const ansi = {
   brightGreen: '\x1b[92m',
   brightYellow: '\x1b[93m',
   brightRed: '\x1b[91m',
+  brightWhite: '\x1b[97m',
 
   // Backgrounds
   bgBlue: '\x1b[44m',

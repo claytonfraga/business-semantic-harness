@@ -53,8 +53,8 @@ export async function main(argv: string[]): Promise<number> {
     ? argsWithoutProject.filter((_, index) => !flagsToRemove.includes(index))
     : argsWithoutProject;
 
-  const promptFlag = command.findIndex((arg) => arg === '--prompt');
-  const promptFileFlag = command.findIndex((arg) => arg === '--prompt-file');
+  const promptFlag = command.indexOf('--prompt');
+  const promptFileFlag = command.indexOf('--prompt-file');
   if (promptFlag >= 0 && !command[promptFlag + 1]) {
     process.stderr.write('Texto ausente após --prompt.\n');
     return 2;

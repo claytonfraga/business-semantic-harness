@@ -4,7 +4,12 @@ export interface RenderState {
   model: string;
   contextLength?: number;
   domain?: string;
+  ontologySummary?: string;
+  projectFolder?: string;
+  gitBranch?: string;
   governed: boolean;
+  alignmentStatus?: 'ALIGNED' | 'MISMATCH' | 'INSUFFICIENT_DATA';
+  alignmentWarning?: string;
   tokensTotal: number;
   sessionCost?: number;
   width?: number;
@@ -18,7 +23,7 @@ export interface GateCheckItem {
 }
 
 export interface ChatEntry {
-  type: 'user' | 'agent' | 'tool' | 'tool_result' | 'gate' | 'blank';
+  type: 'user' | 'agent' | 'tool' | 'tool_result' | 'gate' | 'alert' | 'blank';
   content?: string;
   toolName?: string;
   toolArgs?: Record<string, unknown> | string;
@@ -151,12 +156,21 @@ export function formatToolInvocation(name: string, args: Record<string, unknown>
 
 export function renderHeader(state: RenderState, width: number): string {
   const logo = `${ansi.bold}${ansi.brightBlue}BSH${ansi.reset} ${ansi.dim}[Business Semantic Harness]${ansi.reset}`;
-  const statusBadge = state.governed
-    ? `${ansi.bold}${ansi.brightGreen}[● GOVERNED]${ansi.reset}`
-    : `${ansi.bold}${ansi.yellow}[○ UNGOVERNED]${ansi.reset}`;
+  
+  let statusBadge: string;
+  let visibleStatus: string;
+  if (!state.governed) {
+    statusBadge = `${ansi.bold}${ansi.yellow}[o] UNGOVERNED${ansi.reset}`;
+    visibleStatus = '[o] UNGOVERNED';
+  } else if (state.alignmentStatus === 'MISMATCH') {
+    statusBadge = `${ansi.bold}${ansi.yellow}[!] DOMAIN MISMATCH${ansi.reset}`;
+    visibleStatus = '[!] DOMAIN MISMATCH';
+  } else {
+    statusBadge = `${ansi.bold}${ansi.brightGreen}[*] GOVERNED${ansi.reset}`;
+    visibleStatus = '[*] GOVERNED';
+  }
 
   const visibleLogo = 'BSH [Business Semantic Harness]';
-  const visibleStatus = state.governed ? '[● GOVERNED]' : '[○ UNGOVERNED]';
   const fixedChars = 4 + visibleLogo.length + 2 + visibleStatus.length + 4;
   const dashCount = Math.max(2, width - fixedChars);
   const firstLine = `─── ${logo} ${'─'.repeat(dashCount)} ${statusBadge} ───`;
@@ -164,17 +178,34 @@ export function renderHeader(state: RenderState, width: number): string {
   const ctxStr = state.contextLength ? ` (${formatContextLength(state.contextLength)})` : ' (128k ctx)';
   const modelStr = `${state.model}${ctxStr}`;
 
-  const domainStr = state.domain
-    ? `${ansi.brightGreen}${state.domain}${ansi.reset} ${ansi.dim}(SHACL active)${ansi.reset}`
-    : `${ansi.yellow}none${ansi.reset} ${ansi.dim}(inactive)${ansi.reset}`;
+  let ontologyStr = '';
+  const domainText = state.ontologySummary || state.domain;
+  if (domainText) {
+    if (!state.governed) {
+      ontologyStr = `${ansi.yellow}${domainText}${ansi.reset} ${ansi.dim}(inactive)${ansi.reset}`;
+    } else if (state.alignmentStatus === 'MISMATCH') {
+      ontologyStr = `${ansi.bold}${ansi.yellow}[!] mismatch${ansi.reset} ${ansi.yellow}${domainText}${ansi.reset}`;
+    } else {
+      ontologyStr = `${ansi.brightGreen}${domainText}${ansi.reset} ${ansi.dim}(SHACL active)${ansi.reset}`;
+    }
+  } else {
+    ontologyStr = `${ansi.yellow}none${ansi.reset} ${ansi.dim}(inactive)${ansi.reset}`;
+  }
 
+  const secondLine = tuiLine(`  Model: ${ansi.cyan}${modelStr}${ansi.reset}   Ontology: ${ontologyStr}`, width);
+
+  const projectStr = state.projectFolder || 'project';
+  const branchStr = state.gitBranch ? `git(${state.gitBranch})` : 'non-git';
   const tokensStr = state.tokensTotal.toLocaleString();
   const costStr = state.sessionCost !== undefined ? ` ($${state.sessionCost.toFixed(4)})` : '';
-  const infoLine = `  Model: ${ansi.cyan}${modelStr}${ansi.reset}   Domain: ${domainStr}   Tokens: ${tokensStr}${costStr}`;
-  const secondLine = tuiLine(infoLine, width);
+  const thirdLine = tuiLine(
+    `  Project: ${ansi.blue}${projectStr}${ansi.reset}   Branch: ${ansi.magenta}${branchStr}${ansi.reset}   Tokens: ${tokensStr}${costStr}`,
+    width
+  );
+
   const separator = '─'.repeat(width);
 
-  return [tuiLine(firstLine, width), secondLine, separator].join('\n');
+  return [tuiLine(firstLine, width), secondLine, thirdLine, separator].join('\n');
 }
 
 export function renderChatEntry(entry: ChatEntry, width: number): string[] {
@@ -186,21 +217,21 @@ export function renderChatEntry(entry: ChatEntry, width: number): string[] {
       break;
 
     case 'user': {
-      const wrapped = wrapText(entry.content || '', width - 12);
-      lines.push(tuiLine(`  ${ansi.bold}${ansi.cyan}❯ [User]${ansi.reset} ${wrapped[0] || ''}`, width));
+      const wrapped = wrapText(entry.content || '', width - 14);
+      lines.push(tuiLine(`  ${ansi.cyan}▎${ansi.reset} ${ansi.bold}${ansi.cyan}> [User]${ansi.reset} ${wrapped[0] || ''}`, width));
       for (let i = 1; i < wrapped.length; i++) {
-        lines.push(tuiLine(`           ${wrapped[i]}`, width));
+        lines.push(tuiLine(`  ${ansi.dim}▎${ansi.reset}   ${wrapped[i]}`, width));
       }
       lines.push(tuiLine('', width));
       break;
     }
 
     case 'agent': {
-      lines.push(tuiLine(`  ${ansi.bold}${ansi.cyan}[BSH Agent]${ansi.reset}`, width));
+      lines.push(tuiLine(`  ${ansi.magenta}▎${ansi.reset} ${ansi.bold}${ansi.magenta}[BSH Agent]${ansi.reset}`, width));
       for (const rawLine of (entry.content || '').split('\n')) {
-        const wrapped = wrapText(rawLine, width - 4);
+        const wrapped = wrapText(rawLine, width - 8);
         for (const w of wrapped) {
-          lines.push(tuiLine(`  ${w}`, width));
+          lines.push(tuiLine(`  ${ansi.dim}▎${ansi.reset}   ${w}`, width));
         }
       }
       lines.push(tuiLine('', width));
@@ -209,12 +240,12 @@ export function renderChatEntry(entry: ChatEntry, width: number): string[] {
 
     case 'tool': {
       const inv = formatToolInvocation(entry.toolName || '', entry.toolArgs || {});
-      lines.push(tuiLine(`  ${ansi.yellow}⚙ Tool:${ansi.reset} ${ansi.bold}${inv}${ansi.reset}`, width));
+      lines.push(tuiLine(`  ${ansi.blue}▎${ansi.reset} ${ansi.yellow}>_ Tool:${ansi.reset} ${ansi.bold}${inv}${ansi.reset}`, width));
       break;
     }
 
     case 'tool_result': {
-      lines.push(tuiLine(`  ${ansi.green}↳${ansi.reset} ${entry.content || ''}`, width));
+      lines.push(tuiLine(`  ${ansi.dim}▎${ansi.reset}   ${ansi.green}->${ansi.reset} ${entry.content || ''}`, width));
       lines.push(tuiLine('', width));
       break;
     }
@@ -222,25 +253,37 @@ export function renderChatEntry(entry: ChatEntry, width: number): string[] {
     case 'gate': {
       const isViolation = entry.gateStatus === 'VIOLATION';
       const shape = entry.gateShape || 'TransferShape';
-      const icon = isViolation ? `${ansi.brightRed}🚨` : `${ansi.brightCyan}🛡️ `;
-      const title = `${icon} ${ansi.bold}Semantic Gate${ansi.reset} ${ansi.dim}[Evaluating SHACL constraints: ${ansi.reset}${ansi.bold}${shape}${ansi.reset}${ansi.dim}]${ansi.reset}`;
+      const barColor = isViolation ? ansi.brightRed : ansi.brightGreen;
+      const title = `${ansi.bold}${ansi.cyan}[#] Semantic Gate${ansi.reset} ${ansi.dim}[Evaluating SHACL constraints: ${ansi.reset}${ansi.bold}${shape}${ansi.reset}${ansi.dim}]${ansi.reset}`;
       const badge = isViolation
-        ? `${ansi.bold}${ansi.brightRed}[✖ VIOLATION]${ansi.reset}`
-        : `${ansi.bold}${ansi.brightGreen}[● CONFORMING]${ansi.reset}`;
+        ? `${ansi.bold}${ansi.brightRed}[X] VIOLATION${ansi.reset}`
+        : `${ansi.bold}${ansi.brightGreen}[OK] CONFORMING${ansi.reset}`;
 
-      lines.push(tuiLine(`  ${title} ${badge}`, width));
+      lines.push(tuiLine(`  ${barColor}▎${ansi.reset} ${title} ${badge}`, width));
 
       if (entry.gateChecks && entry.gateChecks.length > 0) {
         for (const check of entry.gateChecks) {
-          const checkIcon = check.ok ? `${ansi.brightGreen}✔${ansi.reset}` : `${ansi.brightRed}✖${ansi.reset}`;
-          lines.push(tuiLine(`    ${checkIcon} ${check.text}`, width));
+          const checkIcon = check.ok ? `${ansi.brightGreen}[+]${ansi.reset}` : `${ansi.brightRed}[X]${ansi.reset}`;
+          lines.push(tuiLine(`  ${barColor}▎${ansi.reset}   ${checkIcon} ${check.text}`, width));
         }
       }
 
       const statusText = isViolation
-        ? `    ${ansi.bold}${ansi.brightRed}→ Status: VIOLATION (Promotion blocked)${ansi.reset}`
-        : `    ${ansi.bold}${ansi.brightGreen}→ Status: CONFORMING (Ready to promote)${ansi.reset}`;
-      lines.push(tuiLine(statusText, width));
+        ? `${ansi.bold}${ansi.brightRed}-> Status: VIOLATION (Promotion blocked)${ansi.reset}`
+        : `${ansi.bold}${ansi.brightGreen}-> Status: CONFORMING (Ready to promote)${ansi.reset}`;
+      lines.push(tuiLine(`  ${barColor}▎${ansi.reset}   ${statusText}`, width));
+      lines.push(tuiLine('', width));
+      break;
+    }
+
+    case 'alert': {
+      lines.push(tuiLine(`  ${ansi.brightYellow}▎${ansi.reset} ${ansi.bold}${ansi.yellow}[!] [Semantic Domain Alert]${ansi.reset}`, width));
+      for (const rawLine of (entry.content || '').split('\n')) {
+        const wrapped = wrapText(rawLine, width - 8);
+        for (const w of wrapped) {
+          lines.push(tuiLine(`  ${ansi.brightYellow}▎${ansi.reset}   ${ansi.yellow}${w}${ansi.reset}`, width));
+        }
+      }
       lines.push(tuiLine('', width));
       break;
     }
@@ -256,15 +299,16 @@ export function renderCompleteTui(
   customWidth?: number,
   customHeight?: number
 ): string {
-  const terminalCols = process.stdout.columns && process.stdout.columns > 50 ? process.stdout.columns : 96;
-  const terminalRows = process.stdout.rows && process.stdout.rows >= 15 ? process.stdout.rows : 30;
+  const terminalCols = process.stdout.columns && process.stdout.columns >= 50 ? process.stdout.columns : 96;
+  const terminalRows = process.stdout.rows && process.stdout.rows >= 12 ? process.stdout.rows : 30;
 
-  const width = Math.min(120, Math.max(85, customWidth || state.width || terminalCols));
-  const height = Math.max(15, customHeight || state.height || terminalRows);
+  // Fully responsive to total screen resolution (no arbitrary max width clamp)
+  const width = Math.max(60, customWidth || state.width || terminalCols);
+  const height = Math.max(12, customHeight || state.height || terminalRows);
 
   const header = renderHeader(state, width);
-  const headerLinesCount = 3;
-  const footerLinesCount = 4;
+  const headerLinesCount = 4;
+  const footerLinesCount = 5;
   const chromeCount = headerLinesCount + footerLinesCount;
   const viewportHeight = Math.max(4, height - chromeCount);
 
@@ -298,12 +342,45 @@ export function renderCompleteTui(
     }
   }
 
-  const promptLine = tuiLine(`> ${currentPrompt}`, width);
-  const scrollIndicator = scrollOffset > 0 ? ` ${ansi.yellow}[▲ Scroll: +${scrollOffset}]${ansi.reset}` : '';
-  const shortcuts = `  ${ansi.bold}[Ctrl+M]${ansi.reset} Model  ${ansi.bold}[Ctrl+D]${ansi.reset} Domain/SHACL  ${ansi.bold}[Ctrl+G]${ansi.reset} Diff/Gate  ${ansi.bold}[Ctrl+C]${ansi.reset} Exit${scrollIndicator}`;
-  const shortcutsLine = tuiLine(shortcuts, width);
+  // Rich prompt box inspired by image.png and OpenTUI standards
+  const modeBadge = !state.governed
+    ? `${ansi.bold}${ansi.yellow}[o] Ungoverned${ansi.reset}`
+    : state.alignmentStatus === 'MISMATCH'
+    ? `${ansi.bold}${ansi.yellow}[!] Domain Mismatch${ansi.reset}`
+    : `${ansi.bold}${ansi.brightGreen}[■] Governed${ansi.reset}`;
+
+  const domainBadge = state.ontologySummary
+    ? (state.alignmentStatus === 'MISMATCH' ? `${ansi.yellow}${state.ontologySummary}${ansi.reset}` : `${ansi.cyan}${state.ontologySummary}${ansi.reset}`)
+    : (state.domain ? `${ansi.cyan}${state.domain}${ansi.reset}` : `${ansi.dim}none${ansi.reset}`);
+
+  const promptBadgeLine = tuiLine(
+    `  ${modeBadge} ${ansi.dim}·${ansi.reset} ${ansi.bold}${state.model}${ansi.reset} ${ansi.dim}·${ansi.reset} ${domainBadge} ${ansi.dim}· OpenRouter${ansi.reset}`,
+    width
+  );
+
+  const promptDisplay = currentPrompt !== undefined ? currentPrompt : `${ansi.dim}[Type your prompt here...]${ansi.reset}`;
+  const promptInputLine = tuiLine(`  ${ansi.cyan}▎${ansi.reset} ${ansi.bold}${ansi.brightWhite}>${ansi.reset} ${promptDisplay}`, width);
+
+  // Footer status line: project path, branch, tokens, percentage, cost, shortcuts
+  const branchStr = state.gitBranch ? `git(${state.gitBranch})` : 'non-git';
+  const projectFolder = state.projectFolder || 'project';
+  const ctxTotal = state.contextLength || 131072;
+  const ctxUsed = state.tokensTotal;
+  const ctxPct = ((ctxUsed / ctxTotal) * 100).toFixed(1);
+  const ctxStr = `${(ctxUsed / 1000).toFixed(1)}k (${ctxPct}%)`;
+  const costStr = state.sessionCost !== undefined ? `$${state.sessionCost.toFixed(2)}` : '$0.00';
+  const scrollIndicator = scrollOffset > 0 ? ` ${ansi.yellow}[^ Scroll: +${scrollOffset}]${ansi.reset}` : '';
+
+  const leftPart = `  ${ansi.dim}${projectFolder}${ansi.reset} ${ansi.magenta}${branchStr}${ansi.reset}`;
+  const rightPart = `${ansi.cyan}${ctxStr}${ansi.reset} ${ansi.dim}·${ansi.reset} ${ansi.green}${costStr}${ansi.reset} ${ansi.dim}·${ansi.reset} ${ansi.bold}[Ctrl+M]${ansi.reset} Model ${ansi.bold}[Ctrl+D]${ansi.reset} Domain ${ansi.bold}[Ctrl+G]${ansi.reset} Diff${scrollIndicator}`;
+  
+  const leftVis = stripAnsi(leftPart).length;
+  const rightVis = stripAnsi(rightPart).length;
+  const gap = Math.max(2, width - leftVis - rightVis);
+  const footerStatusLine = tuiLine(`${leftPart}${' '.repeat(gap)}${rightPart}`, width);
+
   const separator = '─'.repeat(width);
   const bottom = '─'.repeat(width);
 
-  return [header, ...viewportLines, separator, promptLine, shortcutsLine, bottom].join('\n');
+  return [header, ...viewportLines, separator, promptBadgeLine, promptInputLine, footerStatusLine, bottom].join('\n');
 }

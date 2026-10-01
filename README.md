@@ -96,7 +96,8 @@ When BSH starts, it opens the maximized, borderless terminal interface:
 
 ```text
 ─── BSH [Business Semantic Harness] ─────────────────────────── [● GOVERNED] ───
-  Model: deepseek/deepseek-v4.1-flash (1M ctx)   Domain: ativos (SHACL active)   Tokens: 1,420
+  Model: deepseek/deepseek-v4.1-flash (1M ctx)   Ontology: ativos v1.0.0 (4 classes, 2 shapes) (SHACL active)
+  Project: pilot/asset-management   Branch: git(master)   Tokens: 1,420
 ─────────────────────────────────────────────────────────────────────────────────
   ❯ [User] Add an endpoint to transfer assets in 'In Operation' state.
 
@@ -123,14 +124,60 @@ When BSH starts, it opens the maximized, borderless terminal interface:
 
 | Command / Shortcut | Action |
 |---|---|
-| `[Ctrl+M]` or `/model` | Open the **Model Selector modal** to browse or search OpenRouter models. |
+| `[Ctrl+M]` or `/model [query]` | Open the **Model Selector modal** to browse or search OpenRouter models dynamically (e.g. `/model gpt`). |
 | `[Ctrl+D]` or `/domain` | Open the **Domain & SHACL Selector modal** to switch active ontology governance. |
+| `/ungoverned` or `/bypass` | Temporarily disable ontology governance harness (bypass mode) to run unconstrained. |
+| `/governed` | Re-enable ontology governance harness and re-evaluate domain constraints. |
+| `/affinity` or `/alignment` | Run an instant semantic affinity check between active ontology concepts and current codebase. |
 | `[Ctrl+G]` or `/diff` | Open the **Diff Review & Semantic Gate** modal to review diffs and promote changes. |
 | `[Ctrl+L]` or `/clear` | Clear the chat history and reset scroll view. |
 | `/up` / `/down` | Scroll the message history viewport up or down by 5 lines. |
 | `/top` / `/bottom` | Jump to the very beginning or restore auto-scroll to the latest message. |
 | `/help` | Print available commands and keyboard shortcuts in English. |
 | `/exit` or `/quit` | Clean up the session worktree and exit BSH cleanly. |
+
+---
+
+## Canonical Location of Ontologies & Ontological Mechanisms
+
+Every domain ontology and its associated semantic mechanisms belong to the project they govern and reside strictly in:
+
+```text
+<project>/
+└── .bsh/
+    ├── config.json                     # Project-level defaults (model, defaultDomain)
+    └── domains/                        # Canonical directory for ontological mechanisms
+        └── <domain-id>/                # Dedicated domain folder (e.g., assets, payments, billing)
+            ├── ontology.jsonld         # OWL/RDF domain vocabulary (classes, properties, states)
+            ├── shapes.ttl              # SHACL shapes, targetClasses, and validation constraints
+            └── rules/                  # Additional SPARQL rules and semantic constraints
+```
+
+---
+
+## Domain Concept Affinity & Alignment Verification
+
+To prevent applying the wrong business domain ontology to a project (e.g. enforcing patrimonial asset rules on an authentication service or math library), BSH includes an automated **Domain Concept Affinity Engine**:
+
+1. **Concept Extraction**: On startup and whenever `/domain` is changed, BSH extracts all domain classes, labels, properties, and SHACL shapes from the active domain.
+2. **Codebase Token Indexing**: BSH scans project source code and folder structures (excluding `.git`, `node_modules`, `.bsh`, `dist`).
+3. **Affinity Scoring**: Calculates the semantic overlap between ontology terms and codebase identifiers.
+4. **Proactive Warning & Control**:
+   - If concepts align, BSH displays `[● GOVERNED]` with `(SHACL active)`.
+   - If a mismatch is detected (low concept overlap), BSH updates the header to `[⚠ DOMAIN MISMATCH]` with `(⚠ mismatch)` and emits a prominent `⚠ [Semantic Domain Alert]` into the chat.
+   - The user is immediately prompted to either:
+     - Switch to the correct domain with `/domain` (`[Ctrl+D]`);
+     - Disable the ontology harness with `/ungoverned` (`[Ctrl+G]`);
+     - Proceed consciously if new domain terms are about to be introduced in the current turn.
+
+---
+
+## Mandatory E2E Testing Standard
+
+**All functional and End-to-End (E2E) tests MUST execute the distributed BSH product binary (`bsh` globally installed via `npm pack` / `npm install -g`), NEVER running TypeScript source code directly (`tsx`, `ts-node` or `node src/...`)**.
+
+This ensures that E2E validation exercises the exact binary, packaging, bin wrappers, and distribution artifacts that end-users receive.
+
 
 ---
 

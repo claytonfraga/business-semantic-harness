@@ -1,7 +1,10 @@
 import * as readline from 'node:readline/promises';
+import { Writable } from 'node:stream';
+import { relative, basename } from 'node:path';
 import { loadEnvConfig, saveEnvConfig } from '../config/env.js';
 import { OpenRouterClient } from '../client/openrouter/client.js';
 import { getAvailableDomains, loadDomainValidator, type DomainValidator } from '../governance/domainRegistry.js';
+import { checkDomainAffinity } from '../governance/domainAffinity.js';
 import { runAgentTurn } from '../agent/agentLoop.js';
 import type { ChatMessage } from '../client/openrouter/types.js';
 import {
@@ -72,14 +75,15 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   // 4. Git Worktree Isolation
   let sessao: SessaoWorktree | null = null;
   let workspaceRoot = projectRoot;
+  let activeGitBranch: string | undefined;
   if (await gitDisponivel()) {
     try {
       const repoRoot = await resolverRepositorio(projectRoot);
-      const branch = await branchAtual(repoRoot);
+      activeGitBranch = await branchAtual(repoRoot);
       const commit = await commitAtual(repoRoot);
       sessao = await criarSessaoWorktree({
         repositorioOrigem: repoRoot,
-        branchOrigem: branch,
+        branchOrigem: activeGitBranch,
         commitBase: commit,
         incluirEstadoLocal: true,
       });
@@ -94,8 +98,42 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   let lastGateConforming = true;
   let lastGateViolations: string[] = [];
   let scrollOffset = 0;
+  let alignmentStatus: 'ALIGNED' | 'MISMATCH' | 'INSUFFICIENT_DATA' = 'ALIGNED';
+  let alignmentWarning: string | undefined;
   const messages: ChatMessage[] = [];
   const chatEntries: ChatEntry[] = [];
+
+  const runAffinityCheck = async (domainId?: string) => {
+    if (!domainId || !validator) {
+      alignmentStatus = 'INSUFFICIENT_DATA';
+      alignmentWarning = undefined;
+      return;
+    }
+    const targetDomain = availableDomains.find((d) => d.id === domainId);
+    if (!targetDomain) return;
+
+    try {
+      const aff = await checkDomainAffinity(
+        projectRoot,
+        targetDomain.ontologyPath,
+        targetDomain.shapesPath,
+        domainId
+      );
+      alignmentStatus = aff.status;
+      if (aff.status === 'MISMATCH') {
+        alignmentWarning = aff.summary;
+        chatEntries.push({
+          type: 'alert',
+          content: `${aff.summary}\n↳ Ações: digite /domain para trocar, /ungoverned para desabilitar o harness ontológico, ou prossiga normalmente.`,
+        });
+      }
+    } catch {
+      // Best-effort
+    }
+  };
+
+  // Initial affinity check before first render
+  await runAffinityCheck(activeDomainId);
 
   const getActiveContextLength = () => {
     return modelsList.find((m) => m.id === activeModel)?.context_length || 131072;
@@ -105,21 +143,42 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     const cols = process.stdout.columns && process.stdout.columns >= 50 ? process.stdout.columns : 96;
     const rows = process.stdout.rows && process.stdout.rows >= 15 ? process.stdout.rows : 30;
 
+    const activeDomainSummary = availableDomains.find((d) => d.id === activeDomainId);
+    let ontologySummary = '';
+    if (activeDomainSummary) {
+      const v = activeDomainSummary.version ? ` v${activeDomainSummary.version}` : '';
+      const c = activeDomainSummary.classesCount ? `${activeDomainSummary.classesCount} classes` : '';
+      const s = activeDomainSummary.shapesCount ? `${activeDomainSummary.shapesCount} shapes` : '';
+      const details = [c, s].filter(Boolean).join(', ');
+      ontologySummary = details ? `${activeDomainSummary.id}${v} (${details})` : `${activeDomainSummary.id}${v}`;
+    } else if (activeDomainId) {
+      ontologySummary = activeDomainId;
+    }
+
+    const relProject = relative(process.cwd(), projectRoot);
+    const projectFolder = relProject && !relProject.startsWith('..') ? relProject : basename(projectRoot);
+    const gitBranch = sessao?.branchOrigem || activeGitBranch;
+
     const frame = renderCompleteTui({
       model: activeModel,
       contextLength: getActiveContextLength(),
       domain: activeDomainId,
+      ontologySummary,
+      projectFolder,
+      gitBranch,
       governed: validator !== null,
+      alignmentStatus,
+      alignmentWarning,
       tokensTotal,
       width: cols,
       height: rows,
       scrollOffset,
     }, chatEntries, currentPrompt, cols, rows);
 
-    process.stdout.write(`\x1b[H${frame}`);
+    process.stdout.write(`\x1b[?7l\x1b[H${frame}\x1b[?7h`);
     if (currentPrompt === '') {
       const promptRow = rows - 2;
-      process.stdout.write(`\x1b[${promptRow};3H`);
+      process.stdout.write(`\x1b[${promptRow};1H`);
     }
   };
 
@@ -131,14 +190,26 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   };
   process.stdout.on('resize', onResize);
 
-  redrawScreen('');
+  const promptPrefix = `  \x1b[36m▎\x1b[39m \x1b[1m\x1b[97m>\x1b[39m\x1b[22m `;
+  const filterOut = new Writable({
+    write(chunk, _encoding, cb) {
+      const s = chunk.toString();
+      const replaced = s.replaceAll('\x1b[0J', '\x1b[K').replaceAll('\x1b[J', '\x1b[K');
+      process.stdout.write(replaced);
+      cb();
+    },
+  });
 
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: filterOut,
+    terminal: true,
+  });
 
   try {
     while (true) {
       redrawScreen('');
-      const prompt = (await rl.question('')).trim();
+      const prompt = (await rl.question(promptPrefix)).trim();
       if (!prompt) continue;
 
       // Reset scroll on active user prompt
@@ -180,9 +251,13 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         continue;
       }
 
-      if (prompt === '/model') {
-        activeModel = await selectModelModal(modelsList, activeModel);
-        await saveEnvConfig({ BSH_DEFAULT_MODEL: activeModel }, projectRoot);
+      if (prompt.startsWith('/model')) {
+        const query = prompt.replace(/^\/model\s*/, '').trim();
+        const prevModel = activeModel;
+        activeModel = await selectModelModal(modelsList, activeModel, query || undefined);
+        if (activeModel !== prevModel) {
+          await saveEnvConfig({ BSH_DEFAULT_MODEL: activeModel }, projectRoot);
+        }
         redrawScreen();
         continue;
       }
@@ -192,9 +267,67 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         if (activeDomainId) {
           validator = await loadDomainValidator(projectRoot, activeDomainId);
           await saveEnvConfig({ BSH_DEFAULT_DOMAIN: activeDomainId }, projectRoot);
+          await runAffinityCheck(activeDomainId);
         } else {
           validator = null;
+          alignmentStatus = 'INSUFFICIENT_DATA';
         }
+        redrawScreen();
+        continue;
+      }
+
+      if (prompt === '/ungoverned' || prompt === '/bypass') {
+        validator = null;
+        alignmentStatus = 'INSUFFICIENT_DATA';
+        chatEntries.push({
+          type: 'agent',
+          content: 'Harness ontológico desabilitado pelo usuário. Sessão operando em modo UNGOVERNED sem restrições de SHACL.',
+        });
+        redrawScreen();
+        continue;
+      }
+
+      if (prompt === '/governed') {
+        if (activeDomainId) {
+          try {
+            validator = await loadDomainValidator(projectRoot, activeDomainId);
+            await runAffinityCheck(activeDomainId);
+            chatEntries.push({
+              type: 'agent',
+              content: `Mecanismo ontológico reativado para o domínio '${activeDomainId}'. Modo GOVERNED ativo.`,
+            });
+          } catch (err: unknown) {
+            chatEntries.push({
+              type: 'agent',
+              content: `Erro ao ativar domínio '${activeDomainId}': ${err instanceof Error ? err.message : String(err)}`,
+            });
+          }
+        } else {
+          chatEntries.push({
+            type: 'agent',
+            content: 'Nenhum domínio configurado. Use /domain para selecionar um domínio.',
+          });
+        }
+        redrawScreen();
+        continue;
+      }
+
+      if (prompt === '/affinity' || prompt === '/alignment') {
+        if (!activeDomainId) {
+          console.log(`\n${ansi.yellow}Nenhum domínio ativo para checar afinidade semântica.${ansi.reset}`);
+        } else {
+          const targetDomain = availableDomains.find((d) => d.id === activeDomainId);
+          if (targetDomain) {
+            const aff = await checkDomainAffinity(projectRoot, targetDomain.ontologyPath, targetDomain.shapesPath, activeDomainId);
+            console.log(`\n${ansi.bold}Relatório de Afinidade Semântica [${activeDomainId}]:${ansi.reset}`);
+            console.log(`  Status: ${aff.status === 'ALIGNED' ? ansi.brightGreen : ansi.yellow}${aff.status}${ansi.reset}`);
+            console.log(`  Score: ${(aff.score * 100).toFixed(1)}%`);
+            console.log(`  Conceitos da ontologia: ${aff.ontologyTerms.slice(0, 8).join(', ')}`);
+            console.log(`  Conceitos encontrados no projeto: ${aff.matchedTerms.join(', ') || 'Nenhum'}`);
+            console.log(`  ${aff.summary}`);
+          }
+        }
+        await rl.question(`\n${ansi.dim}Pressione Enter para retornar ao agente...${ansi.reset}`);
         redrawScreen();
         continue;
       }
@@ -226,12 +359,15 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
       if (prompt === '/help') {
         console.log(`\n${ansi.bold}BSH Available Commands:${ansi.reset}`);
-        console.log(`  ${ansi.cyan}/model${ansi.reset}   - Browse and change active OpenRouter model`);
-        console.log(`  ${ansi.cyan}/domain${ansi.reset}  - Select domain ontology and SHACL governance rules`);
-        console.log(`  ${ansi.cyan}/diff${ansi.reset}    - Review workspace code diff and promote to branch`);
-        console.log(`  ${ansi.cyan}/rules${ansi.reset}   - Inspect active SHACL rules for the current domain`);
-        console.log(`  ${ansi.cyan}/clear${ansi.reset}   - Clear screen and refresh header`);
-        console.log(`  ${ansi.cyan}/exit${ansi.reset}    - End governed session and exit`);
+        console.log(`  ${ansi.cyan}/model${ansi.reset}       - Browse and change active OpenRouter model`);
+        console.log(`  ${ansi.cyan}/domain${ansi.reset}      - Select domain ontology and SHACL governance rules`);
+        console.log(`  ${ansi.cyan}/ungoverned${ansi.reset}  - Disable ontology governance harness (bypass mode)`);
+        console.log(`  ${ansi.cyan}/governed${ansi.reset}    - Re-enable ontology governance harness`);
+        console.log(`  ${ansi.cyan}/affinity${ansi.reset}    - Check domain concept affinity with current codebase`);
+        console.log(`  ${ansi.cyan}/diff${ansi.reset}        - Review workspace code diff and promote to branch`);
+        console.log(`  ${ansi.cyan}/rules${ansi.reset}       - Inspect active SHACL rules for the current domain`);
+        console.log(`  ${ansi.cyan}/clear${ansi.reset}       - Clear screen and refresh header`);
+        console.log(`  ${ansi.cyan}/exit${ansi.reset}        - End governed session and exit`);
         await rl.question(`\n${ansi.dim}Press Enter to return to agent...${ansi.reset}`);
         redrawScreen();
         continue;
