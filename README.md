@@ -290,4 +290,5 @@ npm test
 
 ## License
 
-MIT © Clayton Fraga Filho
+Apache-2.0 © Clayton Fraga Filho
+

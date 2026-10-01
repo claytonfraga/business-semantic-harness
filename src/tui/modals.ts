@@ -272,3 +272,47 @@ export async function diffReviewModal(
     rl.close();
   }
 }
+
+export interface SettingsState {
+  confirmPromptViolations: boolean;
+  model: string;
+  domain?: string;
+}
+
+export async function settingsModal(
+  currentSettings: SettingsState
+): Promise<SettingsState> {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  try {
+    process.stdout.write('\n');
+    const statusText = currentSettings.confirmPromptViolations
+      ? `${ansi.brightGreen}[ENABLED] (Pausar e solicitar Enter ao detectar violações no prompt)${ansi.reset}`
+      : `${ansi.yellow}[DISABLED] (Executar diretamente sem pausa)${ansi.reset}`;
+
+    console.log(box('BSH Settings & Preferences', [
+      `1. Confirmar Prompts Violadores: ${statusText}`,
+      `   Modelo Ativo: ${ansi.cyan}${currentSettings.model}${ansi.reset}`,
+      `   Domínio Ativo: ${ansi.magenta}${currentSettings.domain || 'none'}${ansi.reset}`,
+      '',
+      'Ações disponíveis:',
+      '  [1] Alternar confirmação de prompts violadores (Toggle ON/OFF)',
+      '  [q/Enter] Salvar e retornar à sessão',
+    ], 76));
+
+    const answer = (await rl.question(`\n${ansi.bold}Escolha uma opção [1 / Enter para sair]: ${ansi.reset}`)).trim();
+    if (answer === '1') {
+      const updated = {
+        ...currentSettings,
+        confirmPromptViolations: !currentSettings.confirmPromptViolations,
+      };
+      const newStatus = updated.confirmPromptViolations ? `${ansi.brightGreen}ATIVADA${ansi.reset}` : `${ansi.yellow}DESATIVADA${ansi.reset}`;
+      console.log(`\n✔ Confirmação de prompts violadores alterada para: ${newStatus}`);
+      await rl.question(`\n${ansi.dim}Pressione Enter para continuar...${ansi.reset}`);
+      return updated;
+    }
+
+    return currentSettings;
+  } finally {
+    rl.close();
+  }
+}

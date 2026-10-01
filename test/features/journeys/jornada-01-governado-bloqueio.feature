@@ -8,6 +8,11 @@ Funcionalidade: Jornada 1 - Sessão Governada com Bloqueio de Violação SHACL
     Dado que o projeto piloto "pilot/asset-management" possui ontologia "ativos" com SHACL ativo
     E o BSH é iniciado com o comando "bsh --project pilot/asset-management"
     Quando o usuário digita no prompt "Transfer retired asset AST-002 to Maintenance department without justification"
+    Então o BSH captura o prompt e aciona a guarda semântica pré-execução
+    E o BSH destaca o prompt com o distintivo "[!] VIOLATION DETECTED"
+    E exibe o alerta "[!] [PROMPT VIOLATION DETECTED]" com a regra violada "TransferShape"
+    E solicita ao usuário que pressione [Enter] para prosseguir ou digite /cancel
+    Quando o usuário pressiona [Enter] para confirmar o prosseguimento
     Então o BSH Agent analisa o código no worktree Git isolado
     E o Gate Semântico avalia os fatos RDF contra as restrições da forma "TransferShape"
     E o Gate Semântico detecta a violação e reporta "[X] VIOLATION"

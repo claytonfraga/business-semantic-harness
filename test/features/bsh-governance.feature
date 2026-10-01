@@ -13,13 +13,17 @@ Feature: Governança Semântica e Execução Autônoma no BSH
       And o cabeçalho da TUI exibe a ontologia ativa "ativos v1.0.0 (4 classes, 2 shapes)", pasta "pilot/asset-management" e branch "git(master)"
       And o BSH é iniciado com governança ativa no domínio "ativos" através do OpenRouter
 
-    Scenario: Jornada 1 - Bloqueio de alteração violadora com digitação de prompt
+    Scenario: Jornada 1 - Bloqueio de alteração violadora com detecção e confirmação de prompt
       Given que a TUI do BSH está aberta no espaço de entrada de prompt
       When o usuário digita no espaço de prompt: "Transfer retired asset AST-002 to Maintenance department without justification"
-      And confirma a execução com Enter
+      And confirma a entrada com Enter
+      Then o BSH detecta a violação do prompt contra a forma "TransferShape"
+      And exibe o destaque "[!] VIOLATION DETECTED" e o alerta "[!] [PROMPT VIOLATION DETECTED]"
+      And solicita ao usuário confirmação via Enter para prosseguir
+      When o usuário pressiona Enter para prosseguir
       Then o modelo inspeciona a base de código no worktree isolado
       And o gate semântico detecta a violação da regra "TransferShape"
-      And o BSH bloqueia a promoção exibindo o status "[✖ VIOLATION]"
+      And o BSH bloqueia a promoção exibindo o status "[X] VIOLATION"
       And o branch principal permanece 100% íntegro e protegido
 
     Scenario: Jornada 3 - Alteração conforme cooperativa com aprovação do gate
@@ -95,4 +99,15 @@ Feature: Governança Semântica e Execução Autônoma no BSH
       Then o BSH identifica a presença de conceitos como "Asset", "Transfer", "Status" e "Location"
       And a pontuação de afinidade conceitual é confirmada como alta
       And o cabeçalho da TUI exibe o selo de governança ativa "[● GOVERNED]" sem alertas de incompatibilidade
+
+  # Regra de configurações da TUI e confirmação de prompts violadores
+  Rule: O usuário pode configurar na TUI se prompts violadores devem exigir confirmação explícita
+
+    Scenario: Configuração de confirmação de prompts violadores via /settings
+      Given que a TUI do BSH está aberta no espaço de entrada de prompt
+      When o usuário digita "/settings"
+      Then o modal de configurações exibe a opção "Confirmar Prompts Violadores"
+      When o usuário escolhe alternar a opção
+      Then a preferência é atualizada e salva na configuração do projeto
+
 

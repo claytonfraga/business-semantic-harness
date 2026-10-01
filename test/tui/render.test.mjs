@@ -238,3 +238,44 @@ test('TUI render: renders DOMAIN MISMATCH badge and alert entry correctly', () =
   assert.equal(tui.split('\n').length, height, 'Must maintain exact fixed height');
 });
 
+test('TUI render: renders prompt violation badge and warning entry with Enter prompt', () => {
+  const width = 96;
+  const height = 26;
+
+  const tui = renderCompleteTui(
+    {
+      model: 'deepseek/deepseek-v4.1-flash',
+      contextLength: 1048576,
+      domain: 'ativos',
+      governed: true,
+      tokensTotal: 1420,
+      width,
+      height,
+    },
+    [
+      {
+        type: 'user',
+        content: 'Transfer retired asset AST-002 to Maintenance department without justification',
+        isViolating: true,
+      },
+      {
+        type: 'prompt_violation',
+        violationShape: 'TransferShape (ex:TransferenciaShape)',
+        violationRule: 'Invariante de Ciclo de Vida: Ativo baixado não pode ser transferido.',
+        content: 'O prompt solicita a transferência de um ativo em estado Baixado/Retired.',
+        waitingConfirmation: true,
+      },
+    ],
+    '[Enter para prosseguir /cancel para abortar] >',
+    width,
+    height
+  );
+
+  assert.ok(tui.includes('[!] VIOLATION DETECTED'), 'Must highlight violating user prompt');
+  assert.ok(tui.includes('[!] [PROMPT VIOLATION DETECTED]'), 'Must render prompt violation header');
+  assert.ok(tui.includes('TransferShape'), 'Must show violated shape');
+  assert.ok(tui.includes('Pressione [Enter] para prosseguir'), 'Must prompt user for confirmation');
+  assert.equal(tui.split('\n').length, height, 'Must maintain exact fixed height');
+});
+
+

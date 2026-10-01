@@ -5,6 +5,7 @@ export interface EnvConfig {
   openRouterApiKey?: string;
   defaultModel?: string;
   defaultDomain?: string;
+  confirmPromptViolations?: boolean;
 }
 
 /**
@@ -55,10 +56,14 @@ export async function loadEnvConfig(projectRoot: string = process.cwd()): Promis
   const defaultModel = process.env.BSH_DEFAULT_MODEL || fileEnv.BSH_DEFAULT_MODEL;
   const defaultDomain = process.env.BSH_DEFAULT_DOMAIN || fileEnv.BSH_DEFAULT_DOMAIN;
 
+  const rawConfirm = process.env.BSH_CONFIRM_PROMPT_VIOLATIONS ?? fileEnv.BSH_CONFIRM_PROMPT_VIOLATIONS;
+  const confirmPromptViolations = rawConfirm !== undefined ? rawConfirm.toLowerCase() === 'true' : true;
+
   return {
     openRouterApiKey,
     defaultModel,
     defaultDomain,
+    confirmPromptViolations,
   };
 }
 

@@ -23,13 +23,17 @@ export interface GateCheckItem {
 }
 
 export interface ChatEntry {
-  type: 'user' | 'agent' | 'tool' | 'tool_result' | 'gate' | 'alert' | 'blank';
+  type: 'user' | 'agent' | 'tool' | 'tool_result' | 'gate' | 'alert' | 'prompt_violation' | 'blank';
   content?: string;
+  isViolating?: boolean;
   toolName?: string;
   toolArgs?: Record<string, unknown> | string;
   gateShape?: string;
   gateChecks?: GateCheckItem[];
   gateStatus?: 'CONFORMING' | 'VIOLATION';
+  violationShape?: string;
+  violationRule?: string;
+  waitingConfirmation?: boolean;
 }
 
 export function formatContextLength(ctx?: number): string {
@@ -218,7 +222,12 @@ export function renderChatEntry(entry: ChatEntry, width: number): string[] {
 
     case 'user': {
       const wrapped = wrapText(entry.content || '', width - 14);
-      lines.push(tuiLine(`  ${ansi.cyan}▎${ansi.reset} ${ansi.bold}${ansi.cyan}> [User]${ansi.reset} ${wrapped[0] || ''}`, width));
+      const isViolating = entry.isViolating;
+      const barColor = isViolating ? ansi.brightRed : ansi.cyan;
+      const userTag = isViolating
+        ? `${ansi.bold}${ansi.brightRed}> [User] [!] VIOLATION DETECTED${ansi.reset}`
+        : `${ansi.bold}${ansi.cyan}> [User]${ansi.reset}`;
+      lines.push(tuiLine(`  ${barColor}▎${ansi.reset} ${userTag} ${wrapped[0] || ''}`, width));
       for (let i = 1; i < wrapped.length; i++) {
         lines.push(tuiLine(`  ${ansi.dim}▎${ansi.reset}   ${wrapped[i]}`, width));
       }
@@ -283,6 +292,29 @@ export function renderChatEntry(entry: ChatEntry, width: number): string[] {
         for (const w of wrapped) {
           lines.push(tuiLine(`  ${ansi.brightYellow}▎${ansi.reset}   ${ansi.yellow}${w}${ansi.reset}`, width));
         }
+      }
+      lines.push(tuiLine('', width));
+      break;
+    }
+
+    case 'prompt_violation': {
+      lines.push(tuiLine(`  ${ansi.brightRed}▎${ansi.reset} ${ansi.bold}${ansi.brightRed}[!] [PROMPT VIOLATION DETECTED]${ansi.reset} ${ansi.dim}[Pre-flight Semantic Guard]${ansi.reset}`, width));
+      if (entry.violationShape) {
+        lines.push(tuiLine(`  ${ansi.brightRed}▎${ansi.reset}   ${ansi.bold}${ansi.yellow}Shape Violada:${ansi.reset} ${entry.violationShape}`, width));
+      }
+      if (entry.violationRule) {
+        lines.push(tuiLine(`  ${ansi.brightRed}▎${ansi.reset}   ${ansi.bold}${ansi.yellow}Regra SHACL:${ansi.reset} ${entry.violationRule}`, width));
+      }
+      if (entry.content) {
+        for (const rawLine of entry.content.split('\n')) {
+          const wrapped = wrapText(rawLine, width - 8);
+          for (const w of wrapped) {
+            lines.push(tuiLine(`  ${ansi.brightRed}▎${ansi.reset}   ${ansi.red}${w}${ansi.reset}`, width));
+          }
+        }
+      }
+      if (entry.waitingConfirmation) {
+        lines.push(tuiLine(`  ${ansi.brightRed}▎${ansi.reset}   ${ansi.bold}${ansi.brightYellow}-> Pressione [Enter] para prosseguir ou digite /cancel para descartar${ansi.reset}`, width));
       }
       lines.push(tuiLine('', width));
       break;

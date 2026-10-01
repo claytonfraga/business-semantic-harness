@@ -20,7 +20,8 @@ import {
 import { promoverSessao } from '../git/promotion.js';
 import { ansi } from './ansi.js';
 import { renderCompleteTui, type ChatEntry } from './render.js';
-import { promptApiKeyModal, selectModelModal, selectDomainModal, diffReviewModal } from './modals.js';
+import { promptApiKeyModal, selectModelModal, selectDomainModal, diffReviewModal, settingsModal } from './modals.js';
+import { detectPromptViolation } from '../enforcement/promptGuard.js';
 
 export interface TuiSessionOptions {
   projectRoot?: string;
@@ -34,6 +35,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   // 1. Authentication & Config
   const env = await loadEnvConfig(projectRoot);
   let apiKey = env.openRouterApiKey;
+  let confirmPromptViolations = env.confirmPromptViolations ?? true;
 
   if (!apiKey) {
     const auth = await promptApiKeyModal();
@@ -357,10 +359,31 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         continue;
       }
 
+      if (prompt === '/settings' || prompt === '/config') {
+        const updated = await settingsModal({
+          confirmPromptViolations,
+          model: activeModel,
+          domain: activeDomainId,
+        });
+        if (updated.confirmPromptViolations !== confirmPromptViolations) {
+          confirmPromptViolations = updated.confirmPromptViolations;
+          await saveEnvConfig({
+            BSH_CONFIRM_PROMPT_VIOLATIONS: String(confirmPromptViolations),
+          }, projectRoot);
+          chatEntries.push({
+            type: 'agent',
+            content: `Configuração atualizada: Confirmação de prompts violadores = ${confirmPromptViolations ? 'ATIVADA' : 'DESATIVADA'}.`,
+          });
+        }
+        redrawScreen();
+        continue;
+      }
+
       if (prompt === '/help') {
         console.log(`\n${ansi.bold}BSH Available Commands:${ansi.reset}`);
         console.log(`  ${ansi.cyan}/model${ansi.reset}       - Browse and change active OpenRouter model`);
         console.log(`  ${ansi.cyan}/domain${ansi.reset}      - Select domain ontology and SHACL governance rules`);
+        console.log(`  ${ansi.cyan}/settings${ansi.reset}    - Configure BSH settings (e.g. pause/confirm on prompt violation)`);
         console.log(`  ${ansi.cyan}/ungoverned${ansi.reset}  - Disable ontology governance harness (bypass mode)`);
         console.log(`  ${ansi.cyan}/governed${ansi.reset}    - Re-enable ontology governance harness`);
         console.log(`  ${ansi.cyan}/affinity${ansi.reset}    - Check domain concept affinity with current codebase`);
@@ -373,8 +396,44 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         continue;
       }
 
-      // User prompt entry
-      chatEntries.push({ type: 'user', content: prompt });
+      // Pre-flight Semantic Guard: Check for Prompt Violations against ontology + SHACL
+      const promptViolation = detectPromptViolation(prompt, activeDomainId);
+
+      if (promptViolation.isViolating && validator) {
+        // Tag user prompt entry with violation badge
+        chatEntries.push({ type: 'user', content: prompt, isViolating: true });
+
+        // Push prominent violation alert card
+        chatEntries.push({
+          type: 'prompt_violation',
+          violationShape: promptViolation.shape,
+          violationRule: promptViolation.rule,
+          content: `${promptViolation.message}\n` +
+            (promptViolation.matchedKeywords ? `Termos identificados: ${promptViolation.matchedKeywords.join(', ')}` : ''),
+          waitingConfirmation: confirmPromptViolations,
+        });
+
+        if (confirmPromptViolations) {
+          redrawScreen('Aguardando confirmação do usuário...');
+          const confirmPrefix = `  \x1b[31m▎\x1b[39m \x1b[1m\x1b[93m[Enter para prosseguir /cancel para abortar] >\x1b[39m\x1b[22m `;
+          const answer = (await rl.question(confirmPrefix)).trim();
+          if (answer === '/cancel' || answer === 'cancel' || answer === '/abort' || answer === 'q') {
+            chatEntries.push({
+              type: 'agent',
+              content: 'Execução do prompt cancelada pelo usuário após alerta de violação ontológica.',
+            });
+            redrawScreen();
+            continue;
+          }
+          chatEntries.push({
+            type: 'agent',
+            content: 'Usuário confirmou prosseguimento da execução do prompt sob governança do harness.',
+          });
+        }
+      } else {
+        chatEntries.push({ type: 'user', content: prompt });
+      }
+
       if (validator) {
         chatEntries.push({
           type: 'agent',
