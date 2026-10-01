@@ -25,7 +25,7 @@ function recordSessionEvent(fileName: string, entry: Record<string, unknown>): v
 
 export function createBSHMcpServer(root: string, governed = false): McpServer {
   const server = new McpServer(
-    { name: 'bsh', version: '0.2.4-beta' },
+    { name: 'bsh', version: '0.2.5-beta' },
     { instructions: 'Consulte a ontologia do domínio e valide propostas com regras SHACL antes de alterar o código do projeto.' },
   );
 
