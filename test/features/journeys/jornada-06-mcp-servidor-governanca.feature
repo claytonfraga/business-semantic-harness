@@ -1,21 +1,17 @@
 # language: pt
-Funcionalidade: Jornada 6 - BSH como Servidor MCP para Governança de Agentes Externos
-  Como um desenvolvedor ou agente autônomo externo (Claude Desktop, Cursor, Agy)
-  Eu quero me conectar ao BSH através do Model Context Protocol (MCP) via stdio
-  Para inspecionar regras de domínio, verificar prompts e validar conformidade SHACL de código
+Funcionalidade: Jornada 6 - BSH como Servidor MCP para Governança do Agente Agy
+  Como um desenvolvedor utilizando o agente autônomo Agy
+  Eu quero integrar o Agy ao servidor MCP do BSH via stdio
+  Para que o Agy consulte regras ontológicas, previna violações em pré-voo e valide restrições SHACL
 
-  Cenário: Agente externo consome BSH via MCP para validação ontológica e detecção de violações
+  Cenário: Agy conecta-se ao BSH via MCP e detecta violação de regra de negócio antes da execução
     Dado que o projeto piloto "pilot/asset-management" possui ontologia "ativos" com SHACL ativo
-    E o BSH é inicializado em modo servidor MCP pelo comando "bsh mcp --project pilot/asset-management"
-    Quando o cliente MCP envia uma requisição "tools/list"
-    Então o BSH retorna as ferramentas disponíveis: "bsh_query_ontology", "bsh_check_prompt_intent", "bsh_validate_shacl" e "bsh_check_affinity"
-    Quando o agente externo invoca a ferramenta "bsh_check_prompt_intent" com a solicitação "Transfer retired asset AST-001 to Finance department without justification"
-    Então a ferramenta retorna violação detectada com o detalhe da regra "TransferShape" e alerta de ativo baixado
-    Quando o agente externo consulta a ontologia via "bsh_query_ontology" com o IRI "urn:pilot:ativos:Ativo"
-    Então o BSH retorna os conceitos e definições da ontologia ativa
-    Quando o agente externo invoca a ferramenta "bsh_check_prompt_intent" com a solicitação conforme "Transfer available asset AST-101 to Carlos in Finance department"
-    Então a ferramenta retorna que o prompt é conforme e não violador
-    Quando o agente externo submete fatos Turtle violadores à ferramenta "bsh_validate_shacl"
-    Então o validador SHACL do BSH reporta conformidade falsa e detalha as violações encontradas
-    Quando o agente externo submete fatos Turtle conformes à ferramenta "bsh_validate_shacl"
-    Então o validador SHACL do BSH reporta conformidade verdadeira autorizando a transição
+    E o servidor MCP do BSH é configurado no Agy via "agy mcp add bsh bsh mcp --project pilot/asset-management"
+    Quando o usuário abre a sessão interativa do Agy no terminal
+    E o usuário envia o prompt "Consulte o servidor MCP bsh e verifique se o prompt 'Transfer retired asset AST-001 without justification' viola alguma regra da ontologia de ativos"
+    Então o Agy descobre e invoca a ferramenta MCP "bsh_check_prompt_intent"
+    E o servidor BSH reporta a violação da regra "TransferenciaShape" para ativos baixados
+    E o Agy apresenta na sua interface a explicação detalhada da violação e o trecho de restrição SHACL
+    Quando o usuário solicita a validação da transferência de um ativo disponível
+    Então o Agy invoca a ferramenta MCP "bsh_validate_shacl"
+    E o Gate Semântico do BSH reporta conformidade com as regras do domínio

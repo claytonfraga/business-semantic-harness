@@ -1,15 +1,16 @@
 # language: pt
-Funcionalidade: Jornada 7 - BSH como Cliente MCP Consumindo Servidores de Terceiros
-  Como um desenvolvedor utilizando o BSH
-  Eu quero que o BSH se conecte a servidores MCP externos (como Context7 para documentação)
-  Para que o agente descubra e utilize ferramentas especializadas de terceiros durante a execução
+Funcionalidade: Jornada 7 - BSH como Cliente MCP Consumindo Context7 na Interface TUI
+  Como um desenvolvedor utilizando a interface TUI do BSH
+  Eu quero gerenciar servidores MCP com o comando /mcp e pedir à IA para se conectar a ferramentas externas
+  Para que o agente descubra e utilize ferramentas de documentação como o Context7 durante o turno
 
-  Cenário: BSH conecta-se a servidor MCP Context7 e invoca ferramenta de busca documental
-    Dado que o projeto possui configuração de servidores MCP em ".bsh/mcp.json" com o servidor "context7"
-    E o servidor Context7 expõe a ferramenta "context7_search_docs"
-    Quando o BSH inicia a sessão com o gerenciador de clientes MCP ativo
+  Cenário: Usuário configura o servidor MCP Context7 na TUI e solicita à IA a consulta documental
+    Dado que o projeto piloto "pilot/asset-management" é aberto com o comando compilado "bsh --project pilot/asset-management"
+    Quando o usuário digita "/mcp" para inspecionar o status das conexões MCP
+    E o usuário digita o comando "/mcp add context7 node test/support/mock-context7-server.mjs"
     Então o BSH estabelece conexão via stdio com o servidor Context7 e registra a ferramenta "context7_search_docs"
-    Quando o usuário envia uma solicitação que requer consulta técnica como "What does SHACL define according to documentation?"
-    Então o agente BSH planeja o turno e despacha a chamada para a ferramenta "context7_search_docs" com a query "shacl shapes"
-    E o servidor Context7 retorna a documentação técnica relevante
-    E o BSH conclui o turno fornecendo a resposta fundamentada com base na documentação recuperada
+    E o feed exibe a confirmação de conexão com a lista de ferramentas ativas
+    Quando o usuário envia o prompt "Conecte-se ao MCP Context7 e consulte a documentação sobre regras de validação SHACL"
+    Então o agente BSH planeja o turno e aciona a ferramenta externa "context7_search_docs"
+    E a chamada de ferramenta e o resultado retornado pelo Context7 são exibidos no feed da TUI
+    E o BSH conclui o turno apresentando a explicação fundamentada com base na documentação oficial recuperada

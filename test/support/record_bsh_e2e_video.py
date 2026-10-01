@@ -124,8 +124,14 @@ def render_terminal_frame(text: str, title: str, output_path: Path, width: int =
             color = (56, 189, 248) # Sky 400
         elif "[BSH Agent]" in line:
             color = (192, 132, 252) # Purple 400
-        elif ">_ Tool:" in line:
+        elif ">_ Tool:" in line or "● bsh/" in line or "● Read" in line or "● Bash" in line:
             color = (251, 191, 36) # Amber 300
+        elif "Antigravity CLI" in line or "Gemini" in line:
+            color = (56, 189, 248) # Sky 400
+        elif "isViolating: true" in line or "Violação detectada" in line or "viola as regras" in line:
+            color = (248, 113, 113) # Red 400
+        elif "TransferenciaShape" in line:
+            color = (250, 204, 21) # Amber 400
         elif "->" in line and "Status" not in line:
             color = (74, 222, 128) # Green 400
         elif "───" in line or line.startswith("─"):
@@ -513,75 +519,16 @@ def main() -> int:
     )
     print(f"✔ Model search video saved: {model_res['video_path']} ({model_res['file_size_kb']:.1f} KB, SHA-256: {model_res['sha256'][:16]}...)")
 
-    # Scenario 6: BSH as MCP Server for External Agents
-    print("\n--- Running Scenario 6: BSH as MCP Server (External Agent Governance) ---")
-    mcp_server_video = VIDEOS_DIR / "bsh-mcp-server-scenario.mp4"
-    mcp_server_shot = SCREENSHOTS_DIR / "bsh-mcp-server-scenario.png"
+    # Scenario 6: BSH as MCP Server with Agy Autonomous Agent
+    mcp_server_res = run_scenario_6(pilot_dir, bsh_bin)
 
-    mcp_server_intro_title = "Jornada 6: BSH como Servidor MCP — Governança de Agentes Externos"
-    mcp_server_intro_lines = [
-        "Domínio de Negócio: Gestão de Ativos ('ativos')",
-        "Protocolo: Model Context Protocol (MCP) via transporte stdio",
-        "Objetivo da Jornada: Agentes externos (Claude, Cursor, Agy) consomem governança semântica via MCP.",
-        "Comportamento Esperado do BSH:",
-        "  • BSH inicializa em modo servidor MCP com ferramentas ontológicas e SHACL.",
-        "  • O cliente lista e descobre ferramentas (bsh_query_ontology, bsh_validate_shacl, etc).",
-        "  • bsh_check_prompt_intent intercepta solicitações violadoras em pré-voo.",
-        "  • bsh_query_ontology recupera definições formais de classes e propriedades.",
-        "  • bsh_validate_shacl valida fatos RDF e bloqueia violações negociais no Gate Semântico.",
-    ]
-
-    mcp_server_res = record_scenario(
-        session_name="bsh-e2e-mcp-server",
-        title="BSH E2E Scenario 6: MCP Server Governance for External Agents",
-        intro_title=mcp_server_intro_title,
-        intro_lines=mcp_server_intro_lines,
-        command=["node", str(WORKTREE_ROOT / "test" / "support" / "run-jornada-06-mcp-server.mjs")],
-        user_inputs=[],
-        output_video=mcp_server_video,
-        output_screenshot=mcp_server_shot,
-        completion_marker="─── MCP Session Completed",
-        max_wait=60.0,
-        is_interactive_tui=False,
-    )
-    print(f"✔ MCP Server video saved: {mcp_server_res['video_path']} ({mcp_server_res['file_size_kb']:.1f} KB, SHA-256: {mcp_server_res['sha256'][:16]}...)")
-
-    # Scenario 7: BSH as MCP Client Consuming Third-Party Tools (Context7)
-    print("\n--- Running Scenario 7: BSH as MCP Client (Third-Party Context7 Tools) ---")
-    mcp_client_video = VIDEOS_DIR / "bsh-mcp-client-scenario.mp4"
-    mcp_client_shot = SCREENSHOTS_DIR / "bsh-mcp-client-scenario.png"
-
-    mcp_client_intro_title = "Jornada 7: BSH como Cliente MCP — Consumo de Ferramentas de Terceiros"
-    mcp_client_intro_lines = [
-        "Configuração: .bsh/mcp.json com servidor externo 'context7'",
-        "Protocolo: Model Context Protocol (MCP) via transporte stdio",
-        "Objetivo da Jornada: Integrar ferramentas de terceiros (busca documental) ao agente BSH.",
-        "Comportamento Esperado do BSH:",
-        "  • BSH carrega a configuração e conecta-se ao servidor Context7.",
-        "  • Ferramenta context7_search_docs é descoberta e registrada.",
-        "  • Durante o turno do agente, a ferramenta é acionada para recuperar documentação técnica.",
-        "  • O agente sintetiza a resposta final fundamentada na documentação recebida.",
-    ]
-
-    mcp_client_res = record_scenario(
-        session_name="bsh-e2e-mcp-client",
-        title="BSH E2E Scenario 7: MCP Client Consuming Third-Party Tools (Context7)",
-        intro_title=mcp_client_intro_title,
-        intro_lines=mcp_client_intro_lines,
-        command=["node", str(WORKTREE_ROOT / "test" / "support" / "run-jornada-07-mcp-client.mjs")],
-        user_inputs=[],
-        output_video=mcp_client_video,
-        output_screenshot=mcp_client_shot,
-        completion_marker="─── MCP Client Execution Finished",
-        max_wait=60.0,
-        is_interactive_tui=False,
-    )
-    print(f"✔ MCP Client video saved: {mcp_client_res['video_path']} ({mcp_client_res['file_size_kb']:.1f} KB, SHA-256: {mcp_client_res['sha256'][:16]}...)")
+    # Scenario 7: BSH as MCP Client Consuming Third-Party Tools (Context7) in BSH TUI
+    mcp_client_res = run_scenario_7(pilot_dir, bsh_bin)
 
     # Copy MP4 videos to WSL Downloads for easy human evaluation
     downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
     if downloads_dir.exists():
-        for vid in [gov_video, ungov_video, coop_video, mismatch_video, model_video, mcp_server_video, mcp_client_video]:
+        for vid in [gov_video, ungov_video, coop_video, mismatch_video, model_video, Path(mcp_server_res["video_path"]), Path(mcp_client_res["video_path"])]:
             if vid.exists():
                 shutil.copy2(vid, downloads_dir / vid.name)
         print(f"✔ Copied all MP4 videos to Windows Downloads: {downloads_dir}")
@@ -594,6 +541,98 @@ def main() -> int:
     print(f"✔ Comprehensive test report generated: {report_file}")
 
     return 0
+
+
+def run_scenario_6(pilot_dir: Path, bsh_bin: str) -> dict:
+    print("\n--- Running Scenario 6: External Agent (Agy) with BSH MCP Server Governance ---")
+    mcp_server_video = VIDEOS_DIR / "bsh-mcp-server-scenario.mp4"
+    mcp_server_shot = SCREENSHOTS_DIR / "bsh-mcp-server-scenario.png"
+
+    agy_bin = shutil.which("agy") or "/home/clayton/.local/bin/agy"
+
+    # Configure agy MCP to use bsh mcp
+    subprocess.run([agy_bin, "mcp", "remove", "bsh"], stderr=subprocess.DEVNULL)
+    subprocess.run([agy_bin, "mcp", "add", "bsh", bsh_bin, "mcp", "--project", str(pilot_dir)], check=True)
+
+    intro_title = "Jornada 6: Agente Autônomo Agy Integrado ao BSH como Servidor MCP"
+    intro_lines = [
+        "Agente Autônomo Externo: Antigravity CLI (Agy)",
+        "Integração: Model Context Protocol (MCP) via transporte stdio ('bsh mcp')",
+        "Objetivo da Jornada: O Agy conecta-se ao BSH para consultar regras de negócio e interceptar violações.",
+        "Comportamento Esperado:",
+        "  • O Agy descobre as ferramentas expostas pelo BSH MCP Server.",
+        "  • O usuário envia uma solicitação violadora de transferência de ativo baixado.",
+        "  • O Agy aciona a ferramenta bsh_check_prompt_intent e detecta a violação contra TransferenciaShape.",
+        "  • O Agy apresenta em tela o diagnóstico completo com base nas regras ontológicas do BSH.",
+    ]
+
+    try:
+        user_inputs = [
+            ("Consulte o servidor MCP bsh e verifique se o prompt 'Transfer retired asset AST-001 without justification' viola alguma regra da ontologia de ativos", 24.0),
+        ]
+
+        res = record_scenario(
+            session_name="bsh-e2e-mcp-server",
+            title="Agy Autonomous Agent with BSH MCP Server Governance",
+            intro_title=intro_title,
+            intro_lines=intro_lines,
+            command=[agy_bin, "--dangerously-skip-permissions"],
+            user_inputs=user_inputs,
+            output_video=mcp_server_video,
+            output_screenshot=mcp_server_shot,
+            is_interactive_tui=True,
+        )
+        print(f"✔ MCP Server video saved: {res['video_path']} ({res['file_size_kb']:.1f} KB, SHA-256: {res['sha256'][:16]}...)")
+        return res
+    finally:
+        subprocess.run([agy_bin, "mcp", "remove", "bsh"], stderr=subprocess.DEVNULL)
+
+
+def run_scenario_7(pilot_dir: Path, bsh_bin: str) -> dict:
+    print("\n--- Running Scenario 7: BSH as MCP Client (Context7 Tool Execution in TUI) ---")
+    mcp_client_video = VIDEOS_DIR / "bsh-mcp-client-scenario.mp4"
+    mcp_client_shot = SCREENSHOTS_DIR / "bsh-mcp-client-scenario.png"
+
+    mcp_json = pilot_dir / ".bsh" / "mcp.json"
+    if mcp_json.exists():
+        mcp_json.unlink()
+
+    intro_title = "Jornada 7: BSH como Cliente MCP — Configuração e Consumo de Ferramentas de Terceiros"
+    intro_lines = [
+        "Interface: OpenTUI moderna nativa do BSH (binário compilado)",
+        "Servidor MCP Externo: Context7 (provedor de documentação técnica oficial)",
+        "Objetivo da Jornada: O usuário gerencia conexões MCP com /mcp e a IA consome ferramentas externas no turno.",
+        "Comportamento Esperado:",
+        "  • O usuário inspeciona conexões ativas com o comando /mcp.",
+        "  • O usuário conecta o servidor Context7 via comando /mcp add context7 node ...",
+        "  • O BSH conecta via stdio e registra a ferramenta context7_search_docs no chat.",
+        "  • O usuário solicita consulta documental: a IA despacha context7_search_docs e responde fundamentada.",
+    ]
+
+    mock_server = WORKTREE_ROOT / "test" / "support" / "mock-context7-server.mjs"
+    user_inputs = [
+        ("/mcp", 4.0),
+        (f"/mcp add context7 node {mock_server}", 5.0),
+        ("Conecte-se ao MCP Context7 e consulte a documentação sobre regras de validação SHACL", 14.0),
+    ]
+
+    try:
+        res = record_scenario(
+            session_name="bsh-e2e-mcp-client",
+            title="BSH OpenTUI: MCP Client Configuration & Third-Party Tool Execution",
+            intro_title=intro_title,
+            intro_lines=intro_lines,
+            command=["env", "OPENROUTER_API_KEY=sk-or-v1-mock-test", bsh_bin, "--project", str(pilot_dir)],
+            user_inputs=user_inputs,
+            output_video=mcp_client_video,
+            output_screenshot=mcp_client_shot,
+            is_interactive_tui=True,
+        )
+        print(f"✔ MCP Client video saved: {res['video_path']} ({res['file_size_kb']:.1f} KB, SHA-256: {res['sha256'][:16]}...)")
+        return res
+    finally:
+        if mcp_json.exists():
+            mcp_json.unlink()
 
 
 def generate_markdown_report(
@@ -611,7 +650,7 @@ def generate_markdown_report(
     content = f"""# Relatório de Testes E2E: BSH com OpenRouter, Governança Semântica e Protocolo MCP
 
 **Data de Execução**: {now_iso}  
-**Ambiente**: Linux x86_64, Node.js v22, OpenRouter API (`sk-or-v1-...`)  
+**Ambiente**: Linux x86_64, Node.js v22, OpenRouter API (`sk-or-v1-...`), Antigravity CLI (Agy)  
 **Executável do BSH**: `{bsh_bin}` (Pacote de distribuição `business-semantic-harness-0.2.4-beta.tgz`)  
 **Fonte da Verdade da Especificação**: [`test/features/bsh-governance.feature`](file://{WORKTREE_ROOT}/test/features/bsh-governance.feature)  
 **Jornadas de Usuário**: [`test/features/journeys/`](file://{WORKTREE_ROOT}/test/features/journeys/)  
@@ -628,8 +667,8 @@ Este relatório apresenta a validação E2E do **Business Semantic Harness (BSH)
 3. **Jornada 3 (Harness Ontológico Ativo - Governed Conforme)**: Alteração conforme aprovada pelo Gate Semântico com emissão de status `CONFORMING`.
 4. **Jornada 4 (Detecção Proativa de Desalinhamento - Domain Mismatch)**: Detecção preventiva de incompatibilidade entre ontologia e código do projeto.
 5. **Jornada 5 (Busca e Alternância de Modelos - OpenRouter Model Search)**: Pesquisa de modelos no catálogo OpenRouter e cancelamento seguro sem alterar modelo ativo.
-6. **Jornada 6 (BSH como Servidor MCP de Governança)**: Exposição das ferramentas ontológicas e SHACL (`bsh_query_ontology`, `bsh_check_prompt_intent`, `bsh_validate_shacl`, `bsh_check_affinity`) para agentes e IDEs externas via stdio.
-7. **Jornada 7 (BSH como Cliente MCP Consumindo Terceiros)**: Integração e execução de ferramentas especializadas externas (ex: `context7_search_docs`) configuradas em `.bsh/mcp.json`.
+6. **Jornada 6 (BSH como Servidor MCP de Governança para Agente Agy)**: Integração com o agente autônomo Agy via MCP stdio, detectando violações ontológicas e exibindo regras SHACL.
+7. **Jornada 7 (BSH como Cliente MCP Consumindo Context7)**: Gerenciamento de servidores via comando `/mcp add` e consumo de documentação oficial no turno do agente na interface TUI do BSH.
 
 ---
 
@@ -644,8 +683,8 @@ Todos os vídeos foram gravados diretamente do terminal `tmux`, incluindo **slid
 | **3. Harness Ativo (Conforme)** | [`bsh-cooperative-scenario.mp4`](file://{coop_res['video_path']}) | {coop_res['file_size_kb']:.1f} KB | `{coop_res['sha256']}` | [`bsh-cooperative-scenario.png`](file://{coop_res['screenshot_path']}) |
 | **4. Alerta de Afinidade (Mismatch)** | [`bsh-domain-mismatch-scenario.mp4`](file://{mismatch_res['video_path']}) | {mismatch_res['file_size_kb']:.1f} KB | `{mismatch_res['sha256']}` | [`bsh-domain-mismatch-scenario.png`](file://{mismatch_res['screenshot_path']}) |
 | **5. Busca de Modelos (Safe Cancel)** | [`bsh-model-search-scenario.mp4`](file://{model_res['video_path']}) | {model_res['file_size_kb']:.1f} KB | `{model_res['sha256']}` | [`bsh-model-search-scenario.png`](file://{model_res['screenshot_path']}) |
-| **6. Servidor MCP (Governança Externa)** | [`bsh-mcp-server-scenario.mp4`](file://{mcp_server_res['video_path']}) | {mcp_server_res['file_size_kb']:.1f} KB | `{mcp_server_res['sha256']}` | [`bsh-mcp-server-scenario.png`](file://{mcp_server_res['screenshot_path']}) |
-| **7. Cliente MCP (Consumo de Terceiros)** | [`bsh-mcp-client-scenario.mp4`](file://{mcp_client_res['video_path']}) | {mcp_client_res['file_size_kb']:.1f} KB | `{mcp_client_res['sha256']}` | [`bsh-mcp-client-scenario.png`](file://{mcp_client_res['screenshot_path']}) |
+| **6. Servidor MCP (Agente Agy)** | [`bsh-mcp-server-scenario.mp4`](file://{mcp_server_res['video_path']}) | {mcp_server_res['file_size_kb']:.1f} KB | `{mcp_server_res['sha256']}` | [`bsh-mcp-server-scenario.png`](file://{mcp_server_res['screenshot_path']}) |
+| **7. Cliente MCP (BSH TUI com Context7)** | [`bsh-mcp-client-scenario.mp4`](file://{mcp_client_res['video_path']}) | {mcp_client_res['file_size_kb']:.1f} KB | `{mcp_client_res['sha256']}` | [`bsh-mcp-client-scenario.png`](file://{mcp_client_res['screenshot_path']}) |
 
 ---
 
@@ -663,7 +702,7 @@ Todos os vídeos foram gravados diretamente do terminal `tmux`, incluindo **slid
 
 ## 4. Conclusão da Avaliação
 
-A padronização obrigatória de especificação em `.feature` e geração de evidência em vídeo `.mp4` consolida a rastreabilidade científica e a reprodutibilidade do BSH em todos os seus pontos de contato operacionais.
+A padronização mandatória de especificação em `.feature` e geração de evidência em vídeo `.mp4` consolida a rastreabilidade científica e a reprodutibilidade do BSH em todos os seus pontos de contato operacionais.
 """
     output_file.write_text(content, encoding="utf-8")
 
@@ -679,64 +718,17 @@ if __name__ == "__main__":
     bsh_bin = shutil.which("bsh") or str(WORKTREE_ROOT / "dist" / "cli.js")
 
     if parsed_args.scenario == "6":
-        # Run only Scenario 6
-        mcp_server_video = VIDEOS_DIR / "bsh-mcp-server-scenario.mp4"
-        mcp_server_shot = SCREENSHOTS_DIR / "bsh-mcp-server-scenario.png"
-        intro_lines = [
-            "Domínio de Negócio: Gestão de Ativos ('ativos')",
-            "Protocolo: Model Context Protocol (MCP) via transporte stdio",
-            "Objetivo da Jornada: Agentes externos consomem governança semântica via MCP.",
-            "Comportamento Esperado do BSH:",
-            "  • BSH inicializa em modo servidor MCP com ferramentas ontológicas e SHACL.",
-            "  • O cliente lista e descobre ferramentas (bsh_query_ontology, bsh_validate_shacl, etc).",
-            "  • bsh_check_prompt_intent intercepta solicitações violadoras em pré-voo.",
-            "  • bsh_query_ontology recupera definições formais de classes e propriedades.",
-            "  • bsh_validate_shacl valida fatos RDF e bloqueia violações negociais no Gate Semântico.",
-        ]
-        res = record_scenario(
-            session_name="bsh-e2e-mcp-server",
-            title="BSH E2E Scenario 6: MCP Server Governance for External Agents",
-            intro_title="Jornada 6: BSH como Servidor MCP — Governança de Agentes Externos",
-            intro_lines=intro_lines,
-            command=["node", str(WORKTREE_ROOT / "test" / "support" / "run-jornada-06-mcp-server.mjs")],
-            user_inputs=[],
-            output_video=mcp_server_video,
-            output_screenshot=mcp_server_shot,
-            completion_marker="─── MCP Session Completed",
-            max_wait=60.0,
-            is_interactive_tui=False,
-        )
-        print(f"✔ MCP Server video saved: {res['video_path']} ({res['file_size_kb']:.1f} KB, SHA-256: {res['sha256'][:16]}...)")
+        res = run_scenario_6(pilot_dir, bsh_bin)
+        downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
+        if downloads_dir.exists():
+            shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
         sys.exit(0)
 
     elif parsed_args.scenario == "7":
-        # Run only Scenario 7
-        mcp_client_video = VIDEOS_DIR / "bsh-mcp-client-scenario.mp4"
-        mcp_client_shot = SCREENSHOTS_DIR / "bsh-mcp-client-scenario.png"
-        intro_lines = [
-            "Configuração: .bsh/mcp.json com servidor externo 'context7'",
-            "Protocolo: Model Context Protocol (MCP) via transporte stdio",
-            "Objetivo da Jornada: Integrar ferramentas de terceiros (busca documental) ao agente BSH.",
-            "Comportamento Esperado do BSH:",
-            "  • BSH carrega a configuração e conecta-se ao servidor Context7.",
-            "  • Ferramenta context7_search_docs é descoberta e registrada.",
-            "  • Durante o turno do agente, a ferramenta é acionada para recuperar documentação técnica.",
-            "  • O agente sintetiza a resposta final fundamentada na documentação recebida.",
-        ]
-        res = record_scenario(
-            session_name="bsh-e2e-mcp-client",
-            title="BSH E2E Scenario 7: MCP Client Consuming Third-Party Tools (Context7)",
-            intro_title="Jornada 7: BSH como Cliente MCP — Consumo de Ferramentas de Terceiros",
-            intro_lines=intro_lines,
-            command=["node", str(WORKTREE_ROOT / "test" / "support" / "run-jornada-07-mcp-client.mjs")],
-            user_inputs=[],
-            output_video=mcp_client_video,
-            output_screenshot=mcp_client_shot,
-            completion_marker="─── MCP Client Execution Finished",
-            max_wait=60.0,
-            is_interactive_tui=False,
-        )
-        print(f"✔ MCP Client video saved: {res['video_path']} ({res['file_size_kb']:.1f} KB, SHA-256: {res['sha256'][:16]}...)")
+        res = run_scenario_7(pilot_dir, bsh_bin)
+        downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
+        if downloads_dir.exists():
+            shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
         sys.exit(0)
 
     raise SystemExit(main())
