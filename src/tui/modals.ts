@@ -1,4 +1,5 @@
 import * as readline from 'node:readline/promises';
+import * as nodeReadline from 'node:readline';
 import { ansi, box } from './ansi.js';
 import type { OpenRouterModel } from '../client/openrouter/types.js';
 import type { DomainSummary } from '../governance/domainRegistry.js';
@@ -401,15 +402,156 @@ export async function selectSkillModal(
 import {
   DEFAULT_SLASH_COMMANDS,
   filterSlashCommands,
+  formatSlashCommandLine,
   type SlashCommandDef,
 } from './slashCommands.js';
 
-export async function selectSlashCommandModal(
-  commands: SlashCommandDef[] = DEFAULT_SLASH_COMMANDS,
-  initialQuery = ''
+async function runInteractiveSlashMenu(
+  commands: SlashCommandDef[],
+  initialQuery: string
+): Promise<string | null> {
+  return new Promise((resolve) => {
+    let query = (initialQuery || '').trim();
+    let selectedIndex = 0;
+
+    const render = () => {
+      const scored = filterSlashCommands(query, commands);
+      const visibleItems = scored.slice(0, 14);
+      if (selectedIndex >= visibleItems.length) {
+        selectedIndex = Math.max(0, visibleItems.length - 1);
+      }
+
+      const lines: string[] = [
+        'Navegue com [↑/↓], filtre digitando ou selecione com [Enter]. Pressione [Esc] para voltar sem selecionar.',
+        `Filtro atual: ${query ? `${ansi.yellow}${query}${ansi.reset}` : `${ansi.dim}(todos os comandos)${ansi.reset}`}`,
+        '',
+      ];
+
+      if (visibleItems.length === 0) {
+        lines.push(`  ${ansi.red}Nenhum comando correspondente ao filtro "${query}".${ansi.reset}`);
+      } else {
+        for (let i = 0; i < visibleItems.length; i++) {
+          const { command, indices } = visibleItems[i];
+          const isActive = (i === selectedIndex);
+          const highlightedName = query && indices.length > 0
+            ? highlightMatches(command.name, indices)
+            : undefined;
+          lines.push(formatSlashCommandLine(command, i, isActive, highlightedName));
+        }
+      }
+
+      lines.push('');
+      lines.push(`${ansi.dim}[↑/↓] Navegar  [Enter] Selecionar  [1-9] Escolha direta  [Esc/q] Não selecionar (voltar)${ansi.reset}`);
+
+      process.stdout.write('\x1b[2J\x1b[H');
+      process.stdout.write(`\n${box('Menu de Comandos Disponíveis no BSH', lines, 82)}\n`);
+      process.stdout.write(`\n${ansi.bold}Filtro ou navegação: ${ansi.reset}${query}`);
+    };
+
+    nodeReadline.emitKeypressEvents(process.stdin);
+    const wasRaw = process.stdin.isRaw;
+    if (process.stdin.isTTY && typeof process.stdin.setRawMode === 'function') {
+      process.stdin.setRawMode(true);
+    }
+    process.stdin.resume();
+
+    render();
+
+    const cleanup = (result: string | null) => {
+      process.stdin.removeListener('keypress', onKey);
+      if (process.stdin.isTTY && typeof process.stdin.setRawMode === 'function') {
+        process.stdin.setRawMode(wasRaw || false);
+      }
+      resolve(result);
+    };
+
+    const onKey = (_str: string, key: nodeReadline.Key) => {
+      if (!key) return;
+
+      const scored = filterSlashCommands(query, commands);
+      const visibleItems = scored.slice(0, 14);
+
+      // Cancel / Não selecionar
+      if (key.name === 'escape' || (key.ctrl && key.name === 'c') || (key.name === 'q' && !query)) {
+        cleanup(null);
+        return;
+      }
+
+      // Up arrow or 'k' when no query
+      if (key.name === 'up' || (key.name === 'k' && !query)) {
+        if (visibleItems.length > 0) {
+          selectedIndex = (selectedIndex - 1 + visibleItems.length) % visibleItems.length;
+          render();
+        }
+        return;
+      }
+
+      // Down arrow or 'j' when no query
+      if (key.name === 'down' || (key.name === 'j' && !query)) {
+        if (visibleItems.length > 0) {
+          selectedIndex = (selectedIndex + 1) % visibleItems.length;
+          render();
+        }
+        return;
+      }
+
+      // Tab key
+      if (key.name === 'tab') {
+        if (visibleItems.length > 0) {
+          selectedIndex = (selectedIndex + 1) % visibleItems.length;
+          render();
+        }
+        return;
+      }
+
+      // Enter / Return
+      if (key.name === 'return' || key.name === 'enter') {
+        if (visibleItems.length > 0 && visibleItems[selectedIndex]) {
+          cleanup(visibleItems[selectedIndex].command.name);
+        } else {
+          cleanup(null);
+        }
+        return;
+      }
+
+      // Direct number selection '1' to '9' when query is empty
+      if (!query && /^[1-9]$/.test(key.name || '')) {
+        const num = parseInt(key.name || '', 10);
+        if (num >= 1 && num <= visibleItems.length) {
+          cleanup(visibleItems[num - 1].command.name);
+          return;
+        }
+      }
+
+      // Backspace
+      if (key.name === 'backspace') {
+        if (query.length > 0) {
+          query = query.slice(0, -1);
+          selectedIndex = 0;
+          render();
+        }
+        return;
+      }
+
+      // Printable characters for search filter
+      if (_str && _str.length === 1 && !key.ctrl && !key.meta) {
+        query += _str;
+        selectedIndex = 0;
+        render();
+      }
+    };
+
+    process.stdin.on('keypress', onKey);
+  });
+}
+
+async function runFallbackSlashMenu(
+  commands: SlashCommandDef[],
+  initialQuery: string
 ): Promise<string | null> {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   let query = (initialQuery || '').trim();
+  let selectedIndex = 0;
 
   try {
     while (true) {
@@ -427,23 +569,20 @@ export async function selectSlashCommandModal(
       } else {
         for (let i = 0; i < visibleItems.length; i++) {
           const { command, indices } = visibleItems[i];
+          const isActive = (i === selectedIndex);
           const highlightedName = query && indices.length > 0
             ? highlightMatches(command.name, indices)
-            : `${ansi.cyan}${command.name}${ansi.reset}`;
-          const shortcutBadge = command.shortcut ? ` ${ansi.dim}[${command.shortcut}]${ansi.reset}` : '';
-          const categoryBadge = ` ${ansi.magenta}(${command.category})${ansi.reset}`;
-          lines.push(
-            `  ${ansi.bold}${i + 1}.${ansi.reset} ${highlightedName}${shortcutBadge}${categoryBadge} - ${ansi.dim}${command.description}${ansi.reset}`
-          );
+            : undefined;
+          lines.push(formatSlashCommandLine(command, i, isActive, highlightedName));
         }
       }
 
       lines.push('');
       lines.push(`Comandos: [1-${visibleItems.length}] selecionar | Digite termo para filtrar | q ou Enter para voltar`);
 
-      console.log(`\n${box('Menu de Comandos Disponíveis no BSH', lines, 80)}`);
+      console.log(`\n${box('Menu de Comandos Disponíveis no BSH', lines, 82)}`);
 
-      const answer = (await rl.question(`\n${ansi.bold}Escolha um comando [1-${visibleItems.length} / busca / q]: ${ansi.reset}`)).trim();
+      const answer = (await rl.question(`\n${ansi.bold}Escolha um comando [1-${visibleItems.length} / busca / q / Esc]: ${ansi.reset}`)).trim();
       if (!answer || answer.toLowerCase() === 'q') {
         return null;
       }
@@ -471,10 +610,21 @@ export async function selectSlashCommandModal(
 
       // Otherwise update search query
       query = answer;
+      selectedIndex = 0;
     }
   } finally {
     rl.close();
     process.stdin.resume();
   }
+}
+
+export async function selectSlashCommandModal(
+  commands: SlashCommandDef[] = DEFAULT_SLASH_COMMANDS,
+  initialQuery = ''
+): Promise<string | null> {
+  if (process.stdin.isTTY && typeof process.stdin.setRawMode === 'function') {
+    return runInteractiveSlashMenu(commands, initialQuery);
+  }
+  return runFallbackSlashMenu(commands, initialQuery);
 }
 

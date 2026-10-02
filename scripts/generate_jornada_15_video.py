@@ -123,14 +123,14 @@ def main():
     print("--- [1/5] Gerando slide de abertura em fundo preto ---")
     slide_path = frames_dir / f"frame_{frame_idx:05d}.png"
     render_slide(
-        title="Jornada 15: Menu de Comandos de Barra no Prompt do BSH",
+        title="Jornada 15: Menu de Comandos de Barra & Navegação Cromática",
         subtitle="Verificação E2E Baseada em Especificação BDD Gherkin (openspec/specs)",
         bullets=[
-            "1. Disparo exclusivo ao pressionar '/' com a linha de entrada vazia",
-            "2. Exibição imediata do menu modal contendo todos os comandos disponíveis",
-            "3. Apresentação do nome do comando, descrição do que faz e atalhos rápidos",
-            "4. Filtragem dinâmica e busca difusa ao digitar termos (ex: 'ex' -> /exit)",
-            "5. Execução direta com encerramento seguro e restauração limpa da tela",
+            "1. Disparo exclusivo ao pressionar '/' com o prompt estritamente vazio",
+            "2. Navegação com setas exibindo cor exclusiva e distinta para cada opção ativa",
+            "3. Decisão de NÃO SELECIONAR: tecla Escape fecha o menu e preserva o prompt limpo",
+            "4. Reabertura com '/', busca difusa instantânea ('ex') e destaque de caracteres",
+            "5. Seleção e confirmação com Enter (/exit) com encerramento seguro da sessão",
         ],
         output_path=slide_path
     )
@@ -160,48 +160,87 @@ def main():
     subprocess.run(["tmux", "send-keys", "-t", session_name, "-l", "/"], check=True)
     time.sleep(1.5)
 
-    # Capture open menu modal
-    for _ in range(20):
+    # Capture open menu modal with /model active (Magenta)
+    for _ in range(12):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH TUI: Menu de Comandos de Barra Aberto Automaticamente", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Menu Aberto - /model Ativo (Magenta)", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
-    # ---------------- Passo 2: Digitar busca 'ex' no menu ----------------
-    print("--- [4/5] Filtrando comandos com termo 'ex' ---")
+    # Navegar com seta Down para /domain (Verde Esmeralda)
+    subprocess.run(["tmux", "send-keys", "-t", session_name, "Down"], check=True)
+    time.sleep(0.8)
+    for _ in range(8):
+        frame_idx += 1
+        text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
+        render_terminal_frame(text, "BSH TUI: Navegação - /domain Ativo (Verde Esmeralda)", frames_dir / f"frame_{frame_idx:05d}.png")
+        time.sleep(0.1)
+
+    # Navegar com seta Down para /skills (Ciano Elétrico)
+    subprocess.run(["tmux", "send-keys", "-t", session_name, "Down"], check=True)
+    time.sleep(0.8)
+    for _ in range(8):
+        frame_idx += 1
+        text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
+        render_terminal_frame(text, "BSH TUI: Navegação - /skills Ativo (Ciano Elétrico)", frames_dir / f"frame_{frame_idx:05d}.png")
+        time.sleep(0.1)
+
+    # Navegar com seta Down para /diff (Amarelo Dourado)
+    subprocess.run(["tmux", "send-keys", "-t", session_name, "Down"], check=True)
+    time.sleep(0.8)
+    for _ in range(8):
+        frame_idx += 1
+        text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
+        render_terminal_frame(text, "BSH TUI: Navegação - /diff Ativo (Amarelo Dourado)", frames_dir / f"frame_{frame_idx:05d}.png")
+        time.sleep(0.1)
+
+    # ---------------- Passo 2: Decisão de NÃO SELECIONAR (Escape) ----------------
+    print("--- [4/5] Pressionando Escape para NÃO SELECIONAR (fechar menu e voltar) ---")
+    subprocess.run(["tmux", "send-keys", "-t", session_name, "Escape"], check=True)
+    time.sleep(1.5)
+    for _ in range(10):
+        frame_idx += 1
+        text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
+        render_terminal_frame(text, "BSH TUI: Menu Cancelado (Escape) - Prompt Limpo Restaurado", frames_dir / f"frame_{frame_idx:05d}.png")
+        time.sleep(0.1)
+
+    # ---------------- Passo 3: Reabrir e filtrar com 'ex' ----------------
+    print("--- [5/5] Reabrindo com '/', filtrando 'ex' e selecionando /exit ---")
+    subprocess.run(["tmux", "send-keys", "-t", session_name, "-l", "/"], check=True)
+    time.sleep(1.0)
+
     for char in "ex":
         subprocess.run(["tmux", "send-keys", "-t", session_name, "-l", char], check=True)
         time.sleep(0.1)
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH TUI: Busca e Filtragem Dinâmica no Menu (/exit)", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Busca e Filtragem Dinâmica (/exit Carmesim)", frames_dir / f"frame_{frame_idx:05d}.png")
 
     time.sleep(1.5)
-    for _ in range(15):
+    for _ in range(12):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH TUI: Opção /exit Filtrada e Destacada", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Opção /exit Filtrada e Destacada em Carmesim", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     # Save screenshot of the filtered menu
     screenshot_out.parent.mkdir(parents=True, exist_ok=True)
-    render_terminal_frame(text, "BSH TUI: Menu de Comandos de Barra com Busca Difusa", screenshot_out)
+    render_terminal_frame(text, "BSH TUI: Menu de Comandos de Barra com Cores Exclusivas", screenshot_out)
     print(f"Screenshot final salva em: {screenshot_out}")
 
-    # ---------------- Passo 3: Confirmar seleção com Enter ----------------
-    print("--- [5/5] Confirmando seleção de /exit com Enter ---")
+    # Confirmar com Enter
     subprocess.run(["tmux", "send-keys", "-t", session_name, "Enter"], check=True)
     time.sleep(2.0)
 
-    for _ in range(15):
+    for _ in range(12):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
         render_terminal_frame(text, "BSH TUI: Execução do Comando /exit e Limpeza do Terminal", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
-    # Hold final frame for 2 seconds
+    # Hold final frame for 1.5 seconds
     final_frame = frames_dir / f"frame_{frame_idx:05d}.png"
-    for _ in range(20):
+    for _ in range(15):
         frame_idx += 1
         dup = frames_dir / f"frame_{frame_idx:05d}.png"
         dup.write_bytes(final_frame.read_bytes())

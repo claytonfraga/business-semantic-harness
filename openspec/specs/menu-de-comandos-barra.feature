@@ -34,14 +34,38 @@ Funcionalidade: Menu Interativo de Comandos de Barra no Prompt do BSH
     Então a lista deve atualizar dinamicamente exibindo apenas as opções correspondentes
     E os caracteres coincidentes devem ser destacados visualmente
 
+  Cenário: Navegação interativa com cor exclusiva para cada opção ativa
+    Dado que o menu de comandos de barra está aberto exibindo os comandos disponíveis
+    Quando o usuário navega entre as opções utilizando as setas de direção para cima ou para baixo
+    Então a opção sob o cursor deve se tornar a opção ativa
+    E cada opção ativa deve exibir uma cor visual exclusiva e diferente das demais opções:
+      | Comando | Cor Ativa Exclusiva |
+      | /model | Magenta / Roxo Vibrante |
+      | /domain | Verde Esmeralda |
+      | /skills | Ciano Elétrico |
+      | /diff | Amarelo Dourado |
+      | /rules | Azul Céu |
+      | /settings | Laranja Pêssego |
+      | /affinity | Turquesa / Aqua |
+      | /mcp | Violeta Elétrico |
+      | /clear | Prata Brilhante |
+      | /done | Verde Limão |
+      | /help | Azul Royal |
+      | /ungoverned | Âmbar Quente |
+      | /governed | Menta Refrescante |
+      | /exit | Carmesim / Vermelho |
+    E a opção ativa deve exibir um marcador de foco enquanto as opções inativas permanecem em tom atenuado
+
+  Cenário: Opção de não selecionar e fechamento do menu
+    Dado que o menu de comandos de barra está aberto e o usuário navegou entre opções
+    Quando o usuário opta por não selecionar nenhuma opção pressionando a tecla "Escape" ou "q"
+    Então o menu deve ser fechado imediatamente
+    E nenhum comando deve ser despachado para execução
+    E o prompt da TUI deve ser restaurado em seu estado limpo original
+
   Cenário: Seleção e despacho de comando a partir do menu
     Dado que o menu de comandos de barra está aberto
-    Quando o usuário seleciona uma opção através do índice numérico ou navegando com setas e pressionando Enter
+    Quando o usuário navega até a opção desejada e pressiona a tecla "Enter" ou digita seu número ordinal
     Então o menu deve ser fechado
     E o comando selecionado deve ser despachado imediatamente para execução no BSH
 
-  Cenário: Cancelamento e restauração do prompt limpo
-    Dado que o menu de comandos de barra está aberto
-    Quando o usuário pressiona a tecla "Escape" ou "q"
-    Então o menu de comandos de barra deve ser fechado
-    E o buffer do prompt deve retornar ao estado vazio sem resíduos de caracteres
