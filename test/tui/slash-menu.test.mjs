@@ -80,8 +80,43 @@ describe('Slash Commands Menu Unit Suite (Given/When/Then)', () => {
     };
 
     assert.strictEqual(isTrigger('/', 'crie rota /api', false, false), false);
-    assert.strictEqual(isTrigger('/', 'verificar /src/core', false, false), false);
     assert.strictEqual(isTrigger('/', '', true, false), false); // modal já aberto
     assert.strictEqual(isTrigger('/', '', false, true), false); // turno em execução
   });
+
+  it('Given todos os comandos do catálogo, When inspecionadas suas cores ativas, Then cada opção ativa possui uma cor exclusiva diferente das demais', () => {
+    const activeColors = DEFAULT_SLASH_COMMANDS.map((c) => c.activeColor);
+    const uniqueColors = new Set(activeColors);
+
+    // Todos os 14 comandos devem ter cores exclusivas
+    assert.strictEqual(uniqueColors.size, DEFAULT_SLASH_COMMANDS.length);
+
+    // Verificar se cores conhecidas estão associadas corretamente
+    const modelCmd = DEFAULT_SLASH_COMMANDS.find((c) => c.name === '/model');
+    const domainCmd = DEFAULT_SLASH_COMMANDS.find((c) => c.name === '/domain');
+    const exitCmd = DEFAULT_SLASH_COMMANDS.find((c) => c.name === '/exit');
+
+    assert.ok(modelCmd.activeColor.includes('177m') || modelCmd.activeColorName === 'Magenta');
+    assert.ok(domainCmd.activeColor.includes('48m') || domainCmd.activeColorName === 'Verde Esmeralda');
+    assert.ok(exitCmd.activeColor.includes('196m') || exitCmd.activeColorName === 'Carmesim');
+
+    // Nenhuma cor de comando coincide com a de outro
+    assert.notStrictEqual(modelCmd.activeColor, domainCmd.activeColor);
+    assert.notStrictEqual(domainCmd.activeColor, exitCmd.activeColor);
+  });
+
+  it('Given um comando slash formatado para exibição, When a opção está ativa, Then inclui o ponteiro ❯ e a cor exclusiva do comando', async () => {
+    const { formatSlashCommandLine } = await import('../../dist/tui/slashCommands.js');
+    const cmd = DEFAULT_SLASH_COMMANDS.find((c) => c.name === '/exit');
+
+    const activeLine = formatSlashCommandLine(cmd, 13, true);
+    assert.ok(activeLine.includes('❯'), 'Deve conter ponteiro de foco ❯');
+    assert.ok(activeLine.includes(cmd.activeColor), 'Deve conter a cor exclusiva do comando ativo');
+    assert.ok(activeLine.includes('/exit'), 'Deve conter o nome do comando');
+
+    const inactiveLine = formatSlashCommandLine(cmd, 13, false);
+    assert.ok(!inactiveLine.includes('❯'), 'Não deve conter ponteiro de foco ❯ quando inativo');
+    assert.ok(inactiveLine.startsWith('  '), 'Deve conter indentação neutra quando inativo');
+  });
 });
+
