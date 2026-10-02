@@ -8,6 +8,7 @@ export interface AgentLoopOptions {
   client: OpenRouterClient;
   model: string;
   workspaceRoot: string;
+  projectRoot?: string;
   messages: ChatMessage[];
   systemPrompt?: string;
   maxTurns?: number;
@@ -93,7 +94,7 @@ export function buildCodingAgentSystemPrompt(options: {
 }
 
 export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurnResult> {
-  const executor = new WorkspaceToolExecutor(options.workspaceRoot);
+  const executor = new WorkspaceToolExecutor(options.workspaceRoot, options.projectRoot);
   const maxTurns = options.maxTurns ?? 10;
   let turns = 0;
   let toolCallsExecuted = 0;
