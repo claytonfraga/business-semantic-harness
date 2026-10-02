@@ -254,14 +254,19 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
   const runWithModal = async <T>(fn: () => Promise<T>): Promise<T> => {
     isModalOpen = true;
+    if (rl) {
+      rl.pause();
+    }
     try {
       return await fn();
     } finally {
       isModalOpen = false;
-      process.stdin.resume();
       if (rl) {
+        (rl as unknown as { line: string; cursor: number }).line = '';
+        (rl as unknown as { cursor: number }).cursor = 0;
         rl.resume();
       }
+      process.stdin.resume();
     }
   };
 
@@ -439,16 +444,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     ) {
       (rl as unknown as { line: string; cursor: number }).line = '';
       (rl as unknown as { cursor: number }).cursor = 0;
-      runWithModal(async () => {
-        const selected = await selectSlashCommandModal();
-        if (selected) {
-          dispatchPrompt(selected);
-        } else {
-          (rl as unknown as { line: string; cursor: number }).line = '';
-          (rl as unknown as { cursor: number }).cursor = 0;
-          redrawScreen('');
-        }
-      });
+      dispatchPrompt('/');
       return;
     }
 
@@ -559,6 +555,16 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       scrollOffset = 0;
 
       // Handle Slash Commands
+      if (prompt === '/' || prompt === '/menu') {
+        const selected = await runWithModal(() => selectSlashCommandModal());
+        if (selected) {
+          prompt = selected;
+        } else {
+          redrawScreen('');
+          continue;
+        }
+      }
+
       if (exitRequested || prompt === '/exit' || prompt === '/quit') {
         break;
       }
