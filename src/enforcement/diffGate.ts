@@ -9,6 +9,7 @@ export interface DiffGateResult {
   hasChanges: boolean;
   diffSummary: string;
   filesChanged: string[];
+  fileStats?: { path: string; linesAdded: number; linesRemoved: number }[];
   linesAdded: number;
   linesRemoved: number;
   conforming: boolean;
@@ -125,10 +126,17 @@ export async function evaluateWorkspaceDiffGate(options: {
     checks.push({ ok: true, text: 'Transição de código e propriedades semânticas válidas' });
   }
 
+  const fileStats = diffArquivos.map((d) => ({
+    path: d.caminho,
+    linesAdded: d.adicionadas.length,
+    linesRemoved: d.removidas.length,
+  }));
+
   return {
     hasChanges: true,
     diffSummary: `${filesChanged.length} arquivos modificados (+${linesAdded} / -${linesRemoved})`,
     filesChanged,
+    fileStats,
     linesAdded,
     linesRemoved,
     conforming: isConforming,

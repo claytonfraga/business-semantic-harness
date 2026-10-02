@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { searchModels } from '../../dist/tui/modals.js';
+import { searchModels, fuzzyScore, highlightMatches } from '../../dist/tui/modals.js';
 
 test('searchModels filters by model ID case-insensitively', () => {
   const models = [
@@ -36,3 +36,36 @@ test('searchModels returns empty array on empty query', () => {
   assert.deepEqual(searchModels(models, ''), []);
   assert.deepEqual(searchModels(models, '   '), []);
 });
+
+test('fuzzyScore calculates scores, boundary bonuses, and matching character indices', () => {
+  const match = fuzzyScore('anthropic/claude-3.5-sonnet', 'claude sonnet');
+  assert.ok(match !== null, 'Should match multiple tokens');
+  assert.ok(match.score > 50, 'Score should reflect word boundaries and matches');
+  assert.ok(match.indices.length >= 12, 'Should capture character indices of matched tokens');
+
+  const noMatch = fuzzyScore('openai/gpt-4o', 'gemini');
+  assert.equal(noMatch, null, 'Should return null for non-matching patterns');
+});
+
+test('highlightMatches wraps matching characters in bold yellow ANSI escape codes', () => {
+  const highlighted = highlightMatches('deepseek', [0, 4]);
+  assert.ok(highlighted.includes('\x1b[1m\x1b[33md\x1b[0m'), 'Must highlight index 0');
+  assert.ok(highlighted.includes('\x1b[1m\x1b[33ms\x1b[0m'), 'Must highlight index 4');
+});
+
+test('searchModels supports fuzzy subsequence search across reordered tokens', () => {
+  const models = [
+    { id: 'anthropic/claude-3.5-sonnet', name: 'Claude 3.5 Sonnet' },
+    { id: 'deepseek/deepseek-v4.1-flash', name: 'DeepSeek Flash' },
+    { id: 'google/gemini-2.0-flash-001', name: 'Gemini Flash' },
+  ];
+
+  const matches = searchModels(models, 'sonnet 3.5');
+  assert.equal(matches.length, 1);
+  assert.equal(matches[0].id, 'anthropic/claude-3.5-sonnet');
+
+  const flashMatches = searchModels(models, 'flash deepseek');
+  assert.equal(flashMatches.length, 1);
+  assert.equal(flashMatches[0].id, 'deepseek/deepseek-v4.1-flash');
+});
+

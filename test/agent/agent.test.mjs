@@ -208,3 +208,54 @@ test('Given runAgentTurn with an action prompt, when model stops after reading w
   }
 });
 
+test('Given runAgentTurn, when model generates explanation before tool call, then onAssistantMessage is invoked', async () => {
+  const tempDir = mkdtempSync(join(tmpdir(), 'bsh-agent-msg-test-'));
+  try {
+    let callIndex = 0;
+    const mockClient = {
+      async *streamChat() {
+        callIndex++;
+        if (callIndex === 1) {
+          // Model explains its intent AND invokes a tool
+          yield { delta: { content: 'Vou criar o arquivo de configuração solicitado.' } };
+          yield {
+            delta: {
+              tool_calls: [
+                {
+                  index: 0,
+                  id: 'call_1',
+                  type: 'function',
+                  function: {
+                    name: 'write_file',
+                    arguments: JSON.stringify({ path: 'config.json', content: '{}' }),
+                  },
+                },
+              ],
+            },
+          };
+        } else {
+          yield { delta: { content: 'Configuração criada com sucesso.' } };
+        }
+      },
+    };
+
+    const intermediateMessages = [];
+    const result = await runAgentTurn({
+      client: mockClient,
+      model: 'deepseek/deepseek-chat',
+      workspaceRoot: tempDir,
+      messages: [{ role: 'user', content: 'crie a configuração' }],
+      onAssistantMessage: (msg) => intermediateMessages.push(msg),
+    });
+
+    assert.equal(result.completed, true);
+    assert.equal(intermediateMessages.length, 1);
+    assert.equal(intermediateMessages[0].content, 'Vou criar o arquivo de configuração solicitado.');
+    assert.equal(intermediateMessages[0].intermediate, true);
+    assert.equal(result.finalAssistantMessage.content, 'Configuração criada com sucesso.');
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+

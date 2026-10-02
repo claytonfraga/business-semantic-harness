@@ -165,9 +165,9 @@ test('TUI render: height is fixed and invariant regardless of entry count', () =
   const lines0 = tui0.split('\n');
   const linesMany = tuiMany.split('\n');
   assert.equal(lines0[0], linesMany[0], 'Top header border must be identical');
-  assert.equal(lines0[3], linesMany[3], 'Header separator must be identical');
+  assert.equal(lines0[2], linesMany[2], 'Header separator must be identical');
   assert.equal(lines0[height - 1], linesMany[height - 1], 'Bottom border must be identical');
-  assert.equal(lines0[height - 5], linesMany[height - 5], 'Footer separator must be identical');
+  assert.equal(lines0[height - 4], linesMany[height - 4], 'Footer separator must be identical');
 });
 
 test('TUI render: scrolling viewport navigates past entries with scrollOffset', () => {
@@ -275,6 +275,7 @@ test('TUI render: renders prompt violation badge and warning entry with Enter pr
   assert.ok(tui.includes('[!] [PROMPT VIOLATION DETECTED]'), 'Must render prompt violation header');
   assert.ok(tui.includes('TransferShape'), 'Must show violated shape');
   assert.ok(tui.includes('Pressione [Enter] para prosseguir'), 'Must prompt user for confirmation');
+  assert.ok(tui.includes('[ESC] / /cancel'), 'Must show [ESC] as alternative to cancel confirmation');
   assert.equal(tui.split('\n').length, height, 'Must maintain exact fixed height');
 });
 
@@ -316,8 +317,179 @@ test('TUI render: renders visual scrollbar track and thumb when content exceeds 
     height
   );
   const topLines = topTui.split('\n');
-  // First viewport line is line 4 (0-indexed: lines 0..3 are header)
-  assert.ok(topLines[4].includes('█'), 'Top of viewport must contain thumb when scrolled to top');
+  // First viewport line is line 3 (0-indexed: lines 0..2 are header)
+  assert.ok(topLines[3].includes('█'), 'Top of viewport must contain thumb when scrolled to top');
 });
 
+test('TUI render: renders implementation_receipt with modified files and line counts', () => {
+  const width = 96;
+  const height = 24;
+
+  const tui = renderCompleteTui(
+    { model: 'deepseek/deepseek-v4.1-flash', governed: true, tokensTotal: 500, width, height },
+    [
+      {
+        type: 'implementation_receipt',
+        receiptHasChanges: true,
+        receiptFiles: [
+          { path: 'src/assets/domain/ativo.ts', linesAdded: 15, linesRemoved: 2 },
+          { path: 'src/assets/infrastructure/asset-http-server.ts', linesAdded: 25, linesRemoved: 0 },
+        ],
+        receiptTotalAdded: 40,
+        receiptTotalRemoved: 2,
+      },
+    ],
+    '>',
+    width,
+    height
+  );
+
+  const clean = stripAnsi(tui);
+  assert.ok(clean.includes('[✔ IMPLEMENTAÇÃO REALIZADA]'), 'Must render implementation header');
+  assert.ok(clean.includes('[Arquivos Modificados: 2]'), 'Must show file count');
+  assert.ok(clean.includes('src/assets/domain/ativo.ts (+15 / -2)'), 'Must list file stats');
+  assert.ok(clean.includes('+40 / -2 linhas'), 'Must list total lines added/removed');
+  assert.equal(tui.split('\n').length, height, 'Must maintain exact fixed height');
+});
+
+test('TUI render: renders implementation_receipt diagnostic when no files were changed', () => {
+  const width = 96;
+  const height = 24;
+
+  const tui = renderCompleteTui(
+    { model: 'deepseek/deepseek-v4.1-flash', governed: true, tokensTotal: 500, width, height },
+    [
+      {
+        type: 'implementation_receipt',
+        receiptHasChanges: false,
+        receiptFiles: [],
+        receiptTotalAdded: 0,
+        receiptTotalRemoved: 0,
+      },
+    ],
+    '>',
+    width,
+    height
+  );
+
+  assert.ok(tui.includes('[ℹ LEITURA / DIAGNÓSTICO]'), 'Must render diagnostic indicator');
+  assert.ok(tui.includes('Nenhuma alteração foi gravada em arquivos nesta resposta'), 'Must explain no files changed');
+  assert.equal(tui.split('\n').length, height, 'Must maintain exact fixed height');
+});
+
+test('TUI render: renders queued entry indicator and queue count in footer', () => {
+  const width = 96;
+  const height = 24;
+
+  const tui = renderCompleteTui(
+    {
+      model: 'deepseek/deepseek-v4.1-flash',
+      governed: true,
+      tokensTotal: 500,
+      queueLength: 2,
+      generationDurationMs: 3450,
+      generationTps: 42,
+      width,
+      height,
+    },
+    [
+      { type: 'user', content: 'Primeiro prompt' },
+      { type: 'user', content: 'Segundo prompt enfileirado', isQueued: true },
+    ],
+    '>',
+    width,
+    height
+  );
+
+  const clean = stripAnsi(tui);
+  assert.ok(clean.includes('[Na fila]'), 'Must render [Na fila] badge for queued user entry');
+  assert.ok(clean.includes('[Queue: 2]'), 'Must render [Queue: 2] badge in footer status');
+  assert.ok(clean.includes('3.5s (42 tps)'), 'Must render duration and TPS metrics');
+  assert.ok(clean.includes('[ESC ESC]'), 'Must render ESC ESC shortcut hint');
+  assert.ok(clean.includes('[^C]'), 'Must render Ctrl+C shortcut hint');
+  assert.equal(tui.split('\n').length, height, 'Must maintain exact fixed height');
+});
+
+test('TUI render: renders collapsed reasoning entry with tokens and duration summary', () => {
+  const width = 96;
+  const height = 24;
+
+  const tui = renderCompleteTui(
+    { model: 'deepseek/deepseek-r1', governed: true, tokensTotal: 800, width, height },
+    [
+      {
+        type: 'reasoning',
+        content: 'Pensando profundamente sobre os requisitos ontológicos e classes SHACL...',
+        reasoningCollapsed: true,
+        reasoningTokens: 320,
+        reasoningDurationMs: 1400,
+      },
+    ],
+    '>',
+    width,
+    height
+  );
+
+  const clean = stripAnsi(tui);
+  assert.ok(clean.includes('▼ [Raciocínio: ~320 tokens · 1.4s]'), 'Must render collapsed reasoning header');
+  assert.ok(clean.includes('[Ctrl+O expandir]'), 'Must render expand shortcut hint');
+  assert.ok(!clean.includes('Pensando profundamente'), 'Collapsed reasoning must hide body content');
+  assert.equal(tui.split('\n').length, height, 'Must preserve invariant height');
+});
+
+test('TUI render: renders expanded reasoning entry with visible body content', () => {
+  const width = 96;
+  const height = 24;
+
+  const tui = renderCompleteTui(
+    { model: 'deepseek/deepseek-r1', governed: true, tokensTotal: 800, width, height },
+    [
+      {
+        type: 'reasoning',
+        content: 'Análise detalhada de invariantes ontológicos para o domínio ativos.',
+        reasoningCollapsed: false,
+        reasoningTokens: 320,
+        reasoningDurationMs: 1400,
+      },
+    ],
+    '>',
+    width,
+    height
+  );
+
+  const clean = stripAnsi(tui);
+  assert.ok(clean.includes('▲ [Raciocínio: ~320 tokens · 1.4s]'), 'Must render expanded reasoning header');
+  assert.ok(clean.includes('Análise detalhada de invariantes ontológicos'), 'Must render reasoning body when expanded');
+  assert.ok(clean.includes('[Ctrl+O recolher]'), 'Must render collapse shortcut hint');
+  assert.equal(tui.split('\n').length, height, 'Must preserve invariant height');
+});
+
+test('TUI render: renders real-time incremental diff_preview card', () => {
+  const width = 96;
+  const height = 24;
+
+  const tui = renderCompleteTui(
+    { model: 'deepseek/deepseek-v4.1-flash', governed: true, tokensTotal: 500, width, height },
+    [
+      {
+        type: 'diff_preview',
+        diffFiles: [
+          { path: 'src/assets/domain/ativo.ts', linesAdded: 12, linesRemoved: 3 },
+          { path: 'src/assets/infrastructure/http.ts', linesAdded: 18, linesRemoved: 0 },
+        ],
+        diffTotalAdded: 30,
+        diffTotalRemoved: 3,
+      },
+    ],
+    '>',
+    width,
+    height
+  );
+
+  const clean = stripAnsi(tui);
+  assert.ok(clean.includes('[Δ DIFF PREVIEW]'), 'Must render diff preview card header');
+  assert.ok(clean.includes('2 arquivos alterados (+30 / -3)'), 'Must show diff summary totals');
+  assert.ok(clean.includes('src/assets/domain/ativo.ts (+12 / -3)'), 'Must list modified file stats');
+  assert.equal(tui.split('\n').length, height, 'Must maintain exact fixed height');
+});
 

@@ -754,6 +754,77 @@ def run_scenario_10(pilot_dir: Path, bsh_bin: str) -> dict:
     return res
 
 
+def run_scenario_11(pilot_dir: Path, bsh_bin: str) -> dict:
+    print("\n--- Running Scenario 11: Ergonomic TUI, FIFO Queue & Keyboard Shortcuts ---")
+    queue_video = VIDEOS_DIR / "bsh-tui-queue-shortcuts-scenario.mp4"
+    queue_shot = SCREENSHOTS_DIR / "bsh-tui-queue-shortcuts-scenario.png"
+
+    intro_title = "Jornada 11: Ergonomia TUI, Fila Concorrente de Prompts e Atalhos de Teclado"
+    intro_lines = [
+        "Interface: BSH OpenTUI com Fila Concorrente FIFO, Deduplicação Visual e Atalhos Ágeis",
+        "Objetivo 1 (Deduplicação Visual): Cabeçalho limpo em 3 linhas e rodapé unificado em 4 linhas (7 linhas chrome).",
+        "Objetivo 2 (Fila Concorrente FIFO): Prompts enviados durante processamento recebem tag [Na fila] e contador [Queue: N].",
+        "Objetivo 3 (Cancelamento Imediato): Tecla [ESC] para confirmações pendentes e duplo Escape (ESC ESC) para o turno.",
+        "Objetivo 4 (Limpeza Instantânea): Limpeza do buffer de prompt via Ctrl+C e auto-clear no envio com Enter.",
+        "Objetivo 5 (Telemetria no Rodapé): Exibição em tempo real de duração em segundos e taxa de geração (TPS).",
+    ]
+
+    user_inputs = [
+        ("consulte as regras ontológicas de transferência do ativo AST-001", 6.0),
+        ("mostre o resumo do domínio", 6.0),
+        ("/status", 4.0),
+    ]
+
+    res = record_scenario(
+        session_name="bsh-e2e-queue-shortcuts",
+        title="BSH: Ergonomic TUI, FIFO Queue & Fast Keyboard Shortcuts",
+        intro_title=intro_title,
+        intro_lines=intro_lines,
+        command=["env", "OPENROUTER_API_KEY=sk-or-v1-mock-test", bsh_bin, "--project", str(pilot_dir)],
+        user_inputs=user_inputs,
+        output_video=queue_video,
+        output_screenshot=queue_shot,
+        is_interactive_tui=True,
+    )
+    print(f"✔ Ergonomic TUI & Queue video saved: {res['video_path']} ({res['file_size_kb']:.1f} KB, SHA-256: {res['sha256'][:16]}...)")
+    return res
+
+
+def run_scenario_12(pilot_dir: Path, bsh_bin: str) -> dict:
+    print("\n--- Running Scenario 12: Advanced UX (CoT Reasoning, Real-Time Diff, Multiline & Fuzzy Search) ---")
+    adv_video = VIDEOS_DIR / "bsh-advanced-ux-reasoning-diff-fuzzy-scenario.mp4"
+    adv_shot = SCREENSHOTS_DIR / "bsh-advanced-ux-reasoning-diff-fuzzy-scenario.png"
+
+    intro_title = "Jornada 12: UX Avançada com Raciocínio CoT Retrátil, Diff em Tempo Real, Modo Multilinha e Busca Difusa"
+    intro_lines = [
+        "Interface: BSH OpenTUI com Suporte a Modelos de Raciocínio Profundo (CoT) e Ergonomia Avançada",
+        "Objetivo 1 (Raciocínio CoT Retrátil): Recolhimento automático de cadeias de pensamento longas (toggle com Ctrl+O).",
+        "Objetivo 2 (Diff em Tempo Real): Exibição instantânea do balanço de adições/remoções (+X / -Y) por arquivo alterado.",
+        "Objetivo 3 (Modo Multilinha): Suporte a entrada em bloco com aspas triplas (\"\"\") e editor externo via /editor.",
+        "Objetivo 4 (Busca Difusa com Realce): Localização instantânea de modelos via Ctrl+M com destaque de caracteres.",
+    ]
+
+    user_inputs = [
+        ('"""\nfunction verificarAtivo(id) {\n  // Validacao de integridade ontologica\n  return id !== null;\n}\n"""', 6.0),
+        ("/model r1 deepseek", 5.0),
+        ("q", 3.0),
+    ]
+
+    res = record_scenario(
+        session_name="bsh-e2e-adv-ux",
+        title="BSH: Advanced UX with CoT Reasoning, Real-Time Diff, Multiline & Fuzzy Search",
+        intro_title=intro_title,
+        intro_lines=intro_lines,
+        command=["env", "OPENROUTER_API_KEY=sk-or-v1-mock-test", bsh_bin, "--project", str(pilot_dir)],
+        user_inputs=user_inputs,
+        output_video=adv_video,
+        output_screenshot=adv_shot,
+        is_interactive_tui=True,
+    )
+    print(f"✔ Advanced UX video saved: {res['video_path']} ({res['file_size_kb']:.1f} KB, SHA-256: {res['sha256'][:16]}...)")
+    return res
+
+
 def generate_markdown_report(
     gov_res: dict,
     ungov_res: dict,
@@ -833,7 +904,7 @@ A padronização mandatória de especificação em `.feature` e geração de evi
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="BSH E2E Video Recorder")
-    parser.add_argument("--scenario", choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "all"], default="all")
+    parser.add_argument("--scenario", choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "all"], default="all")
     parsed_args = parser.parse_args()
 
     ensure_dirs()
@@ -872,6 +943,24 @@ if __name__ == "__main__":
 
     elif parsed_args.scenario == "10":
         res = run_scenario_10(pilot_dir, bsh_bin)
+        downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
+        if downloads_dir.exists():
+            shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
+            if Path(res["screenshot_path"]).exists():
+                shutil.copy2(Path(res["screenshot_path"]), downloads_dir / Path(res["screenshot_path"]).name)
+        sys.exit(0)
+
+    elif parsed_args.scenario == "11":
+        res = run_scenario_11(pilot_dir, bsh_bin)
+        downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
+        if downloads_dir.exists():
+            shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
+            if Path(res["screenshot_path"]).exists():
+                shutil.copy2(Path(res["screenshot_path"]), downloads_dir / Path(res["screenshot_path"]).name)
+        sys.exit(0)
+
+    elif parsed_args.scenario == "12":
+        res = run_scenario_12(pilot_dir, bsh_bin)
         downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
         if downloads_dir.exists():
             shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
