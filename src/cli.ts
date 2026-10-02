@@ -12,11 +12,11 @@ import { startTuiSession } from './tui/session.js';
 
 export async function main(argv: string[]): Promise<number> {
   if (argv.length === 1 && (argv[0] === '--version' || argv[0] === '-v')) {
-    process.stdout.write('0.2.8-beta\n');
+    process.stdout.write('0.2.9-beta\n');
     return 0;
   }
   if (argv.length === 1 && argv[0] === '--help') {
-    process.stdout.write('bsh: [tui] [--model <nome>] [--domain <nome>] [--api-key <key>] | init | domain add <nome> | ontology validate | ontology show <dominio> | sessions list|clean <id> | mcp [--governed] | auth [login|status|logout]\n');
+    process.stdout.write('bsh: [tui] [--model <nome>] [--domain <nome>] [--api-key <key>] | init | domain add <nome> | ontology validate | ontology show <dominio> | sessions list|clean <id> | mcp [--governed] | auth [login|status|logout] | skill [list|show|add]\n');
     return 0;
   }
 
@@ -114,6 +114,10 @@ export async function main(argv: string[]): Promise<number> {
     if (command.length >= 1 && command[0] === 'auth') {
       const { handleAuthCommand } = await import('./cli/authCommand.js');
       return await handleAuthCommand(command.slice(1), projectRoot);
+    }
+    if (command.length >= 1 && (command[0] === 'skill' || command[0] === 'skills')) {
+      const { handleSkillCliCommand } = await import('./skills/cliCommand.js');
+      return await handleSkillCliCommand(command.slice(1), projectRoot);
     }
 
     if (command.length === 1 && command[0] === 'init') {

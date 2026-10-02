@@ -825,6 +825,45 @@ def run_scenario_12(pilot_dir: Path, bsh_bin: str) -> dict:
     return res
 
 
+def run_scenario_13(pilot_dir: Path, bsh_bin: str) -> dict:
+    print("\n--- Running Scenario 13: Skills Mechanism & Prototype Execution ---")
+    skills_video = VIDEOS_DIR / "bsh-skills-prototype-scenario.mp4"
+    skills_shot = SCREENSHOTS_DIR / "bsh-skills-prototype-scenario.png"
+
+    intro_title = "Jornada 13: Mecanismo de Instalação e Execução de Skills & Prototipação Rápida"
+    intro_lines = [
+        "Interface: BSH OpenTUI com Suporte a Skills Especializadas (Agy / Codex / Claude Code compatibility)",
+        "Objetivo 1 (Descoberta Multi-Raiz de Skills): Escaneamento automático de skills em .bsh/skills/, .agents/skills/ e globais.",
+        "Objetivo 2 (Inspeção e Ativação Interativa): Acesso via /skills com busca difusa e ativação na sessão.",
+        "Objetivo 3 (Skill prototype em Ação): Execução autônoma de diretivas de prototipação rápida para validação de hipóteses.",
+        "Objetivo 4 (Governança Semântica Estrita): Semantic Gate ativo protegendo o domínio ontológico mesmo durante prototipação.",
+    ]
+
+    user_inputs = [
+        ("/skills prototype", 5.0),
+        ("1", 4.0),
+        ("/skill show prototype", 5.0),
+        ("Crie um prototipo da funcao calcularDepreciacao em conformidade com o dominio de ativos", 6.0),
+        ("Transfira o ativo para estado INVALIDO_DEPRECIADO", 6.0),
+        ("/exit", 3.0),
+    ]
+
+    res = record_scenario(
+        session_name="bsh-e2e-skills-prototype",
+        title="BSH: Skills Mechanism & Prototype Execution with Semantic Governance",
+        intro_title=intro_title,
+        intro_lines=intro_lines,
+        command=["env", "OPENROUTER_API_KEY=sk-or-v1-mock-test", bsh_bin, "--project", str(pilot_dir)],
+        user_inputs=user_inputs,
+        output_video=skills_video,
+        output_screenshot=skills_shot,
+        is_interactive_tui=True,
+    )
+    print(f"✔ Skills & Prototype video saved: {res['video_path']} ({res['file_size_kb']:.1f} KB, SHA-256: {res['sha256'][:16]}...)")
+    return res
+
+
+
 def generate_markdown_report(
     gov_res: dict,
     ungov_res: dict,
@@ -904,7 +943,7 @@ A padronização mandatória de especificação em `.feature` e geração de evi
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="BSH E2E Video Recorder")
-    parser.add_argument("--scenario", choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "all"], default="all")
+    parser.add_argument("--scenario", choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "all"], default="all")
     parsed_args = parser.parse_args()
 
     ensure_dirs()
@@ -961,6 +1000,15 @@ if __name__ == "__main__":
 
     elif parsed_args.scenario == "12":
         res = run_scenario_12(pilot_dir, bsh_bin)
+        downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
+        if downloads_dir.exists():
+            shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
+            if Path(res["screenshot_path"]).exists():
+                shutil.copy2(Path(res["screenshot_path"]), downloads_dir / Path(res["screenshot_path"]).name)
+        sys.exit(0)
+
+    elif parsed_args.scenario == "13":
+        res = run_scenario_13(pilot_dir, bsh_bin)
         downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
         if downloads_dir.exists():
             shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)

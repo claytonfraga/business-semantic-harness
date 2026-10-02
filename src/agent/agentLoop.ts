@@ -57,6 +57,7 @@ export function buildCodingAgentSystemPrompt(options: {
   workspaceSummary?: WorkspaceSummary;
   domainId?: string;
   governed?: boolean;
+  skillsContext?: string;
 }): string {
   const parts: string[] = [
     'You are BSH (Business Semantic Harness), an autonomous AI pair programming assistant and expert software engineer.',
@@ -82,6 +83,10 @@ export function buildCodingAgentSystemPrompt(options: {
 
   if (options.workspaceSummary?.formattedContext) {
     parts.push('', options.workspaceSummary.formattedContext);
+  }
+
+  if (options.skillsContext) {
+    parts.push('', options.skillsContext);
   }
 
   return parts.join('\n');
