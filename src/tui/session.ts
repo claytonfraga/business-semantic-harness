@@ -25,7 +25,7 @@ import {
 import { promoverSessao } from '../git/promotion.js';
 import { ansi } from './ansi.js';
 import { renderCompleteTui, type ChatEntry } from './render.js';
-import { promptApiKeyModal, selectModelModal, selectDomainModal, diffReviewModal, settingsModal, selectSkillModal } from './modals.js';
+import { promptApiKeyModal, selectModelModal, selectDomainModal, diffReviewModal, settingsModal, selectSkillModal, selectSlashCommandModal } from './modals.js';
 import { SkillRegistry } from '../skills/registry.js';
 import { installSkillPackage } from '../skills/installer.js';
 import { detectSkillInvocation, detectSemanticSkillNeed } from '../skills/activation.js';
@@ -426,6 +426,29 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       (rl as unknown as { line: string; cursor: number }).line = '';
       (rl as unknown as { cursor: number }).cursor = 0;
       dispatchPrompt('/domain');
+      return;
+    }
+
+    // Typing "/" in an empty prompt opens the Slash Commands Menu
+    const currentLine = (rl as unknown as { line?: string }).line || '';
+    if (
+      !isExecutingTurn &&
+      !isModalOpen &&
+      (_str === '/' || key.sequence === '/') &&
+      currentLine.trim().length === 0
+    ) {
+      (rl as unknown as { line: string; cursor: number }).line = '';
+      (rl as unknown as { cursor: number }).cursor = 0;
+      runWithModal(async () => {
+        const selected = await selectSlashCommandModal();
+        if (selected) {
+          dispatchPrompt(selected);
+        } else {
+          (rl as unknown as { line: string; cursor: number }).line = '';
+          (rl as unknown as { cursor: number }).cursor = 0;
+          redrawScreen('');
+        }
+      });
       return;
     }
 

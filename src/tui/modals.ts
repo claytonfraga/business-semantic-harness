@@ -397,3 +397,84 @@ export async function selectSkillModal(
     process.stdin.resume();
   }
 }
+
+import {
+  DEFAULT_SLASH_COMMANDS,
+  filterSlashCommands,
+  type SlashCommandDef,
+} from './slashCommands.js';
+
+export async function selectSlashCommandModal(
+  commands: SlashCommandDef[] = DEFAULT_SLASH_COMMANDS,
+  initialQuery = ''
+): Promise<string | null> {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  let query = (initialQuery || '').trim();
+
+  try {
+    while (true) {
+      const scored = filterSlashCommands(query, commands);
+      const visibleItems = scored.slice(0, 14);
+
+      const lines: string[] = [
+        'Selecione uma opção digitando seu número ou termo de busca.',
+        `Filtro atual: ${query ? `${ansi.yellow}${query}${ansi.reset}` : `${ansi.dim}(todos os comandos)${ansi.reset}`}`,
+        '',
+      ];
+
+      if (visibleItems.length === 0) {
+        lines.push(`  ${ansi.red}Nenhum comando correspondente ao filtro "${query}".${ansi.reset}`);
+      } else {
+        for (let i = 0; i < visibleItems.length; i++) {
+          const { command, indices } = visibleItems[i];
+          const highlightedName = query && indices.length > 0
+            ? highlightMatches(command.name, indices)
+            : `${ansi.cyan}${command.name}${ansi.reset}`;
+          const shortcutBadge = command.shortcut ? ` ${ansi.dim}[${command.shortcut}]${ansi.reset}` : '';
+          const categoryBadge = ` ${ansi.magenta}(${command.category})${ansi.reset}`;
+          lines.push(
+            `  ${ansi.bold}${i + 1}.${ansi.reset} ${highlightedName}${shortcutBadge}${categoryBadge} - ${ansi.dim}${command.description}${ansi.reset}`
+          );
+        }
+      }
+
+      lines.push('');
+      lines.push(`Comandos: [1-${visibleItems.length}] selecionar | Digite termo para filtrar | q ou Enter para voltar`);
+
+      console.log(`\n${box('Menu de Comandos Disponíveis no BSH', lines, 80)}`);
+
+      const answer = (await rl.question(`\n${ansi.bold}Escolha um comando [1-${visibleItems.length} / busca / q]: ${ansi.reset}`)).trim();
+      if (!answer || answer.toLowerCase() === 'q') {
+        return null;
+      }
+
+      // Check direct number selection
+      const num = parseInt(answer, 10);
+      if (!Number.isNaN(num) && num >= 1 && num <= visibleItems.length) {
+        return visibleItems[num - 1].command.name;
+      }
+
+      // Check if user typed an exact command name like "/exit" or "exit"
+      const normalizedAnswer = answer.startsWith('/') ? answer.toLowerCase() : `/${answer.toLowerCase()}`;
+      const exactMatch = commands.find((c) => c.name.toLowerCase() === normalizedAnswer);
+      if (exactMatch) {
+        return exactMatch.name;
+      }
+
+      // If user typed a search term that narrows to exactly 1 result and pressed Enter
+      if (visibleItems.length === 1 && answer.length >= 2) {
+        const firstMatchName = visibleItems[0].command.name.toLowerCase();
+        if (firstMatchName.includes(answer.toLowerCase())) {
+          return visibleItems[0].command.name;
+        }
+      }
+
+      // Otherwise update search query
+      query = answer;
+    }
+  } finally {
+    rl.close();
+    process.stdin.resume();
+  }
+}
+
