@@ -5,6 +5,48 @@ import { avaliarOperacoes } from './motorEnforcement.js';
 import { createOntologySnapshot } from '../ontology/query.js';
 import { join } from 'node:path';
 
+export interface GitNumstatResult {
+  files: { path: string; linesAdded: number; linesRemoved: number }[];
+  totalAdded: number;
+  totalRemoved: number;
+}
+
+export async function getGitDiffNumstat(worktree: string, baseCommit?: string): Promise<GitNumstatResult> {
+  const base = baseCommit || 'HEAD';
+  let diffNumstat = '';
+  try {
+    diffNumstat = await git(worktree, ['diff', '--numstat', base]);
+  } catch {
+    try {
+      diffNumstat = await git(worktree, ['diff', '--numstat']);
+    } catch {
+      return { files: [], totalAdded: 0, totalRemoved: 0 };
+    }
+  }
+
+  if (!diffNumstat?.trim()) {
+    return { files: [], totalAdded: 0, totalRemoved: 0 };
+  }
+
+  const files: { path: string; linesAdded: number; linesRemoved: number }[] = [];
+  let totalAdded = 0;
+  let totalRemoved = 0;
+
+  for (const line of diffNumstat.trim().split('\n')) {
+    const parts = line.split('\t');
+    if (parts.length >= 3) {
+      const add = parseInt(parts[0], 10) || 0;
+      const rem = parseInt(parts[1], 10) || 0;
+      const path = parts[2];
+      files.push({ path, linesAdded: add, linesRemoved: rem });
+      totalAdded += add;
+      totalRemoved += rem;
+    }
+  }
+
+  return { files, totalAdded, totalRemoved };
+}
+
 export interface DiffGateResult {
   hasChanges: boolean;
   diffSummary: string;

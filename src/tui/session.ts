@@ -10,7 +10,7 @@ import { getAvailableDomains, loadDomainValidator, type DomainValidator } from '
 import { checkDomainAffinity } from '../governance/domainAffinity.js';
 import { runAgentTurn, buildCodingAgentSystemPrompt } from '../agent/agentLoop.js';
 import { inspectWorkspace } from '../agent/workspaceContext.js';
-import { evaluateWorkspaceDiffGate, type DiffGateResult } from '../enforcement/diffGate.js';
+import { evaluateWorkspaceDiffGate, getGitDiffNumstat, type DiffGateResult } from '../enforcement/diffGate.js';
 import type { ChatMessage } from '../client/openrouter/types.js';
 import {
   branchAtual,
@@ -24,11 +24,12 @@ import {
 } from '../git/worktree.js';
 import { promoverSessao } from '../git/promotion.js';
 import { ansi } from './ansi.js';
-import { renderCompleteTui, type ChatEntry, type ReceiptFileStat } from './render.js';
+import { renderCompleteTui, type ChatEntry } from './render.js';
 import { promptApiKeyModal, selectModelModal, selectDomainModal, diffReviewModal, settingsModal } from './modals.js';
 import { detectPromptViolation } from '../enforcement/promptGuard.js';
 import { McpClientManager } from '../mcp/clientManager.js';
 import { loadPromptHistory, savePromptHistory } from './history.js';
+import { InputQueueManager } from './inputQueue.js';
 
 export interface TuiSessionOptions {
   projectRoot?: string;
@@ -191,7 +192,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       scrollOffset,
       generationDurationMs: lastTurnDurationMs,
       generationTps: lastTurnTps,
-      queueLength: promptQueue.length,
+      queueLength: inputQueue.length,
     }, chatEntries, currentPrompt, cols, rows);
 
     process.stdout.write(`\x1b[?7l\x1b[H${frame}\x1b[?7h`);
@@ -232,19 +233,14 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     historySize: 1000,
   });
 
-  // Prompt queueing & ergonomic state
-  const promptQueue: string[] = [];
+  // Input queueing & ergonomic state machine (SRP)
+  const inputQueue = new InputQueueManager();
   let isExecutingTurn = false;
   let activeAbortController: AbortController | null = null;
   let promptResolver: ((line: string) => void) | null = null;
   let confirmationResolver: ((line: string) => void) | null = null;
-  let lastEscTime = 0;
   let lastTurnDurationMs = 0;
   let lastTurnTps = 0;
-
-  // Multiline capture state
-  let multiLineMode = false;
-  const multiLineBuffer: string[] = [];
 
   const dispatchPrompt = (text: string) => {
     if (confirmationResolver) {
@@ -256,7 +252,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
     if (isExecutingTurn) {
       if (text) {
-        promptQueue.push(text);
+        inputQueue.enqueue(text);
         chatEntries.push({
           type: 'user',
           content: text,
@@ -270,7 +266,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         promptResolver = null;
         resolve(text);
       } else if (text) {
-        promptQueue.push(text);
+        inputQueue.enqueue(text);
       }
     }
   };
@@ -282,31 +278,14 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
     const trimmed = line.trim();
 
-    // Multiline triple-quote mode (""")
-    if (trimmed.startsWith('"""') && !multiLineMode) {
-      multiLineMode = true;
-      const initial = trimmed.slice(3);
-      if (initial) multiLineBuffer.push(initial);
-      redrawScreen('... [Modo Multilinha: digite """ para submeter]');
-      return;
-    }
-
-    if (multiLineMode) {
-      if (trimmed.endsWith('"""')) {
-        const finalPart = trimmed.slice(0, -3);
-        if (finalPart) multiLineBuffer.push(finalPart);
-        const completePrompt = multiLineBuffer.join('\n').trim();
-        multiLineMode = false;
-        multiLineBuffer.length = 0;
-        if (completePrompt) {
-          dispatchPrompt(completePrompt);
-        } else {
-          redrawScreen('');
-        }
-        return;
+    // Process line through multiline state machine (SRP)
+    const multiline = inputQueue.processLineInput(line);
+    if (multiline.isHandled) {
+      if (multiline.completePrompt) {
+        dispatchPrompt(multiline.completePrompt);
+      } else {
+        redrawScreen(multiline.hint || '');
       }
-      multiLineBuffer.push(line);
-      redrawScreen('... [Modo Multilinha]');
       return;
     }
 
@@ -390,9 +369,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         return;
       }
 
-      const now = Date.now();
-      if (now - lastEscTime <= 500) {
-        lastEscTime = 0;
+      if (inputQueue.handleEscape()) {
         if (isExecutingTurn && activeAbortController) {
           activeAbortController.abort('ESC ESC');
           chatEntries.push({
@@ -403,8 +380,6 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           redrawScreen('');
           return;
         }
-      } else {
-        lastEscTime = now;
       }
       return;
     }
@@ -430,8 +405,8 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   process.stdin.on('keypress', onKeypress);
 
   const getNextPrompt = (): Promise<string> => {
-    if (promptQueue.length > 0) {
-      const next = promptQueue.shift() ?? '';
+    if (inputQueue.hasItems) {
+      const next = inputQueue.dequeue() ?? '';
       const queuedEntry = chatEntries.find((e) => e.type === 'user' && e.content === next && e.isQueued);
       if (queuedEntry) {
         delete queuedEntry.isQueued;
@@ -928,25 +903,11 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
             });
             redrawScreen();
 
-            // Real-time incremental diff preview after file modification tools
+            // Real-time incremental diff preview after file modification tools (DRY)
             if (sessao && (call.name === 'write_to_file' || call.name === 'replace_file_content')) {
-              git(sessao.caminhoWorktree, ['diff', '--numstat', sessao.commitBase])
-                .then((diffNumstat) => {
-                  if (diffNumstat?.trim()) {
-                    const files: ReceiptFileStat[] = [];
-                    let totalAdded = 0;
-                    let totalRemoved = 0;
-                    for (const line of diffNumstat.trim().split('\n')) {
-                      const parts = line.split('\t');
-                      if (parts.length >= 3) {
-                        const add = parseInt(parts[0], 10) || 0;
-                        const rem = parseInt(parts[1], 10) || 0;
-                        const path = parts[2];
-                        files.push({ path, linesAdded: add, linesRemoved: rem });
-                        totalAdded += add;
-                        totalRemoved += rem;
-                      }
-                    }
+              getGitDiffNumstat(sessao.caminhoWorktree, sessao.commitBase)
+                .then(({ files, totalAdded, totalRemoved }) => {
+                  if (files.length > 0) {
                     const previewEntry = chatEntries.find((e) => e.type === 'diff_preview');
                     if (!previewEntry) {
                       chatEntries.push({
