@@ -15,6 +15,9 @@ export interface RenderState {
   width?: number;
   height?: number;
   scrollOffset?: number;
+  generationDurationMs?: number;
+  generationTps?: number;
+  queueLength?: number;
 }
 
 export interface GateCheckItem {
@@ -22,8 +25,14 @@ export interface GateCheckItem {
   text: string;
 }
 
+export interface ReceiptFileStat {
+  path: string;
+  linesAdded: number;
+  linesRemoved: number;
+}
+
 export interface ChatEntry {
-  type: 'user' | 'agent' | 'tool' | 'tool_result' | 'gate' | 'alert' | 'prompt_violation' | 'blank';
+  type: 'user' | 'agent' | 'tool' | 'tool_result' | 'gate' | 'alert' | 'prompt_violation' | 'implementation_receipt' | 'reasoning' | 'diff_preview' | 'blank';
   content?: string;
   isViolating?: boolean;
   toolName?: string;
@@ -34,6 +43,17 @@ export interface ChatEntry {
   violationShape?: string;
   violationRule?: string;
   waitingConfirmation?: boolean;
+  receiptFiles?: ReceiptFileStat[];
+  receiptTotalAdded?: number;
+  receiptTotalRemoved?: number;
+  receiptHasChanges?: boolean;
+  isQueued?: boolean;
+  reasoningCollapsed?: boolean;
+  reasoningTokens?: number;
+  reasoningDurationMs?: number;
+  diffFiles?: ReceiptFileStat[];
+  diffTotalAdded?: number;
+  diffTotalRemoved?: number;
 }
 
 export function formatContextLength(ctx?: number): string {
@@ -179,9 +199,6 @@ export function renderHeader(state: RenderState, width: number): string {
   const dashCount = Math.max(2, width - fixedChars);
   const firstLine = `─── ${logo} ${'─'.repeat(dashCount)} ${statusBadge} ───`;
 
-  const ctxStr = state.contextLength ? ` (${formatContextLength(state.contextLength)})` : ' (128k ctx)';
-  const modelStr = `${state.model}${ctxStr}`;
-
   let ontologyStr = '';
   const domainText = state.ontologySummary || state.domain;
   if (domainText) {
@@ -196,20 +213,16 @@ export function renderHeader(state: RenderState, width: number): string {
     ontologyStr = `${ansi.yellow}none${ansi.reset} ${ansi.dim}(inactive)${ansi.reset}`;
   }
 
-  const secondLine = tuiLine(`  Model: ${ansi.cyan}${modelStr}${ansi.reset}   Ontology: ${ontologyStr}`, width);
-
   const projectStr = state.projectFolder || 'project';
   const branchStr = state.gitBranch ? `git(${state.gitBranch})` : 'non-git';
-  const tokensStr = state.tokensTotal.toLocaleString();
-  const costStr = state.sessionCost !== undefined ? ` ($${state.sessionCost.toFixed(4)})` : '';
-  const thirdLine = tuiLine(
-    `  Project: ${ansi.blue}${projectStr}${ansi.reset}   Branch: ${ansi.magenta}${branchStr}${ansi.reset}   Tokens: ${tokensStr}${costStr}`,
+  const secondLine = tuiLine(
+    `  Project: ${ansi.blue}${projectStr}${ansi.reset}   Branch: ${ansi.magenta}${branchStr}${ansi.reset}   Ontology: ${ontologyStr}`,
     width
   );
 
   const separator = '─'.repeat(width);
 
-  return [tuiLine(firstLine, width), secondLine, thirdLine, separator].join('\n');
+  return [tuiLine(firstLine, width), secondLine, separator].join('\n');
 }
 
 export function renderChatEntry(entry: ChatEntry, width: number): string[] {
@@ -224,9 +237,10 @@ export function renderChatEntry(entry: ChatEntry, width: number): string[] {
       const wrapped = wrapText(entry.content || '', width - 14);
       const isViolating = entry.isViolating;
       const barColor = isViolating ? ansi.brightRed : ansi.cyan;
+      const queuedBadge = entry.isQueued ? ` ${ansi.bold}${ansi.yellow}[Na fila]${ansi.reset}` : '';
       const userTag = isViolating
-        ? `${ansi.bold}${ansi.brightRed}> [User] [!] VIOLATION DETECTED${ansi.reset}`
-        : `${ansi.bold}${ansi.cyan}> [User]${ansi.reset}`;
+        ? `${ansi.bold}${ansi.brightRed}> [User] [!] VIOLATION DETECTED${ansi.reset}${queuedBadge}`
+        : `${ansi.bold}${ansi.cyan}> [User]${ansi.reset}${queuedBadge}`;
       lines.push(tuiLine(`  ${barColor}▎${ansi.reset} ${userTag} ${wrapped[0] || ''}`, width));
       for (let i = 1; i < wrapped.length; i++) {
         lines.push(tuiLine(`  ${ansi.dim}▎${ansi.reset}   ${wrapped[i]}`, width));
@@ -314,7 +328,66 @@ export function renderChatEntry(entry: ChatEntry, width: number): string[] {
         }
       }
       if (entry.waitingConfirmation) {
-        lines.push(tuiLine(`  ${ansi.brightRed}▎${ansi.reset}   ${ansi.bold}${ansi.brightYellow}-> Pressione [Enter] para prosseguir ou digite /cancel para descartar${ansi.reset}`, width));
+        lines.push(tuiLine(`  ${ansi.brightRed}▎${ansi.reset}   ${ansi.bold}${ansi.brightYellow}-> Pressione [Enter] para prosseguir ou [ESC] / /cancel para descartar${ansi.reset}`, width));
+      }
+      lines.push(tuiLine('', width));
+      break;
+    }
+
+    case 'implementation_receipt': {
+      const hasChanges = entry.receiptHasChanges ?? false;
+      const barColor = hasChanges ? ansi.brightGreen : ansi.cyan;
+      if (hasChanges) {
+        const filesCount = entry.receiptFiles ? entry.receiptFiles.length : 0;
+        const totalAdd = entry.receiptTotalAdded ?? 0;
+        const totalRem = entry.receiptTotalRemoved ?? 0;
+        lines.push(tuiLine(`  ${barColor}▎${ansi.reset} ${ansi.bold}${ansi.brightGreen}[✔ IMPLEMENTAÇÃO REALIZADA]${ansi.reset} ${ansi.dim}[Arquivos Modificados: ${filesCount}]${ansi.reset}`, width));
+        if (entry.receiptFiles && entry.receiptFiles.length > 0) {
+          for (const f of entry.receiptFiles) {
+            const stat = `(${ansi.brightGreen}+${f.linesAdded}${ansi.reset} / ${ansi.brightRed}-${f.linesRemoved}${ansi.reset})`;
+            lines.push(tuiLine(`  ${barColor}▎${ansi.reset}   ${ansi.cyan}•${ansi.reset} ${f.path} ${stat}`, width));
+          }
+        }
+        lines.push(tuiLine(`  ${barColor}▎${ansi.reset}   ${ansi.bold}${ansi.green}-> Status:${ansi.reset} Alterações gravadas com sucesso no workspace (${ansi.brightGreen}+${totalAdd}${ansi.reset} / ${ansi.brightRed}-${totalRem}${ansi.reset} linhas)`, width));
+      } else {
+        lines.push(tuiLine(`  ${barColor}▎${ansi.reset} ${ansi.bold}${ansi.cyan}[ℹ LEITURA / DIAGNÓSTICO]${ansi.reset}`, width));
+        lines.push(tuiLine(`  ${barColor}▎${ansi.reset}   ${ansi.dim}-> Nenhuma alteração foi gravada em arquivos nesta resposta.${ansi.reset}`, width));
+      }
+      lines.push(tuiLine('', width));
+      break;
+    }
+
+    case 'reasoning': {
+      const isCollapsed = entry.reasoningCollapsed ?? true;
+      const tokCount = entry.reasoningTokens ?? Math.max(1, Math.round((entry.content || '').length / 4));
+      const durStr = entry.reasoningDurationMs ? ` · ${(entry.reasoningDurationMs / 1000).toFixed(1)}s` : '';
+
+      if (isCollapsed) {
+        lines.push(tuiLine(`  ${ansi.magenta}▎${ansi.reset} ${ansi.bold}${ansi.magenta}▼ [Raciocínio: ~${tokCount} tokens${durStr}]${ansi.reset} ${ansi.dim}[Ctrl+O expandir]${ansi.reset}`, width));
+      } else {
+        lines.push(tuiLine(`  ${ansi.magenta}▎${ansi.reset} ${ansi.bold}${ansi.magenta}▲ [Raciocínio: ~${tokCount} tokens${durStr}]${ansi.reset} ${ansi.dim}[Ctrl+O recolher]${ansi.reset}`, width));
+        for (const rawLine of (entry.content || '').split('\n')) {
+          const wrapped = wrapText(rawLine, width - 8);
+          for (const w of wrapped) {
+            lines.push(tuiLine(`  ${ansi.magenta}▎${ansi.reset}   ${ansi.dim}${w}${ansi.reset}`, width));
+          }
+        }
+      }
+      lines.push(tuiLine('', width));
+      break;
+    }
+
+    case 'diff_preview': {
+      const files = entry.diffFiles || [];
+      const add = entry.diffTotalAdded || 0;
+      const rem = entry.diffTotalRemoved || 0;
+      lines.push(tuiLine(`  ${ansi.cyan}▎${ansi.reset} ${ansi.bold}${ansi.cyan}[Δ DIFF PREVIEW]${ansi.reset} ${ansi.dim}[${files.length} arquivos alterados (+${add} / -${rem})]${ansi.reset}`, width));
+      for (const f of files.slice(0, 8)) {
+        const stat = `(${ansi.brightGreen}+${f.linesAdded}${ansi.reset} / ${ansi.brightRed}-${f.linesRemoved}${ansi.reset})`;
+        lines.push(tuiLine(`  ${ansi.dim}▎${ansi.reset}   ${ansi.dim}•${ansi.reset} ${f.path} ${stat}`, width));
+      }
+      if (files.length > 8) {
+        lines.push(tuiLine(`  ${ansi.dim}▎${ansi.reset}   ${ansi.dim}... e mais ${files.length - 8} arquivos${ansi.reset}`, width));
       }
       lines.push(tuiLine('', width));
       break;
@@ -339,8 +412,8 @@ export function renderCompleteTui(
   const height = Math.max(12, customHeight || state.height || terminalRows);
 
   const header = renderHeader(state, width);
-  const headerLinesCount = 4;
-  const footerLinesCount = 5;
+  const headerLinesCount = 3;
+  const footerLinesCount = 4;
   const chromeCount = headerLinesCount + footerLinesCount;
   const viewportHeight = Math.max(4, height - chromeCount);
 
@@ -386,48 +459,58 @@ export function renderCompleteTui(
     });
   }
 
-  // Rich prompt box inspired by image.png and OpenTUI standards
-  const modeBadge = !state.governed
-    ? `${ansi.bold}${ansi.yellow}[o] Ungoverned${ansi.reset}`
-    : state.alignmentStatus === 'MISMATCH'
-    ? `${ansi.bold}${ansi.yellow}[!] Domain Mismatch${ansi.reset}`
-    : `${ansi.bold}${ansi.brightGreen}[■] Governed${ansi.reset}`;
-
-  const domainBadge = state.ontologySummary
-    ? (state.alignmentStatus === 'MISMATCH' ? `${ansi.yellow}${state.ontologySummary}${ansi.reset}` : `${ansi.cyan}${state.ontologySummary}${ansi.reset}`)
-    : (state.domain ? `${ansi.cyan}${state.domain}${ansi.reset}` : `${ansi.dim}none${ansi.reset}`);
-
-  const promptBadgeLine = tuiLine(
-    `  ${modeBadge} ${ansi.dim}·${ansi.reset} ${ansi.bold}${state.model}${ansi.reset} ${ansi.dim}·${ansi.reset} ${domainBadge} ${ansi.dim}· OpenRouter${ansi.reset}`,
-    width
-  );
-
   const promptDisplay = currentPrompt !== undefined ? currentPrompt : `${ansi.dim}[Type your prompt here...]${ansi.reset}`;
   const promptInputLine = tuiLine(`  ${ansi.cyan}▎${ansi.reset} ${ansi.bold}${ansi.brightWhite}>${ansi.reset} ${promptDisplay}`, width);
 
-  // Footer status line: project path, branch, tokens, percentage, cost, shortcuts
-  const branchStr = state.gitBranch ? `git(${state.gitBranch})` : 'non-git';
-  const projectFolder = state.projectFolder || 'project';
+  // Footer status line: Model, Tokens, Cost, Duration/TPS, Queue, Shortcuts
   const ctxTotal = state.contextLength || 131072;
   const ctxUsed = state.tokensTotal;
   const ctxPct = ((ctxUsed / ctxTotal) * 100).toFixed(1);
   const ctxStr = `${(ctxUsed / 1000).toFixed(1)}k (${ctxPct}%)`;
   const costStr = state.sessionCost !== undefined ? `$${state.sessionCost.toFixed(2)}` : '$0.00';
-  const scrollIndicator = scrollOffset > 0 ? ` ${ansi.yellow}[^ Scroll: +${scrollOffset}]${ansi.reset}` : '';
-  const shortcuts = width >= 105
-    ? `${ansi.bold}[Ctrl+M]${ansi.reset} Model ${ansi.bold}[Ctrl+D]${ansi.reset} Domain ${ansi.bold}[Ctrl+G]${ansi.reset} Diff ${ansi.bold}[PgUp/PgDn]${ansi.reset} Scroll`
-    : `${ansi.bold}[Ctrl+M]${ansi.reset} ${ansi.bold}[Ctrl+D]${ansi.reset} ${ansi.bold}[Ctrl+G]${ansi.reset} ${ansi.bold}[PgUp/Dn]${ansi.reset}`;
+  const scrollIndicator = scrollOffset > 0 ? `${ansi.yellow}[^ Scroll: +${scrollOffset}]${ansi.reset}` : '';
 
-  const leftPart = `  ${ansi.dim}${projectFolder}${ansi.reset} ${ansi.magenta}${branchStr}${ansi.reset}`;
-  const rightPart = `${ansi.cyan}${ctxStr}${ansi.reset} ${ansi.dim}·${ansi.reset} ${ansi.green}${costStr}${ansi.reset}${scrollIndicator} ${ansi.dim}·${ansi.reset} ${shortcuts}`;
-  
+  const displayModel = (width < 105 && state.model.includes('/'))
+    ? (state.model.split('/').slice(1).join('/') || state.model)
+    : state.model;
+
+  const metrics: string[] = [
+    `${ansi.bold}${ansi.cyan}${displayModel}${ansi.reset}`,
+    `${ansi.cyan}${ctxStr}${ansi.reset}`,
+    `${ansi.green}${costStr}${ansi.reset}`,
+  ];
+  if (state.generationDurationMs !== undefined && state.generationDurationMs > 0) {
+    const durSec = (state.generationDurationMs / 1000).toFixed(1);
+    const tpsStr = state.generationTps !== undefined && state.generationTps > 0 ? ` (${state.generationTps.toFixed(0)} tps)` : '';
+    metrics.push(`${durSec}s${tpsStr}`);
+  }
+  if (state.queueLength !== undefined && state.queueLength > 0) {
+    metrics.push(`${ansi.bold}${ansi.yellow}[Queue: ${state.queueLength}]${ansi.reset}`);
+  }
+  if (scrollIndicator) {
+    metrics.push(scrollIndicator);
+  }
+
+  const leftPart = `  ${metrics.join(` ${ansi.dim}·${ansi.reset} `)}`;
   const leftVis = stripAnsi(leftPart).length;
-  const rightVis = stripAnsi(rightPart).length;
+
+  const optFull = `${ansi.bold}[ESC ESC]${ansi.reset} Cancel ${ansi.bold}[^C]${ansi.reset} Clear ${ansi.bold}[Ctrl+M]${ansi.reset} Model ${ansi.bold}[Ctrl+D]${ansi.reset} Domain ${ansi.bold}[PgUp/Dn]${ansi.reset} Scroll`;
+  const optMid = `${ansi.bold}[ESC ESC]${ansi.reset} Cancel ${ansi.bold}[^C]${ansi.reset} Clear ${ansi.bold}[Ctrl+M]${ansi.reset} ${ansi.bold}[Ctrl+D]${ansi.reset}`;
+  const optShort = `${ansi.bold}[ESC ESC]${ansi.reset} Cancel ${ansi.bold}[^C]${ansi.reset} Clear`;
+  const optMin = `${ansi.bold}[ESC ESC]${ansi.reset} ${ansi.bold}[^C]${ansi.reset}`;
+
+  let shortcuts = optFull;
+  if (width - leftVis - stripAnsi(shortcuts).length < 2) shortcuts = optMid;
+  if (width - leftVis - stripAnsi(shortcuts).length < 2) shortcuts = optShort;
+  if (width - leftVis - stripAnsi(shortcuts).length < 2) shortcuts = optMin;
+  if (width - leftVis - stripAnsi(shortcuts).length < 2) shortcuts = '';
+
+  const rightVis = stripAnsi(shortcuts).length;
   const gap = Math.max(2, width - leftVis - rightVis);
-  const footerStatusLine = tuiLine(`${leftPart}${' '.repeat(gap)}${rightPart}`, width);
+  const footerStatusLine = tuiLine(`${leftPart}${' '.repeat(gap)}${shortcuts}`, width);
 
   const separator = '─'.repeat(width);
   const bottom = '─'.repeat(width);
 
-  return [header, ...viewportLines, separator, promptBadgeLine, promptInputLine, footerStatusLine, bottom].join('\n');
+  return [header, ...viewportLines, separator, promptInputLine, footerStatusLine, bottom].join('\n');
 }

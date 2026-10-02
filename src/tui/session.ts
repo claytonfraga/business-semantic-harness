@@ -2,14 +2,15 @@ import * as readline from 'node:readline/promises';
 import type { Key } from 'node:readline';
 import { Writable } from 'node:stream';
 import { relative, basename, join } from 'node:path';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, unlink } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
 import { loadEnvConfig, saveEnvConfig } from '../config/env.js';
 import { OpenRouterClient } from '../client/openrouter/client.js';
 import { getAvailableDomains, loadDomainValidator, type DomainValidator } from '../governance/domainRegistry.js';
 import { checkDomainAffinity } from '../governance/domainAffinity.js';
 import { runAgentTurn, buildCodingAgentSystemPrompt } from '../agent/agentLoop.js';
 import { inspectWorkspace } from '../agent/workspaceContext.js';
-import { evaluateWorkspaceDiffGate } from '../enforcement/diffGate.js';
+import { evaluateWorkspaceDiffGate, getGitDiffNumstat, type DiffGateResult } from '../enforcement/diffGate.js';
 import type { ChatMessage } from '../client/openrouter/types.js';
 import {
   branchAtual,
@@ -28,6 +29,7 @@ import { promptApiKeyModal, selectModelModal, selectDomainModal, diffReviewModal
 import { detectPromptViolation } from '../enforcement/promptGuard.js';
 import { McpClientManager } from '../mcp/clientManager.js';
 import { loadPromptHistory, savePromptHistory } from './history.js';
+import { InputQueueManager } from './inputQueue.js';
 
 export interface TuiSessionOptions {
   projectRoot?: string;
@@ -50,9 +52,6 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       return;
     }
     apiKey = auth.apiKey;
-    if (!auth.ephemeral) {
-      await saveEnvConfig({ OPENROUTER_API_KEY: apiKey }, projectRoot);
-    }
   }
 
   const client = new OpenRouterClient({ apiKey });
@@ -188,6 +187,9 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       width: cols,
       height: rows,
       scrollOffset,
+      generationDurationMs: lastTurnDurationMs,
+      generationTps: lastTurnTps,
+      queueLength: inputQueue.length,
     }, chatEntries, currentPrompt, cols, rows);
 
     process.stdout.write(`\x1b[?7l\x1b[H${frame}\x1b[?7h`);
@@ -204,7 +206,6 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   };
   process.stdout.on('resize', onResize);
 
-  const promptPrefix = `  \x1b[36m▎\x1b[39m \x1b[1m\x1b[97m>\x1b[39m\x1b[22m `;
   const filterOut = new Writable({
     write(chunk, _encoding, cb) {
       const s = chunk.toString();
@@ -229,34 +230,229 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     historySize: 1000,
   });
 
-  // Keypress listener for PageUp, PageDown, Shift+Up, Shift+Down and History Up/Down
+  // Input queueing & ergonomic state machine (SRP)
+  const inputQueue = new InputQueueManager();
+  let isExecutingTurn = false;
+  let activeAbortController: AbortController | null = null;
+  let promptResolver: ((line: string) => void) | null = null;
+  let confirmationResolver: ((line: string) => void) | null = null;
+  let lastTurnDurationMs = 0;
+  let lastTurnTps = 0;
+
+  const dispatchPrompt = (text: string) => {
+    if (confirmationResolver) {
+      const resolver = confirmationResolver;
+      confirmationResolver = null;
+      resolver(text);
+      return;
+    }
+
+    if (isExecutingTurn) {
+      if (text) {
+        inputQueue.enqueue(text);
+        chatEntries.push({
+          type: 'user',
+          content: text,
+          isQueued: true,
+        });
+        redrawScreen('');
+      }
+    } else {
+      if (promptResolver) {
+        const resolve = promptResolver;
+        promptResolver = null;
+        resolve(text);
+      } else if (text) {
+        inputQueue.enqueue(text);
+      }
+    }
+  };
+
+  rl.on('line', (line: string) => {
+    // Auto-clear input buffer immediately on Enter
+    (rl as unknown as { line: string; cursor: number }).line = '';
+    (rl as unknown as { cursor: number }).cursor = 0;
+
+    const trimmed = line.trim();
+
+    // Process line through multiline state machine (SRP)
+    const multiline = inputQueue.processLineInput(line);
+    if (multiline.isHandled) {
+      if (multiline.completePrompt) {
+        dispatchPrompt(multiline.completePrompt);
+      } else {
+        redrawScreen(multiline.hint || '');
+      }
+      return;
+    }
+
+    if (!trimmed) {
+      if (!isExecutingTurn) {
+        redrawScreen('');
+      }
+      return;
+    }
+
+    dispatchPrompt(trimmed);
+  });
+
+  rl.on('SIGINT', () => {
+    const currentLine = (rl as unknown as { line?: string }).line || '';
+    if (currentLine.length > 0) {
+      (rl as unknown as { line: string; cursor: number }).line = '';
+      (rl as unknown as { cursor: number }).cursor = 0;
+      redrawScreen('');
+    } else if (isExecutingTurn && activeAbortController) {
+      activeAbortController.abort('SIGINT');
+      chatEntries.push({
+        type: 'agent',
+        content: '[!] Execução cancelada pelo usuário (Ctrl+C).',
+      });
+      isExecutingTurn = false;
+      redrawScreen('');
+    } else {
+      redrawScreen('');
+    }
+  });
+
+  // Keypress listener for shortcuts, ESC ESC, and single-line history
   const onKeypress = (_str: string, key: Key) => {
     if (!key) return;
+
+    // Ctrl+C clears prompt buffer immediately
+    if (key.ctrl && key.name === 'c') {
+      const currentLine = (rl as unknown as { line?: string }).line || '';
+      if (currentLine.length > 0) {
+        (rl as unknown as { line: string; cursor: number }).line = '';
+        (rl as unknown as { cursor: number }).cursor = 0;
+        redrawScreen('');
+      }
+      return;
+    }
+
+    // Ctrl+O toggles reasoning CoT collapse/expansion
+    if (key.ctrl && key.name === 'o') {
+      const reasoningEntries = chatEntries.filter((e) => e.type === 'reasoning');
+      if (reasoningEntries.length > 0) {
+        const target = reasoningEntries[reasoningEntries.length - 1];
+        target.reasoningCollapsed = !target.reasoningCollapsed;
+        redrawScreen((rl as unknown as { line?: string }).line || '');
+      }
+      return;
+    }
+
+    // Ctrl+M opens model selector when idle
+    if (!isExecutingTurn && key.ctrl && key.name === 'm') {
+      (rl as unknown as { line: string; cursor: number }).line = '';
+      (rl as unknown as { cursor: number }).cursor = 0;
+      dispatchPrompt('/model');
+      return;
+    }
+
+    // Ctrl+D opens domain selector when idle
+    if (!isExecutingTurn && key.ctrl && key.name === 'd') {
+      (rl as unknown as { line: string; cursor: number }).line = '';
+      (rl as unknown as { cursor: number }).cursor = 0;
+      dispatchPrompt('/domain');
+      return;
+    }
+
+    // Single ESC cancels prompt violation confirmation immediately; double ESC (within 500ms) cancels current turn execution
+    if (key.name === 'escape') {
+      if (confirmationResolver) {
+        const res = confirmationResolver;
+        confirmationResolver = null;
+        res('/cancel');
+        return;
+      }
+
+      if (inputQueue.handleEscape()) {
+        if (isExecutingTurn && activeAbortController) {
+          activeAbortController.abort('ESC ESC');
+          chatEntries.push({
+            type: 'agent',
+            content: '[!] Execução cancelada pelo usuário (ESC ESC).',
+          });
+          isExecutingTurn = false;
+          redrawScreen('');
+          return;
+        }
+      }
+      return;
+    }
+
     if (key.name === 'pageup') {
       scrollOffset += 6;
-      redrawScreen(rl.line);
+      redrawScreen((rl as unknown as { line?: string }).line || '');
     } else if (key.name === 'pagedown') {
       scrollOffset = Math.max(0, scrollOffset - 6);
-      redrawScreen(rl.line);
+      redrawScreen((rl as unknown as { line?: string }).line || '');
     } else if (key.name === 'up' && (key.shift || key.ctrl)) {
       scrollOffset += 1;
-      redrawScreen(rl.line);
+      redrawScreen((rl as unknown as { line?: string }).line || '');
     } else if (key.name === 'down' && (key.shift || key.ctrl)) {
       scrollOffset = Math.max(0, scrollOffset - 1);
-      redrawScreen(rl.line);
-    } else if ((key.name === 'up' || key.name === 'down') && !key.shift && !key.ctrl) {
+      redrawScreen((rl as unknown as { line?: string }).line || '');
+    } else {
       setImmediate(() => {
-        redrawScreen(rl.line);
+        redrawScreen((rl as unknown as { line?: string }).line || '');
       });
     }
   };
   process.stdin.on('keypress', onKeypress);
 
+  const getNextPrompt = (): Promise<string> => {
+    if (inputQueue.hasItems) {
+      const next = inputQueue.dequeue() ?? '';
+      const queuedEntry = chatEntries.find((e) => e.type === 'user' && e.content === next && e.isQueued);
+      if (queuedEntry) {
+        delete queuedEntry.isQueued;
+      }
+      return Promise.resolve(next);
+    }
+    return new Promise<string>((resolve) => {
+      promptResolver = resolve;
+    });
+  };
+
+  const waitForConfirmation = (): Promise<string> => {
+    return new Promise<string>((resolve) => {
+      confirmationResolver = resolve;
+    });
+  };
+
   try {
     while (true) {
       redrawScreen('');
-      const prompt = (await rl.question(promptPrefix)).trim();
+      let prompt = (await getNextPrompt()).trim();
       if (!prompt) continue;
+
+      if (prompt === '/editor') {
+        const tmpFile = join('/tmp', `bsh-prompt-${Date.now()}.md`);
+        await writeFile(
+          tmpFile,
+          '# Digite ou cole seu prompt aqui.\n# Linhas iniciadas com # serão ignoradas.\n# Salve e feche o editor para enviar ao BSH.\n',
+          'utf8'
+        );
+        process.stdout.write('\x1b[?1049l\x1b[?25h');
+        const editorCmd = process.env.VISUAL || process.env.EDITOR || 'nano';
+        spawnSync(editorCmd, [tmpFile], { stdio: 'inherit' });
+        process.stdout.write('\x1b[?1049h\x1b[2J\x1b[H');
+        let edited = '';
+        try {
+          const raw = await readFile(tmpFile, 'utf8');
+          edited = raw.replace(/^#.*$/gm, '').trim();
+          await unlink(tmpFile).catch(() => {});
+        } catch {
+          // ignore
+        }
+        if (edited) {
+          prompt = edited;
+        } else {
+          redrawScreen();
+          continue;
+        }
+      }
 
       // Save prompt into project-specific history (.bsh/history.json)
       if (!prompt.startsWith('/')) {
@@ -547,14 +743,13 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           process.stdout.write('\r\x1b[2K');
           const savedHistory = [...(((rl as unknown as { history?: string[] }).history) || [])];
           (rl as unknown as { history?: string[] }).history = [];
-          const confirmPrefix = `  \x1b[31m▎\x1b[39m \x1b[1m\x1b[93m[Enter para prosseguir /cancel para abortar] >\x1b[39m\x1b[22m `;
           let answer = '';
           try {
-            answer = (await rl.question(confirmPrefix)).trim();
+            answer = (await waitForConfirmation()).trim();
           } finally {
             (rl as unknown as { history?: string[] }).history = savedHistory;
           }
-          if (answer === '/cancel' || answer === 'cancel' || answer === '/abort' || answer === 'q') {
+          if (answer === '/cancel' || answer === 'cancel' || answer === '/abort' || answer === 'q' || answer === 'escape' || answer === 'esc') {
             chatEntries.push({
               type: 'agent',
               content: 'Execução do prompt cancelada pelo usuário após alerta de violação ontológica.',
@@ -617,6 +812,13 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         governed: validator !== null,
       });
 
+      isExecutingTurn = true;
+      activeAbortController = new AbortController();
+      const turnStartTime = performance.now();
+      let turnTokensCount = 0;
+      let activeReasoningEntry: ChatEntry | null = null;
+      let reasoningStartTime = 0;
+
       try {
         const turnResult = await runAgentTurn({
           client,
@@ -624,11 +826,64 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           workspaceRoot,
           messages,
           systemPrompt,
+          signal: activeAbortController.signal,
           mcpManager,
+          onReasoningDelta: (text) => {
+            if (!activeReasoningEntry) {
+              reasoningStartTime = performance.now();
+              activeReasoningEntry = {
+                type: 'reasoning',
+                content: text,
+                reasoningCollapsed: true,
+                reasoningTokens: Math.max(1, Math.round(text.length / 4)),
+                reasoningDurationMs: 0,
+              };
+              chatEntries.push(activeReasoningEntry);
+            } else {
+              activeReasoningEntry.content = (activeReasoningEntry.content || '') + text;
+              activeReasoningEntry.reasoningTokens = Math.max(1, Math.round((activeReasoningEntry.content.length) / 4));
+              activeReasoningEntry.reasoningDurationMs = performance.now() - reasoningStartTime;
+            }
+            redrawScreen();
+          },
           onDelta: (text) => {
+            if (activeReasoningEntry) {
+              activeReasoningEntry.reasoningDurationMs = performance.now() - reasoningStartTime;
+              activeReasoningEntry = null;
+            }
             _agentResponseAccum += text;
+            turnTokensCount += Math.max(1, Math.round(text.length / 4));
+            const elapsed = performance.now() - turnStartTime;
+            lastTurnDurationMs = elapsed;
+            lastTurnTps = elapsed > 0 ? (turnTokensCount / (elapsed / 1000)) : 0;
+            const lastEntry = chatEntries[chatEntries.length - 1];
+            if (lastEntry && lastEntry.type === 'agent') {
+              lastEntry.content = (lastEntry.content || '') + text;
+            } else {
+              chatEntries.push({
+                type: 'agent',
+                content: text,
+              });
+            }
+            redrawScreen();
+          },
+          onAssistantMessage: (msg) => {
+            const lastEntry = chatEntries[chatEntries.length - 1];
+            if (lastEntry && lastEntry.type === 'agent') {
+              lastEntry.content = msg.content;
+            } else {
+              chatEntries.push({
+                type: 'agent',
+                content: msg.content,
+              });
+            }
+            redrawScreen();
           },
           onToolCallStart: (call) => {
+            if (activeReasoningEntry) {
+              activeReasoningEntry.reasoningDurationMs = performance.now() - reasoningStartTime;
+              activeReasoningEntry = null;
+            }
             chatEntries.push({
               type: 'tool',
               toolName: call.name,
@@ -644,6 +899,30 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
               content: preview,
             });
             redrawScreen();
+
+            // Real-time incremental diff preview after file modification tools (DRY)
+            if (sessao && (call.name === 'write_to_file' || call.name === 'replace_file_content')) {
+              getGitDiffNumstat(sessao.caminhoWorktree, sessao.commitBase)
+                .then(({ files, totalAdded, totalRemoved }) => {
+                  if (files.length > 0) {
+                    const previewEntry = chatEntries.find((e) => e.type === 'diff_preview');
+                    if (!previewEntry) {
+                      chatEntries.push({
+                        type: 'diff_preview',
+                        diffFiles: files,
+                        diffTotalAdded: totalAdded,
+                        diffTotalRemoved: totalRemoved,
+                      });
+                    } else {
+                      previewEntry.diffFiles = files;
+                      previewEntry.diffTotalAdded = totalAdded;
+                      previewEntry.diffTotalRemoved = totalRemoved;
+                    }
+                    redrawScreen();
+                  }
+                })
+                .catch(() => {});
+            }
           },
         });
 
@@ -654,20 +933,44 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         }
 
         if (turnResult.finalAssistantMessage?.content) {
-          chatEntries.push({
-            type: 'agent',
-            content: turnResult.finalAssistantMessage.content,
-          });
+          const lastEntry = chatEntries[chatEntries.length - 1];
+          if (lastEntry && lastEntry.type === 'agent') {
+            lastEntry.content = turnResult.finalAssistantMessage.content;
+          } else {
+            chatEntries.push({
+              type: 'agent',
+              content: turnResult.finalAssistantMessage.content,
+            });
+          }
         }
 
-        // Semantic Gate Interception & Verification based on real code diff
-        if (validator && sessao) {
-          const diffGateResult = await evaluateWorkspaceDiffGate({
+        // Evaluate diff and emit Implementation Receipt
+        let diffGateResult: DiffGateResult | null = null;
+        if (sessao) {
+          // Remove ephemeral real-time diff preview when final implementation receipt is produced
+          const previewIdx = chatEntries.findIndex((e) => e.type === 'diff_preview');
+          if (previewIdx !== -1) {
+            chatEntries.splice(previewIdx, 1);
+          }
+
+          diffGateResult = await evaluateWorkspaceDiffGate({
             worktree: sessao.caminhoWorktree,
             commitBase: sessao.commitBase,
             domainId: activeDomainId,
             projectRoot,
           });
+
+          chatEntries.push({
+            type: 'implementation_receipt',
+            receiptHasChanges: diffGateResult.hasChanges,
+            receiptFiles: diffGateResult.fileStats || [],
+            receiptTotalAdded: diffGateResult.linesAdded,
+            receiptTotalRemoved: diffGateResult.linesRemoved,
+          });
+        }
+
+        // Semantic Gate Interception & Verification based on real code diff
+        if (validator && sessao && diffGateResult) {
 
           const isViolation = !diffGateResult.conforming || promptViolation.isViolating;
 
@@ -723,14 +1026,24 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           }
         }
 
+        const elapsed = performance.now() - turnStartTime;
+        lastTurnDurationMs = elapsed;
+        lastTurnTps = elapsed > 0 ? (turnTokensCount / (elapsed / 1000)) : 0;
         tokensTotal += 350;
         redrawScreen();
       } catch (err: unknown) {
-        chatEntries.push({
-          type: 'agent',
-          content: `Error: ${err instanceof Error ? err.message : String(err)}`,
-        });
+        if (activeAbortController?.signal.aborted) {
+          // Aborted by user via ESC ESC or Ctrl+C; cancellation entry already posted
+        } else {
+          chatEntries.push({
+            type: 'agent',
+            content: `Error: ${err instanceof Error ? err.message : String(err)}`,
+          });
+        }
         redrawScreen();
+      } finally {
+        isExecutingTurn = false;
+        activeAbortController = null;
       }
     }
   } finally {

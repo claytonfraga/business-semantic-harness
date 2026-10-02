@@ -15,6 +15,7 @@ export interface AgentLoopOptions {
   mcpManager?: McpClientManager;
   onDelta?: (text: string) => void;
   onReasoningDelta?: (text: string) => void;
+  onAssistantMessage?: (msg: { content: string; intermediate: boolean }) => void;
   onToolCallStart?: (call: { name: string; args: Record<string, unknown> }) => void;
   onToolCallDone?: (call: { name: string; result: string }) => void;
 }
@@ -158,6 +159,13 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
       tool_calls: toolCallsList.length > 0 ? toolCallsList : undefined,
     };
     conversation.push(assistantMsg);
+
+    if (toolCallsList.length > 0 && assistantContent.trim()) {
+      options.onAssistantMessage?.({
+        content: assistantContent.trim(),
+        intermediate: true,
+      });
+    }
 
     // If no tool calls in this turn
     if (toolCallsList.length === 0) {
