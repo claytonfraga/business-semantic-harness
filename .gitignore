@@ -13,7 +13,9 @@ __pycache__/
 *.aux
 *.log
 *.out
-openspec/
+openspec/*
+!openspec/specs/
+!openspec/specs/**
 screenshots/
 /evaluation/
 AGENTS.md
