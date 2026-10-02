@@ -28,6 +28,7 @@ import { renderCompleteTui, type ChatEntry } from './render.js';
 import { promptApiKeyModal, selectModelModal, selectDomainModal, diffReviewModal, settingsModal, selectSkillModal } from './modals.js';
 import { SkillRegistry } from '../skills/registry.js';
 import { installSkillPackage } from '../skills/installer.js';
+import { detectSkillInvocation, detectSemanticSkillNeed } from '../skills/activation.js';
 import { detectPromptViolation } from '../enforcement/promptGuard.js';
 import { McpClientManager } from '../mcp/clientManager.js';
 import { loadPromptHistory, savePromptHistory } from './history.js';
@@ -200,6 +201,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       generationTps: lastTurnTps,
       queueLength: inputQueue.length,
       ctrlCExitAlert: exitGuard.isExitPending(),
+      activeSkill: activeSkillNames.length > 0 ? activeSkillNames.join(', ') : undefined,
     }, chatEntries, currentPrompt, cols, rows);
 
     process.stdout.write(`\x1b[?7l\x1b[H${frame}\x1b[?7h`);
@@ -749,6 +751,35 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           redrawScreen();
           continue;
         }
+
+        if (parts[1] === 'done' || parts[1] === 'finish' || parts[1] === 'close') {
+          if (activeSkillNames.length === 0) {
+            chatEntries.push({
+              type: 'agent',
+              content: 'Nenhuma skill ativa no momento para concluir.',
+            });
+          } else {
+            const closedSkills = activeSkillNames.splice(0, activeSkillNames.length);
+            chatEntries.push({
+              type: 'agent',
+              content: `✔ Loop da skill [${closedSkills.join(', ')}] concluído com sucesso. Diretivas da skill finalizadas.`,
+            });
+          }
+          redrawScreen();
+          continue;
+        }
+      }
+
+      if (prompt === '/done' || prompt === '/finish') {
+        if (activeSkillNames.length > 0) {
+          const closedSkills = activeSkillNames.splice(0, activeSkillNames.length);
+          chatEntries.push({
+            type: 'agent',
+            content: `✔ Loop da skill [${closedSkills.join(', ')}] concluído com sucesso. Diretivas da skill finalizadas.`,
+          });
+          redrawScreen();
+          continue;
+        }
       }
 
       if (prompt === '/mcp' || prompt.startsWith('/mcp ')) {
@@ -908,6 +939,29 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         continue;
       }
 
+      // Dynamic Skill Invocation: Check if prompt triggers a registered skill (e.g. /prototype <task> or semantic match)
+      const allDiscoveredSkillsForPrompt = await skillRegistry.discover();
+      const skillInvocation = detectSkillInvocation(prompt, allDiscoveredSkillsForPrompt);
+      if (skillInvocation.isSlashCommand && skillInvocation.matchedSkill) {
+        if (!activeSkillNames.includes(skillInvocation.matchedSkill.name)) {
+          activeSkillNames.push(skillInvocation.matchedSkill.name);
+        }
+        chatEntries.push({
+          type: 'agent',
+          content: `✔ Skill ativada: [${skillInvocation.matchedSkill.name}] (${skillInvocation.matchedSkill.scope})\n↳ Diretrizes e diretivas incorporadas ao raciocínio do agente.`,
+        });
+        prompt = skillInvocation.effectivePrompt;
+      } else {
+        const semanticSkill = detectSemanticSkillNeed(prompt, allDiscoveredSkillsForPrompt);
+        if (semanticSkill && !activeSkillNames.includes(semanticSkill.name)) {
+          activeSkillNames.push(semanticSkill.name);
+          chatEntries.push({
+            type: 'agent',
+            content: `ℹ Diretivas da skill recomendada ativadas: [${semanticSkill.name}]`,
+          });
+        }
+      }
+
       // Pre-flight Semantic Guard: Check for Prompt Violations against ontology + SHACL
       const promptViolation = detectPromptViolation(prompt, activeDomainId);
 
@@ -1015,6 +1069,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           client,
           model: activeModel,
           workspaceRoot,
+          projectRoot,
           messages,
           systemPrompt,
           signal: activeAbortController.signal,

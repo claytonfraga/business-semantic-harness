@@ -2,6 +2,7 @@ import { readFile, writeFile, readdir, stat } from 'node:fs/promises';
 import { isAbsolute, resolve, sep, relative, join } from 'node:path';
 import { spawn } from 'node:child_process';
 import type { ToolDefinition } from '../client/openrouter/types.js';
+import { SkillRegistry } from '../skills/registry.js';
 
 export const AGENT_TOOLS: ToolDefinition[] = [
   {
@@ -111,6 +112,20 @@ export const AGENT_TOOLS: ToolDefinition[] = [
       },
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'inspect_skill',
+      description: 'Inspect full instructions, documentation, and guidelines for an available agent skill (e.g. "prototype", "code-review").',
+      parameters: {
+        type: 'object',
+        properties: {
+          name: { type: 'string', description: 'Name of the skill to inspect.' },
+        },
+        required: ['name'],
+      },
+    },
+  },
 ];
 
 const IGNORED_DIRS = new Set([
@@ -191,9 +206,11 @@ async function findFilesInDir(
 
 export class WorkspaceToolExecutor {
   private workspaceRoot: string;
+  private projectRoot: string;
 
-  constructor(workspaceRoot: string) {
+  constructor(workspaceRoot: string, projectRoot?: string) {
     this.workspaceRoot = resolve(workspaceRoot);
+    this.projectRoot = resolve(projectRoot || workspaceRoot);
   }
 
   private resolveSafePath(relPath: string): string {
@@ -332,6 +349,20 @@ export class WorkspaceToolExecutor {
             resolvePromise(`Process error: ${err.message}`);
           });
         });
+      }
+
+      case 'inspect_skill': {
+        const skillName = String(args.name || '').trim();
+        if (!skillName) {
+          throw new Error('Missing "name" parameter for inspect_skill.');
+        }
+        const registry = new SkillRegistry(this.projectRoot);
+        const skill = await registry.get(skillName);
+        if (!skill) {
+          return `Skill "${skillName}" was not found. Available skills can be checked via system instructions or bsh skill list.`;
+        }
+        const filesInfo = skill.associatedFiles.length > 0 ? `\nAssociated Files: ${skill.associatedFiles.join(', ')}` : '';
+        return `Skill: ${skill.name} (${skill.scope})\nDescription: ${skill.description}\nFile: ${skill.filePath}${filesInfo}\n\n--- Skill Guidelines ---\n${skill.body}`;
       }
 
       default:

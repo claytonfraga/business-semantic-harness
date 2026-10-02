@@ -103,9 +103,27 @@ export async function runHeadlessCodingSession(options: HeadlessOptions): Promis
   }
 
   const { SkillRegistry } = await import('../skills/registry.js');
+  const { detectSkillInvocation, detectSemanticSkillNeed } = await import('../skills/activation.js');
   const skillRegistry = new SkillRegistry(projectRoot);
   const discoveredSkills = await skillRegistry.discover();
-  const skillsContext = skillRegistry.formatSkillsForPrompt(discoveredSkills);
+
+  const invocation = detectSkillInvocation(prompt, discoveredSkills);
+  let effectivePrompt = prompt;
+  const activeSkillNames: string[] = [];
+
+  if (invocation.matchedSkill) {
+    activeSkillNames.push(invocation.matchedSkill.name);
+    effectivePrompt = invocation.effectivePrompt;
+    process.stdout.write(`\x1b[35m✔ Invocação de Skill detectada: [${invocation.matchedSkill.name}]\x1b[39m\n`);
+  } else {
+    const semanticMatch = detectSemanticSkillNeed(prompt, discoveredSkills);
+    if (semanticMatch) {
+      activeSkillNames.push(semanticMatch.name);
+      process.stdout.write(`\x1b[35mℹ Diretivas da skill recomendada ativadas: [${semanticMatch.name}]\x1b[39m\n`);
+    }
+  }
+
+  const skillsContext = skillRegistry.formatSkillsForPrompt(discoveredSkills, activeSkillNames);
 
   const systemPrompt = buildCodingAgentSystemPrompt({
     workspaceSummary,
@@ -114,14 +132,15 @@ export async function runHeadlessCodingSession(options: HeadlessOptions): Promis
     skillsContext,
   });
 
-  process.stdout.write(`\x1b[1m\x1b[97mPrompt:\x1b[39m\x1b[22m ${prompt}\n\n`);
+  process.stdout.write(`\x1b[1m\x1b[97mPrompt:\x1b[39m\x1b[22m ${effectivePrompt}\n\n`);
 
   try {
     const turnResult = await runAgentTurn({
       client,
       model: activeModel,
       workspaceRoot,
-      messages: [{ role: 'user', content: prompt }],
+      projectRoot,
+      messages: [{ role: 'user', content: effectivePrompt }],
       systemPrompt,
       mcpManager,
       onToolCallStart: (call) => {

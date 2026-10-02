@@ -19,6 +19,7 @@ export interface RenderState {
   generationTps?: number;
   queueLength?: number;
   ctrlCExitAlert?: boolean;
+  activeSkill?: string;
 }
 
 export interface GateCheckItem {
@@ -216,8 +217,9 @@ export function renderHeader(state: RenderState, width: number): string {
 
   const projectStr = state.projectFolder || 'project';
   const branchStr = state.gitBranch ? `git(${state.gitBranch})` : 'non-git';
+  const skillStr = state.activeSkill ? `   Skill: ${ansi.bold}${ansi.magenta}${state.activeSkill}${ansi.reset} ${ansi.dim}[⚡ ACTIVE]${ansi.reset}` : '';
   const secondLine = tuiLine(
-    `  Project: ${ansi.blue}${projectStr}${ansi.reset}   Branch: ${ansi.magenta}${branchStr}${ansi.reset}   Ontology: ${ontologyStr}`,
+    `  Project: ${ansi.blue}${projectStr}${ansi.reset}   Branch: ${ansi.magenta}${branchStr}${ansi.reset}   Ontology: ${ontologyStr}${skillStr}`,
     width
   );
 
