@@ -121,4 +121,17 @@ export class InputQueueManager {
 
     return { isHandled: false };
   }
+
+  /**
+   * Cancels multiline mode and clears its buffer.
+   * Returns true if multiline was active and got cancelled.
+   */
+  cancelMultiline(): boolean {
+    if (this.inMultilineMode) {
+      this.inMultilineMode = false;
+      this.multilineBuffer.length = 0;
+      return true;
+    }
+    return false;
+  }
 }

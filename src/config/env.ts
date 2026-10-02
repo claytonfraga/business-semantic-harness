@@ -55,12 +55,12 @@ export async function loadEnvConfig(projectRoot: string = process.cwd()): Promis
   if (process.env.OPENROUTER_API_KEY) {
     openRouterApiKey = process.env.OPENROUTER_API_KEY;
     apiKeySource = 'env';
-  } else if (userAuth.apiKey) {
-    openRouterApiKey = userAuth.apiKey;
-    apiKeySource = 'user_store';
   } else if (fileEnv.OPENROUTER_API_KEY) {
     openRouterApiKey = fileEnv.OPENROUTER_API_KEY;
     apiKeySource = 'file';
+  } else if (userAuth.apiKey) {
+    openRouterApiKey = userAuth.apiKey;
+    apiKeySource = 'user_store';
   }
 
   const defaultModel = process.env.BSH_DEFAULT_MODEL || fileEnv.BSH_DEFAULT_MODEL;

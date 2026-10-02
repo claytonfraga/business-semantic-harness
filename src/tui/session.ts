@@ -30,6 +30,7 @@ import { detectPromptViolation } from '../enforcement/promptGuard.js';
 import { McpClientManager } from '../mcp/clientManager.js';
 import { loadPromptHistory, savePromptHistory } from './history.js';
 import { InputQueueManager } from './inputQueue.js';
+import { ExitGuard, cleanExitTerminal } from './exitGuard.js';
 
 export interface TuiSessionOptions {
   projectRoot?: string;
@@ -153,6 +154,9 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     return modelsList.find((m) => m.id === activeModel)?.context_length || 131072;
   };
 
+  const exitGuard = new ExitGuard({ windowMs: 1500 });
+  let exitRequested = false;
+
   const redrawScreen = (currentPrompt = '') => {
     const cols = process.stdout.columns && process.stdout.columns >= 50 ? process.stdout.columns : 96;
     const rows = process.stdout.rows && process.stdout.rows >= 15 ? process.stdout.rows : 30;
@@ -190,6 +194,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       generationDurationMs: lastTurnDurationMs,
       generationTps: lastTurnTps,
       queueLength: inputQueue.length,
+      ctrlCExitAlert: exitGuard.isExitPending(),
     }, chatEntries, currentPrompt, cols, rows);
 
     process.stdout.write(`\x1b[?7l\x1b[H${frame}\x1b[?7h`);
@@ -296,37 +301,76 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     dispatchPrompt(trimmed);
   });
 
-  rl.on('SIGINT', () => {
+  const onCtrlCAction = () => {
+    if (inputQueue.cancelMultiline()) {
+      chatEntries.push({
+        type: 'agent',
+        content: '[!] Entrada multilinha cancelada.',
+      });
+      redrawScreen('');
+      return;
+    }
+
     const currentLine = (rl as unknown as { line?: string }).line || '';
-    if (currentLine.length > 0) {
+    const decision = exitGuard.handleCtrlC({
+      hasPromptText: currentLine.length > 0,
+      isExecutingTurn,
+    });
+
+    if (decision === 'CLEARED_PROMPT') {
       (rl as unknown as { line: string; cursor: number }).line = '';
       (rl as unknown as { cursor: number }).cursor = 0;
       redrawScreen('');
-    } else if (isExecutingTurn && activeAbortController) {
-      activeAbortController.abort('SIGINT');
-      chatEntries.push({
-        type: 'agent',
-        content: '[!] Execução cancelada pelo usuário (Ctrl+C).',
-      });
-      isExecutingTurn = false;
-      redrawScreen('');
-    } else {
-      redrawScreen('');
+      return;
     }
-  });
+
+    if (decision === 'ABORTED_TURN') {
+      if (activeAbortController) {
+        activeAbortController.abort('Ctrl+C');
+        chatEntries.push({
+          type: 'agent',
+          content: '[!] Execução cancelada pelo usuário (Ctrl+C).',
+        });
+        isExecutingTurn = false;
+      }
+      redrawScreen('');
+      return;
+    }
+
+    if (decision === 'ALERT_TRIGGERED') {
+      redrawScreen('');
+      setTimeout(() => {
+        if (!exitGuard.isExitPending()) {
+          redrawScreen((rl as unknown as { line?: string }).line || '');
+        }
+      }, 1550);
+      return;
+    }
+
+    if (decision === 'EXIT_CONFIRMED') {
+      exitRequested = true;
+      if (promptResolver) {
+        const res = promptResolver;
+        promptResolver = null;
+        res('/exit');
+      }
+      if (confirmationResolver) {
+        const res = confirmationResolver;
+        confirmationResolver = null;
+        res('/cancel');
+      }
+    }
+  };
+
+  rl.on('SIGINT', onCtrlCAction);
 
   // Keypress listener for shortcuts, ESC ESC, and single-line history
   const onKeypress = (_str: string, key: Key) => {
     if (!key) return;
 
-    // Ctrl+C clears prompt buffer immediately
+    // Ctrl+C handled via ExitGuard
     if (key.ctrl && key.name === 'c') {
-      const currentLine = (rl as unknown as { line?: string }).line || '';
-      if (currentLine.length > 0) {
-        (rl as unknown as { line: string; cursor: number }).line = '';
-        (rl as unknown as { cursor: number }).cursor = 0;
-        redrawScreen('');
-      }
+      onCtrlCAction();
       return;
     }
 
@@ -464,7 +508,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       scrollOffset = 0;
 
       // Handle Slash Commands
-      if (prompt === '/exit' || prompt === '/quit') {
+      if (exitRequested || prompt === '/exit' || prompt === '/quit') {
         break;
       }
 
@@ -1049,7 +1093,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   } finally {
     process.stdin.off('keypress', onKeypress);
     process.stdout.off('resize', onResize);
-    process.stdout.write('\x1b[?1049l\x1b[?25h');
+    cleanExitTerminal();
     rl.close();
     await mcpManager.close().catch(() => undefined);
     if (sessao) {

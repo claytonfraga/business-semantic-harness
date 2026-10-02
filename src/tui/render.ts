@@ -18,6 +18,7 @@ export interface RenderState {
   generationDurationMs?: number;
   generationTps?: number;
   queueLength?: number;
+  ctrlCExitAlert?: boolean;
 }
 
 export interface GateCheckItem {
@@ -509,7 +510,20 @@ export function renderCompleteTui(
   const gap = Math.max(2, width - leftVis - rightVis);
   const footerStatusLine = tuiLine(`${leftPart}${' '.repeat(gap)}${shortcuts}`, width);
 
-  const separator = '─'.repeat(width);
+  let separator = '─'.repeat(width);
+  if (state.ctrlCExitAlert) {
+    const alertMsg = ' [⚠ Pressione Ctrl+C novamente para fechar o BSH] ';
+    const alertFormatted = `${ansi.bold}${ansi.brightYellow}${alertMsg}${ansi.reset}`;
+    const alertLen = alertMsg.length;
+    if (width > alertLen + 6) {
+      const leftDashes = '─'.repeat(3);
+      const rightDashes = '─'.repeat(width - 3 - alertLen);
+      separator = `${leftDashes}${alertFormatted}${rightDashes}`;
+    } else {
+      separator = tuiLine(alertFormatted, width);
+    }
+  }
+
   const bottom = '─'.repeat(width);
 
   return [header, ...viewportLines, separator, promptInputLine, footerStatusLine, bottom].join('\n');
