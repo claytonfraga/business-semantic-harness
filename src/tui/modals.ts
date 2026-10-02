@@ -3,8 +3,8 @@ import { ansi, box } from './ansi.js';
 import type { OpenRouterModel } from '../client/openrouter/types.js';
 import type { DomainSummary } from '../governance/domainRegistry.js';
 
-import { spawn } from 'node:child_process';
-import { authenticateViaWebBrowser } from '../client/openrouter/pkce.js';
+import { authenticateViaWebBrowser, openBrowser } from '../client/openrouter/pkce.js';
+import { saveUserAuth, getAuthFilePath } from '../config/userStore.js';
 
 export interface AuthResult {
   apiKey: string;
@@ -12,54 +12,60 @@ export interface AuthResult {
 }
 
 export async function promptApiKeyModal(): Promise<AuthResult> {
+  process.stdout.write('\n');
+  console.log(box('BSH - Configuração de Autenticação (Primeiro Acesso)', [
+    'Nenhuma credencial encontrada no ambiente ou cofre do usuário.',
+    'Iniciando autenticação via navegador (OAuth/PKCE) por padrão...',
+    '',
+    'A credencial será salva com segurança em:',
+    `  ${ansi.dim}${getAuthFilePath()}${ansi.reset}`,
+    '',
+    'Caso esteja em ambiente headless (SSH/terminal remoto) ou queira colar uma chave,',
+    'você pode inseri-la diretamente abaixo.',
+  ], 76));
+
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  try {
-    process.stdout.write('\n');
-    console.log(box('OpenRouter Authentication Required', [
-      'No OPENROUTER_API_KEY found in environment or .env file.',
-      '',
-      'Choose an authentication method:',
-      `  ${ansi.bold}1.${ansi.reset} ${ansi.brightGreen}Login via Web Browser${ansi.reset} (OAuth/PKCE, ephemeral - zero disk storage)`,
-      `  ${ansi.bold}2.${ansi.reset} Enter API Key manually (saved securely to local .env)`,
-    ], 76));
+  let resolved = false;
 
-    const choice = (await rl.question(`\n${ansi.bold}Select method [1/2, default 1]: ${ansi.reset}`)).trim();
+  const authPromise = authenticateViaWebBrowser({
+    onUrlReady: (url) => {
+      console.log(`\n${ansi.bold}URL de Autorização:${ansi.reset}\n  ${ansi.cyan}${url}${ansi.reset}\n`);
+      openBrowser(url);
+    },
+  });
 
-    if (choice === '2') {
-      const key = await rl.question(`\n${ansi.bold}Enter OpenRouter API Key: ${ansi.reset}`);
-      return { apiKey: key.trim(), ephemeral: false };
+  const webFlow = authPromise.then(async (result) => {
+    if (!resolved) {
+      resolved = true;
+      await saveUserAuth({ apiKey: result.apiKey });
+      console.log(`\n${ansi.brightGreen}✔ Autenticação via navegador concluída! Salva em ${getAuthFilePath()}${ansi.reset}`);
+      return { apiKey: result.apiKey, ephemeral: false };
     }
+    return null;
+  });
 
-    // Default: Web Browser Authentication (OAuth/PKCE)
-    console.log(`\n${ansi.dim}Starting local OAuth callback listener...${ansi.reset}`);
-    const authPromise = authenticateViaWebBrowser({
-      onUrlReady: (url) => {
-        console.log(`\n${box('Complete Authentication in Browser', [
-          'Opening OpenRouter in your browser...',
-          '',
-          'If it did not open automatically, visit this URL:',
-          `  ${ansi.cyan}${url}${ansi.reset}`,
-          '',
-          'Once authorized, this session will start immediately.',
-          'Your credentials will remain strictly in memory and will NOT be saved to disk.',
-        ], 76)}`);
+  const manualFlow = rl.question(`${ansi.bold}Cole sua API Key do OpenRouter (ou autorize no navegador): ${ansi.reset}`).then(async (key) => {
+    const trimmed = key.trim();
+    if (trimmed && !resolved) {
+      resolved = true;
+      await saveUserAuth({ apiKey: trimmed });
+      console.log(`\n${ansi.brightGreen}✔ Chave salva com sucesso em ${getAuthFilePath()}${ansi.reset}`);
+      return { apiKey: trimmed, ephemeral: false };
+    }
+    return null;
+  });
 
-        // Attempt opening default browser on Linux/WSL/macOS
-        try {
-          if (process.platform === 'linux') {
-            spawn('xdg-open', [url], { detached: true, stdio: 'ignore' }).unref();
-          } else if (process.platform === 'darwin') {
-            spawn('open', [url], { detached: true, stdio: 'ignore' }).unref();
-          }
-        } catch {
-          // Fallback to manual link click
-        }
-      },
-    });
-
-    const result = await authPromise;
-    console.log(`\n${ansi.brightGreen}✔ Web authentication verified! Session key loaded in memory.${ansi.reset}`);
-    return { apiKey: result.apiKey, ephemeral: true };
+  try {
+    const firstResult = await Promise.race([webFlow, manualFlow]);
+    if (firstResult) {
+      return firstResult;
+    }
+    // Se o usuário apertou Enter sem digitar chave, aguarda o fluxo do navegador
+    const webResult = await webFlow;
+    if (webResult) {
+      return webResult;
+    }
+    throw new Error('Falha na autenticação.');
   } finally {
     rl.close();
   }

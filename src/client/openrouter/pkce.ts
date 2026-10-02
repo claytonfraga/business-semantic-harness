@@ -1,5 +1,36 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { createServer, type Server } from 'node:http';
+import { spawn } from 'node:child_process';
+
+/**
+ * Attempts to open a URL in the user's default browser across Linux, WSL, macOS, and Windows.
+ * Returns true if the process was launched, false if it threw an error.
+ */
+export function openBrowser(url: string): boolean {
+  try {
+    if (process.platform === 'win32') {
+      spawn('cmd.exe', ['/c', 'start', '', url], { detached: true, stdio: 'ignore' }).unref();
+      return true;
+    }
+    if (process.platform === 'darwin') {
+      spawn('open', [url], { detached: true, stdio: 'ignore' }).unref();
+      return true;
+    }
+    const isWsl = process.env.WSL_DISTRO_NAME !== undefined || process.env.WSL_INTEROP !== undefined;
+    if (isWsl) {
+      try {
+        spawn('wslview', [url], { detached: true, stdio: 'ignore' }).unref();
+        return true;
+      } catch {
+        // Fallback to xdg-open
+      }
+    }
+    spawn('xdg-open', [url], { detached: true, stdio: 'ignore' }).unref();
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export interface PkceCodes {
   verifier: string;

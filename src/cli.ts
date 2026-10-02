@@ -16,7 +16,7 @@ export async function main(argv: string[]): Promise<number> {
     return 0;
   }
   if (argv.length === 1 && argv[0] === '--help') {
-    process.stdout.write('bsh: [tui] [--model <nome>] [--domain <nome>] | init | domain add <nome> | ontology validate | ontology show <dominio> | sessions list|clean <id> | mcp [--governed]\n');
+    process.stdout.write('bsh: [tui] [--model <nome>] [--domain <nome>] [--api-key <key>] | init | domain add <nome> | ontology validate | ontology show <dominio> | sessions list|clean <id> | mcp [--governed] | auth [login|status|logout]\n');
     return 0;
   }
 
@@ -27,6 +27,15 @@ export async function main(argv: string[]): Promise<number> {
   }
   const projectRoot = resolve(projectFlag >= 0 ? argv[projectFlag + 1] : process.cwd());
   const argsWithoutProject = projectFlag >= 0 ? argv.filter((_, index) => index !== projectFlag && index !== projectFlag + 1) : argv;
+
+  const apiKeyFlag = argsWithoutProject.indexOf('--api-key');
+  if (apiKeyFlag >= 0 && !argsWithoutProject[apiKeyFlag + 1]) {
+    process.stderr.write('Chave ausente após --api-key.\n');
+    return 2;
+  }
+  if (apiKeyFlag >= 0) {
+    process.env.OPENROUTER_API_KEY = argsWithoutProject[apiKeyFlag + 1];
+  }
 
   const modelFlag = argsWithoutProject.findIndex((arg) => arg === '--model' || arg === '-m');
   let model: string | undefined;
@@ -49,6 +58,7 @@ export async function main(argv: string[]): Promise<number> {
   }
 
   const flagsToRemove = [
+    apiKeyFlag >= 0 ? [apiKeyFlag, apiKeyFlag + 1] : [],
     modelFlag >= 0 ? [modelFlag, modelFlag + 1] : [],
     domainFlag >= 0 ? [domainFlag, domainFlag + 1] : [],
   ].flat();
@@ -101,6 +111,11 @@ export async function main(argv: string[]): Promise<number> {
       await runMcpServer(projectRoot, governed);
       return 0;
     }
+    if (command.length >= 1 && command[0] === 'auth') {
+      const { handleAuthCommand } = await import('./cli/authCommand.js');
+      return await handleAuthCommand(command.slice(1), projectRoot);
+    }
+
     if (command.length === 1 && command[0] === 'init') {
       await initProject(projectRoot);
       process.stdout.write(`Projeto BSH criado em ${projectRoot}. Adicione ao menos um domínio.\n`);

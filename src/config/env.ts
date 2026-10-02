@@ -1,8 +1,10 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { loadUserAuth } from './userStore.js';
 
 export interface EnvConfig {
   openRouterApiKey?: string;
+  apiKeySource?: 'env' | 'user_store' | 'file' | 'none';
   defaultModel?: string;
   defaultDomain?: string;
   confirmPromptViolations?: boolean;
@@ -32,7 +34,8 @@ export function parseEnvContent(content: string): Record<string, string> {
 }
 
 /**
- * Loads configuration from process.env and optional .env in projectRoot.
+ * Loads configuration from process.env, global user store (~/.config/bsh/auth.json), and optional .env in projectRoot.
+ * Cascading precedence: process.env > global user store > project .env
  */
 export async function loadEnvConfig(projectRoot: string = process.cwd()): Promise<EnvConfig> {
   let fileEnv: Record<string, string> = {};
@@ -41,18 +44,25 @@ export async function loadEnvConfig(projectRoot: string = process.cwd()): Promis
     const raw = await readFile(envPath, 'utf8');
     fileEnv = parseEnvContent(raw);
   } catch {
-    // If not found in projectRoot, try process.cwd() as fallback
-    if (projectRoot !== process.cwd()) {
-      try {
-        const cwdRaw = await readFile(join(process.cwd(), '.env'), 'utf8');
-        fileEnv = parseEnvContent(cwdRaw);
-      } catch {
-        // Ignore missing fallback
-      }
-    }
+    // Project .env is optional
   }
 
-  const openRouterApiKey = process.env.OPENROUTER_API_KEY || fileEnv.OPENROUTER_API_KEY;
+  const userAuth = await loadUserAuth();
+
+  let openRouterApiKey: string | undefined;
+  let apiKeySource: EnvConfig['apiKeySource'] = 'none';
+
+  if (process.env.OPENROUTER_API_KEY) {
+    openRouterApiKey = process.env.OPENROUTER_API_KEY;
+    apiKeySource = 'env';
+  } else if (userAuth.apiKey) {
+    openRouterApiKey = userAuth.apiKey;
+    apiKeySource = 'user_store';
+  } else if (fileEnv.OPENROUTER_API_KEY) {
+    openRouterApiKey = fileEnv.OPENROUTER_API_KEY;
+    apiKeySource = 'file';
+  }
+
   const defaultModel = process.env.BSH_DEFAULT_MODEL || fileEnv.BSH_DEFAULT_MODEL;
   const defaultDomain = process.env.BSH_DEFAULT_DOMAIN || fileEnv.BSH_DEFAULT_DOMAIN;
 
@@ -61,6 +71,7 @@ export async function loadEnvConfig(projectRoot: string = process.cwd()): Promis
 
   return {
     openRouterApiKey,
+    apiKeySource,
     defaultModel,
     defaultDomain,
     confirmPromptViolations,

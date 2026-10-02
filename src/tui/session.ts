@@ -52,9 +52,6 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       return;
     }
     apiKey = auth.apiKey;
-    if (!auth.ephemeral) {
-      await saveEnvConfig({ OPENROUTER_API_KEY: apiKey }, projectRoot);
-    }
   }
 
   const client = new OpenRouterClient({ apiKey });
