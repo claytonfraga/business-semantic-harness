@@ -25,7 +25,9 @@ import {
 import { promoverSessao } from '../git/promotion.js';
 import { ansi } from './ansi.js';
 import { renderCompleteTui, type ChatEntry } from './render.js';
-import { promptApiKeyModal, selectModelModal, selectDomainModal, diffReviewModal, settingsModal } from './modals.js';
+import { promptApiKeyModal, selectModelModal, selectDomainModal, diffReviewModal, settingsModal, selectSkillModal } from './modals.js';
+import { SkillRegistry } from '../skills/registry.js';
+import { installSkillPackage } from '../skills/installer.js';
 import { detectPromptViolation } from '../enforcement/promptGuard.js';
 import { McpClientManager } from '../mcp/clientManager.js';
 import { loadPromptHistory, savePromptHistory } from './history.js';
@@ -150,6 +152,9 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   // Initial affinity check before first render
   await runAffinityCheck(activeDomainId);
 
+  const skillRegistry = new SkillRegistry(projectRoot);
+  const activeSkillNames: string[] = [];
+
   const getActiveContextLength = () => {
     return modelsList.find((m) => m.id === activeModel)?.context_length || 131072;
   };
@@ -238,13 +243,30 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   // Input queueing & ergonomic state machine (SRP)
   const inputQueue = new InputQueueManager();
   let isExecutingTurn = false;
+  let isModalOpen = false;
   let activeAbortController: AbortController | null = null;
   let promptResolver: ((line: string) => void) | null = null;
   let confirmationResolver: ((line: string) => void) | null = null;
   let lastTurnDurationMs = 0;
   let lastTurnTps = 0;
 
+  const runWithModal = async <T>(fn: () => Promise<T>): Promise<T> => {
+    isModalOpen = true;
+    try {
+      return await fn();
+    } finally {
+      isModalOpen = false;
+      process.stdin.resume();
+      if (rl) {
+        rl.resume();
+      }
+    }
+  };
+
   const dispatchPrompt = (text: string) => {
+    if (isModalOpen) {
+      return;
+    }
     if (confirmationResolver) {
       const resolver = confirmationResolver;
       confirmationResolver = null;
@@ -274,6 +296,10 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   };
 
   rl.on('line', (line: string) => {
+    if (isModalOpen) {
+      return;
+    }
+
     // Auto-clear input buffer immediately on Enter
     (rl as unknown as { line: string; cursor: number }).line = '';
     (rl as unknown as { cursor: number }).cursor = 0;
@@ -366,7 +392,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
   // Keypress listener for shortcuts, ESC ESC, and single-line history
   const onKeypress = (_str: string, key: Key) => {
-    if (!key) return;
+    if (!key || isModalOpen) return;
 
     // Ctrl+C handled via ExitGuard
     if (key.ctrl && key.name === 'c') {
@@ -550,7 +576,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       if (prompt.startsWith('/model')) {
         const query = prompt.replace(/^\/model\s*/, '').trim();
         const prevModel = activeModel;
-        activeModel = await selectModelModal(modelsList, activeModel, query || undefined);
+        activeModel = await runWithModal(() => selectModelModal(modelsList, activeModel, query || undefined));
         if (activeModel !== prevModel) {
           await saveEnvConfig({ BSH_DEFAULT_MODEL: activeModel }, projectRoot);
         }
@@ -559,7 +585,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       }
 
       if (prompt === '/domain') {
-        activeDomainId = await selectDomainModal(availableDomains, activeDomainId);
+        activeDomainId = await runWithModal(() => selectDomainModal(availableDomains, activeDomainId));
         if (activeDomainId) {
           validator = await loadDomainValidator(projectRoot, activeDomainId);
           await saveEnvConfig({ BSH_DEFAULT_DOMAIN: activeDomainId }, projectRoot);
@@ -606,6 +632,123 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         }
         redrawScreen();
         continue;
+      }
+
+      if (prompt === '/skills' || prompt.startsWith('/skills ') || prompt === '/skill' || prompt.startsWith('/skill ')) {
+        const parts = prompt.trim().split(/\s+/);
+        const isSubCommand = ['show', 'add', 'activate', 'deactivate'].includes(parts[1]);
+        if (parts.length === 1 || !isSubCommand) {
+          const query = parts.length === 1
+            ? undefined
+            : (parts[1] === 'list' || parts[1] === 'search')
+              ? parts.slice(2).join(' ')
+              : parts.slice(1).join(' ');
+          const allSkills = await skillRegistry.discover();
+          const modalRes = await runWithModal(() => selectSkillModal(allSkills, activeSkillNames, query));
+          if (modalRes.action === 'toggle' && modalRes.selectedSkillName) {
+            const idx = activeSkillNames.indexOf(modalRes.selectedSkillName);
+            if (idx >= 0) {
+              activeSkillNames.splice(idx, 1);
+              chatEntries.push({
+                type: 'agent',
+                content: `Skill desativada: ${modalRes.selectedSkillName}`,
+              });
+            } else {
+              activeSkillNames.push(modalRes.selectedSkillName);
+              chatEntries.push({
+                type: 'agent',
+                content: `✔ Skill ativada para a sessão: ${modalRes.selectedSkillName}`,
+              });
+            }
+          } else if (modalRes.action === 'show' && modalRes.selectedSkillName) {
+            const s = await skillRegistry.get(modalRes.selectedSkillName);
+            if (s) {
+              chatEntries.push({
+                type: 'agent',
+                content: `[Skill: ${s.name} (${s.scope})]\n${s.description}\n\n${s.body.slice(0, 300)}...`,
+              });
+            }
+          }
+          redrawScreen();
+          continue;
+        }
+
+        if (parts[1] === 'show' && parts[2]) {
+          const s = await skillRegistry.get(parts[2]);
+          if (s) {
+            chatEntries.push({
+              type: 'agent',
+              content: `[Skill: ${s.name} (${s.scope})]\n${s.description}\nArquivo: ${s.filePath}\n\n${s.body}`,
+            });
+          } else {
+            chatEntries.push({
+              type: 'agent',
+              content: `Skill '${parts[2]}' não encontrada.`,
+            });
+          }
+          redrawScreen();
+          continue;
+        }
+
+        if (parts[1] === 'add' && parts[2]) {
+          const source = parts[2];
+          chatEntries.push({
+            type: 'agent',
+            content: `Instalando skill '${source}'...`,
+          });
+          redrawScreen();
+          const res = await installSkillPackage(source, { projectRoot });
+          if (res.success) {
+            skillRegistry.clearCache();
+            chatEntries.push({
+              type: 'agent',
+              content: `✔ Skill instalada com sucesso a partir de ${source}.`,
+            });
+          } else {
+            chatEntries.push({
+              type: 'agent',
+              content: `Erro ao instalar skill: ${res.error || res.output}`,
+            });
+          }
+          redrawScreen();
+          continue;
+        }
+
+        if (parts[1] === 'activate' && parts[2]) {
+          const s = await skillRegistry.get(parts[2]);
+          if (s) {
+            if (!activeSkillNames.includes(s.name)) activeSkillNames.push(s.name);
+            chatEntries.push({
+              type: 'agent',
+              content: `✔ Skill ativada para esta sessão: ${s.name}`,
+            });
+          } else {
+            chatEntries.push({
+              type: 'agent',
+              content: `Skill '${parts[2]}' não encontrada.`,
+            });
+          }
+          redrawScreen();
+          continue;
+        }
+
+        if (parts[1] === 'deactivate' && parts[2]) {
+          const idx = activeSkillNames.indexOf(parts[2]);
+          if (idx >= 0) {
+            activeSkillNames.splice(idx, 1);
+            chatEntries.push({
+              type: 'agent',
+              content: `Skill desativada: ${parts[2]}`,
+            });
+          } else {
+            chatEntries.push({
+              type: 'agent',
+              content: `Skill '${parts[2]}' não estava ativa.`,
+            });
+          }
+          redrawScreen();
+          continue;
+        }
       }
 
       if (prompt === '/mcp' || prompt.startsWith('/mcp ')) {
@@ -704,7 +847,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
       if (prompt === '/diff') {
         const diffText = sessao ? await git(sessao.caminhoWorktree, ['diff', sessao.commitBase]).catch(() => '') : '';
-        const shouldPromote = await diffReviewModal(diffText, lastGateConforming, lastGateViolations);
+        const shouldPromote = await runWithModal(() => diffReviewModal(diffText, lastGateConforming, lastGateViolations));
         if (shouldPromote && sessao) {
           await promoverSessao(sessao);
           console.log(`${ansi.brightGreen}✔ Successfully promoted changes to ${sessao.branchOrigem}!${ansi.reset}`);
@@ -728,11 +871,11 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       }
 
       if (prompt === '/settings' || prompt === '/config') {
-        const updated = await settingsModal({
+        const updated = await runWithModal(() => settingsModal({
           confirmPromptViolations,
           model: activeModel,
           domain: activeDomainId,
-        });
+        }));
         if (updated.confirmPromptViolations !== confirmPromptViolations) {
           confirmPromptViolations = updated.confirmPromptViolations;
           await saveEnvConfig({
@@ -850,10 +993,14 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       let _agentResponseAccum = '';
       messages.push({ role: 'user', content: prompt });
 
+      const allDiscoveredSkills = await skillRegistry.discover();
+      const skillsContext = skillRegistry.formatSkillsForPrompt(allDiscoveredSkills, activeSkillNames);
+
       const systemPrompt = buildCodingAgentSystemPrompt({
         workspaceSummary,
         domainId: activeDomainId,
         governed: validator !== null,
+        skillsContext,
       });
 
       isExecutingTurn = true;

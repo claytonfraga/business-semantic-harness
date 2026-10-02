@@ -102,10 +102,16 @@ export async function runHeadlessCodingSession(options: HeadlessOptions): Promis
     }
   }
 
+  const { SkillRegistry } = await import('../skills/registry.js');
+  const skillRegistry = new SkillRegistry(projectRoot);
+  const discoveredSkills = await skillRegistry.discover();
+  const skillsContext = skillRegistry.formatSkillsForPrompt(discoveredSkills);
+
   const systemPrompt = buildCodingAgentSystemPrompt({
     workspaceSummary,
     domainId: activeDomainId,
     governed,
+    skillsContext,
   });
 
   process.stdout.write(`\x1b[1m\x1b[97mPrompt:\x1b[39m\x1b[22m ${prompt}\n\n`);

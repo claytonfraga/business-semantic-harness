@@ -2,6 +2,7 @@ import * as readline from 'node:readline/promises';
 import { ansi, box } from './ansi.js';
 import type { OpenRouterModel } from '../client/openrouter/types.js';
 import type { DomainSummary } from '../governance/domainRegistry.js';
+import type { Skill } from '../skills/types.js';
 
 import { authenticateViaWebBrowser, openBrowser } from '../client/openrouter/pkce.js';
 import { saveUserAuth, getAuthFilePath } from '../config/userStore.js';
@@ -319,5 +320,80 @@ export async function settingsModal(
     return currentSettings;
   } finally {
     rl.close();
+  }
+}
+
+export async function selectSkillModal(
+  skills: Skill[],
+  activeSkills: string[] = [],
+  initialQuery?: string
+): Promise<{ selectedSkillName?: string; action: 'toggle' | 'show' | 'close' }> {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  let query = (initialQuery || '').trim();
+
+  try {
+    while (true) {
+      let scored = skills.map((s) => {
+        const match = fuzzyScore(s.name, query);
+        return { skill: s, score: match ? match.score : -1, indices: match ? match.indices : [] };
+      });
+
+      if (query) {
+        scored = scored.filter((item) => item.score >= 0);
+        scored.sort((a, b) => b.score - a.score);
+      }
+
+      const visibleItems = scored.slice(0, 15);
+      const lines: string[] = [
+        'Skills fornecem diretivas operacionais especializadas para o agente BSH.',
+        'Digite um termo para filtrar ou o número para alternar a ativação da skill.',
+        '',
+        `Busca atual: ${query ? `${ansi.yellow}${query}${ansi.reset}` : `${ansi.dim}(todas as skills)${ansi.reset}`}`,
+        '',
+      ];
+
+      if (visibleItems.length === 0) {
+        lines.push(`  ${ansi.red}Nenhuma skill encontrada para o termo "${query}".${ansi.reset}`);
+      } else {
+        for (let i = 0; i < visibleItems.length; i++) {
+          const { skill, indices } = visibleItems[i];
+          const isActive = activeSkills.includes(skill.name);
+          const activeMarker = isActive ? ` ${ansi.brightGreen}[ATIVA]${ansi.reset}` : '';
+          const scopeMarker = skill.scope === 'project' ? `${ansi.cyan}[project]${ansi.reset}` : `${ansi.dim}[global]${ansi.reset}`;
+          const highlightedName = query && indices.length > 0 ? highlightMatches(skill.name, indices) : skill.name;
+          const desc = skill.description.length > 55 ? `${skill.description.slice(0, 52)}...` : skill.description;
+          lines.push(`  ${ansi.bold}${i + 1}.${ansi.reset} ${highlightedName} ${scopeMarker}${activeMarker} - ${ansi.dim}${desc}${ansi.reset}`);
+        }
+      }
+
+      lines.push('');
+      lines.push(`Total de skills: ${skills.length} | Ativas: ${activeSkills.length}`);
+      lines.push(`Comandos: [1-${visibleItems.length}] alternar ativação | /show <N> ver detalhes | q ou Enter sair`);
+
+      console.log(`\n${box('Gerenciador de Skills do BSH', lines, 78)}`);
+
+      const answer = (await rl.question(`\n${ansi.bold}Ação ou busca [q/Enter para voltar]: ${ansi.reset}`)).trim();
+      if (!answer || answer.toLowerCase() === 'q') {
+        return { action: 'close' };
+      }
+
+      if (answer.startsWith('/show ')) {
+        const num = parseInt(answer.replace('/show ', '').trim(), 10);
+        if (!Number.isNaN(num) && num >= 1 && num <= visibleItems.length) {
+          return { selectedSkillName: visibleItems[num - 1].skill.name, action: 'show' };
+        }
+      }
+
+      const num = parseInt(answer, 10);
+      if (!Number.isNaN(num) && num >= 1 && num <= visibleItems.length) {
+        return { selectedSkillName: visibleItems[num - 1].skill.name, action: 'toggle' };
+      }
+
+      // Otherwise update search query
+      query = answer;
+    }
+  } finally {
+    rl.close();
+    process.stdin.resume();
   }
 }
