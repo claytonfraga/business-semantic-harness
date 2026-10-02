@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { resolve } from 'node:path';
+import { mkdtemp, rm, mkdir, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { parseSkillFrontmatter } from '../../dist/skills/frontmatter.js';
 import { SkillRegistry } from '../../dist/skills/registry.js';
 import { handleSkillCliCommand } from '../../dist/skills/cliCommand.js';
@@ -36,80 +38,131 @@ Direct instructions without frontmatter.
   assert.ok(parsed.body.includes('# Plain Skill'));
 });
 
-test('Given a SkillRegistry for this project, When discover is called, Then it scans project roots and discovers the installed prototype skill', async () => {
-  const projectRoot = resolve(process.cwd());
-  const registry = new SkillRegistry(projectRoot);
-  const skills = await registry.discover();
+test('Given a SkillRegistry for a project with skills, When discover is called, Then it scans project roots and discovers the installed prototype skill', async () => {
+  const testProject = await mkdtemp(join(tmpdir(), 'bsh-skill-test-'));
+  try {
+    const skillDir = join(testProject, '.bsh', 'skills', 'prototype');
+    await mkdir(skillDir, { recursive: true });
+    await writeFile(
+      join(skillDir, 'SKILL.md'),
+      '---\nname: prototype\ndescription: Build a throwaway prototype to answer a design question.\n---\n\n# Prototype\n\nA prototype is throwaway code that answers a question.\n',
+      'utf8'
+    );
+    await writeFile(join(skillDir, 'LOGIC.md'), '# Logic Demo\n', 'utf8');
 
-  assert.ok(skills.length > 0, 'Should discover skills');
-  const prototypeSkill = skills.find((s) => s.name === 'prototype');
-  assert.ok(prototypeSkill, 'Should find prototype skill');
-  assert.equal(prototypeSkill.scope, 'project');
-  assert.ok(prototypeSkill.description.includes('prototype'));
+    const registry = new SkillRegistry(testProject);
+    const skills = await registry.discover({ projectRoot: testProject, enableGlobal: false });
+
+    assert.ok(skills.length > 0, 'Should discover skills');
+    const prototypeSkill = skills.find((s) => s.name === 'prototype');
+    assert.ok(prototypeSkill, 'Should find prototype skill');
+    assert.equal(prototypeSkill.scope, 'project');
+    assert.ok(prototypeSkill.description.includes('prototype'));
+  } finally {
+    await rm(testProject, { recursive: true, force: true }).catch(() => {});
+  }
 });
 
-test('Given the prototype skill in .agents/skills/prototype, When get(\'prototype\') is called, Then it returns the skill with scope project and associated files', async () => {
-  const projectRoot = resolve(process.cwd());
-  const registry = new SkillRegistry(projectRoot);
-  const skill = await registry.get('prototype');
+test('Given the prototype skill in project root, When get(\'prototype\') is called, Then it returns the skill with scope project and associated files', async () => {
+  const testProject = await mkdtemp(join(tmpdir(), 'bsh-skill-test-'));
+  try {
+    const skillDir = join(testProject, '.agents', 'skills', 'prototype');
+    await mkdir(skillDir, { recursive: true });
+    await writeFile(
+      join(skillDir, 'SKILL.md'),
+      '---\nname: prototype\ndescription: Build a throwaway prototype to answer a design question.\n---\n\n# Prototype\n\nA prototype is throwaway code that answers a question.\n',
+      'utf8'
+    );
+    await writeFile(join(skillDir, 'LOGIC.md'), '# Logic Demo\n', 'utf8');
 
-  assert.ok(skill, 'Skill prototype should exist');
-  assert.equal(skill.name, 'prototype');
-  assert.equal(skill.scope, 'project');
-  assert.ok(skill.associatedFiles.includes('LOGIC.md') || skill.associatedFiles.includes('UI.md'));
-  assert.ok(skill.body.includes('throwaway code that answers a question'));
+    const registry = new SkillRegistry(testProject);
+    const skill = await registry.get('prototype');
+
+    assert.ok(skill, 'Skill prototype should exist');
+    assert.equal(skill.name, 'prototype');
+    assert.equal(skill.scope, 'project');
+    assert.ok(skill.associatedFiles.includes('LOGIC.md'));
+    assert.ok(skill.body.includes('throwaway code that answers a question'));
+  } finally {
+    await rm(testProject, { recursive: true, force: true }).catch(() => {});
+  }
 });
 
 test('Given a list of skills and active skills, When formatSkillsForPrompt is called, Then it formats available skills and injects active skill instructions', async () => {
-  const projectRoot = resolve(process.cwd());
-  const registry = new SkillRegistry(projectRoot);
-  const skills = await registry.discover();
+  const testProject = await mkdtemp(join(tmpdir(), 'bsh-skill-test-'));
+  try {
+    const skillDir = join(testProject, '.bsh', 'skills', 'prototype');
+    await mkdir(skillDir, { recursive: true });
+    await writeFile(
+      join(skillDir, 'SKILL.md'),
+      '---\nname: prototype\ndescription: Build a throwaway prototype to answer a design question.\n---\n\n# Prototype\n\nA prototype is throwaway code that answers a question.\n',
+      'utf8'
+    );
 
-  const promptOutput = registry.formatSkillsForPrompt(skills, ['prototype']);
+    const registry = new SkillRegistry(testProject);
+    const skills = await registry.discover({ projectRoot: testProject, enableGlobal: false });
+    const promptOutput = registry.formatSkillsForPrompt(skills, ['prototype']);
 
-  assert.ok(promptOutput.includes('## Available Agent Skills:'));
-  assert.ok(promptOutput.includes('- **prototype** (project):'));
-  assert.ok(promptOutput.includes('[ACTIVE]'));
-  assert.ok(promptOutput.includes('## Active Skill Instructions:'));
-  assert.ok(promptOutput.includes('### Skill Directives: prototype'));
-  assert.ok(promptOutput.includes('throwaway code that answers a question'));
+    assert.ok(promptOutput.includes('## Available Agent Skills:'));
+    assert.ok(promptOutput.includes('- **prototype** (project):'));
+    assert.ok(promptOutput.includes('[ACTIVE]'));
+    assert.ok(promptOutput.includes('## Active Skill Instructions:'));
+    assert.ok(promptOutput.includes('### Skill Directives: prototype'));
+    assert.ok(promptOutput.includes('throwaway code that answers a question'));
+  } finally {
+    await rm(testProject, { recursive: true, force: true }).catch(() => {});
+  }
 });
 
 test('Given handleSkillCliCommand with show prototype, When executed, Then it outputs skill details and returns exit code 0', async () => {
-  const projectRoot = resolve(process.cwd());
-
-  let output = '';
-  const originalWrite = process.stdout.write;
-  process.stdout.write = (chunk) => {
-    output += chunk.toString();
-    return true;
-  };
-
+  const testProject = await mkdtemp(join(tmpdir(), 'bsh-skill-test-'));
   try {
-    const code = await handleSkillCliCommand(['show', 'prototype'], projectRoot);
-    assert.equal(code, 0);
-    assert.ok(output.includes('Skill: prototype (project)'));
-    assert.ok(output.includes('Instruções da Skill'));
+    const skillDir = join(testProject, '.bsh', 'skills', 'prototype');
+    await mkdir(skillDir, { recursive: true });
+    await writeFile(
+      join(skillDir, 'SKILL.md'),
+      '---\nname: prototype\ndescription: Build a throwaway prototype to answer a design question.\n---\n\n# Prototype\n\nA prototype is throwaway code that answers a question.\n',
+      'utf8'
+    );
+
+    let output = '';
+    const originalWrite = process.stdout.write;
+    process.stdout.write = (chunk) => {
+      output += chunk.toString();
+      return true;
+    };
+
+    try {
+      const code = await handleSkillCliCommand(['show', 'prototype'], testProject);
+      assert.equal(code, 0);
+      assert.ok(output.includes('Skill: prototype (project)'));
+      assert.ok(output.includes('Instruções da Skill'));
+    } finally {
+      process.stdout.write = originalWrite;
+    }
   } finally {
-    process.stdout.write = originalWrite;
+    await rm(testProject, { recursive: true, force: true }).catch(() => {});
   }
 });
 
 test('Given handleSkillCliCommand with unknown subcommand, When executed, Then it prints error and returns exit code 2', async () => {
-  const projectRoot = resolve(process.cwd());
-
-  let errOutput = '';
-  const originalErr = process.stderr.write;
-  process.stderr.write = (chunk) => {
-    errOutput += chunk.toString();
-    return true;
-  };
-
+  const testProject = await mkdtemp(join(tmpdir(), 'bsh-skill-test-'));
   try {
-    const code = await handleSkillCliCommand(['invalid-action'], projectRoot);
-    assert.equal(code, 2);
-    assert.ok(errOutput.includes('Subcomando inválido'));
+    let errOutput = '';
+    const originalErr = process.stderr.write;
+    process.stderr.write = (chunk) => {
+      errOutput += chunk.toString();
+      return true;
+    };
+
+    try {
+      const code = await handleSkillCliCommand(['invalid-action'], testProject);
+      assert.equal(code, 2);
+      assert.ok(errOutput.includes('Subcomando inválido'));
+    } finally {
+      process.stderr.write = originalErr;
+    }
   } finally {
-    process.stderr.write = originalErr;
+    await rm(testProject, { recursive: true, force: true }).catch(() => {});
   }
 });
