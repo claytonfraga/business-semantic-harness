@@ -4582,6 +4582,45 @@
         "specified"
       ],
       "line": 107
+    },
+    {
+      "id": "BSH-OPENTUI-014",
+      "feature": "opentui-component-tui.feature",
+      "sources": [
+        "openspec/changes/rebuild-tui-with-opentui/design.md",
+        "openspec/config.yaml"
+      ],
+      "tags": [
+        "opentui",
+        "specified"
+      ],
+      "line": 117
+    },
+    {
+      "id": "BSH-OPENTUI-015",
+      "feature": "opentui-component-tui.feature",
+      "sources": [
+        "openspec/changes/rebuild-tui-with-opentui/design.md",
+        "openspec/config.yaml"
+      ],
+      "tags": [
+        "opentui",
+        "specified"
+      ],
+      "line": 139
+    },
+    {
+      "id": "BSH-OPENTUI-016",
+      "feature": "opentui-component-tui.feature",
+      "sources": [
+        "openspec/changes/rebuild-tui-with-opentui/design.md",
+        "openspec/config.yaml"
+      ],
+      "tags": [
+        "opentui",
+        "specified"
+      ],
+      "line": 148
     }
   ],
   "journeyCoverage": [

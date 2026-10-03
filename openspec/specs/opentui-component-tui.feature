@@ -112,3 +112,42 @@ Funcionalidade: Reconstrução integral da TUI com componentes OpenTUI
     E as jornadas devem ter sido planejadas previamente em arquivos feature
     E a execução funcional deve usar o BSH empacotado e seguir a política vigente de evidências
     E cenários bloqueados ou não executados não devem ser apresentados como aprovados
+
+  @BSH-OPENTUI-014
+  Cenário: Aplicar a paleta GitHub Dark Dimmed em toda a interface
+    Dado que a TUI usa componentes OpenTUI
+    Quando a sessão, paleta ou qualquer diálogo for exibido
+    Então todas as superfícies devem usar os tokens compartilhados do tema GitHub Dark Dimmed
+      | Papel | Cor |
+      | Fundo principal | #22272e |
+      | Fundo de painéis e diálogos | #2d333b |
+      | Fundo rebaixado | #1c2128 |
+      | Texto principal | #adbac7 |
+      | Texto secundário | #768390 |
+      | Texto em destaque | #cdd9e5 |
+      | Borda principal | #444c56 |
+      | Borda discreta | #373e47 |
+      | Acento e informação | #539bf5 |
+      | Fundo de seleção em destaque | #316dca |
+      | Sucesso | #57ab5a |
+      | Atenção | #c69026 |
+      | Erro e bloqueio | #e5534b |
+      | Raciocínio | #986ee2 |
+    E cores específicas por comando devem seguir "menu-de-comandos-barra.feature"
+
+  @BSH-OPENTUI-015
+  Cenário: Preservar significado e legibilidade dos estados com o novo tema
+    Dado que a sessão pode indicar conformidade, violação, alerta, fila e foco
+    Quando a paleta de cores GitHub Dark Dimmed for aplicada
+    Então os estados devem manter seus rótulos e indicadores além da cor
+    E texto de seleção deve permanecer legível sobre o fundo em destaque
+    E um alerta ou bloqueio não deve ser apresentado como sucesso
+    E a mudança de cores não deve alterar comandos, atalhos ou decisões de governança
+
+  @BSH-OPENTUI-016
+  Cenário: Centralizar estilos nos componentes OpenTUI
+    Dado que existe um módulo de tokens do tema para a TUI
+    Quando cabeçalho, conversa, entrada, rodapé, seletores e diálogos forem compostos
+    Então seus estilos devem consumir os tokens compartilhados
+    E o OpenTUI deve aplicar as cores e fundos dos componentes
+    E não devem ser usadas sequências ANSI escritas à mão para aplicar o tema

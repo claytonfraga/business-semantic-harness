@@ -26,6 +26,12 @@ A React or Solid renderer would add a framework and its lifecycle to a project t
 
 Retain reusable domain logic such as fuzzy scoring, history persistence, FIFO queueing, exit decisions, command definitions, and service calls when it does not draw terminal widgets. Remove production use of manual ANSI frame construction, cursor coordinates, and raw-readline interactive widgets. Business state and semantic enforcement remain independent of the rendering library.
 
+## Shared color theme
+
+The user added GitHub Dark Dimmed to the approved migration scope. Use shared theme tokens for every OpenTUI surface; exact role values and semantic obligations are in `BSH-OPENTUI-014` through `016`. The slash feature now specifies distinct command accent values from the same scale, superseding its former ANSI-256 values while retaining navigation and command identity.
+
+Source: the official [GitHub theme generator](https://github.com/primer/github-vscode-theme/blob/main/src/colors.js) imports `@primer/primitives` `7.10.0` Dark Dimmed tokens, pinned in its [package manifest](https://github.com/primer/github-vscode-theme/blob/main/package.json). The published token JSON was inspected on 2026-10-03. Application code consumes shared semantic tokens; it does not embed escape sequences or depend on the terminal's arbitrary default ANSI palette.
+
 ## State and event flow
 
 The session controller owns conversation entries, prompt processing, active model/domain/skills, execution status, approval state, and queued inputs. OpenTUI events dispatch commands or update selection/input state; controller updates drive component properties. Agent streaming callbacks update the same state without creating a competing stdin consumer. Dialogs own focus temporarily, return a selection or cancellation, and restore prompt focus. Scroll position and resize are handled through components without discarding conversation or entered input.
@@ -50,4 +56,4 @@ The local quality, unit, and E2E commands remain required before any push. No pu
 
 ## Preparation status
 
-The catalog is committed, the feature branch is open, and architecture/source-of-truth rules are recorded in OpenSpec and repository guidance. Runtime code and dependencies are unchanged. Written-spec review precedes the detailed implementation plan under the applied architectural workflow.
+The catalog is committed, the feature branch is open, and architecture/source-of-truth rules are recorded in OpenSpec and repository guidance. The user approved this design on 2026-10-03. The [implementation plan](implementation-plan.md) is ready for review and execution-method selection. Runtime code and dependencies are unchanged.

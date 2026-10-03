@@ -2,7 +2,7 @@
 
 Extracted on 2026-10-03 from the current working tree, including existing local TUI and palette edits.
 
-The behavioral requirements are written in Portuguese Gherkin (`# language: pt`), following the existing slash-command palette and journey specifications. Supporting documentation and metadata are in English. This catalog contains 309 identified scenarios in 23 capability files. Scenarios may contain several related acceptance criteria; the scenario count is not a count of atomic obligations.
+The behavioral requirements are written in Portuguese Gherkin (`# language: pt`), following the existing slash-command palette and journey specifications. Supporting documentation and metadata are in English. This catalog contains 312 identified scenarios in 23 capability files. Scenarios may contain several related acceptance criteria; the scenario count is not a count of atomic obligations.
 
 ## Specification authority
 
@@ -37,7 +37,7 @@ Requirements for capability behavior live here; journey execution plans remain i
 | [menu-de-comandos-barra.feature](menu-de-comandos-barra.feature) | 11 |
 | [model-and-domain-selection.feature](model-and-domain-selection.feature) | 9 |
 | [ontology-validation-and-query.feature](ontology-validation-and-query.feature) | 11 |
-| [opentui-component-tui.feature](opentui-component-tui.feature) | 13 |
+| [opentui-component-tui.feature](opentui-component-tui.feature) | 16 |
 | [openrouter-client.feature](openrouter-client.feature) | 7 |
 | [prompt-guard-and-governance-mode.feature](prompt-guard-and-governance-mode.feature) | 11 |
 | [semantic-enforcement-and-promotion-gate.feature](semantic-enforcement-and-promotion-gate.feature) | 21 |

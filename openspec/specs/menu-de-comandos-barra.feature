@@ -39,26 +39,26 @@ Funcionalidade: Paleta Flutuante de Comandos Slash no Padrão OpenTUI
     E os caracteres correspondentes no nome do comando devem ser realçados
 
   @BSH-MENU-004
-  Cenário: Navegação interativa com rolagem de janela e cores vibrantes exclusivas por comando
+  Cenário: Navegação interativa com rolagem de janela e cores GitHub Dark Dimmed exclusivas por comando
     Dado que a paleta de comandos slash está aberta com 14 comandos disponíveis
     Quando o usuário navega entre as opções utilizando as setas direcionais para baixo ou para cima
     Então a janela visível deve rolar suavemente exibindo 5 itens por vez
-    E cada opção ativa sob foco deve ser destacada com uma cor exclusiva da paleta ANSI-256:
+    E cada opção ativa sob foco deve ser destacada com uma cor exclusiva das escalas GitHub Dark Dimmed:
       | Comando | Cor Ativa Exclusiva |
-      | /model | Magenta / Orchid (\x1b[1;38;5;177m) |
-      | /domain | Verde Esmeralda (\x1b[1;38;5;48m) |
-      | /skills | Ciano Elétrico (\x1b[1;38;5;51m) |
-      | /diff | Amarelo Dourado (\x1b[1;38;5;220m) |
-      | /rules | Azul Céu (\x1b[1;38;5;75m) |
-      | /settings | Laranja Pêssego (\x1b[1;38;5;208m) |
-      | /affinity | Turquesa (\x1b[1;38;5;43m) |
-      | /mcp | Violeta (\x1b[1;38;5;141m) |
-      | /clear | Prata Brilhante (\x1b[1;38;5;253m) |
-      | /done | Verde Limão (\x1b[1;38;5;154m) |
-      | /help | Azul Royal (\x1b[1;38;5;39m) |
-      | /ungoverned | Âmbar Quente (\x1b[1;38;5;209m) |
-      | /governed | Menta (\x1b[1;38;5;49m) |
-      | /exit | Carmesim (\x1b[1;38;5;196m) |
+      | /model | #b083f0 |
+      | /domain | #57ab5a |
+      | /skills | #96d0ff |
+      | /diff | #eac55f |
+      | /rules | #6cb6ff |
+      | /settings | #f69d50 |
+      | /affinity | #4184e4 |
+      | /mcp | #986ee2 |
+      | /clear | #cdd9e5 |
+      | /done | #6bc46d |
+      | /help | #539bf5 |
+      | /ungoverned | #daaa3f |
+      | /governed | #8ddb8c |
+      | /exit | #f47067 |
     E a opção ativa deve exibir o ponteiro "❯" enquanto as opções inativas permanecem atenuadas
 
   @BSH-MENU-005
