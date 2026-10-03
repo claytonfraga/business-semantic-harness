@@ -1,0 +1,27 @@
+{
+  "validatedAt": "2026-10-03T14:00:52.964Z",
+  "scope": "Specification syntax and traceability only",
+  "parser": "@cucumber/gherkin 42.0.1",
+  "dialect": "pt",
+  "featureFiles": 22,
+  "scenarios": 296,
+  "steps": 1357,
+  "indexedRequirements": 296,
+  "journeysMapped": 15,
+  "sourceInventoryFiles": 224,
+  "checks": [
+    "Gherkin syntax",
+    "Portuguese dialect",
+    "Scenario ID uniqueness",
+    "When/Then steps",
+    "Index locations",
+    "Source reference existence",
+    "Journey reference integrity",
+    "Source hashes",
+    "Product source capability mapping"
+  ],
+  "behavioralScenariosExecuted": false,
+  "e2eExecuted": false,
+  "passed": true,
+  "errors": []
+}
