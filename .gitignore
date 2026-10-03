@@ -16,6 +16,11 @@ __pycache__/
 openspec/*
 !openspec/specs/
 !openspec/specs/**
+!openspec/config.yaml
+!openspec/changes/
+openspec/changes/*
+!openspec/changes/rebuild-tui-with-opentui/
+!openspec/changes/rebuild-tui-with-opentui/**
 screenshots/
 /evaluation/
 AGENTS.md

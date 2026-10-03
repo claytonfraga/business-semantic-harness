@@ -1,12 +1,12 @@
 {
-  "validatedAt": "2026-10-03T14:00:52.964Z",
+  "validatedAt": "2026-10-03T14:04:43.113Z",
   "scope": "Specification syntax and traceability only",
   "parser": "@cucumber/gherkin 42.0.1",
   "dialect": "pt",
-  "featureFiles": 22,
-  "scenarios": 296,
-  "steps": 1357,
-  "indexedRequirements": 296,
+  "featureFiles": 23,
+  "scenarios": 309,
+  "steps": 1423,
+  "indexedRequirements": 309,
   "journeysMapped": 15,
   "sourceInventoryFiles": 224,
   "checks": [

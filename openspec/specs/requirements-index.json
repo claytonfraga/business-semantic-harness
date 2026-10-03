@@ -4400,6 +4400,188 @@
       ],
       "tags": [],
       "line": 110
+    },
+    {
+      "id": "BSH-OPENTUI-001",
+      "feature": "opentui-component-tui.feature",
+      "sources": [
+        "AGENTS.md",
+        "openspec/config.yaml",
+        "openspec/changes/rebuild-tui-with-opentui/design.md"
+      ],
+      "tags": [
+        "opentui",
+        "specified"
+      ],
+      "line": 12
+    },
+    {
+      "id": "BSH-OPENTUI-002",
+      "feature": "opentui-component-tui.feature",
+      "sources": [
+        "AGENTS.md",
+        "openspec/config.yaml",
+        "openspec/changes/rebuild-tui-with-opentui/design.md"
+      ],
+      "tags": [
+        "opentui",
+        "specified"
+      ],
+      "line": 20
+    },
+    {
+      "id": "BSH-OPENTUI-003",
+      "feature": "opentui-component-tui.feature",
+      "sources": [
+        "AGENTS.md",
+        "openspec/config.yaml",
+        "openspec/changes/rebuild-tui-with-opentui/design.md"
+      ],
+      "tags": [
+        "opentui",
+        "specified"
+      ],
+      "line": 28
+    },
+    {
+      "id": "BSH-OPENTUI-004",
+      "feature": "opentui-component-tui.feature",
+      "sources": [
+        "AGENTS.md",
+        "openspec/config.yaml",
+        "openspec/changes/rebuild-tui-with-opentui/design.md"
+      ],
+      "tags": [
+        "opentui",
+        "specified"
+      ],
+      "line": 37
+    },
+    {
+      "id": "BSH-OPENTUI-005",
+      "feature": "opentui-component-tui.feature",
+      "sources": [
+        "AGENTS.md",
+        "openspec/config.yaml",
+        "openspec/changes/rebuild-tui-with-opentui/design.md"
+      ],
+      "tags": [
+        "opentui",
+        "specified"
+      ],
+      "line": 45
+    },
+    {
+      "id": "BSH-OPENTUI-006",
+      "feature": "opentui-component-tui.feature",
+      "sources": [
+        "AGENTS.md",
+        "openspec/config.yaml",
+        "openspec/changes/rebuild-tui-with-opentui/design.md"
+      ],
+      "tags": [
+        "opentui",
+        "specified"
+      ],
+      "line": 52
+    },
+    {
+      "id": "BSH-OPENTUI-007",
+      "feature": "opentui-component-tui.feature",
+      "sources": [
+        "AGENTS.md",
+        "openspec/config.yaml",
+        "openspec/changes/rebuild-tui-with-opentui/design.md"
+      ],
+      "tags": [
+        "opentui",
+        "specified"
+      ],
+      "line": 59
+    },
+    {
+      "id": "BSH-OPENTUI-008",
+      "feature": "opentui-component-tui.feature",
+      "sources": [
+        "AGENTS.md",
+        "openspec/config.yaml",
+        "openspec/changes/rebuild-tui-with-opentui/design.md"
+      ],
+      "tags": [
+        "opentui",
+        "specified"
+      ],
+      "line": 67
+    },
+    {
+      "id": "BSH-OPENTUI-009",
+      "feature": "opentui-component-tui.feature",
+      "sources": [
+        "AGENTS.md",
+        "openspec/config.yaml",
+        "openspec/changes/rebuild-tui-with-opentui/design.md"
+      ],
+      "tags": [
+        "opentui",
+        "specified"
+      ],
+      "line": 75
+    },
+    {
+      "id": "BSH-OPENTUI-010",
+      "feature": "opentui-component-tui.feature",
+      "sources": [
+        "AGENTS.md",
+        "openspec/config.yaml",
+        "openspec/changes/rebuild-tui-with-opentui/design.md"
+      ],
+      "tags": [
+        "opentui",
+        "specified"
+      ],
+      "line": 83
+    },
+    {
+      "id": "BSH-OPENTUI-011",
+      "feature": "opentui-component-tui.feature",
+      "sources": [
+        "AGENTS.md",
+        "openspec/config.yaml",
+        "openspec/changes/rebuild-tui-with-opentui/design.md"
+      ],
+      "tags": [
+        "opentui",
+        "specified"
+      ],
+      "line": 91
+    },
+    {
+      "id": "BSH-OPENTUI-012",
+      "feature": "opentui-component-tui.feature",
+      "sources": [
+        "AGENTS.md",
+        "openspec/config.yaml",
+        "openspec/changes/rebuild-tui-with-opentui/design.md"
+      ],
+      "tags": [
+        "opentui",
+        "specified"
+      ],
+      "line": 98
+    },
+    {
+      "id": "BSH-OPENTUI-013",
+      "feature": "opentui-component-tui.feature",
+      "sources": [
+        "AGENTS.md",
+        "openspec/config.yaml",
+        "openspec/changes/rebuild-tui-with-opentui/design.md"
+      ],
+      "tags": [
+        "opentui",
+        "specified"
+      ],
+      "line": 107
     }
   ],
   "journeyCoverage": [
@@ -5086,7 +5268,7 @@
   "sourceInventory": [
     {
       "path": "AGENTS.md",
-      "sha256": "8ebcaeef1f38b8fa6d66cf75beb6d999b3164e315d5a73cb0fb47009951e7c1c",
+      "sha256": "10650656249edd9c0df15497d4cb1ca665fceb617222babf9c7f642cd07b3168",
       "capabilities": [
         "CLI",
         "DIST",
@@ -5126,7 +5308,7 @@
     },
     {
       "path": "openspec/config.yaml",
-      "sha256": "70cabd7044ae16aedba56dd2eab070524ce620bb055919e1321d70754d8fa1bb",
+      "sha256": "ecfab8396851e14283eb68ead5b4a338926db64ac5082ad7cf38e08c0b247df9",
       "capabilities": [
         "CLI",
         "DIST",
@@ -6530,5 +6712,7 @@
         "DIST"
       ]
     }
-  ]
+  ],
+  "catalogBaselineCommit": "2afc270",
+  "updatedAt": "2026-10-03"
 }
