@@ -394,13 +394,13 @@ def main():
 
     subprocess.run(["tmux", "kill-session", "-t", session_name], stderr=subprocess.DEVNULL)
 
-    # ---------------- Scenario 6: Codex Adapter Check ----------------
-    print("--- [8/8] Scenario 6: Codex Adapter Functional Check ---")
-    codex_res = subprocess.run(["bsh", "--project", str(clean_pilot_dir), "codex"], capture_output=True, text=True)
-    print(f"bsh codex exit code: {codex_res.returncode}")
-    print(f"bsh codex output: {codex_res.stdout.strip() or codex_res.stderr.strip()}")
-    assert codex_res.returncode == 2, f"Expected exit code 2, got {codex_res.returncode}"
-    print("Codex adapter correctly refused start; both cases marked as blocked before the first turn.")
+    # ---------------- Scenario 6: Native Agent & Ontology Check ----------------
+    print("--- [8/8] Scenario 6: Native Agent & Ontology Check ---")
+    onto_res = subprocess.run(["bsh", "--project", str(clean_pilot_dir), "ontology", "validate"], capture_output=True, text=True)
+    print(f"bsh ontology validate exit code: {onto_res.returncode}")
+    print(f"bsh ontology validate output: {onto_res.stdout.strip()}")
+    assert onto_res.returncode == 0, f"Expected exit code 0, got {onto_res.returncode}"
+    print("Native BSH validated ontology successfully in clean pilot copy.")
 
     # Encode video
     print("Encoding official MP4 video with ffmpeg...")

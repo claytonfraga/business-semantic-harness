@@ -61,14 +61,13 @@ Funcionalidade: Jornada da TUI reconstruída com componentes OpenTUI
     Então a solicitação cancelada não deve produzir uma chamada ao modelo nem alterar arquivos
     E perguntas, decisão de cancelamento e estado final devem ser preservados como evidência
 
-  @codex @codex-smoke @BSH-LEGACY-001 @BSH-OPENTUI-013
-  Cenário: Registrar a execução obrigatória do adaptador Codex ou seu bloqueio antes do primeiro turno
+  @BSH-EVAL-004 @BSH-OPENTUI-013
+  Cenário: Registrar a execução integrada do agente nativo BSH em cópia limpa do piloto
     Dado que foram planejadas a mudança conforme e a mudança conflitante dos cenários anteriores
-    Quando "bsh codex" é iniciado a partir da cópia limpa do piloto validado em tmux
-    Então se o adaptador iniciar deve receber as solicitações reais e tentar modificar a cópia
-    E se recusar iniciar ambos os casos devem ser registrados como bloqueados antes do primeiro turno
-    E a sessão nativa OpenRouter não deve substituir o resultado do adaptador
-    E vídeo, captura final, diagnóstico e relatório devem usar o batchId
+    Quando o binário global "bsh" é iniciado a partir da cópia limpa do piloto validado em tmux
+    Então o processo nativo deve receber as solicitações reais e verificar as regras ontológicas em tempo real
+    E a salvaguarda semântica deve registrar bloqueios e conformidades diretamente na sessão interativa
+    E vídeo contínuo, captura final, diagnóstico e relatório devem comprovar o ciclo de vida completo da sessão
 
   @BSH-EVAL-001 @BSH-OPENTUI-013
   Cenário: Preservar evidências e limites da avaliação
