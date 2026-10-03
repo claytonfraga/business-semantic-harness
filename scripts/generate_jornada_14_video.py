@@ -113,7 +113,8 @@ def main():
     session_name = "bsh-jornada-14-multiturn"
     video_out = work_dir / "evaluation" / "videos" / "bsh-skills-dynamic-inclusion.mp4"
     screenshot_out = work_dir / "evaluation" / "screenshots" / "bsh-skills-dynamic-inclusion.png"
-    wsl_downloads = Path("/mnt/c/Users/clayt/Downloads")
+    wsl_downloads = Path("/mnt/c/Users/clayt/Downloads/bsh")
+    wsl_downloads.mkdir(parents=True, exist_ok=True)
 
     frame_idx = 0
 

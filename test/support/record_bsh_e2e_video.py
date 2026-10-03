@@ -528,19 +528,18 @@ def main() -> int:
     # Scenario 8: TUI Visual Scrollbar, Project History & Concrete Agent Execution
     scroll_res = run_scenario_8(pilot_dir, bsh_bin)
 
-    # Copy MP4 videos to WSL Downloads for easy human evaluation
-    downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
-    if downloads_dir.exists():
-        for vid in [gov_video, ungov_video, coop_video, mismatch_video, model_video, Path(mcp_server_res["video_path"]), Path(mcp_client_res["video_path"]), Path(scroll_res["video_path"])]:
-            if vid.exists():
-                shutil.copy2(vid, downloads_dir / vid.name)
-        print(f"✔ Copied all MP4 videos to Windows Downloads: {downloads_dir}")
+    # Copy MP4 videos to WSL Downloads/bsh for easy human evaluation
+    downloads_dir = Path("/mnt/c/Users/clayt/Downloads/bsh")
+    downloads_dir.mkdir(parents=True, exist_ok=True)
+    for vid in [gov_video, ungov_video, coop_video, mismatch_video, model_video, Path(mcp_server_res["video_path"]), Path(mcp_client_res["video_path"]), Path(scroll_res["video_path"])]:
+        if vid.exists():
+            shutil.copy2(vid, downloads_dir / vid.name)
+    print(f"✔ Copied all MP4 videos to Windows Downloads/bsh: {downloads_dir}")
 
     # Generate Comprehensive Test Report
     report_file = REPORTS_DIR / "relatorio-testes-e2e-openrouter.md"
     generate_markdown_report(gov_res, ungov_res, coop_res, mismatch_res, model_res, mcp_server_res, mcp_client_res, scroll_res, report_file)
-    if downloads_dir.exists():
-        shutil.copy2(report_file, downloads_dir / "relatorio-testes-e2e-openrouter.md")
+    shutil.copy2(report_file, downloads_dir / "relatorio-testes-e2e-openrouter.md")
     print(f"✔ Comprehensive test report generated: {report_file}")
 
     return 0
@@ -950,70 +949,57 @@ if __name__ == "__main__":
     pilot_dir = WORKTREE_ROOT / "pilot" / "asset-management"
     bsh_bin = shutil.which("bsh") or str(WORKTREE_ROOT / "dist" / "cli.js")
 
+    downloads_dir = Path("/mnt/c/Users/clayt/Downloads/bsh")
+    downloads_dir.mkdir(parents=True, exist_ok=True)
+
     if parsed_args.scenario == "6":
         res = run_scenario_6(pilot_dir, bsh_bin)
-        downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
-        if downloads_dir.exists():
-            shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
+        shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
         sys.exit(0)
 
     elif parsed_args.scenario == "7":
         res = run_scenario_7(pilot_dir, bsh_bin)
-        downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
-        if downloads_dir.exists():
-            shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
+        shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
         sys.exit(0)
 
     elif parsed_args.scenario == "8":
         res = run_scenario_8(pilot_dir, bsh_bin)
-        downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
-        if downloads_dir.exists():
-            shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
+        shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
         sys.exit(0)
 
     elif parsed_args.scenario == "9":
         res = run_scenario_9(pilot_dir, bsh_bin)
-        downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
-        if downloads_dir.exists():
-            shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
-            if Path(res["screenshot_path"]).exists():
-                shutil.copy2(Path(res["screenshot_path"]), downloads_dir / Path(res["screenshot_path"]).name)
+        shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
+        if Path(res["screenshot_path"]).exists():
+            shutil.copy2(Path(res["screenshot_path"]), downloads_dir / Path(res["screenshot_path"]).name)
         sys.exit(0)
 
     elif parsed_args.scenario == "10":
         res = run_scenario_10(pilot_dir, bsh_bin)
-        downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
-        if downloads_dir.exists():
-            shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
-            if Path(res["screenshot_path"]).exists():
-                shutil.copy2(Path(res["screenshot_path"]), downloads_dir / Path(res["screenshot_path"]).name)
+        shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
+        if Path(res["screenshot_path"]).exists():
+            shutil.copy2(Path(res["screenshot_path"]), downloads_dir / Path(res["screenshot_path"]).name)
         sys.exit(0)
 
     elif parsed_args.scenario == "11":
         res = run_scenario_11(pilot_dir, bsh_bin)
-        downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
-        if downloads_dir.exists():
-            shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
-            if Path(res["screenshot_path"]).exists():
-                shutil.copy2(Path(res["screenshot_path"]), downloads_dir / Path(res["screenshot_path"]).name)
+        shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
+        if Path(res["screenshot_path"]).exists():
+            shutil.copy2(Path(res["screenshot_path"]), downloads_dir / Path(res["screenshot_path"]).name)
         sys.exit(0)
 
     elif parsed_args.scenario == "12":
         res = run_scenario_12(pilot_dir, bsh_bin)
-        downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
-        if downloads_dir.exists():
-            shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
-            if Path(res["screenshot_path"]).exists():
-                shutil.copy2(Path(res["screenshot_path"]), downloads_dir / Path(res["screenshot_path"]).name)
+        shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
+        if Path(res["screenshot_path"]).exists():
+            shutil.copy2(Path(res["screenshot_path"]), downloads_dir / Path(res["screenshot_path"]).name)
         sys.exit(0)
 
     elif parsed_args.scenario == "13":
         res = run_scenario_13(pilot_dir, bsh_bin)
-        downloads_dir = Path("/mnt/c/Users/clayt/Downloads")
-        if downloads_dir.exists():
-            shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
-            if Path(res["screenshot_path"]).exists():
-                shutil.copy2(Path(res["screenshot_path"]), downloads_dir / Path(res["screenshot_path"]).name)
+        shutil.copy2(Path(res["video_path"]), downloads_dir / Path(res["video_path"]).name)
+        if Path(res["screenshot_path"]).exists():
+            shutil.copy2(Path(res["screenshot_path"]), downloads_dir / Path(res["screenshot_path"]).name)
         sys.exit(0)
 
     raise SystemExit(main())
