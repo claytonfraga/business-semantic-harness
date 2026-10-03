@@ -34,25 +34,25 @@ describe('Slash Commands Menu Unit Suite (Given/When/Then)', () => {
 
     assert.ok(results.length > 0);
     assert.strictEqual(results[0].command.name, '/exit');
-    assert.match(results[0].command.description, /encerrar a sessão/i);
+    assert.match(results[0].command.description, /safely exit/i);
   });
 
-  it('Given o catálogo de comandos, When filtrado por "domain", Then retorna o comando com atalho Ctrl+D e categoria Governança', () => {
+  it('Given o catálogo de comandos, When filtrado por "domain", Then retorna o comando com atalho Ctrl+D e categoria Governance', () => {
     const results = filterSlashCommands('domain');
 
     assert.ok(results.length > 0);
     assert.strictEqual(results[0].command.name, '/domain');
     assert.strictEqual(results[0].command.shortcut, 'Ctrl+D');
-    assert.strictEqual(results[0].command.category, 'Governança');
+    assert.strictEqual(results[0].command.category, 'Governance');
   });
 
-  it('Given o catálogo de comandos, When filtrado por "model", Then retorna o comando com atalho Ctrl+M e categoria Configuração', () => {
+  it('Given o catálogo de comandos, When filtrado por "model", Then retorna o comando com atalho Ctrl+M e categoria Config', () => {
     const results = filterSlashCommands('/model');
 
     assert.ok(results.length > 0);
     assert.strictEqual(results[0].command.name, '/model');
     assert.strictEqual(results[0].command.shortcut, 'Ctrl+M');
-    assert.strictEqual(results[0].command.category, 'Configuração');
+    assert.strictEqual(results[0].command.category, 'Config');
   });
 
   it('Given a regra de disparo da TUI, When a tecla "/" é pressionada em linha vazia, Then o menu deve ser acionado', () => {
@@ -99,8 +99,8 @@ describe('Slash Commands Menu Unit Suite (Given/When/Then)', () => {
     const exitCmd = DEFAULT_SLASH_COMMANDS.find((c) => c.name === '/exit');
 
     assert.ok(modelCmd.activeColor.includes('177m') || modelCmd.activeColorName === 'Magenta');
-    assert.ok(domainCmd.activeColor.includes('48m') || domainCmd.activeColorName === 'Verde Esmeralda');
-    assert.ok(exitCmd.activeColor.includes('196m') || exitCmd.activeColorName === 'Carmesim');
+    assert.ok(domainCmd.activeColor.includes('48m') || domainCmd.activeColorName === 'Emerald Green');
+    assert.ok(exitCmd.activeColor.includes('196m') || exitCmd.activeColorName === 'Crimson');
 
     // Nenhuma cor de comando coincide com a de outro
     assert.notStrictEqual(modelCmd.activeColor, domainCmd.activeColor);
@@ -118,7 +118,21 @@ describe('Slash Commands Menu Unit Suite (Given/When/Then)', () => {
 
     const inactiveLine = formatSlashCommandLine(cmd, 13, false);
     assert.ok(!inactiveLine.includes('❯'), 'Não deve conter ponteiro de foco ❯ quando inativo');
-    assert.ok(inactiveLine.startsWith('  '), 'Deve conter indentação neutra quando inativo');
+  });
+
+  it('Given o renderizador OpenTUI renderSlashMenuBox, When executado com 14 comandos e pageSize 5, Then retorna 7 linhas limitadas a 72 colunas com rolagem', async () => {
+    const { renderSlashMenuBox } = await import('../../dist/tui/slashCommands.js');
+    const lines = renderSlashMenuBox({ selectedIndex: 0, scrollOffset: 0, pageSize: 5, query: '' }, 72);
+
+    assert.strictEqual(lines.length, 7, 'Deve renderizar exatamente 7 linhas (top border, 5 itens, bottom border)');
+    for (const line of lines) {
+      // Limpeza de sequências ANSI para checar largura visual
+      const visible = line.replace(/\x1b\[[0-9;]*m/g, '');
+      assert.ok(visible.length <= 72, `Linha não deve extrapolar 72 colunas: visual=${visible.length}`);
+    }
+    assert.ok(lines[0].includes('1-5 of 14'), 'Cabeçalho deve indicar janela de rolagem');
+    assert.ok(lines[0].includes('scroll'), 'Cabeçalho deve indicar rolagem');
+    assert.ok(lines[6].includes('Select') && lines[6].includes('Dismiss'), 'Rodapé deve conter instruções em inglês');
   });
 });
 

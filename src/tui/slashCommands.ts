@@ -1,10 +1,11 @@
-import { fuzzyScore } from './fuzzySearch.js';
+import { ansi, stripAnsi } from './ansi.js';
+import { fuzzyScore, highlightMatches } from './fuzzySearch.js';
 
 export interface SlashCommandDef {
   name: string;
   description: string;
   shortcut?: string;
-  category: 'Sistema' | 'Governança' | 'Configuração' | 'Skills' | 'Interface';
+  category: 'System' | 'Governance' | 'Config' | 'Skills' | 'UI';
   activeColor: string;
   activeColorName: string;
 }
@@ -12,103 +13,103 @@ export interface SlashCommandDef {
 export const DEFAULT_SLASH_COMMANDS: SlashCommandDef[] = [
   {
     name: '/model',
-    description: 'Navegar e alternar o modelo LLM do OpenRouter ativo via busca difusa',
+    description: 'Switch active LLM model via fuzzy search',
     shortcut: 'Ctrl+M',
-    category: 'Configuração',
+    category: 'Config',
     activeColor: '\x1b[1;38;5;177m',
     activeColorName: 'Magenta',
   },
   {
     name: '/domain',
-    description: 'Selecionar domínio ontológico e carregar shapes SHACL de governança',
+    description: 'Select domain ontology & SHACL rules',
     shortcut: 'Ctrl+D',
-    category: 'Governança',
+    category: 'Governance',
     activeColor: '\x1b[1;38;5;48m',
-    activeColorName: 'Verde Esmeralda',
+    activeColorName: 'Emerald Green',
   },
   {
     name: '/skills',
-    description: 'Explorar, instalar e gerenciar skills operacionais do ecossistema',
+    description: 'Manage & execute operational skills',
     category: 'Skills',
     activeColor: '\x1b[1;38;5;51m',
-    activeColorName: 'Ciano Elétrico',
+    activeColorName: 'Electric Cyan',
   },
   {
     name: '/diff',
-    description: 'Revisar diff de alterações no workspace isolado e promover para a branch',
-    category: 'Sistema',
+    description: 'Review workspace diff & promote changes',
+    category: 'System',
     activeColor: '\x1b[1;38;5;220m',
-    activeColorName: 'Amarelo Dourado',
+    activeColorName: 'Golden Yellow',
   },
   {
     name: '/rules',
-    description: 'Inspecionar regras SHACL e restrições ontológicas ativas no domínio',
-    category: 'Governança',
+    description: 'Inspect active SHACL shapes & rules',
+    category: 'Governance',
     activeColor: '\x1b[1;38;5;75m',
-    activeColorName: 'Azul Céu',
+    activeColorName: 'Sky Blue',
   },
   {
     name: '/settings',
-    description: 'Ajustar preferências da sessão (confirmação de violações, defaults)',
-    category: 'Configuração',
+    description: 'Configure session & prompt preferences',
+    category: 'Config',
     activeColor: '\x1b[1;38;5;208m',
-    activeColorName: 'Laranja Pêssego',
+    activeColorName: 'Peach Orange',
   },
   {
     name: '/affinity',
-    description: 'Diagnosticar afinidade semântica entre vocabulário ontológico e o projeto',
-    category: 'Governança',
+    description: 'Check semantic ontology affinity',
+    category: 'Governance',
     activeColor: '\x1b[1;38;5;43m',
-    activeColorName: 'Turquesa',
+    activeColorName: 'Turquoise',
   },
   {
     name: '/mcp',
-    description: 'Gerenciar conexões e ferramentas MCP (Model Context Protocol)',
-    category: 'Sistema',
+    description: 'Manage Model Context Protocol tools',
+    category: 'System',
     activeColor: '\x1b[1;38;5;141m',
-    activeColorName: 'Violeta',
+    activeColorName: 'Violet',
   },
   {
     name: '/clear',
-    description: 'Limpar a tela da TUI e reiniciar o viewport de mensagens',
-    category: 'Interface',
+    description: 'Clear screen & reset message viewport',
+    category: 'UI',
     activeColor: '\x1b[1;38;5;253m',
-    activeColorName: 'Prata Brilhante',
+    activeColorName: 'Bright Silver',
   },
   {
     name: '/done',
-    description: 'Concluir formalmente o loop da skill ativa e consolidar entregáveis',
+    description: 'Finalize skill loop & save deliverables',
     category: 'Skills',
     activeColor: '\x1b[1;38;5;154m',
-    activeColorName: 'Verde Limão',
+    activeColorName: 'Lime Green',
   },
   {
     name: '/help',
-    description: 'Exibir comandos disponíveis, atalhos de teclado e documentação',
-    category: 'Interface',
+    description: 'Display available commands & shortcuts',
+    category: 'UI',
     activeColor: '\x1b[1;38;5;39m',
-    activeColorName: 'Azul Royal',
+    activeColorName: 'Royal Blue',
   },
   {
     name: '/ungoverned',
-    description: 'Desativar temporariamente o harness ontológico (modo bypass sem SHACL)',
-    category: 'Governança',
+    description: 'Bypass SHACL semantic governance',
+    category: 'Governance',
     activeColor: '\x1b[1;38;5;209m',
-    activeColorName: 'Âmbar Quente',
+    activeColorName: 'Warm Amber',
   },
   {
     name: '/governed',
-    description: 'Reativar a governança ontológica estrita e validação de regras SHACL',
-    category: 'Governança',
+    description: 'Enforce strict SHACL domain rules',
+    category: 'Governance',
     activeColor: '\x1b[1;38;5;49m',
-    activeColorName: 'Menta',
+    activeColorName: 'Mint Green',
   },
   {
     name: '/exit',
-    description: 'Encerrar a sessão do BSH com segurança e restaurar o terminal limpo',
-    category: 'Sistema',
+    description: 'Safely exit BSH and restore terminal',
+    category: 'System',
     activeColor: '\x1b[1;38;5;196m',
-    activeColorName: 'Carmesim',
+    activeColorName: 'Crimson',
   },
 ];
 
@@ -132,12 +133,12 @@ export function filterSlashCommands(
 
   for (const cmd of commands) {
     const rawCmdName = cmd.name.replace(/^\//, '').toLowerCase();
-    
-    // Exact prefix match gets high priority
+
+    // Exact prefix match gets highest priority
     if (rawCmdName.startsWith(cleanQuery)) {
       results.push({
         command: cmd,
-        score: 100 + (10 - rawCmdName.length),
+        score: 1000 + (10 - rawCmdName.length),
         indices: Array.from({ length: cleanQuery.length }, (_, i) => i + 1), // skip '/'
       });
       continue;
@@ -148,18 +149,18 @@ export function filterSlashCommands(
     if (nameMatch) {
       results.push({
         command: cmd,
-        score: nameMatch.score,
+        score: 500 + nameMatch.score,
         indices: nameMatch.indices,
       });
       continue;
     }
 
-    // Fuzzy match on description
+    // Fuzzy match on description (lower priority)
     const descMatch = fuzzyScore(cmd.description, cleanQuery);
     if (descMatch) {
       results.push({
         command: cmd,
-        score: descMatch.score * 0.5,
+        score: Math.min(100, descMatch.score * 0.2),
         indices: [],
       });
     }
@@ -172,6 +173,13 @@ export function getSlashCommandActiveColor(name: string): string {
   const normalized = name.startsWith('/') ? name.toLowerCase() : `/${name.toLowerCase()}`;
   const found = DEFAULT_SLASH_COMMANDS.find((c) => c.name.toLowerCase() === normalized);
   return found?.activeColor || '\x1b[1;38;5;51m';
+}
+
+export interface SlashMenuOverlayState {
+  selectedIndex: number;
+  scrollOffset: number;
+  pageSize: number;
+  query: string;
 }
 
 export function formatSlashCommandLine(
@@ -198,3 +206,100 @@ export function formatSlashCommandLine(
 
   return `${pointer}${numBadge} ${nameStr}${shortcutBadge}${categoryBadge} - ${descStr}`;
 }
+
+/**
+ * Renders the compact OpenTUI-style floating command palette box.
+ * Responsive, bounded width (<= 72 chars), scrollable viewport window.
+ */
+export function renderSlashMenuBox(
+  state: SlashMenuOverlayState,
+  maxWidth = 72,
+  commands: SlashCommandDef[] = DEFAULT_SLASH_COMMANDS
+): string[] {
+  const scored = filterSlashCommands(state.query, commands);
+  const total = scored.length;
+  const pageSize = state.pageSize || 5;
+  const boxWidth = Math.min(maxWidth, 72);
+  const innerWidth = boxWidth - 4; // between "│ " and " │"
+
+  // Ensure scrollOffset keeps selectedIndex visible
+  let scrollOffset = state.scrollOffset;
+  if (state.selectedIndex < scrollOffset) {
+    scrollOffset = state.selectedIndex;
+  } else if (state.selectedIndex >= scrollOffset + pageSize) {
+    scrollOffset = state.selectedIndex - pageSize + 1;
+  }
+  scrollOffset = Math.max(0, Math.min(scrollOffset, Math.max(0, total - pageSize)));
+
+  const visibleItems = scored.slice(scrollOffset, scrollOffset + pageSize);
+
+  // Header line
+  let headerTitle: string;
+  let headerRight: string;
+  if (total === 0) {
+    headerTitle = 'Slash Commands';
+    headerRight = 'No match';
+  } else if (state.query) {
+    headerTitle = `Commands (${total} found)`;
+    headerRight = `Filter: "${state.query}"`;
+  } else {
+    const rangeEnd = Math.min(total, scrollOffset + pageSize);
+    headerTitle = `Commands (${scrollOffset + 1}-${rangeEnd} of ${total})`;
+    headerRight = '↑/↓ scroll';
+  }
+
+  const leftHeader = `┌─ ${headerTitle} `;
+  const rightHeader = ` ${headerRight} ─┐`;
+  const midDashLen = Math.max(2, boxWidth - stripAnsi(leftHeader).length - stripAnsi(rightHeader).length);
+  const topBorder = `${ansi.dim}${leftHeader}${'─'.repeat(midDashLen)}${rightHeader}${ansi.reset}`;
+
+  const rows: string[] = [topBorder];
+
+  if (visibleItems.length === 0) {
+    const emptyMsg = `  No commands matching "${state.query}"`;
+    const padded = emptyMsg.padEnd(innerWidth);
+    rows.push(`${ansi.dim}│${ansi.reset} ${ansi.red}${padded}${ansi.reset} ${ansi.dim}│${ansi.reset}`);
+  } else {
+    for (let i = 0; i < visibleItems.length; i++) {
+      const globalIndex = scrollOffset + i;
+      const { command, indices } = visibleItems[i];
+      const isActive = globalIndex === state.selectedIndex;
+
+      const pointer = isActive ? `${command.activeColor}❯${ansi.reset} ` : '  ';
+      const cmdFormatted = isActive
+        ? `${command.activeColor}${command.name.padEnd(12)}${ansi.reset}`
+        : (state.query && indices.length > 0
+            ? highlightMatches(command.name.padEnd(12), indices)
+            : `${ansi.dim}${command.name.padEnd(12)}${ansi.reset}`);
+
+      const shortcutStr = command.shortcut ? `[${command.shortcut}]` : '';
+      const shortcutFormatted = `${ansi.dim}${shortcutStr.padEnd(8)}${ansi.reset}`;
+
+      // Calculate remaining space for description
+      const descBudget = Math.max(10, innerWidth - 25);
+      let descText = command.description;
+      if (descText.length > descBudget) {
+        descText = `${descText.slice(0, descBudget - 2)}..`;
+      }
+      const descFormatted = isActive
+        ? `${ansi.bold}${descText.padEnd(descBudget)}${ansi.reset}`
+        : `${ansi.dim}${descText.padEnd(descBudget)}${ansi.reset}`;
+
+      const content = `${pointer}${cmdFormatted} ${shortcutFormatted} ${descFormatted}`;
+      const visibleLen = stripAnsi(content).length;
+      const extraPad = Math.max(0, innerWidth - visibleLen);
+
+      rows.push(`${ansi.dim}│${ansi.reset} ${content}${' '.repeat(extraPad)} ${ansi.dim}│${ansi.reset}`);
+    }
+  }
+
+  // Footer line: exact boxWidth characters
+  const footerLeft = '└─ [Enter] Select  [Esc] Dismiss ';
+  const footerRight = ' Type to filter ─┘';
+  const footerDashLen = Math.max(2, boxWidth - footerLeft.length - footerRight.length);
+  const bottomBorder = `${ansi.dim}${footerLeft}${'─'.repeat(footerDashLen)}${footerRight}${ansi.reset}`;
+  rows.push(bottomBorder);
+
+  return rows;
+}
+

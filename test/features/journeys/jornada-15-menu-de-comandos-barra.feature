@@ -1,38 +1,38 @@
 # language: pt
-Funcionalidade: Jornada 15 - Menu Interativo de Comandos de Barra no Prompt do BSH
+Funcionalidade: Jornada 15 - Paleta Flutuante OpenTUI de Comandos Slash
 
-  Como um usuário da TUI do BSH
-  Eu quero que ao digitar "/" em um prompt vazio apareça um menu com todos os comandos disponíveis e suas descrições
-  Para descobrir e acionar funcionalidades do sistema com rapidez e sem memorizar sintaxes
+  Como um usuário interagindo com a interface de terminal do BSH
+  Eu quero que uma paleta flutuante de comandos no padrão OpenTUI abra ao digitar "/" no prompt vazio
+  Para que eu possa descobrir, navegar, rolar pelas opções e executar comandos com cores distintas e descrições claras
 
   Contexto:
-    Dado que a sessão interativa da TUI do BSH está aberta e pronta
+    Dado que a sessão interativa da TUI do BSH está aberta e ociosa
     E que a linha de entrada do usuário está completamente vazia
 
-  Cenário: Abertura do menu de comandos ao digitar "/" no prompt vazio
-    Quando o usuário pressiona a tecla "/" no prompt vazio
-    Então o sistema deve abrir imediatamente o menu de comandos de barra
-    E o menu deve listar os comandos essenciais incluindo "/model", "/domain", "/diff", "/skills" e "/exit"
-    E cada item deve apresentar seu nome em destaque e a descrição do que ele faz
+  Cenário: Abertura da paleta flutuante OpenTUI no prompt vazio
+    Quando o usuário digita "/" no prompt vazio
+    Então a paleta flutuante de comandos aparece acima do prompt sem limpar a tela
+    E a paleta exibe os comandos com janela de rolagem "(1-5 of 14) • ↑/↓ scroll"
+    E cada comando exibe seu nome, atalho e descrição concisa em inglês dentro de 72 colunas
 
-  Cenário: Não acionamento do menu quando a tecla "/" for digitada com texto já existente
-    Dado que o usuário já digitou o texto "crie um endpoint para "
+  Cenário: Preservação de "/" como texto literal quando digitado em prompt com conteúdo
+    Dado que o usuário já digitou "criar um endpoint para "
     Quando o usuário pressiona a tecla "/"
-    Então o caractere "/" deve ser adicionado como texto comum na linha de entrada
-    E nenhum menu modal deve ser exibido
+    Então o caractere "/" é inserido como texto literal na linha de comando
+    E nenhuma paleta flutuante é exibida
 
-  Cenário: Navegação entre opções com cores ativas exclusivas e opção de não selecionar
-    Dado que o menu de comandos de barra está aberto
-    Quando o usuário navega com a seta para baixo passando pelas opções do menu
-    Então cada opção em foco deve ser destacada com uma cor exclusiva e diferente da anterior
-    Quando o usuário decide não selecionar nenhuma opção e pressiona a tecla "Escape"
-    Então o menu deve ser fechado imediatamente sem despachar comandos
-    E o usuário permanece no prompt original limpo
+  Cenário: Navegação com rolagem de janela e cores ativas exclusivas por comando
+    Dado que a paleta de comandos slash está aberta
+    Quando o usuário navega entre os comandos usando a tecla direcional para baixo
+    Então a janela visível rola suavemente através das opções
+    E cada comando em foco é destacado com sua cor ANSI exclusiva
+    Quando o usuário opta por não selecionar nenhum comando e pressiona "Escape"
+    Então a paleta é imediatamente fechada sem executar nenhum comando
+    E o prompt retorna ao seu estado limpo original
 
-  Cenário: Filtro e seleção de comando no menu
-    Dado que o usuário abre novamente o menu de comandos de barra com "/"
+  Cenário: Filtragem e execução de comando a partir da paleta
+    Dado que o usuário reabre a paleta digitando "/"
     Quando o usuário digita "ex"
-    Então a lista deve exibir apenas as opções correspondentes como "/exit" com realce de caracteres
-    Quando o usuário confirma a opção "/exit" com Enter
-    Então o sistema deve executar o comando correspondente e encerrar a sessão limpando a tela
-
+    Então a paleta filtra em tempo real exibindo correspondências incluindo "/exit"
+    Quando o usuário confirma a seleção pressionando "Enter"
+    Então a sessão do BSH executa o encerramento seguro e restaura o terminal limpo

@@ -121,17 +121,17 @@ def main():
 
     frame_idx = 0
 
-    print("--- [1/5] Gerando slide de abertura em fundo preto ---")
+    print("--- [1/5] Generating opening black slide ---")
     slide_path = frames_dir / f"frame_{frame_idx:05d}.png"
     render_slide(
-        title="Jornada 15: Menu de Comandos de Barra & Navegação Cromática",
-        subtitle="Verificação E2E Baseada em Especificação BDD Gherkin (openspec/specs)",
+        title="Journey 15: OpenTUI Slash Commands Floating Palette",
+        subtitle="Specification-Driven E2E Verification (openspec/specs)",
         bullets=[
-            "1. Disparo exclusivo ao pressionar '/' com o prompt estritamente vazio",
-            "2. Navegação com setas exibindo cor exclusiva e distinta para cada opção ativa",
-            "3. Decisão de NÃO SELECIONAR: tecla Escape fecha o menu e preserva o prompt limpo",
-            "4. Reabertura com '/', busca difusa instantânea ('ex') e destaque de caracteres",
-            "5. Seleção e confirmação com Enter (/exit) com encerramento seguro da sessão",
+            "1. Triggered strictly upon typing '/' in an empty prompt",
+            "2. Compact floating OpenTUI palette (<=72 cols) with windowed scrolling",
+            "3. Arrow navigation with distinct vibrant color for each active command",
+            "4. Decision NOT TO SELECT: pressing Escape dismisses palette cleanly",
+            "5. Real-time filtering ('ex'), character highlight, and Enter execution",
         ],
         output_path=slide_path
     )
@@ -141,7 +141,7 @@ def main():
         dup_path = frames_dir / f"frame_{frame_idx:05d}.png"
         dup_path.write_bytes(slide_path.read_bytes())
 
-    print("--- [2/5] Iniciando sessão tmux com o binário global bsh ---")
+    print("--- [2/5] Starting tmux session with global bsh binary ---")
     subprocess.run(["tmux", "kill-session", "-t", session_name], stderr=subprocess.DEVNULL)
     subprocess.run(["tmux", "new-session", "-d", "-s", session_name, "-x", "120", "-y", "32"], check=True)
 
@@ -153,11 +153,11 @@ def main():
     for _ in range(12):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH TUI: Prompt Inicial Vazio Pronto para Comandos", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Clean Idle Prompt Ready for Input", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
-    # ---------------- Passo 1: Digitar '/' em prompt vazio ----------------
-    print("--- [3/5] Pressionando '/' no prompt vazio para disparar o menu de comandos ---")
+    # ---------------- Step 1: Type '/' in empty prompt ----------------
+    print("--- [3/5] Typing '/' in empty prompt to open floating OpenTUI palette ---")
     subprocess.run(["tmux", "send-keys", "-t", session_name, "-l", "/"], check=True)
     time.sleep(1.5)
 
@@ -165,48 +165,66 @@ def main():
     for _ in range(12):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH TUI: Menu Aberto - /model Ativo (Magenta)", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: OpenTUI Palette - /model Active (Magenta)", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
-    # Navegar com seta Down para /domain (Verde Esmeralda)
+    # Navigate Down to /domain (Emerald Green)
     subprocess.run(["tmux", "send-keys", "-t", session_name, "Down"], check=True)
     time.sleep(0.8)
     for _ in range(8):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH TUI: Navegação - /domain Ativo (Verde Esmeralda)", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Navigation - /domain Active (Emerald Green)", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
-    # Navegar com seta Down para /skills (Ciano Elétrico)
+    # Navigate Down to /skills (Electric Cyan)
     subprocess.run(["tmux", "send-keys", "-t", session_name, "Down"], check=True)
     time.sleep(0.8)
     for _ in range(8):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH TUI: Navegação - /skills Ativo (Ciano Elétrico)", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Navigation - /skills Active (Electric Cyan)", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
-    # Navegar com seta Down para /diff (Amarelo Dourado)
+    # Navigate Down to /diff (Golden Yellow)
     subprocess.run(["tmux", "send-keys", "-t", session_name, "Down"], check=True)
     time.sleep(0.8)
     for _ in range(8):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH TUI: Navegação - /diff Ativo (Amarelo Dourado)", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Navigation - /diff Active (Golden Yellow)", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
-    # ---------------- Passo 2: Decisão de NÃO SELECIONAR (Escape) ----------------
-    print("--- [4/5] Pressionando Escape para NÃO SELECIONAR (fechar menu e voltar) ---")
+    # Navigate Down to /rules (Sky Blue)
+    subprocess.run(["tmux", "send-keys", "-t", session_name, "Down"], check=True)
+    time.sleep(0.8)
+    for _ in range(8):
+        frame_idx += 1
+        text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
+        render_terminal_frame(text, "BSH TUI: Navigation - /rules Active (Sky Blue)", frames_dir / f"frame_{frame_idx:05d}.png")
+        time.sleep(0.1)
+
+    # Navigate Down to /settings (Peach Orange) -> triggers window scroll to (2-6 of 14)
+    subprocess.run(["tmux", "send-keys", "-t", session_name, "Down"], check=True)
+    time.sleep(0.8)
+    for _ in range(10):
+        frame_idx += 1
+        text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
+        render_terminal_frame(text, "BSH TUI: Window Scroll (2-6 of 14) - /settings Active", frames_dir / f"frame_{frame_idx:05d}.png")
+        time.sleep(0.1)
+
+    # ---------------- Step 2: Decision NOT TO SELECT (Escape) ----------------
+    print("--- [4/5] Pressing Escape to dismiss palette without selecting ---")
     subprocess.run(["tmux", "send-keys", "-t", session_name, "Escape"], check=True)
     time.sleep(1.5)
     for _ in range(10):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH TUI: Menu Cancelado (Escape) - Prompt Limpo Restaurado", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Palette Dismissed (Escape) - Clean Prompt Restored", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
-    # ---------------- Passo 3: Reabrir e filtrar com 'ex' ----------------
-    print("--- [5/5] Reabrindo com '/', filtrando 'ex' e selecionando /exit ---")
+    # ---------------- Step 3: Reopen and filter with 'ex' ----------------
+    print("--- [5/5] Reopening with '/', filtering 'ex', and selecting /exit ---")
     subprocess.run(["tmux", "send-keys", "-t", session_name, "-l", "/"], check=True)
     time.sleep(1.0)
 
@@ -215,28 +233,28 @@ def main():
         time.sleep(0.1)
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH TUI: Busca e Filtragem Dinâmica (/exit Carmesim)", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Real-Time Filtering (/exit Crimson)", frames_dir / f"frame_{frame_idx:05d}.png")
 
     time.sleep(1.5)
     for _ in range(12):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH TUI: Opção /exit Filtrada e Destacada em Carmesim", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Filtered /exit Highlighted in Crimson", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     # Save screenshot of the filtered menu
     screenshot_out.parent.mkdir(parents=True, exist_ok=True)
-    render_terminal_frame(text, "BSH TUI: Menu de Comandos de Barra com Cores Exclusivas", screenshot_out)
+    render_terminal_frame(text, "BSH TUI: OpenTUI Floating Slash Palette", screenshot_out)
     print(f"Screenshot final salva em: {screenshot_out}")
 
-    # Confirmar com Enter
+    # Confirm with Enter
     subprocess.run(["tmux", "send-keys", "-t", session_name, "Enter"], check=True)
     time.sleep(2.0)
 
     for _ in range(12):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH TUI: Execução do Comando /exit e Limpeza do Terminal", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Execution of /exit and Clean Terminal Exit", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     # Hold final frame for 1.5 seconds
