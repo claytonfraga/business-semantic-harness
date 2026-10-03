@@ -38,6 +38,12 @@ The session controller owns conversation entries, prompt processing, active mode
 
 Ctrl+C, Escape, confirmation cancellation, double-Escape interruption, queueing during execution, slash filtering, and command shortcuts follow the existing features. Renderer default Ctrl+C termination must not bypass the existing exit-state logic. Shutdown always destroys the renderer and then releases MCP/session resources, including exceptional startup and runtime paths.
 
+## Responsive terminal layout
+
+The user explicitly requires width responsiveness comparable to Agy and Codex. Acceptance is specified in `BSH-OPENTUI-017` through `019`, with `BSH-TUI-003` reconciled from the old fixed chrome/manual ANSI description. All interactive surfaces use actual available width and supported component layout/wrapping. A palette's 72-column limit is a maximum, never a minimum.
+
+Necessary controls and semantic/execution status remain usable on narrow terminals through wrapping, adaptive disposition, or scrolling. Secondary details may be abbreviated. Resize preserves drafts, query, selection, focus, and conversation position. Test 35, 60, 80, and 140 columns during active streaming and open dialogs, plus a smaller-width usability probe. No widget may assume the legacy 60-column minimum.
+
 ## Runtime and distribution compatibility
 
 The project currently declares Node `>=22`, publishes an npm CLI, and uses ESM. The official OpenTUI core documentation consulted on 2026-10-03 states Bun `>=1.3.0` or Node `>=26.4.0` with `--experimental-ffi`. Therefore adopting the latest package without changing the launcher is not proven compatible with the current runtime contract.

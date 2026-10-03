@@ -2,7 +2,7 @@ import type { CliRenderer, KeyEvent, PasteEvent } from '@opentui/core';
 import { githubDarkDimmedTheme as theme } from './theme.js';
 import { fuzzyScore } from './fuzzySearch.js';
 
-export interface SelectionItem<T> { label: string; description?: string; value: T; color?: string }
+export interface SelectionItem<T> { label: string; description?: string; value: T; color?: string; shortcut?: string }
 export interface SelectionDialog<T> {
   title: string; immediateNumeric?: boolean; pageSize?: number; initialQuery?: string; currentSelection?: T; items: SelectionItem<T>[];
   filter?: (query: string) => SelectionItem<T>[];
@@ -28,10 +28,13 @@ export async function createDialogHost(renderer: CliRenderer, restoreFocus: () =
   function mount(title: string) {
     if (active) throw new Error('A dialog is already open');
     active = true;
-    const panel = new BoxRenderable(renderer, { id: `bsh-dialog-${serial++}`, position: 'absolute', bottom: 4, left: 0, width: '100%', maxWidth: 72, height: '70%', minHeight: 6, backgroundColor: theme.panel, border: true, borderColor: theme.border, flexDirection: 'column', padding: 1 });
+    const calcHeight = () => Math.max(8, Math.min(renderer.height - 4, 18));
+    const panel = new BoxRenderable(renderer, { id: `bsh-dialog-${serial++}`, position: 'absolute', bottom: 4, left: 0, width: '100%', maxWidth: 72, height: calcHeight(), backgroundColor: theme.panel, border: true, borderColor: theme.border, flexDirection: 'column', padding: 1 });
+    const onResize = () => { panel.height = calcHeight(); };
+    renderer.on('resize', onResize);
     panel.add(new TextRenderable(renderer, { content: title, width: '100%', wrapMode: 'word', fg: theme.emphasis, flexShrink: 0 }));
     renderer.root.add(panel);
-    return { panel, close() { renderer.root.remove(panel); panel.destroy(); active = false; restoreFocus(); } };
+    return { panel, close() { renderer.off('resize', onResize); renderer.root.remove(panel); panel.destroy(); active = false; restoreFocus(); } };
   }
   class MaskedInput extends InputRenderable {
     private editor = new InputRenderable(renderer, { id: `bsh-secret-model-${serial}`, showCursor: false, selectable: false });
@@ -46,30 +49,69 @@ export async function createDialogHost(renderer: CliRenderer, restoreFocus: () =
     get dialogActive() { return active; },
     async select<T>(options: SelectionDialog<T>): Promise<T | null> {
       const { panel, close } = mount(options.title);
-      const query = new InputRenderable(renderer, { id: `bsh-dialog-query-${serial}`, value: options.initialQuery ?? '', width: '100%', placeholder: 'Search', textColor: theme.text, backgroundColor: theme.recessed });
-      const summary = new TextRenderable(renderer, { width: '100%', wrapMode: 'word', fg: theme.muted });
-      const list = new SelectRenderable(renderer, { width: '100%', flexGrow: options.pageSize ? 0 : 1, height: options.pageSize, minHeight: 1, options: [], showDescription: false, wrapSelection: true, selectedBackgroundColor: theme.selection, selectedTextColor: theme.emphasis, textColor: theme.muted });
-      const detail = new TextRenderable(renderer, { width: '100%', wrapMode: 'word', fg: theme.text, flexShrink: 0 });
-      const hint = new TextRenderable(renderer, { width: '100%', content: 'Enter: select · Esc: close · ↑/↓/Tab: move', wrapMode: 'word', fg: theme.muted, flexShrink: 0 });
-      panel.add(query); panel.add(summary); panel.add(list); panel.add(detail); panel.add(hint);
+      const query = new InputRenderable(renderer, { id: `bsh-dialog-query-${serial}`, value: options.initialQuery ?? '', width: '100%', placeholder: 'Search', textColor: theme.text, backgroundColor: theme.recessed, flexShrink: 0 });
+      const summary = new TextRenderable(renderer, { width: '100%', wrapMode: 'word', fg: theme.muted, flexShrink: 0 });
+      const listHeight = options.pageSize ?? (renderer.height <= 24 ? 3 : 5);
+      const list = new SelectRenderable(renderer, { width: '100%', flexGrow: 0, flexShrink: 0, height: listHeight, minHeight: 1, options: [], showDescription: false, showSelectionIndicator: false, wrapSelection: true, selectedBackgroundColor: theme.selection, selectedTextColor: theme.emphasis, textColor: theme.muted });
+      const detailScroll = new ScrollBoxRenderable(renderer, { width: '100%', flexGrow: 1, flexShrink: 1, minHeight: 0, scrollX: false });
+      const detail = new TextRenderable(renderer, { width: '100%', wrapMode: 'word', fg: theme.text });
+      detailScroll.add(detail);
+      const hint = new TextRenderable(renderer, { width: '100%', content: renderer.width < 45 ? 'Enter: select · Esc: close' : 'Enter: select · Esc: close · ↑/↓/Tab: move', wrapMode: 'word', fg: theme.muted, flexShrink: 0 });
+      panel.add(query); panel.add(summary); panel.add(list); panel.add(detailScroll); panel.add(hint);
       let items: SelectionItem<T>[] = [];
       let navigated = false;
       let numericChoice = '';
       let editingQuery = false;
-      const updateDetail = () => { if (items.length && options.pageSize && !query.value) { const end = Math.min(items.length, Math.max(options.pageSize,list.getSelectedIndex()+1)); summary.content = `(${Math.max(1,end-options.pageSize+1)}-${end} of ${items.length}) • ↑/↓ scroll`; } const item = items[list.getSelectedIndex()]; const match = item ? fuzzyScore(item.label, query.value) : null; detail.content = item ? new StyledText([...Array.from(item.label).map((char, index) => fg(match?.indices.includes(index) ? theme.warning : theme.emphasis)(char)), fg(theme.text)(`\n${item.description ?? ''}`)]) : '';  list.selectedTextColor = item?.color ?? theme.emphasis; };
+      const formatRow = (item: SelectionItem<T>, index: number, isSelected: boolean, width: number): string => {
+        const pointer = isSelected ? '❯ ' : '  ';
+        const ordinal = `${index + 1}. `;
+        const isCurrent = item.value === options.currentSelection ? ' (current)' : '';
+        const base = `${pointer}${ordinal}${item.label}${isCurrent}`;
+        const maxRowWidth = Math.min(width, 72) - 4;
+        if (maxRowWidth < 45 || (!item.shortcut && !item.description)) return base;
+        const labelColWidth = 14;
+        const shortcutColWidth = 10;
+        const paddedLabel = (item.label + isCurrent).padEnd(labelColWidth);
+        const shortcutPart = item.shortcut ? item.shortcut.padEnd(shortcutColWidth) : (item.description ? ' '.repeat(shortcutColWidth) : '');
+        const prefix = `${pointer}${ordinal}${paddedLabel} ${shortcutPart} `;
+        const remaining = maxRowWidth - prefix.length;
+        if (remaining <= 5 || !item.description) return `${pointer}${ordinal}${paddedLabel} ${item.shortcut ?? ''}`.trimEnd();
+        const desc = item.description.length > remaining ? `${item.description.slice(0, remaining - 1)}…` : item.description;
+        return `${prefix}${desc}`;
+      };
+      const updateRows = (selIdx: number) => {
+        list.options = items.map((item, index) => ({ name: formatRow(item, index, index === selIdx, renderer.width), description: '', value: item.value }));
+      };
+      const updateDetail = () => {
+        const selIdx = list.getSelectedIndex();
+        updateRows(selIdx);
+        if (items.length && options.pageSize && !query.value) {
+          const end = Math.min(items.length, Math.max(options.pageSize, selIdx + 1));
+          summary.content = `(${Math.max(1, end - options.pageSize + 1)}-${end} of ${items.length}) • ↑/↓ scroll`;
+        }
+        const item = items[selIdx];
+        const match = item ? fuzzyScore(item.label, query.value) : null;
+        detail.content = item ? new StyledText([...Array.from(item.label).map((char, index) => fg(match?.indices.includes(index) ? theme.warning : theme.emphasis)(char)), fg(theme.text)(`${item.shortcut ? `  ${item.shortcut}` : ''}\n${item.description ?? ''}`)]) : '';
+        list.selectedTextColor = item?.color ?? theme.emphasis;
+      };
       const update = () => {
         const text = query.value;
         items = options.filter ? options.filter(text) : options.items.map(item => ({ item, match: fuzzyScore(`${item.label} ${item.description ?? ''}`, text) })).filter(row => row.match).sort((a,b) => (b.match?.score ?? 0) - (a.match?.score ?? 0)).map(row => row.item);
-        list.options = items.map((item,index) => ({ name: `${index+1}. ${item.label}${item.value === options.currentSelection ? ' (current)' : ''}`, description: '', value: item.value }));
+        updateRows(0);
         list.setSelectedIndex(0); navigated = false;
         summary.content = items.length ? `${items.length} matches${text ? ` · Filter: ${text}` : ' · ↑/↓ scroll'}` : 'No match';
         updateDetail();
       };
+      const onResizeSelect = () => {
+        hint.content = renderer.width < 45 ? 'Enter: select · Esc: close' : 'Enter: select · Esc: close · ↑/↓/Tab: move';
+        updateRows(list.getSelectedIndex());
+      };
+      renderer.on('resize', onResizeSelect);
       query.on('input', update); list.on('selectionChanged', updateDetail); update(); query.focus();
       return new Promise<T | null>(resolve => {
         let settled = false;
         const onDestroy = () => finish(null);
-        const finish = (value: T | null) => { if (settled) return; settled = true; renderer.off('destroy', onDestroy); renderer.keyInput.off('keypress', route); close(); resolve(value); };
+        const finish = (value: T | null) => { if (settled) return; settled = true; renderer.off('resize', onResizeSelect); renderer.off('destroy', onDestroy); renderer.keyInput.off('keypress', route); close(); resolve(value); };
         const route = (key: KeyEvent) => {
           const text = query.value;
           if (key.name === 'escape' || (key.ctrl && key.name === 'c') || (options.cancelBackspace && key.name === 'backspace' && !text)) { key.preventDefault(); finish(null); return; }
@@ -80,11 +122,12 @@ export async function createDialogHost(renderer: CliRenderer, restoreFocus: () =
           if (key.name === 'return' || key.name === 'enter') {
             key.preventDefault();
             if (numericChoice) { const item = items[Number(numericChoice)-1]; if (item) finish(item.value); else { numericChoice = ''; update(); } return; }
-            if ((options.cancelOnEmpty && !text && !navigated) || (options.cancelWords && /^(q|cancel|exit)$/i.test(text))) { finish(null); return; }
-            const custom = options.onQuerySubmit?.(text,items);
+            const custom = options.onQuerySubmit?.(text, items);
             if (custom !== undefined) { finish(custom); return; }
-            const exact = options.items.find(item => item.label.toLowerCase() === text.toLowerCase());
-            finish(exact?.value ?? items[list.getSelectedIndex()]?.value ?? null);
+            const exact = options.items.find(item => item.label.toLowerCase() === text.toLowerCase() || item.label.toLowerCase() === `/${text.toLowerCase()}`);
+            if (exact) { finish(exact.value); return; }
+            if ((options.cancelOnEmpty && !text && !navigated) || (options.cancelWords && /^(q|cancel|exit)$/i.test(text))) { finish(null); return; }
+            finish(items[list.getSelectedIndex()]?.value ?? null);
           } else if (key.name.length === 1 && !key.ctrl && !key.meta) { editingQuery = true; numericChoice = ''; }
         };
         renderer.keyInput.on('keypress', route); renderer.once('destroy', onDestroy);

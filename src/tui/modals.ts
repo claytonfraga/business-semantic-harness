@@ -115,7 +115,16 @@ export async function diffReviewModal(diffText: string, conforms: boolean, viola
 export interface SettingsState { confirmPromptViolations: boolean; model: string; domain?: string }
 export async function settingsModal(currentSettings: SettingsState, host?: DialogHost): Promise<SettingsState> {
   return withHost(host, async shared => {
-    const answer = await shared.select({ title: 'BSH settings', items: [{ label: 'Toggle prompt violation confirmation', value: 'toggle', description: `${currentSettings.confirmPromptViolations ? 'ENABLED' : 'DISABLED'} · Model: ${currentSettings.model} · Domain: ${currentSettings.domain ?? 'none'}` }, { label: 'Save and return', value: 'close' }] });
+    const answer = await shared.select({
+      title: 'BSH settings',
+      immediateNumeric: true,
+      cancelOnEmpty: true,
+      cancelWords: true,
+      items: [
+        { label: 'Toggle prompt violation confirmation', value: 'toggle', description: `${currentSettings.confirmPromptViolations ? 'ENABLED' : 'DISABLED'} · Model: ${currentSettings.model} · Domain: ${currentSettings.domain ?? 'none'}` },
+        { label: 'Save and return', value: 'close' }
+      ]
+    });
     return answer === 'toggle' ? { ...currentSettings, confirmPromptViolations: !currentSettings.confirmPromptViolations } : currentSettings;
   });
 }
@@ -129,6 +138,12 @@ export async function selectSkillModal(skills: Skill[], activeSkills: string[] =
   });
 }
 export async function selectSlashCommandModal(commands: SlashCommandDef[] = DEFAULT_SLASH_COMMANDS, initialQuery = '', host?: DialogHost): Promise<string | null> {
-  const item = (command: SlashCommandDef) => ({ label: command.name, value: command.name, color: command.activeColor, description: `${command.shortcut ? `[${command.shortcut}] · ` : ''}${command.description}` });
+  const item = (command: SlashCommandDef) => ({
+    label: command.name,
+    value: command.name,
+    color: command.activeColor,
+    shortcut: command.shortcut ? `[${command.shortcut}]` : undefined,
+    description: command.description,
+  });
   return withHost(host, shared => shared.select({ title: 'Slash commands', immediateNumeric: true, pageSize: 5, initialQuery, cancelBackspace: true, cancelWords: true, items: commands.map(item), filter: query => filterSlashCommands(query,commands).map(({command}) => item(command)), onQuerySubmit: query => commands.find(command => command.name.toLowerCase() === (query.startsWith('/') ? query : `/${query}`).toLowerCase())?.name }));
 }

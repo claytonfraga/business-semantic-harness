@@ -49,7 +49,7 @@ test('fuzzyScore calculates scores, boundary bonuses, and matching character ind
 });
 
 test('Given matching indices When a plain textual indication is requested Then matches are indicated without terminal escapes', () => {
-  assert.equal(highlightMatches('deepseek', [0, 4]), '[d]eep[s]eek');
+  assert.equal(highlightMatches('deepseek', [0, 4], true), '[d]eep[s]eek');
 });
 
 test('searchModels supports fuzzy subsequence search across reordered tokens', () => {

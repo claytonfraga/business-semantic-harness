@@ -156,3 +156,29 @@ Funcionalidade: Reconstrução integral da TUI com componentes OpenTUI
     Então seus estilos devem consumir os tokens compartilhados
     E o OpenTUI deve aplicar as cores e fundos dos componentes
     E não devem ser usadas sequências ANSI escritas à mão para aplicar o tema
+
+  @BSH-OPENTUI-017
+  Cenário: Adaptar toda a TUI à largura real do terminal
+    Dado que a sessão pode ser aberta em terminais estreitos, médios ou largos
+    Quando a largura da tela muda
+    Então cabeçalho, conversa, entrada, rodapé, paleta e diálogos devem se adaptar à largura real disponível
+    E a TUI não deve impor uma largura mínima artificial superior à tela
+    E texto deve quebrar e componentes devem ajustar sua disposição sem ultrapassar a tela
+    E a paleta deve respeitar simultaneamente o limite de 72 colunas e a largura disponível
+
+  @BSH-OPENTUI-018
+  Cenário: Priorizar conteúdo necessário em telas estreitas
+    Dado que a largura disponível não comporta todos os detalhes em uma linha
+    Quando a interface adapta sua disposição
+    Então controles de entrada, seleção, confirmação e cancelamento devem continuar utilizáveis
+    E estados de governança, bloqueio e execução devem permanecer identificáveis
+    E a interface deve usar quebra de texto, disposição alternativa ou rolagem para conteúdo necessário
+    E detalhes secundários podem ser abreviados sem esconder decisões ou ações obrigatórias
+
+  @BSH-OPENTUI-019
+  Cenário: Preservar estados ao alternar larguras durante a interação
+    Dado que o usuário possui rascunho, consulta, seleção e posição de conversa ativos
+    Quando o terminal alterna entre larguras de 35, 60, 80 e 140 colunas durante streaming ou um diálogo
+    Então os estados de entrada, consulta, seleção, foco e conversa devem ser preservados
+    E os componentes não devem apresentar sobreposição que impeça interação
+    E a verificação deve usar capturas dos componentes OpenTUI e evidências da jornada empacotada

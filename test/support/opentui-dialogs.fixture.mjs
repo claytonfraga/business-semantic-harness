@@ -56,8 +56,64 @@ test('Given BSH-OPENTUI-008 When promotion is blocked or settings toggle Then bl
   const ui = await setup();
   try {
     const blocked = diffReviewModal('+ changed', false, ['Rule violated'],ui.view); await ui.renderOnce(); assert.match(ui.captureCharFrame(), /BLOCKED/); await ui.mockInput.typeText('y'); ui.mockInput.pressEnter(); assert.equal(await blocked,false);
+    const emptySettings = settingsModal({ confirmPromptViolations: true, model: 'model', domain: 'assets' }, ui.view); await ui.renderOnce(); ui.mockInput.pressEnter(); assert.deepEqual(await emptySettings, { confirmPromptViolations: true, model: 'model', domain: 'assets' });
     const settings = settingsModal({ confirmPromptViolations: true,model:'model',domain:'assets' },ui.view); await ui.renderOnce(); await ui.mockInput.typeText('1'); ui.mockInput.pressEnter(); assert.deepEqual(await settings,{ confirmPromptViolations:false,model:'model',domain:'assets' });
     const review = diffReviewModal('+ valid',true,[],ui.view); await ui.renderOnce(); ui.mockInput.pressEnter(); assert.equal(await review,false);
+  } finally { ui.view.destroy(); }
+});
+
+test('Given BSH-MENU-003/006 When query exit is typed Then slash palette resolves /exit instead of null', async () => {
+  const ui = await setup();
+  try {
+    const pending = selectSlashCommandModal(undefined, '', ui.view);
+    await ui.renderOnce();
+    await ui.mockInput.typeText('exit');
+    await ui.renderOnce();
+    ui.mockInput.pressEnter();
+    assert.equal(await pending, '/exit');
+  } finally { ui.view.destroy(); }
+});
+
+test('Given BSH-OPENTUI-017/019 When dialogs render at 35x24 Then list rows, pointer, and scrollable details do not overlap', async () => {
+  const ui = await setup(35);
+  ui.resize(35, 24);
+  try {
+    const pendingSlash = selectSlashCommandModal(undefined, '', ui.view);
+    await ui.renderOnce();
+    const slashFrame = ui.captureCharFrame();
+    assert.match(slashFrame, /❯ 1\. \/model/);
+    assert.match(slashFrame, /5\. \/rules/);
+    assert.match(slashFrame, /Enter: select · Esc: close/);
+    ui.mockInput.pressEscape();
+    await pendingSlash;
+
+    const longModels = [
+      { id: 'openai/gpt-4o', name: 'OpenAI GPT-4o multimodal' },
+      { id: 'google/gemini-2.0-flash-001', name: 'Gemini 2.0 Flash' },
+      { id: 'meta-llama/llama-3.3-70b-instruct', name: 'Llama 3.3 70B' },
+      { id: 'deepseek/deepseek-chat', name: 'DeepSeek Chat' },
+    ];
+    const pendingModel = selectModelModal(longModels, longModels[0].id, '', ui.view);
+    await ui.renderOnce();
+    const modelFrame = ui.captureCharFrame();
+    assert.match(modelFrame, /❯ 1\./);
+    assert.match(modelFrame, /2\. google\/gemini-2\.0/);
+    ui.mockInput.pressEscape();
+    await pendingModel;
+  } finally { ui.view.destroy(); }
+});
+
+test('Given BSH-MENU-001/004 When slash palette opens at 80 columns Then shortcuts, descriptions, and pointer are rendered', async () => {
+  const ui = await setup(80);
+  try {
+    const pending = selectSlashCommandModal(undefined, '', ui.view);
+    await ui.renderOnce();
+    const frame = ui.captureCharFrame();
+    assert.match(frame, /❯ 1\. \/model\s+\[Ctrl\+M\]/);
+    assert.match(frame, /2\. \/domain\s+\[Ctrl\+D\]/);
+    assert.match(frame, /\(1-5 of 14\) • ↑\/↓ scroll/);
+    ui.mockInput.pressEscape();
+    await pending;
   } finally { ui.view.destroy(); }
 });
 

@@ -25,7 +25,7 @@ Funcionalidade: Jornada 15 - Paleta Flutuante OpenTUI de Comandos Slash
     Dado que a paleta de comandos slash está aberta
     Quando o usuário navega entre os comandos usando a tecla direcional para baixo
     Então a janela visível rola suavemente através das opções
-    E cada comando em foco é destacado com sua cor ANSI exclusiva
+    E cada comando em foco é destacado com sua cor GitHub Dark Dimmed definida em "menu-de-comandos-barra.feature"
     Quando o usuário opta por não selecionar nenhum comando e pressiona "Escape"
     Então a paleta é imediatamente fechada sem executar nenhum comando
     E o prompt retorna ao seu estado limpo original

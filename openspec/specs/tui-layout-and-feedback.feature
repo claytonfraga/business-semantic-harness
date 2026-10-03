@@ -26,11 +26,12 @@ Funcionalidade: Layout responsivo e feedback da sessão
   @BSH-TUI-003
   Cenário: Manter dimensões da tela
     Dado um terminal com largura e altura suportadas
-    Quando há mensagens longas, ANSI, blocos de código, cards e redimensionamento
+    Quando há mensagens longas, blocos de código, cards e redimensionamento
     Então cada linha deve permanecer na largura visível da tela
     E o quadro deve ocupar a altura configurada
-    E o layout atual deve reservar 3 linhas de cabeçalho e 4 de rodapé
-    E truncamento e quebra de texto devem preservar sequências ANSI
+    E cabeçalho, conversa, entrada e rodapé devem ajustar sua disposição à largura real disponível
+    E estilos e quebra de texto devem ser gerenciados pelos componentes OpenTUI
+    E a TUI não deve impor uma largura mínima superior à tela nem ocultar controles obrigatórios por truncamento
 
   @BSH-TUI-004
   Cenário: Mostrar contexto ontológico
