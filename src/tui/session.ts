@@ -1,6 +1,3 @@
-import * as readline from 'node:readline/promises';
-import type { Key } from 'node:readline';
-import { Writable } from 'node:stream';
 import { relative, basename, join } from 'node:path';
 import { mkdir, readFile, writeFile, unlink } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
@@ -24,9 +21,9 @@ import {
 } from '../git/worktree.js';
 import { promoverSessao } from '../git/promotion.js';
 import { ansi } from './ansi.js';
-import { renderCompleteTui, type ChatEntry } from './render.js';
+import type { ChatEntry, RenderState } from './state.js';
 import { promptApiKeyModal, selectModelModal, selectDomainModal, diffReviewModal, settingsModal, selectSkillModal, selectSlashCommandModal } from './modals.js';
-import { filterSlashCommands, DEFAULT_SLASH_COMMANDS, type SlashMenuOverlayState } from './slashCommands.js';
+import { DEFAULT_SLASH_COMMANDS } from './slashCommands.js';
 import { SkillRegistry } from '../skills/registry.js';
 import { installSkillPackage } from '../skills/installer.js';
 import { detectSkillInvocation, detectSemanticSkillNeed } from '../skills/activation.js';
@@ -34,12 +31,15 @@ import { detectPromptViolation } from '../enforcement/promptGuard.js';
 import { McpClientManager } from '../mcp/clientManager.js';
 import { loadPromptHistory, savePromptHistory } from './history.js';
 import { InputQueueManager } from './inputQueue.js';
-import { ExitGuard, cleanExitTerminal } from './exitGuard.js';
+import { ExitGuard } from './exitGuard.js';
+import { createTuiView, type TuiView } from './view.js';
+import { SessionInputController } from './input.js';
 
 export interface TuiSessionOptions {
   projectRoot?: string;
   model?: string;
   domain?: string;
+  view?: TuiView;
 }
 
 export async function startTuiSession(options: TuiSessionOptions = {}): Promise<void> {
@@ -51,7 +51,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   let confirmPromptViolations = env.confirmPromptViolations ?? true;
 
   if (!apiKey) {
-    const auth = await promptApiKeyModal();
+    const auth = await promptApiKeyModal(options.view);
     if (!auth?.apiKey) {
       console.log(`${ansi.red}OpenRouter authentication is required to use BSH. Exiting.${ansi.reset}`);
       return;
@@ -112,15 +112,18 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   // 5. Workspace Context Discovery
   const workspaceSummary = await inspectWorkspace(projectRoot);
 
-  // 6. Main TUI Loop & Alternate Screen Buffer (Maximized)
+  // 6. View & Component State
   let tokensTotal = 1420;
   let lastGateConforming = true;
   let lastGateViolations: string[] = [];
-  let scrollOffset = 0;
   let alignmentStatus: 'ALIGNED' | 'MISMATCH' | 'INSUFFICIENT_DATA' = 'ALIGNED';
   let alignmentWarning: string | undefined;
   const messages: ChatMessage[] = [];
   const chatEntries: ChatEntry[] = [];
+  let lastTurnDurationMs = 0;
+  let lastTurnTps = 0;
+
+  const view = options.view ?? await createTuiView();
 
   const runAffinityCheck = async (domainId?: string) => {
     if (!domainId || !validator) {
@@ -151,7 +154,6 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     }
   };
 
-  // Initial affinity check before first render
   await runAffinityCheck(activeDomainId);
 
   const skillRegistry = new SkillRegistry(projectRoot);
@@ -162,12 +164,17 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   };
 
   const exitGuard = new ExitGuard({ windowMs: 1500 });
+  const inputQueue = new InputQueueManager();
+  let isExecutingTurn = false;
   let exitRequested = false;
-  let activeSlashMenu: SlashMenuOverlayState | null = null;
+  let activeAbortController: AbortController | null = null;
+  let promptResolver: ((line: string) => void) | null = null;
+  let confirmationResolver: ((line: string) => void) | null = null;
 
-  const redrawScreen = (currentPrompt = '') => {
-    const cols = process.stdout.columns && process.stdout.columns >= 50 ? process.stdout.columns : 96;
-    const rows = process.stdout.rows && process.stdout.rows >= 15 ? process.stdout.rows : 30;
+  const updateView = (patch: Partial<RenderState> = {}) => {
+    const relProject = relative(process.cwd(), projectRoot);
+    const projectFolder = relProject && !relProject.startsWith('..') ? relProject : basename(projectRoot);
+    const gitBranch = sessao?.branchOrigem || activeGitBranch;
 
     const activeDomainSummary = availableDomains.find((d) => d.id === activeDomainId);
     let ontologySummary = '';
@@ -181,11 +188,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       ontologySummary = activeDomainId;
     }
 
-    const relProject = relative(process.cwd(), projectRoot);
-    const projectFolder = relProject && !relProject.startsWith('..') ? relProject : basename(projectRoot);
-    const gitBranch = sessao?.branchOrigem || activeGitBranch;
-
-    const frame = renderCompleteTui({
+    view.update({
       model: activeModel,
       contextLength: getActiveContextLength(),
       domain: activeDomainId,
@@ -196,87 +199,16 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       alignmentStatus,
       alignmentWarning,
       tokensTotal,
-      width: cols,
-      height: rows,
-      scrollOffset,
       generationDurationMs: lastTurnDurationMs,
       generationTps: lastTurnTps,
       queueLength: inputQueue.length,
       ctrlCExitAlert: exitGuard.isExitPending(),
       activeSkill: activeSkillNames.length > 0 ? activeSkillNames.join(', ') : undefined,
-      slashMenu: activeSlashMenu || undefined,
-    }, chatEntries, currentPrompt, cols, rows);
-
-    process.stdout.write(`\x1b[?7l\x1b[H${frame}\x1b[?7h`);
-    const promptRow = rows - 2;
-    const promptCol = 7 + (activeSlashMenu ? 1 + activeSlashMenu.query.length : (rl ? (rl as unknown as { cursor?: number }).cursor || 0 : 0));
-    process.stdout.write(`\x1b[${promptRow};${promptCol}H`);
-  };
-
-  // Maximize into Alternate Screen Buffer
-  process.stdout.write('\x1b[?1049h\x1b[2J\x1b[H');
-
-  const onResize = () => {
-    redrawScreen('');
-  };
-  process.stdout.on('resize', onResize);
-
-  const filterOut = new Writable({
-    write(chunk, _encoding, cb) {
-      const s = chunk.toString();
-      const replaced = s
-        .replaceAll('\x1b[0J', '\x1b[K')
-        .replaceAll('\x1b[J', '\x1b[K')
-        .replaceAll('\r\n', '\r')
-        .replaceAll('\n', '');
-      process.stdout.write(replaced);
-      cb();
-    },
-  });
-
-  // Load project-specific prompt history (.bsh/history.json)
-  const initialHistory = await loadPromptHistory(projectRoot);
-
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: filterOut,
-    terminal: true,
-    history: initialHistory,
-    historySize: 1000,
-  });
-
-  // Input queueing & ergonomic state machine (SRP)
-  const inputQueue = new InputQueueManager();
-  let isExecutingTurn = false;
-  let isModalOpen = false;
-  let activeAbortController: AbortController | null = null;
-  let promptResolver: ((line: string) => void) | null = null;
-  let confirmationResolver: ((line: string) => void) | null = null;
-  let lastTurnDurationMs = 0;
-  let lastTurnTps = 0;
-
-  const runWithModal = async <T>(fn: () => Promise<T>): Promise<T> => {
-    isModalOpen = true;
-    if (rl) {
-      rl.pause();
-    }
-    try {
-      return await fn();
-    } finally {
-      isModalOpen = false;
-      if (rl) {
-        (rl as unknown as { line: string; cursor: number }).line = '';
-        (rl as unknown as { cursor: number }).cursor = 0;
-        rl.resume();
-      }
-      process.stdin.resume();
-    }
+      ...patch,
+    }, chatEntries);
   };
 
   const dispatchPrompt = (text: string) => {
-    if (isModalOpen) {
-      return;
-    }
     if (confirmationResolver) {
       const resolver = confirmationResolver;
       confirmationResolver = null;
@@ -292,7 +224,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           content: text,
           isQueued: true,
         });
-        redrawScreen('');
+        updateView();
       }
     } else {
       if (promptResolver) {
@@ -301,97 +233,61 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         resolve(text);
       } else if (text) {
         inputQueue.enqueue(text);
+        updateView();
       }
     }
   };
 
-  rl.on('line', (line: string) => {
-    if (isModalOpen || activeSlashMenu) {
-      return;
-    }
+  const initialHistory = await loadPromptHistory(projectRoot);
 
-    // Auto-clear input buffer immediately on Enter
-    (rl as unknown as { line: string; cursor: number }).line = '';
-    (rl as unknown as { cursor: number }).cursor = 0;
-
-    const trimmed = line.trim();
-
-    // Process line through multiline state machine (SRP)
-    const multiline = inputQueue.processLineInput(line);
-    if (multiline.isHandled) {
-      if (multiline.completePrompt) {
-        dispatchPrompt(multiline.completePrompt);
-      } else {
-        redrawScreen(multiline.hint || '');
-      }
-      return;
-    }
-
-    if (!trimmed) {
-      if (!isExecutingTurn) {
-        redrawScreen('');
-      }
-      return;
-    }
-
-    dispatchPrompt(trimmed);
-  });
-
-  const onCtrlCAction = () => {
-    if (activeSlashMenu) {
-      activeSlashMenu = null;
-      (rl as unknown as { line: string; cursor: number }).line = '';
-      (rl as unknown as { cursor: number }).cursor = 0;
-      redrawScreen('');
-      return;
-    }
-
-    if (inputQueue.cancelMultiline()) {
-      chatEntries.push({
-        type: 'agent',
-        content: '[!] Entrada multilinha cancelada.',
-      });
-      redrawScreen('');
-      return;
-    }
-
-    const currentLine = (rl as unknown as { line?: string }).line || '';
-    const decision = exitGuard.handleCtrlC({
-      hasPromptText: currentLine.length > 0,
-      isExecutingTurn,
-    });
-
-    if (decision === 'CLEARED_PROMPT') {
-      (rl as unknown as { line: string; cursor: number }).line = '';
-      (rl as unknown as { cursor: number }).cursor = 0;
-      redrawScreen('');
-      return;
-    }
-
-    if (decision === 'ABORTED_TURN') {
+  const inputController = new SessionInputController({
+    view,
+    queue: inputQueue,
+    exitGuard,
+    history: initialHistory,
+    isExecutingTurn: () => isExecutingTurn,
+    onDispatch: (prompt) => dispatchPrompt(prompt),
+    onAbortTurn: (reason) => {
       if (activeAbortController) {
-        activeAbortController.abort('Ctrl+C');
+        activeAbortController.abort(reason);
         chatEntries.push({
           type: 'agent',
-          content: '[!] Execução cancelada pelo usuário (Ctrl+C).',
+          content: `[!] Execução cancelada pelo usuário (${reason}).`,
         });
         isExecutingTurn = false;
+        updateView();
       }
-      redrawScreen('');
-      return;
-    }
-
-    if (decision === 'ALERT_TRIGGERED') {
-      redrawScreen('');
-      setTimeout(() => {
-        if (!exitGuard.isExitPending()) {
-          redrawScreen((rl as unknown as { line?: string }).line || '');
+    },
+    onCancelConfirmation: () => {
+      if (confirmationResolver) {
+        const res = confirmationResolver;
+        confirmationResolver = null;
+        res('/cancel');
+        return true;
+      }
+      return false;
+    },
+    onToggleReasoning: () => {
+      const reasoningEntries = chatEntries.filter((e) => e.type === 'reasoning');
+      if (reasoningEntries.length > 0) {
+        const target = reasoningEntries[reasoningEntries.length - 1];
+        target.reasoningCollapsed = !target.reasoningCollapsed;
+        updateView();
+      }
+    },
+    onTriggerSlashMenu: () => {
+      void (async () => {
+        const selected = await selectSlashCommandModal(DEFAULT_SLASH_COMMANDS, '', view);
+        if (selected) {
+          dispatchPrompt(selected);
+        } else {
+          view.focusPrompt();
+          updateView();
         }
-      }, 1550);
-      return;
-    }
-
-    if (decision === 'EXIT_CONFIRMED') {
+      })();
+    },
+    onSaveHistory: (hist) => savePromptHistory(projectRoot, hist),
+    onExit: () => {
       exitRequested = true;
       if (promptResolver) {
         const res = promptResolver;
@@ -403,198 +299,9 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         confirmationResolver = null;
         res('/cancel');
       }
-    }
-  };
-
-  rl.on('SIGINT', onCtrlCAction);
-
-  // Keypress listener for shortcuts, ESC ESC, and single-line history
-  const onKeypress = (_str: string, key: Key) => {
-    if (!key || isModalOpen) return;
-
-    // Handle interactive OpenTUI Slash Menu
-    if (activeSlashMenu) {
-      (rl as unknown as { line: string; cursor: number }).line = '';
-      (rl as unknown as { cursor: number }).cursor = 0;
-
-      const scored = filterSlashCommands(activeSlashMenu.query, DEFAULT_SLASH_COMMANDS);
-      const total = scored.length;
-
-      // Escape or Ctrl+C: dismiss menu without selecting
-      if (key.name === 'escape' || (key.ctrl && key.name === 'c')) {
-        activeSlashMenu = null;
-        redrawScreen('');
-        return;
-      }
-
-      // Enter / Return: select highlighted command
-      if (key.name === 'return' || key.name === 'enter') {
-        const selected = scored[activeSlashMenu.selectedIndex]?.command.name;
-        activeSlashMenu = null;
-        if (selected) {
-          dispatchPrompt(selected);
-        } else {
-          redrawScreen('');
-        }
-        return;
-      }
-
-      // Up arrow: navigate up with wrap-around
-      if (key.name === 'up') {
-        if (total > 0) {
-          activeSlashMenu.selectedIndex = (activeSlashMenu.selectedIndex - 1 + total) % total;
-          redrawScreen(`/${activeSlashMenu.query}`);
-        }
-        return;
-      }
-
-      // Down arrow or Tab: navigate down with wrap-around
-      if (key.name === 'down' || key.name === 'tab') {
-        if (total > 0) {
-          activeSlashMenu.selectedIndex = (activeSlashMenu.selectedIndex + 1) % total;
-          redrawScreen(`/${activeSlashMenu.query}`);
-        }
-        return;
-      }
-
-      // Backspace: delete character or close if query is empty
-      if (key.name === 'backspace') {
-        if (activeSlashMenu.query.length > 0) {
-          activeSlashMenu.query = activeSlashMenu.query.slice(0, -1);
-          activeSlashMenu.selectedIndex = 0;
-          activeSlashMenu.scrollOffset = 0;
-          redrawScreen(`/${activeSlashMenu.query}`);
-        } else {
-          activeSlashMenu = null;
-          redrawScreen('');
-        }
-        return;
-      }
-
-      // Direct digit 1-9 selection when query is empty
-      if (!activeSlashMenu.query && /^[1-9]$/.test(key.name || '')) {
-        const num = parseInt(key.name || '', 10);
-        if (num >= 1 && num <= total) {
-          const selected = scored[num - 1]?.command.name;
-          activeSlashMenu = null;
-          if (selected) {
-            dispatchPrompt(selected);
-          } else {
-            redrawScreen('');
-          }
-          return;
-        }
-      }
-
-      // Printable characters for search filter
-      if (_str && _str.length === 1 && !key.ctrl && !key.meta) {
-        activeSlashMenu.query += _str;
-        activeSlashMenu.selectedIndex = 0;
-        activeSlashMenu.scrollOffset = 0;
-        redrawScreen(`/${activeSlashMenu.query}`);
-        return;
-      }
-
-      return;
-    }
-
-    // Ctrl+C handled via ExitGuard
-    if (key.ctrl && key.name === 'c') {
-      onCtrlCAction();
-      return;
-    }
-
-    // Ctrl+O toggles reasoning CoT collapse/expansion
-    if (key.ctrl && key.name === 'o') {
-      const reasoningEntries = chatEntries.filter((e) => e.type === 'reasoning');
-      if (reasoningEntries.length > 0) {
-        const target = reasoningEntries[reasoningEntries.length - 1];
-        target.reasoningCollapsed = !target.reasoningCollapsed;
-        redrawScreen((rl as unknown as { line?: string }).line || '');
-      }
-      return;
-    }
-
-    // Ctrl+M opens model selector when idle
-    if (!isExecutingTurn && key.ctrl && key.name === 'm') {
-      (rl as unknown as { line: string; cursor: number }).line = '';
-      (rl as unknown as { cursor: number }).cursor = 0;
-      dispatchPrompt('/model');
-      return;
-    }
-
-    // Ctrl+D opens domain selector when idle
-    if (!isExecutingTurn && key.ctrl && key.name === 'd') {
-      (rl as unknown as { line: string; cursor: number }).line = '';
-      (rl as unknown as { cursor: number }).cursor = 0;
-      dispatchPrompt('/domain');
-      return;
-    }
-
-    // Typing "/" in an empty prompt opens the Slash Commands Menu
-    const currentLine = (rl as unknown as { line?: string }).line || '';
-    if (
-      !isExecutingTurn &&
-      !isModalOpen &&
-      !activeSlashMenu &&
-      (_str === '/' || key.sequence === '/' || key.name === '/') &&
-      (currentLine.trim().length === 0 || currentLine.trim() === '/')
-    ) {
-      (rl as unknown as { line: string; cursor: number }).line = '';
-      (rl as unknown as { cursor: number }).cursor = 0;
-      activeSlashMenu = {
-        selectedIndex: 0,
-        scrollOffset: 0,
-        pageSize: 5,
-        query: '',
-      };
-      redrawScreen('/');
-      return;
-    }
-
-    // Single ESC cancels prompt violation confirmation immediately; double ESC (within 500ms) cancels current turn execution
-    if (key.name === 'escape') {
-      if (confirmationResolver) {
-        const res = confirmationResolver;
-        confirmationResolver = null;
-        res('/cancel');
-        return;
-      }
-
-      if (inputQueue.handleEscape()) {
-        if (isExecutingTurn && activeAbortController) {
-          activeAbortController.abort('ESC ESC');
-          chatEntries.push({
-            type: 'agent',
-            content: '[!] Execução cancelada pelo usuário (ESC ESC).',
-          });
-          isExecutingTurn = false;
-          redrawScreen('');
-          return;
-        }
-      }
-      return;
-    }
-
-    if (key.name === 'pageup') {
-      scrollOffset += 6;
-      redrawScreen((rl as unknown as { line?: string }).line || '');
-    } else if (key.name === 'pagedown') {
-      scrollOffset = Math.max(0, scrollOffset - 6);
-      redrawScreen((rl as unknown as { line?: string }).line || '');
-    } else if (key.name === 'up' && (key.shift || key.ctrl)) {
-      scrollOffset += 1;
-      redrawScreen((rl as unknown as { line?: string }).line || '');
-    } else if (key.name === 'down' && (key.shift || key.ctrl)) {
-      scrollOffset = Math.max(0, scrollOffset - 1);
-      redrawScreen((rl as unknown as { line?: string }).line || '');
-    } else {
-      setImmediate(() => {
-        redrawScreen((rl as unknown as { line?: string }).line || '');
-      });
-    }
-  };
-  process.stdin.on('keypress', onKeypress);
+    },
+    onAlertChange: () => updateView(),
+  });
 
   const getNextPrompt = (): Promise<string> => {
     if (inputQueue.hasItems) {
@@ -603,6 +310,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       if (queuedEntry) {
         delete queuedEntry.isQueued;
       }
+      updateView();
       return Promise.resolve(next);
     }
     return new Promise<string>((resolve) => {
@@ -617,8 +325,10 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   };
 
   try {
+    updateView();
+
     while (true) {
-      redrawScreen('');
+      updateView();
       let prompt = (await getNextPrompt()).trim();
       if (!prompt) continue;
 
@@ -629,10 +339,13 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           '# Digite ou cole seu prompt aqui.\n# Linhas iniciadas com # serão ignoradas.\n# Salve e feche o editor para enviar ao BSH.\n',
           'utf8'
         );
-        process.stdout.write('\x1b[?1049l\x1b[?25h');
+        view.suspend();
         const editorCmd = process.env.VISUAL || process.env.EDITOR || 'nano';
-        spawnSync(editorCmd, [tmpFile], { stdio: 'inherit' });
-        process.stdout.write('\x1b[?1049h\x1b[2J\x1b[H');
+        try {
+          spawnSync(editorCmd, [tmpFile], { stdio: 'inherit' });
+        } finally {
+          view.resume();
+        }
         let edited = '';
         try {
           const raw = await readFile(tmpFile, 'utf8');
@@ -644,27 +357,18 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         if (edited) {
           prompt = edited;
         } else {
-          redrawScreen();
+          updateView();
           continue;
         }
       }
 
-      // Save prompt into project-specific history (.bsh/history.json)
-      if (!prompt.startsWith('/')) {
-        const currentHist = (rl as unknown as { history?: string[] }).history || [];
-        await savePromptHistory(projectRoot, currentHist);
-      }
-
-      // Reset scroll on active user prompt
-      scrollOffset = 0;
-
       // Handle Slash Commands
       if (prompt === '/' || prompt === '/menu') {
-        const selected = await runWithModal(() => selectSlashCommandModal());
+        const selected = await selectSlashCommandModal(DEFAULT_SLASH_COMMANDS, '', view);
         if (selected) {
           prompt = selected;
         } else {
-          redrawScreen('');
+          updateView();
           continue;
         }
       }
@@ -675,52 +379,52 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
       if (prompt === '/clear') {
         chatEntries.length = 0;
-        scrollOffset = 0;
-        redrawScreen();
+        view.scrollTo('top');
+        updateView();
         continue;
       }
 
       if (prompt.startsWith('/up') || prompt === '/pgup') {
         const parts = prompt.split(/\s+/);
         const count = parts.length > 1 ? parseInt(parts[1], 10) || 6 : 6;
-        scrollOffset += count;
-        redrawScreen();
+        view.scrollBy(-count);
+        updateView();
         continue;
       }
 
       if (prompt.startsWith('/down') || prompt === '/pgdn') {
         const parts = prompt.split(/\s+/);
         const count = parts.length > 1 ? parseInt(parts[1], 10) || 6 : 6;
-        scrollOffset = Math.max(0, scrollOffset - count);
-        redrawScreen();
+        view.scrollBy(count);
+        updateView();
         continue;
       }
 
       if (prompt === '/top') {
-        scrollOffset = 99999;
-        redrawScreen();
+        view.scrollTo('top');
+        updateView();
         continue;
       }
 
       if (prompt === '/bottom') {
-        scrollOffset = 0;
-        redrawScreen();
+        view.scrollTo('bottom');
+        updateView();
         continue;
       }
 
       if (prompt.startsWith('/model')) {
         const query = prompt.replace(/^\/model\s*/, '').trim();
         const prevModel = activeModel;
-        activeModel = await runWithModal(() => selectModelModal(modelsList, activeModel, query || undefined));
+        activeModel = await selectModelModal(modelsList, activeModel, query || undefined, view);
         if (activeModel !== prevModel) {
           await saveEnvConfig({ BSH_DEFAULT_MODEL: activeModel }, projectRoot);
         }
-        redrawScreen();
+        updateView();
         continue;
       }
 
       if (prompt === '/domain') {
-        activeDomainId = await runWithModal(() => selectDomainModal(availableDomains, activeDomainId));
+        activeDomainId = await selectDomainModal(availableDomains, activeDomainId, view);
         if (activeDomainId) {
           validator = await loadDomainValidator(projectRoot, activeDomainId);
           await saveEnvConfig({ BSH_DEFAULT_DOMAIN: activeDomainId }, projectRoot);
@@ -729,7 +433,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           validator = null;
           alignmentStatus = 'INSUFFICIENT_DATA';
         }
-        redrawScreen();
+        updateView();
         continue;
       }
 
@@ -740,7 +444,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           type: 'agent',
           content: 'Harness ontológico desabilitado pelo usuário. Sessão operando em modo UNGOVERNED sem restrições de SHACL.',
         });
-        redrawScreen();
+        updateView();
         continue;
       }
 
@@ -765,7 +469,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
             content: 'Nenhum domínio configurado. Use /domain para selecionar um domínio.',
           });
         }
-        redrawScreen();
+        updateView();
         continue;
       }
 
@@ -779,7 +483,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
               ? parts.slice(2).join(' ')
               : parts.slice(1).join(' ');
           const allSkills = await skillRegistry.discover();
-          const modalRes = await runWithModal(() => selectSkillModal(allSkills, activeSkillNames, query));
+          const modalRes = await selectSkillModal(allSkills, activeSkillNames, query, view);
           if (modalRes.action === 'toggle' && modalRes.selectedSkillName) {
             const idx = activeSkillNames.indexOf(modalRes.selectedSkillName);
             if (idx >= 0) {
@@ -804,7 +508,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
               });
             }
           }
-          redrawScreen();
+          updateView();
           continue;
         }
 
@@ -821,7 +525,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
               content: `Skill '${parts[2]}' não encontrada.`,
             });
           }
-          redrawScreen();
+          updateView();
           continue;
         }
 
@@ -831,7 +535,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
             type: 'agent',
             content: `Instalando skill '${source}'...`,
           });
-          redrawScreen();
+          updateView();
           const res = await installSkillPackage(source, { projectRoot });
           if (res.success) {
             skillRegistry.clearCache();
@@ -845,7 +549,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
               content: `Erro ao instalar skill: ${res.error || res.output}`,
             });
           }
-          redrawScreen();
+          updateView();
           continue;
         }
 
@@ -863,7 +567,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
               content: `Skill '${parts[2]}' não encontrada.`,
             });
           }
-          redrawScreen();
+          updateView();
           continue;
         }
 
@@ -881,7 +585,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
               content: `Skill '${parts[2]}' não estava ativa.`,
             });
           }
-          redrawScreen();
+          updateView();
           continue;
         }
 
@@ -898,7 +602,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
               content: `✔ Loop da skill [${closedSkills.join(', ')}] concluído com sucesso. Diretivas da skill finalizadas.`,
             });
           }
-          redrawScreen();
+          updateView();
           continue;
         }
       }
@@ -910,7 +614,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
             type: 'agent',
             content: `✔ Loop da skill [${closedSkills.join(', ')}] concluído com sucesso. Diretivas da skill finalizadas.`,
           });
-          redrawScreen();
+          updateView();
           continue;
         }
       }
@@ -931,7 +635,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
               content: `Servidores MCP conectados via stdio. Ferramentas ativas (${toolDefs.length}):\n${list}`,
             });
           }
-          redrawScreen();
+          updateView();
           continue;
         }
 
@@ -962,7 +666,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
             type: 'agent',
             content: `✔ Servidor MCP "${serverName}" configurado e conectado com sucesso via stdio!\n↳ Ferramentas registradas: ${toolDefs.map((t) => t.function.name).join(', ') || 'nenhuma'}`,
           });
-          redrawScreen();
+          updateView();
           continue;
         }
 
@@ -984,62 +688,67 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           } catch {
             // ignore
           }
-          redrawScreen();
+          updateView();
           continue;
         }
       }
 
       if (prompt === '/affinity' || prompt === '/alignment') {
         if (!activeDomainId) {
-          console.log(`\n${ansi.yellow}Nenhum domínio ativo para checar afinidade semântica.${ansi.reset}`);
+          chatEntries.push({
+            type: 'agent',
+            content: 'Nenhum domínio ativo para checar afinidade semântica.',
+          });
         } else {
           const targetDomain = availableDomains.find((d) => d.id === activeDomainId);
           if (targetDomain) {
             const aff = await checkDomainAffinity(projectRoot, targetDomain.ontologyPath, targetDomain.shapesPath, activeDomainId);
-            console.log(`\n${ansi.bold}Relatório de Afinidade Semântica [${activeDomainId}]:${ansi.reset}`);
-            console.log(`  Status: ${aff.status === 'ALIGNED' ? ansi.brightGreen : ansi.yellow}${aff.status}${ansi.reset}`);
-            console.log(`  Score: ${(aff.score * 100).toFixed(1)}%`);
-            console.log(`  Conceitos da ontologia: ${aff.ontologyTerms.slice(0, 8).join(', ')}`);
-            console.log(`  Conceitos encontrados no projeto: ${aff.matchedTerms.join(', ') || 'Nenhum'}`);
-            console.log(`  ${aff.summary}`);
+            chatEntries.push({
+              type: 'agent',
+              content: `Relatório de Afinidade Semântica [${activeDomainId}]:\n  Status: ${aff.status}\n  Score: ${(aff.score * 100).toFixed(1)}%\n  Conceitos da ontologia: ${aff.ontologyTerms.slice(0, 8).join(', ')}\n  Conceitos encontrados no projeto: ${aff.matchedTerms.join(', ') || 'Nenhum'}\n  ${aff.summary}`,
+            });
           }
         }
-        await rl.question(`\n${ansi.dim}Pressione Enter para retornar ao agente...${ansi.reset}`);
-        redrawScreen();
+        updateView();
         continue;
       }
 
       if (prompt === '/diff') {
         const diffText = sessao ? await git(sessao.caminhoWorktree, ['diff', sessao.commitBase]).catch(() => '') : '';
-        const shouldPromote = await runWithModal(() => diffReviewModal(diffText, lastGateConforming, lastGateViolations));
+        const shouldPromote = await diffReviewModal(diffText, lastGateConforming, lastGateViolations, view);
         if (shouldPromote && sessao) {
           await promoverSessao(sessao);
-          console.log(`${ansi.brightGreen}✔ Successfully promoted changes to ${sessao.branchOrigem}!${ansi.reset}`);
+          chatEntries.push({
+            type: 'agent',
+            content: `✔ Mudanças promovidas com sucesso para ${sessao.branchOrigem}!`,
+          });
         }
-        redrawScreen();
+        updateView();
         continue;
       }
 
       if (prompt === '/rules') {
-        console.log(`\n${ansi.bold}Active Governance Rules for '${activeDomainId || 'none'}':${ansi.reset}`);
         if (!validator) {
-          console.log(`  ${ansi.yellow}No domain active. Running in UNGOVERNED mode.${ansi.reset}`);
+          chatEntries.push({
+            type: 'agent',
+            content: `Regras de governança ativas para '${activeDomainId || 'none'}':\n  Nenhum domínio ativo. Rodando em modo UNGOVERNED.`,
+          });
         } else {
-          console.log(`  ${ansi.cyan}• TransferShape${ansi.reset}: Enforces valid lifecycle state transitions (InOperation -> Transferred).`);
-          console.log(`  ${ansi.cyan}• RetirementShape${ansi.reset}: Requires mandatory 'motivoBaixa' and technical assessment.`);
-          console.log(`  ${ansi.cyan}• CustodyShape${ansi.reset}: Enforces non-empty recipient and department verification.`);
+          chatEntries.push({
+            type: 'agent',
+            content: `Regras de governança ativas para '${activeDomainId || 'none'}':\n  • TransferShape: Aplica transições de ciclo de vida válidas (InOperation -> Transferred).\n  • RetirementShape: Exige 'motivoBaixa' obrigatório e avaliação técnica.\n  • CustodyShape: Valida recebedor não-nulo e departamento ativo.`,
+          });
         }
-        await rl.question(`\n${ansi.dim}Press Enter to return to agent...${ansi.reset}`);
-        redrawScreen();
+        updateView();
         continue;
       }
 
       if (prompt === '/settings' || prompt === '/config') {
-        const updated = await runWithModal(() => settingsModal({
+        const updated = await settingsModal({
           confirmPromptViolations,
           model: activeModel,
           domain: activeDomainId,
-        }));
+        }, view);
         if (updated.confirmPromptViolations !== confirmPromptViolations) {
           confirmPromptViolations = updated.confirmPromptViolations;
           await saveEnvConfig({
@@ -1050,29 +759,31 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
             content: `Configuração atualizada: Confirmação de prompts violadores = ${confirmPromptViolations ? 'ATIVADA' : 'DESATIVADA'}.`,
           });
         }
-        redrawScreen();
+        updateView();
         continue;
       }
 
       if (prompt === '/help') {
-        console.log(`\n${ansi.bold}BSH Available Commands:${ansi.reset}`);
-        console.log(`  ${ansi.cyan}/model${ansi.reset}       - Browse and change active OpenRouter model`);
-        console.log(`  ${ansi.cyan}/domain${ansi.reset}      - Select domain ontology and SHACL governance rules`);
-        console.log(`  ${ansi.cyan}/settings${ansi.reset}    - Configure BSH settings (e.g. pause/confirm on prompt violation)`);
-        console.log(`  ${ansi.cyan}/ungoverned${ansi.reset}  - Disable ontology governance harness (bypass mode)`);
-        console.log(`  ${ansi.cyan}/governed${ansi.reset}    - Re-enable ontology governance harness`);
-        console.log(`  ${ansi.cyan}/affinity${ansi.reset}    - Check domain concept affinity with current codebase`);
-        console.log(`  ${ansi.cyan}/mcp${ansi.reset}         - Manage MCP client connections and discover tools (/mcp add <name> <cmd>)`);
-        console.log(`  ${ansi.cyan}/diff${ansi.reset}        - Review workspace code diff and promote to branch`);
-        console.log(`  ${ansi.cyan}/rules${ansi.reset}       - Inspect active SHACL rules for the current domain`);
-        console.log(`  ${ansi.cyan}/clear${ansi.reset}       - Clear screen and refresh header`);
-        console.log(`  ${ansi.cyan}/exit${ansi.reset}        - End governed session and exit`);
-        await rl.question(`\n${ansi.dim}Press Enter to return to agent...${ansi.reset}`);
-        redrawScreen();
+        chatEntries.push({
+          type: 'agent',
+          content: `BSH Available Commands:
+  /model       - Browse and change active OpenRouter model
+  /domain      - Select domain ontology and SHACL governance rules
+  /settings    - Configure BSH settings (e.g. pause/confirm on prompt violation)
+  /ungoverned  - Disable ontology governance harness (bypass mode)
+  /governed    - Re-enable ontology governance harness
+  /affinity    - Check domain concept affinity with current codebase
+  /mcp         - Manage MCP client connections and discover tools (/mcp add <name> <cmd>)
+  /diff        - Review workspace code diff and promote to branch
+  /rules       - Inspect active SHACL rules for the current domain
+  /clear       - Clear screen and refresh header
+  /exit        - End governed session and exit`,
+        });
+        updateView();
         continue;
       }
 
-      // Dynamic Skill Invocation: Check if prompt triggers a registered skill (e.g. /prototype <task> or semantic match)
+      // Dynamic Skill Invocation
       const allDiscoveredSkillsForPrompt = await skillRegistry.discover();
       const skillInvocation = detectSkillInvocation(prompt, allDiscoveredSkillsForPrompt);
       if (skillInvocation.isSlashCommand && skillInvocation.matchedSkill) {
@@ -1095,14 +806,11 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         }
       }
 
-      // Pre-flight Semantic Guard: Check for Prompt Violations against ontology + SHACL
+      // Pre-flight Semantic Guard
       const promptViolation = detectPromptViolation(prompt, activeDomainId);
 
       if (promptViolation.isViolating && validator) {
-        // Tag user prompt entry with violation badge
         chatEntries.push({ type: 'user', content: prompt, isViolating: true });
-
-        // Push prominent violation alert card
         chatEntries.push({
           type: 'prompt_violation',
           violationShape: promptViolation.shape,
@@ -1113,22 +821,14 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         });
 
         if (confirmPromptViolations) {
-          redrawScreen('Aguardando confirmação do usuário...');
-          process.stdout.write('\r\x1b[2K');
-          const savedHistory = [...(((rl as unknown as { history?: string[] }).history) || [])];
-          (rl as unknown as { history?: string[] }).history = [];
-          let answer = '';
-          try {
-            answer = (await waitForConfirmation()).trim();
-          } finally {
-            (rl as unknown as { history?: string[] }).history = savedHistory;
-          }
+          updateView();
+          const answer = (await waitForConfirmation()).trim();
           if (answer === '/cancel' || answer === 'cancel' || answer === '/abort' || answer === 'q' || answer === 'escape' || answer === 'esc') {
             chatEntries.push({
               type: 'agent',
               content: 'Execução do prompt cancelada pelo usuário após alerta de violação ontológica.',
             });
-            redrawScreen();
+            updateView();
             continue;
           }
           chatEntries.push({
@@ -1146,9 +846,9 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           content: `Checking domain rules for '${activeDomainId || 'project'}' and inspecting repository...`,
         });
       }
-      redrawScreen('Processing request...');
+      updateView();
 
-      // Auto-connect MCP if requested via natural language and not yet configured
+      // Auto-connect MCP if requested
       const lower = prompt.toLowerCase();
       if ((lower.includes('context7') || lower.includes('conecte') || lower.includes('conectar') || lower.includes('servidor mcp')) && mcpManager.getToolDefinitions().length === 0) {
         const bshDir = join(projectRoot, '.bsh');
@@ -1174,7 +874,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           type: 'agent',
           content: '✔ Servidor MCP "context7" conectado. Ferramenta registrada: context7_search_docs.',
         });
-        redrawScreen();
+        updateView();
       }
 
       let _agentResponseAccum = '';
@@ -1223,7 +923,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
               activeReasoningEntry.reasoningTokens = Math.max(1, Math.round((activeReasoningEntry.content.length) / 4));
               activeReasoningEntry.reasoningDurationMs = performance.now() - reasoningStartTime;
             }
-            redrawScreen();
+            updateView();
           },
           onDelta: (text) => {
             if (activeReasoningEntry) {
@@ -1244,7 +944,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
                 content: text,
               });
             }
-            redrawScreen();
+            updateView();
           },
           onAssistantMessage: (msg) => {
             const lastEntry = chatEntries[chatEntries.length - 1];
@@ -1256,7 +956,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
                 content: msg.content,
               });
             }
-            redrawScreen();
+            updateView();
           },
           onToolCallStart: (call) => {
             if (activeReasoningEntry) {
@@ -1268,7 +968,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
               toolName: call.name,
               toolArgs: JSON.stringify(call.args).replace(/"([^"]+)":/g, '$1:'),
             });
-            redrawScreen();
+            updateView();
           },
           onToolCallDone: (call) => {
             const firstLine = (call.result || '').split('\n')[0] || '';
@@ -1277,9 +977,8 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
               type: 'tool_result',
               content: preview,
             });
-            redrawScreen();
+            updateView();
 
-            // Real-time incremental diff preview after file modification tools (DRY)
             if (sessao && (call.name === 'write_to_file' || call.name === 'replace_file_content')) {
               getGitDiffNumstat(sessao.caminhoWorktree, sessao.commitBase)
                 .then(({ files, totalAdded, totalRemoved }) => {
@@ -1297,7 +996,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
                       previewEntry.diffTotalAdded = totalAdded;
                       previewEntry.diffTotalRemoved = totalRemoved;
                     }
-                    redrawScreen();
+                    updateView();
                   }
                 })
                 .catch(() => {});
@@ -1305,7 +1004,6 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           },
         });
 
-        // Retain full conversation turns so multi-turn execution maintains complete state
         if (turnResult.allMessages && turnResult.allMessages.length > 0) {
           messages.length = 0;
           messages.push(...turnResult.allMessages);
@@ -1323,10 +1021,8 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           }
         }
 
-        // Evaluate diff and emit Implementation Receipt
         let diffGateResult: DiffGateResult | null = null;
         if (sessao) {
-          // Remove ephemeral real-time diff preview when final implementation receipt is produced
           const previewIdx = chatEntries.findIndex((e) => e.type === 'diff_preview');
           if (previewIdx !== -1) {
             chatEntries.splice(previewIdx, 1);
@@ -1348,9 +1044,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           });
         }
 
-        // Semantic Gate Interception & Verification based on real code diff
         if (validator && sessao && diffGateResult) {
-
           const isViolation = !diffGateResult.conforming || promptViolation.isViolating;
 
           if (isViolation) {
@@ -1365,7 +1059,6 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
                 ];
             lastGateViolations = violationsList;
 
-            // Ensure there is at least one failing check so the gate never contradicts its status
             let checks = diffGateResult.checks;
             const hasFailingCheck = checks.some((c) => !c.ok);
             if (!hasFailingCheck) {
@@ -1409,27 +1102,25 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         lastTurnDurationMs = elapsed;
         lastTurnTps = elapsed > 0 ? (turnTokensCount / (elapsed / 1000)) : 0;
         tokensTotal += 350;
-        redrawScreen();
+        updateView();
       } catch (err: unknown) {
         if (activeAbortController?.signal.aborted) {
-          // Aborted by user via ESC ESC or Ctrl+C; cancellation entry already posted
+          // Aborted by user
         } else {
           chatEntries.push({
             type: 'agent',
             content: `Error: ${err instanceof Error ? err.message : String(err)}`,
           });
         }
-        redrawScreen();
+        updateView();
       } finally {
         isExecutingTurn = false;
         activeAbortController = null;
       }
     }
   } finally {
-    process.stdin.off('keypress', onKeypress);
-    process.stdout.off('resize', onResize);
-    cleanExitTerminal();
-    rl.close();
+    inputController.destroy();
+    view.destroy();
     await mcpManager.close().catch(() => undefined);
     if (sessao) {
       try {
