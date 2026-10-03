@@ -1,0 +1,991 @@
+{
+  "@context": {
+    "ex": "urn:bsh:pilot:ativos:",
+    "bsh": "urn:bsh:ns:v1:",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "@graph": [
+    {
+      "@id": "ex:fix-transf-bnd-001",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-012"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-rh"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-002",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-013"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-financeiro"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-003",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-014"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-administrativo"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-004",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-015"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-financeiro"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-005",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-016"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-006",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-017"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-financeiro"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-007",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-018"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-financeiro"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-008",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-019"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-financeiro"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-009",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-020"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-rh"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-010",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-021"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-financeiro"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-011",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-022"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-administrativo"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-012",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-023"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-financeiro"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-013",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-024"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-014",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-025"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-financeiro"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-015",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-026"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-financeiro"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-016",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-027"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-financeiro"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-017",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-028"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-rh"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-018",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-029"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-financeiro"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-019",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-030"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-administrativo"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-bnd-020",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-031"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-002"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-financeiro"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-004"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-005"
+      },
+      "ex:justificativa": "Transferência em condição limítrofe de fronteira operacional",
+      "ex:registradoPor": "fronteira.teste@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-12T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-001",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-002",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.01",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-003",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-004",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.01",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-005",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-006",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.01",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-007",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-008",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.01",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-009",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-010",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.01",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-011",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-012",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.01",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-013",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-014",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.01",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-015",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-016",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.01",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-017",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-018",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.01",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-019",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-bnd-020",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:motivoBaixa": "Baixa em situação limítrofe contábil de obsolescência",
+      "ex:valorResidual": {
+        "@value": "0.01",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "9999.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "fronteira@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-16T15:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    }
+  ]
+}

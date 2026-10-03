@@ -1,0 +1,379 @@
+@prefix ex: <urn:bsh:pilot:ativos:> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:TransferenciaShape a sh:NodeShape ;
+  sh:targetClass ex:TransferenciaAtivo ;
+  sh:property [
+    sh:path ex:estadoAtual ;
+    sh:minCount 1 ;
+    sh:in ( ex:Disponivel ex:EmUso ) ;
+    sh:message "Ativo baixado não pode ser transferido."
+  ] ;
+  sh:property [
+    sh:path ex:novoResponsavel ;
+    sh:minCount 1 ;
+    sh:message "A transferência exige responsável."
+  ] ;
+  sh:property [
+    sh:path ex:novaLocalizacao ;
+    sh:minCount 1 ;
+    sh:message "A transferência exige nova localização."
+  ] ;
+  sh:property [
+    sh:path ex:solicitante ;
+    sh:disjoint ex:aprovador ;
+    sh:message "O solicitante da transferência não pode ser o aprovador da movimentação."
+  ] .
+
+ex:BaixaShape a sh:NodeShape ;
+  sh:targetClass ex:BaixaAtivo ;
+  sh:property [
+    sh:path ex:estadoAtual ;
+    sh:minCount 1 ;
+    sh:in ( ex:Disponivel ex:EmUso ) ;
+    sh:message "Ativo baixado não pode sofrer nova baixa."
+  ] ;
+  sh:property [
+    sh:path ex:motivoBaixa ;
+    sh:minCount 1 ;
+    sh:message "A baixa exige motivo."
+  ] .
+
+ex:ResponsavelShape a sh:NodeShape ;
+  sh:targetClass ex:AlteracaoResponsavel ;
+  sh:property [
+    sh:path ex:estadoAtual ;
+    sh:minCount 1 ;
+    sh:in ( ex:Disponivel ex:EmUso ) ;
+    sh:message "Ativo baixado não pode trocar de responsável."
+  ] ;
+  sh:property [
+    sh:path ex:novoResponsavel ;
+    sh:minCount 1 ;
+    sh:message "A alteração exige novo responsável."
+  ] .
+
+ex:LocalizacaoShape a sh:NodeShape ;
+  sh:targetClass ex:AtualizacaoLocalizacao ;
+  sh:property [
+    sh:path ex:estadoAtual ;
+    sh:minCount 1 ;
+    sh:in ( ex:Disponivel ex:EmUso ) ;
+    sh:message "Ativo baixado não pode mudar de localização."
+  ] ;
+  sh:property [
+    sh:path ex:novaLocalizacao ;
+    sh:minCount 1 ;
+    sh:message "A alteração exige nova localização."
+  ] .
+
+ex:IdentificacaoPatrimonialShape a sh:NodeShape ;
+  sh:targetClass ex:Ativo ;
+  sh:property [
+    sh:path ex:codigoPatrimonio ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:pattern "^PAT-[0-9]{6}$" ;
+    sh:message "O código patrimonial é obrigatório e deve obedecer ao padrão PAT-NNNNNN (ex: PAT-000123)."
+  ] .
+
+ex:AtivoTIShape a sh:NodeShape ;
+  sh:targetClass ex:AtivoTI ;
+  sh:property [
+    sh:path ex:numeroSerie ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "Ativo de TI exige número de série de fábrica."
+  ] .
+
+ex:AtivoVeiculoShape a sh:NodeShape ;
+  sh:targetClass ex:AtivoVeiculo ;
+  sh:property [
+    sh:path ex:placa ;
+    sh:minCount 1 ;
+    sh:pattern "^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$" ;
+    sh:message "Veículo exige placa no padrão oficial (Mercosul ou tradicional, ex: ABC1D23 ou ABC1234)."
+  ] ;
+  sh:property [
+    sh:path ex:renavam ;
+    sh:minCount 1 ;
+    sh:pattern "^[0-9]{9,11}$" ;
+    sh:message "Veículo exige RENAVAM válido (9 a 11 dígitos numéricos)."
+  ] ;
+  sh:property [
+    sh:path ex:chassi ;
+    sh:minCount 1 ;
+    sh:pattern "^[A-HJ-NPR-Z0-9]{17}$" ;
+    sh:message "Veículo exige chassi VIN com exatamente 17 caracteres alfanuméricos válidos."
+  ] .
+
+ex:AlocacaoUsuarioShape a sh:NodeShape ;
+  sh:targetClass ex:AlocacaoUsuario ;
+  sh:property [
+    sh:path ex:estadoAtual ;
+    sh:minCount 1 ;
+    sh:in ( ex:Disponivel ex:Reservado ) ;
+    sh:message "Ativo em manutenção, baixado ou extraviado não pode ser alocado a usuário final."
+  ] ;
+  sh:property [
+    sh:path ex:novoResponsavel ;
+    sh:minCount 1 ;
+    sh:message "A alocação exige novo responsável."
+  ] ;
+  sh:property [
+    sh:path ex:termoResponsabilidadeAssinado ;
+    sh:minCount 1 ;
+    sh:datatype xsd:boolean ;
+    sh:hasValue true ;
+    sh:message "Alocação a usuário exige termo de responsabilidade assinado."
+  ] .
+
+ex:ReservaAtivoShape a sh:NodeShape ;
+  sh:targetClass ex:ReservaAtivo ;
+  sh:property [
+    sh:path ex:estadoAtual ;
+    sh:minCount 1 ;
+    sh:in ( ex:Disponivel ) ;
+    sh:message "Apenas ativo disponível pode ser reservado."
+  ] ;
+  sh:property [
+    sh:path ex:solicitanteReserva ;
+    sh:minCount 1 ;
+    sh:message "A reserva de ativo exige solicitante."
+  ] ;
+  sh:property [
+    sh:path ex:dataInicioReserva ;
+    sh:minCount 1 ;
+    sh:datatype xsd:date ;
+    sh:message "A reserva exige data de início válida (xsd:date)."
+  ] ;
+  sh:property [
+    sh:path ex:dataFimReserva ;
+    sh:minCount 1 ;
+    sh:datatype xsd:date ;
+    sh:message "A reserva exige data de término válida (xsd:date)."
+  ] ;
+  sh:property [
+    sh:path ex:motivoReserva ;
+    sh:minCount 1 ;
+    sh:message "A reserva exige motivo."
+  ] .
+
+ex:InicioManutencaoShape a sh:NodeShape ;
+  sh:targetClass ex:InicioManutencao ;
+  sh:property [
+    sh:path ex:estadoAtual ;
+    sh:minCount 1 ;
+    sh:in ( ex:Disponivel ex:EmUso ) ;
+    sh:message "Apenas ativo disponível ou em uso pode entrar em manutenção."
+  ] ;
+  sh:property [
+    sh:path ex:motivoManutencao ;
+    sh:minCount 1 ;
+    sh:message "O início de manutenção exige motivo ou descrição do defeito."
+  ] .
+
+ex:ConclusaoManutencaoShape a sh:NodeShape ;
+  sh:targetClass ex:ConclusaoManutencao ;
+  sh:property [
+    sh:path ex:estadoAtual ;
+    sh:minCount 1 ;
+    sh:in ( ex:EmManutencao ) ;
+    sh:message "Conclusão de manutenção somente pode ocorrer para ativo em manutenção."
+  ] ;
+  sh:property [
+    sh:path ex:laudoManutencao ;
+    sh:minCount 1 ;
+    sh:message "Conclusão de manutenção exige laudo técnico."
+  ] .
+
+ex:EnvioAtivoShape a sh:NodeShape ;
+  sh:targetClass ex:EnvioAtivo ;
+  sh:property [
+    sh:path ex:estadoAtual ;
+    sh:minCount 1 ;
+    sh:in ( ex:Disponivel ex:EmUso ) ;
+    sh:message "Ativo em trânsito, baixado ou extraviado não pode ser enviado."
+  ] ;
+  sh:property [
+    sh:path ex:origem ;
+    sh:minCount 1 ;
+    sh:disjoint ex:destino ;
+    sh:message "O envio de ativo exige localização de origem distinta da localização de destino."
+  ] ;
+  sh:property [
+    sh:path ex:destino ;
+    sh:minCount 1 ;
+    sh:message "O envio de ativo exige localização de destino."
+  ] ;
+  sh:property [
+    sh:path ex:transportador ;
+    sh:minCount 1 ;
+    sh:message "O envio de ativo exige identificação do transportador."
+  ] .
+
+ex:RecebimentoAtivoShape a sh:NodeShape ;
+  sh:targetClass ex:RecebimentoAtivo ;
+  sh:property [
+    sh:path ex:estadoAtual ;
+    sh:minCount 1 ;
+    sh:in ( ex:EmTransito ) ;
+    sh:message "Recebimento somente pode ocorrer para ativo em trânsito."
+  ] ;
+  sh:property [
+    sh:path ex:movimentacaoReferenciada ;
+    sh:minCount 1 ;
+    sh:message "O recebimento exige referência ao documento de movimentação anterior."
+  ] .
+
+ex:RegistroExtravioShape a sh:NodeShape ;
+  sh:targetClass ex:RegistroExtravio ;
+  sh:property [
+    sh:path ex:estadoAtual ;
+    sh:minCount 1 ;
+    sh:in ( ex:Disponivel ex:EmUso ex:EmManutencao ex:EmTransito ex:Reservado ) ;
+    sh:message "Ativo já baixado ou já extraviado não pode sofrer novo registro de extravio."
+  ] ;
+  sh:property [
+    sh:path ex:protocoloSinistro ;
+    sh:minCount 1 ;
+    sh:pattern "^SIN-[0-9]{4}/[0-9]{6}$" ;
+    sh:message "Registro de extravio exige protocolo de sinistro no formato SIN-AAAA/NNNNNN."
+  ] .
+
+ex:RecuperacaoAtivoShape a sh:NodeShape ;
+  sh:targetClass ex:RecuperacaoAtivo ;
+  sh:property [
+    sh:path ex:estadoAtual ;
+    sh:minCount 1 ;
+    sh:in ( ex:Extraviado ) ;
+    sh:message "A recuperação somente pode ser aplicada a ativo em estado Extraviado."
+  ] ;
+  sh:property [
+    sh:path ex:laudoRecuperacao ;
+    sh:minCount 1 ;
+    sh:message "A recuperação de ativo extraviado exige laudo de vistoria e recuperação."
+  ] .
+
+ex:ConformidadeManutencaoShape a sh:NodeShape ;
+  sh:targetClass ex:AtivoEquipamento ;
+  sh:property [
+    sh:path ex:statusManutencao ;
+    sh:minCount 1 ;
+    sh:in ( ex:EmDia ex:Isento ) ;
+    sh:message "Ativo com manutenção periódica vencida não pode ser enviado para operação."
+  ] .
+
+ex:ConformidadeCalibracaoShape a sh:NodeShape ;
+  sh:targetClass ex:AtivoInstrumentacao ;
+  sh:property [
+    sh:path ex:statusCalibracao ;
+    sh:minCount 1 ;
+    sh:in ( ex:CalibracaoEmDia ex:CalibracaoIsenta ) ;
+    sh:message "Equipamento com calibração vencida não pode ser alocado para uso operacional."
+  ] ;
+  sh:property [
+    sh:path ex:certificadoCalibracao ;
+    sh:minCount 1 ;
+    sh:message "Equipamento sujeito a calibração exige certificado de calibração emitido."
+  ] .
+
+ex:AuditoriaShape a sh:NodeShape ;
+  sh:targetClass ex:EventoPatrimonial ;
+  sh:property [
+    sh:path ex:registradoPor ;
+    sh:minCount 1 ;
+    sh:message "A auditoria exige a identificação do usuário que registrou a operação."
+  ] ;
+  sh:property [
+    sh:path ex:dataHoraRegistro ;
+    sh:minCount 1 ;
+    sh:datatype xsd:dateTime ;
+    sh:message "A auditoria exige data e hora de registro válida (xsd:dateTime)."
+  ] .
+
+ex:TransferenciaCompatibilidadeOrganizacionalShape a sh:NodeShape ;
+  sh:targetClass ex:TransferenciaAtivo ;
+  sh:sparql [
+    sh:message "O novo responsável deve pertencer ativamente ao departamento de destino." ;
+    sh:select """
+      PREFIX ex: <urn:bsh:pilot:ativos:>
+      SELECT $this ?responsavel ?deptoDestino
+      WHERE {
+        $this ex:novoResponsavel ?responsavel ;
+              ex:departamentoDestino ?deptoDestino .
+        FILTER NOT EXISTS {
+          ?responsavel ex:lotadoEmDepartamento ?deptoDestino .
+        }
+      }
+    """ ;
+  ] .
+
+ex:BaixaValorResidualShape a sh:NodeShape ;
+  sh:targetClass ex:BaixaAtivo ;
+  sh:sparql [
+    sh:message "Baixa de ativo com valor residual positivo exige laudo técnico de descarte." ;
+    sh:select """
+      PREFIX ex: <urn:bsh:pilot:ativos:>
+      SELECT $this ?valorResidual
+      WHERE {
+        $this ex:valorResidual ?valorResidual .
+        FILTER (?valorResidual > 0)
+        FILTER NOT EXISTS {
+          $this ex:laudoTecnicoDescarte ?laudo .
+          FILTER (BOUND(?laudo) && str(?laudo) != "")
+        }
+      }
+    """ ;
+  ] .
+
+ex:ReservaConflitoDatasShape a sh:NodeShape ;
+  sh:targetClass ex:ReservaAtivo ;
+  sh:sparql [
+    sh:message "A data de término da reserva não pode ser anterior à data de início." ;
+    sh:select """
+      PREFIX ex: <urn:bsh:pilot:ativos:>
+      SELECT $this ?inicio ?fim
+      WHERE {
+        $this ex:dataInicioReserva ?inicio ;
+              ex:dataFimReserva ?fim .
+        FILTER (?fim < ?inicio)
+      }
+    """ ;
+  ] .
+
+ex:BaixaAltoValorAprovacaoShape a sh:NodeShape ;
+  sh:targetClass ex:BaixaAtivo ;
+  sh:sparql [
+    sh:message "Baixa de ativo com valor de aquisição superior a R$ 10.000 exige alçada formal de aprovação." ;
+    sh:select """
+      PREFIX ex: <urn:bsh:pilot:ativos:>
+      SELECT $this ?valorAquisicao
+      WHERE {
+        $this ex:valorAquisicao ?valorAquisicao .
+        FILTER (?valorAquisicao > 10000)
+        FILTER NOT EXISTS {
+          $this ex:aprovador ?aprovador .
+          FILTER (BOUND(?aprovador))
+        }
+      }
+    """ ;
+  ] .
+
+ex:AlocacaoCompatibilidadeDepartamentoShape a sh:NodeShape ;
+  sh:targetClass ex:AlocacaoUsuario ;
+  sh:sparql [
+    sh:message "O novo responsável da alocação deve possuir lotação departamental cadastrada." ;
+    sh:select """
+      PREFIX ex: <urn:bsh:pilot:ativos:>
+      SELECT $this ?responsavel
+      WHERE {
+        $this ex:novoResponsavel ?responsavel .
+        FILTER NOT EXISTS {
+          ?responsavel ex:lotadoEmDepartamento ?depto .
+        }
+      }
+    """ ;
+  ] .

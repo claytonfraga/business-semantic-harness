@@ -1,0 +1,3802 @@
+[
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-001",
+    "taskId": "G3",
+    "baseTaskId": "G3",
+    "conditionsApplicable": "A,B,C,D",
+    "initialStateFixture": "baseline-valid-data.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_EXPERIMENT_TASK"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-002",
+    "taskId": "G4",
+    "baseTaskId": "G4",
+    "conditionsApplicable": "A,B,C,D",
+    "initialStateFixture": "baseline-valid-data.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_EXPERIMENT_TASK"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-003",
+    "taskId": "G5",
+    "baseTaskId": "G5",
+    "conditionsApplicable": "A,B,C,D",
+    "initialStateFixture": "baseline-valid-data.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_EXPERIMENT_TASK"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-004",
+    "taskId": "G6",
+    "baseTaskId": "G6",
+    "conditionsApplicable": "A,B,C,D",
+    "initialStateFixture": "baseline-valid-data.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_EXPERIMENT_TASK"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-005",
+    "taskId": "CHAL-VAL-001",
+    "baseTaskId": "CHAL-VAL-001",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-006",
+    "taskId": "CHAL-VAL-002",
+    "baseTaskId": "CHAL-VAL-002",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-007",
+    "taskId": "CHAL-VAL-003",
+    "baseTaskId": "CHAL-VAL-003",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-008",
+    "taskId": "CHAL-VAL-004",
+    "baseTaskId": "CHAL-VAL-004",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-009",
+    "taskId": "CHAL-VAL-005",
+    "baseTaskId": "CHAL-VAL-005",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-010",
+    "taskId": "CHAL-VAL-006",
+    "baseTaskId": "CHAL-VAL-006",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-011",
+    "taskId": "CHAL-VAL-007",
+    "baseTaskId": "CHAL-VAL-007",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-012",
+    "taskId": "CHAL-VAL-008",
+    "baseTaskId": "CHAL-VAL-008",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-013",
+    "taskId": "CHAL-VAL-009",
+    "baseTaskId": "CHAL-VAL-009",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-014",
+    "taskId": "CHAL-VAL-010",
+    "baseTaskId": "CHAL-VAL-010",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-015",
+    "taskId": "CHAL-VAL-011",
+    "baseTaskId": "CHAL-VAL-011",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-016",
+    "taskId": "CHAL-VAL-012",
+    "baseTaskId": "CHAL-VAL-012",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-017",
+    "taskId": "CHAL-VAL-013",
+    "baseTaskId": "CHAL-VAL-013",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-018",
+    "taskId": "CHAL-VAL-014",
+    "baseTaskId": "CHAL-VAL-014",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-019",
+    "taskId": "CHAL-VAL-015",
+    "baseTaskId": "CHAL-VAL-015",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-020",
+    "taskId": "CHAL-VAL-016",
+    "baseTaskId": "CHAL-VAL-016",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-021",
+    "taskId": "CHAL-VAL-017",
+    "baseTaskId": "CHAL-VAL-017",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-022",
+    "taskId": "CHAL-VAL-018",
+    "baseTaskId": "CHAL-VAL-018",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-023",
+    "taskId": "CHAL-VAL-019",
+    "baseTaskId": "CHAL-VAL-019",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-024",
+    "taskId": "CHAL-VAL-020",
+    "baseTaskId": "CHAL-VAL-020",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-025",
+    "taskId": "CHAL-VAL-021",
+    "baseTaskId": "CHAL-VAL-021",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-026",
+    "taskId": "CHAL-VAL-022",
+    "baseTaskId": "CHAL-VAL-022",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-027",
+    "taskId": "CHAL-VAL-023",
+    "baseTaskId": "CHAL-VAL-023",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-028",
+    "taskId": "CHAL-VAL-024",
+    "baseTaskId": "CHAL-VAL-024",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-029",
+    "taskId": "CHAL-VAL-025",
+    "baseTaskId": "CHAL-VAL-025",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-030",
+    "taskId": "CHAL-VAL-026",
+    "baseTaskId": "CHAL-VAL-026",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-031",
+    "taskId": "CHAL-VAL-027",
+    "baseTaskId": "CHAL-VAL-027",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-032",
+    "taskId": "CHAL-VAL-028",
+    "baseTaskId": "CHAL-VAL-028",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-033",
+    "taskId": "CHAL-VAL-029",
+    "baseTaskId": "CHAL-VAL-029",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-034",
+    "taskId": "CHAL-VAL-030",
+    "baseTaskId": "CHAL-VAL-030",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-035",
+    "taskId": "CHAL-VAL-031",
+    "baseTaskId": "CHAL-VAL-031",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-036",
+    "taskId": "CHAL-VAL-032",
+    "baseTaskId": "CHAL-VAL-032",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-037",
+    "taskId": "CHAL-VAL-033",
+    "baseTaskId": "CHAL-VAL-033",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-038",
+    "taskId": "CHAL-VAL-034",
+    "baseTaskId": "CHAL-VAL-034",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-039",
+    "taskId": "CHAL-VAL-035",
+    "baseTaskId": "CHAL-VAL-035",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-VALID-040",
+    "taskId": "CHAL-VAL-036",
+    "baseTaskId": "CHAL-VAL-036",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Transf-EstadoValido;Regra-Transf-Segregacao;Regra-Transf-LotacaoDestino",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-001",
+    "taskId": "V1",
+    "baseTaskId": "V1",
+    "conditionsApplicable": "A,B,C,D",
+    "initialStateFixture": "baseline-valid-data.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_EXPERIMENT_TASK"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-002",
+    "taskId": "V3",
+    "baseTaskId": "V3",
+    "conditionsApplicable": "A,B,C,D",
+    "initialStateFixture": "baseline-valid-data.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_EXPERIMENT_TASK"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-003",
+    "taskId": "V5",
+    "baseTaskId": "V5",
+    "conditionsApplicable": "A,B,C,D",
+    "initialStateFixture": "baseline-valid-data.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_EXPERIMENT_TASK"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-004",
+    "taskId": "V9",
+    "baseTaskId": "V9",
+    "conditionsApplicable": "A,B,C,D",
+    "initialStateFixture": "baseline-valid-data.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_EXPERIMENT_TASK"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-005",
+    "taskId": "V10",
+    "baseTaskId": "V10",
+    "conditionsApplicable": "A,B,C,D",
+    "initialStateFixture": "baseline-valid-data.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_EXPERIMENT_TASK"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-006",
+    "taskId": "V11",
+    "baseTaskId": "V11",
+    "conditionsApplicable": "A,B,C,D",
+    "initialStateFixture": "baseline-valid-data.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_EXPERIMENT_TASK"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-007",
+    "taskId": "V12",
+    "baseTaskId": "V12",
+    "conditionsApplicable": "A,B,C,D",
+    "initialStateFixture": "baseline-valid-data.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_EXPERIMENT_TASK"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-008",
+    "taskId": "V13",
+    "baseTaskId": "V13",
+    "conditionsApplicable": "A,B,C,D",
+    "initialStateFixture": "baseline-valid-data.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_EXPERIMENT_TASK"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-009",
+    "taskId": "V14",
+    "baseTaskId": "V14",
+    "conditionsApplicable": "A,B,C,D",
+    "initialStateFixture": "baseline-valid-data.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_EXPERIMENT_TASK"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-010",
+    "taskId": "CHAL-INVAL-001",
+    "baseTaskId": "CHAL-INVAL-001",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-011",
+    "taskId": "CHAL-INVAL-002",
+    "baseTaskId": "CHAL-INVAL-002",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-012",
+    "taskId": "CHAL-INVAL-003",
+    "baseTaskId": "CHAL-INVAL-003",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-013",
+    "taskId": "CHAL-INVAL-004",
+    "baseTaskId": "CHAL-INVAL-004",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-014",
+    "taskId": "CHAL-INVAL-005",
+    "baseTaskId": "CHAL-INVAL-005",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-015",
+    "taskId": "CHAL-INVAL-006",
+    "baseTaskId": "CHAL-INVAL-006",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-016",
+    "taskId": "CHAL-INVAL-007",
+    "baseTaskId": "CHAL-INVAL-007",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-017",
+    "taskId": "CHAL-INVAL-008",
+    "baseTaskId": "CHAL-INVAL-008",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-018",
+    "taskId": "CHAL-INVAL-009",
+    "baseTaskId": "CHAL-INVAL-009",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-019",
+    "taskId": "CHAL-INVAL-010",
+    "baseTaskId": "CHAL-INVAL-010",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-020",
+    "taskId": "CHAL-INVAL-011",
+    "baseTaskId": "CHAL-INVAL-011",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-021",
+    "taskId": "CHAL-INVAL-012",
+    "baseTaskId": "CHAL-INVAL-012",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-022",
+    "taskId": "CHAL-INVAL-013",
+    "baseTaskId": "CHAL-INVAL-013",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-023",
+    "taskId": "CHAL-INVAL-014",
+    "baseTaskId": "CHAL-INVAL-014",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-024",
+    "taskId": "CHAL-INVAL-015",
+    "baseTaskId": "CHAL-INVAL-015",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-025",
+    "taskId": "CHAL-INVAL-016",
+    "baseTaskId": "CHAL-INVAL-016",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-026",
+    "taskId": "CHAL-INVAL-017",
+    "baseTaskId": "CHAL-INVAL-017",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-027",
+    "taskId": "CHAL-INVAL-018",
+    "baseTaskId": "CHAL-INVAL-018",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-028",
+    "taskId": "CHAL-INVAL-019",
+    "baseTaskId": "CHAL-INVAL-019",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-029",
+    "taskId": "CHAL-INVAL-020",
+    "baseTaskId": "CHAL-INVAL-020",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-INVALID-030",
+    "taskId": "CHAL-INVAL-021",
+    "baseTaskId": "CHAL-INVAL-021",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Transferencia",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-001",
+    "taskId": "CHAL-VAL-037",
+    "baseTaskId": "CHAL-VAL-037",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-002",
+    "taskId": "CHAL-INVAL-022",
+    "baseTaskId": "CHAL-INVAL-022",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-003",
+    "taskId": "CHAL-VAL-038",
+    "baseTaskId": "CHAL-VAL-038",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-004",
+    "taskId": "CHAL-INVAL-023",
+    "baseTaskId": "CHAL-INVAL-023",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-005",
+    "taskId": "CHAL-VAL-039",
+    "baseTaskId": "CHAL-VAL-039",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-006",
+    "taskId": "CHAL-INVAL-024",
+    "baseTaskId": "CHAL-INVAL-024",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-007",
+    "taskId": "CHAL-VAL-040",
+    "baseTaskId": "CHAL-VAL-040",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-008",
+    "taskId": "CHAL-INVAL-025",
+    "baseTaskId": "CHAL-INVAL-025",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-009",
+    "taskId": "CHAL-VAL-041",
+    "baseTaskId": "CHAL-VAL-041",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-010",
+    "taskId": "CHAL-INVAL-026",
+    "baseTaskId": "CHAL-INVAL-026",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-011",
+    "taskId": "CHAL-VAL-042",
+    "baseTaskId": "CHAL-VAL-042",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-012",
+    "taskId": "CHAL-INVAL-027",
+    "baseTaskId": "CHAL-INVAL-027",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-013",
+    "taskId": "CHAL-VAL-043",
+    "baseTaskId": "CHAL-VAL-043",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-014",
+    "taskId": "CHAL-INVAL-028",
+    "baseTaskId": "CHAL-INVAL-028",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-015",
+    "taskId": "CHAL-VAL-044",
+    "baseTaskId": "CHAL-VAL-044",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-016",
+    "taskId": "CHAL-INVAL-029",
+    "baseTaskId": "CHAL-INVAL-029",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-017",
+    "taskId": "CHAL-VAL-045",
+    "baseTaskId": "CHAL-VAL-045",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-018",
+    "taskId": "CHAL-INVAL-030",
+    "baseTaskId": "CHAL-INVAL-030",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-019",
+    "taskId": "CHAL-VAL-046",
+    "baseTaskId": "CHAL-VAL-046",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-BOUNDARY-020",
+    "taskId": "CHAL-INVAL-031",
+    "baseTaskId": "CHAL-INVAL-031",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Fronteira-Estado-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-001",
+    "taskId": "CHAL-VAL-047",
+    "baseTaskId": "CHAL-VAL-047",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-002",
+    "taskId": "CHAL-INVAL-032",
+    "baseTaskId": "CHAL-INVAL-032",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-003",
+    "taskId": "CHAL-VAL-048",
+    "baseTaskId": "CHAL-VAL-048",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-004",
+    "taskId": "CHAL-INVAL-033",
+    "baseTaskId": "CHAL-INVAL-033",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-005",
+    "taskId": "CHAL-VAL-049",
+    "baseTaskId": "CHAL-VAL-049",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-006",
+    "taskId": "CHAL-INVAL-034",
+    "baseTaskId": "CHAL-INVAL-034",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-007",
+    "taskId": "CHAL-VAL-050",
+    "baseTaskId": "CHAL-VAL-050",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-008",
+    "taskId": "CHAL-INVAL-035",
+    "baseTaskId": "CHAL-INVAL-035",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-009",
+    "taskId": "CHAL-VAL-051",
+    "baseTaskId": "CHAL-VAL-051",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-010",
+    "taskId": "CHAL-INVAL-036",
+    "baseTaskId": "CHAL-INVAL-036",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-011",
+    "taskId": "CHAL-VAL-052",
+    "baseTaskId": "CHAL-VAL-052",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-012",
+    "taskId": "CHAL-INVAL-037",
+    "baseTaskId": "CHAL-INVAL-037",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-013",
+    "taskId": "CHAL-VAL-053",
+    "baseTaskId": "CHAL-VAL-053",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-014",
+    "taskId": "CHAL-INVAL-038",
+    "baseTaskId": "CHAL-INVAL-038",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-015",
+    "taskId": "CHAL-VAL-054",
+    "baseTaskId": "CHAL-VAL-054",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-016",
+    "taskId": "CHAL-INVAL-039",
+    "baseTaskId": "CHAL-INVAL-039",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-017",
+    "taskId": "CHAL-VAL-055",
+    "baseTaskId": "CHAL-VAL-055",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-018",
+    "taskId": "CHAL-INVAL-040",
+    "baseTaskId": "CHAL-INVAL-040",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-019",
+    "taskId": "CHAL-VAL-056",
+    "baseTaskId": "CHAL-VAL-056",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-TRANSF-MULTIRULE-020",
+    "taskId": "CHAL-INVAL-041",
+    "baseTaskId": "CHAL-INVAL-041",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Multi-Estado-Segregacao-Lotacao",
+    "sourceShapes": "ex:TransferenciaShape;ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-001",
+    "taskId": "G2",
+    "baseTaskId": "G2",
+    "conditionsApplicable": "A,B,C,D",
+    "initialStateFixture": "baseline-valid-data.jsonld",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "MATERIALIZED_EXPERIMENT_TASK"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-002",
+    "taskId": "CHAL-VAL-057",
+    "baseTaskId": "CHAL-VAL-057",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-003",
+    "taskId": "CHAL-VAL-058",
+    "baseTaskId": "CHAL-VAL-058",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-004",
+    "taskId": "CHAL-VAL-059",
+    "baseTaskId": "CHAL-VAL-059",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-005",
+    "taskId": "CHAL-VAL-060",
+    "baseTaskId": "CHAL-VAL-060",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-valid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-006",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-007",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-008",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-009",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-010",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-011",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-012",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-013",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-014",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-015",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-016",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-017",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-018",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-019",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-020",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-021",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-022",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-023",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-024",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-025",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-026",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-027",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-028",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-029",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-030",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-031",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-032",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-033",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-034",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-035",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-036",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-037",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-038",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-039",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-VALID-040",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Baixa-Motivo;Regra-Baixa-ValorResidualLaudo",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-001",
+    "taskId": "V2",
+    "baseTaskId": "V2",
+    "conditionsApplicable": "A,B,C,D",
+    "initialStateFixture": "baseline-valid-data.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "MATERIALIZED_EXPERIMENT_TASK"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-002",
+    "taskId": "V6",
+    "baseTaskId": "V6",
+    "conditionsApplicable": "A,B,C,D",
+    "initialStateFixture": "baseline-valid-data.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "MATERIALIZED_EXPERIMENT_TASK"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-003",
+    "taskId": "V7",
+    "baseTaskId": "V7",
+    "conditionsApplicable": "A,B,C,D",
+    "initialStateFixture": "baseline-valid-data.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "MATERIALIZED_EXPERIMENT_TASK"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-004",
+    "taskId": "V8",
+    "baseTaskId": "V8",
+    "conditionsApplicable": "A,B,C,D",
+    "initialStateFixture": "baseline-valid-data.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "MATERIALIZED_EXPERIMENT_TASK"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-005",
+    "taskId": "CHAL-INVAL-042",
+    "baseTaskId": "CHAL-INVAL-042",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-006",
+    "taskId": "CHAL-INVAL-043",
+    "baseTaskId": "CHAL-INVAL-043",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-007",
+    "taskId": "CHAL-INVAL-044",
+    "baseTaskId": "CHAL-INVAL-044",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-008",
+    "taskId": "CHAL-INVAL-045",
+    "baseTaskId": "CHAL-INVAL-045",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-009",
+    "taskId": "CHAL-INVAL-046",
+    "baseTaskId": "CHAL-INVAL-046",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-010",
+    "taskId": "CHAL-INVAL-047",
+    "baseTaskId": "CHAL-INVAL-047",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-011",
+    "taskId": "CHAL-INVAL-048",
+    "baseTaskId": "CHAL-INVAL-048",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-012",
+    "taskId": "CHAL-INVAL-049",
+    "baseTaskId": "CHAL-INVAL-049",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-013",
+    "taskId": "CHAL-INVAL-050",
+    "baseTaskId": "CHAL-INVAL-050",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-014",
+    "taskId": "CHAL-INVAL-051",
+    "baseTaskId": "CHAL-INVAL-051",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-015",
+    "taskId": "CHAL-INVAL-052",
+    "baseTaskId": "CHAL-INVAL-052",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-016",
+    "taskId": "CHAL-INVAL-053",
+    "baseTaskId": "CHAL-INVAL-053",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-017",
+    "taskId": "CHAL-INVAL-054",
+    "baseTaskId": "CHAL-INVAL-054",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-018",
+    "taskId": "CHAL-INVAL-055",
+    "baseTaskId": "CHAL-INVAL-055",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-019",
+    "taskId": "CHAL-INVAL-056",
+    "baseTaskId": "CHAL-INVAL-056",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-020",
+    "taskId": "CHAL-INVAL-057",
+    "baseTaskId": "CHAL-INVAL-057",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-021",
+    "taskId": "CHAL-INVAL-058",
+    "baseTaskId": "CHAL-INVAL-058",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-022",
+    "taskId": "CHAL-INVAL-059",
+    "baseTaskId": "CHAL-INVAL-059",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-023",
+    "taskId": "CHAL-INVAL-060",
+    "baseTaskId": "CHAL-INVAL-060",
+    "conditionsApplicable": "ENFORCEMENT_CHALLENGE",
+    "initialStateFixture": "validation-invalid-fixtures.jsonld",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "MATERIALIZED_ENFORCEMENT_CHALLENGE"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-024",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-025",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-026",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-027",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-028",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-029",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-INVALID-030",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Restricao-Baixa",
+    "sourceShapes": "ex:BaixaShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-001",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-002",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-003",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-004",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-005",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-006",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-007",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-008",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-009",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-010",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-011",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-012",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-013",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-014",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-015",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-016",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-017",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-018",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-019",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-BOUNDARY-020",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Fronteira-ValorResidual-Zero",
+    "sourceShapes": "ex:BaixaValorResidualShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-001",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-002",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape;ex:BaixaAltoValorAprovacaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-003",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-004",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape;ex:BaixaAltoValorAprovacaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-005",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-006",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape;ex:BaixaAltoValorAprovacaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-007",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-008",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape;ex:BaixaAltoValorAprovacaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-009",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-010",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape;ex:BaixaAltoValorAprovacaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-011",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-012",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape;ex:BaixaAltoValorAprovacaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-013",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-014",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape;ex:BaixaAltoValorAprovacaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-015",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-016",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape;ex:BaixaAltoValorAprovacaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-017",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-018",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape;ex:BaixaAltoValorAprovacaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-019",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-BAIXA-MULTIRULE-020",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-Multi-Baixa-Residual-Alcada",
+    "sourceShapes": "ex:BaixaShape;ex:BaixaValorResidualShape;ex:BaixaAltoValorAprovacaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-V-01",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Conforme",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-INV-01",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Violacao",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-V-02",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Conforme",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-INV-02",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Violacao",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-V-03",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Conforme",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-INV-03",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Violacao",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-V-04",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Conforme",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-INV-04",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Violacao",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-V-05",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Conforme",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-INV-05",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Violacao",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-V-06",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Conforme",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-INV-06",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Violacao",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-V-07",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Conforme",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-INV-07",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Violacao",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-V-08",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Conforme",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-INV-08",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Violacao",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-V-09",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Conforme",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-INV-09",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Violacao",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-V-10",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Conforme",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ALOCACAOUSUARIO-INV-10",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-AlocacaoUsuario-Violacao",
+    "sourceShapes": "ex:AlocacaoUsuarioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-V-01",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Conforme",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-INV-01",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Violacao",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-V-02",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Conforme",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-INV-02",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Violacao",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-V-03",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Conforme",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-INV-03",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Violacao",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-V-04",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Conforme",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-INV-04",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Violacao",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-V-05",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Conforme",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-INV-05",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Violacao",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-V-06",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Conforme",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-INV-06",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Violacao",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-V-07",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Conforme",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-INV-07",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Violacao",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-V-08",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Conforme",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-INV-08",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Violacao",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-V-09",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Conforme",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-INV-09",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Violacao",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-V-10",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Conforme",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RESERVAATIVO-INV-10",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ReservaAtivo-Violacao",
+    "sourceShapes": "ex:ReservaAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-V-01",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Conforme",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-INV-01",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Violacao",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-V-02",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Conforme",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-INV-02",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Violacao",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-V-03",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Conforme",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-INV-03",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Violacao",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-V-04",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Conforme",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-INV-04",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Violacao",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-V-05",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Conforme",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-INV-05",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Violacao",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-V-06",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Conforme",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-INV-06",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Violacao",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-V-07",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Conforme",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-INV-07",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Violacao",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-V-08",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Conforme",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-INV-08",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Violacao",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-V-09",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Conforme",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-INV-09",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Violacao",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-V-10",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Conforme",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-INICIOMANUTENCAO-INV-10",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-InicioManutencao-Violacao",
+    "sourceShapes": "ex:InicioManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-V-01",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Conforme",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-INV-01",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Violacao",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-V-02",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Conforme",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-INV-02",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Violacao",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-V-03",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Conforme",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-INV-03",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Violacao",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-V-04",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Conforme",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-INV-04",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Violacao",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-V-05",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Conforme",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-INV-05",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Violacao",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-V-06",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Conforme",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-INV-06",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Violacao",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-V-07",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Conforme",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-INV-07",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Violacao",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-V-08",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Conforme",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-INV-08",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Violacao",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-V-09",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Conforme",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-INV-09",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Violacao",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-V-10",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Conforme",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-CONCLUSAOMANUTENCAO-INV-10",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-ConclusaoManutencao-Violacao",
+    "sourceShapes": "ex:ConclusaoManutencaoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-V-01",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Conforme",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-INV-01",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Violacao",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-V-02",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Conforme",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-INV-02",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Violacao",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-V-03",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Conforme",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-INV-03",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Violacao",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-V-04",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Conforme",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-INV-04",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Violacao",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-V-05",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Conforme",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-INV-05",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Violacao",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-V-06",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Conforme",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-INV-06",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Violacao",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-V-07",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Conforme",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-INV-07",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Violacao",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-V-08",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Conforme",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-INV-08",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Violacao",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-V-09",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Conforme",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-INV-09",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Violacao",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-V-10",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Conforme",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-ENVIOATIVO-INV-10",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-EnvioAtivo-Violacao",
+    "sourceShapes": "ex:EnvioAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-V-01",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Conforme",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-INV-01",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Violacao",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-V-02",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Conforme",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-INV-02",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Violacao",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-V-03",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Conforme",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-INV-03",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Violacao",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-V-04",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Conforme",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-INV-04",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Violacao",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-V-05",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Conforme",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-INV-05",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Violacao",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-V-06",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Conforme",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-INV-06",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Violacao",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-V-07",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Conforme",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-INV-07",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Violacao",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-V-08",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Conforme",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-INV-08",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Violacao",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-V-09",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Conforme",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-INV-09",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Violacao",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-V-10",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Conforme",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECEBIMENTOATIVO-INV-10",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecebimentoAtivo-Violacao",
+    "sourceShapes": "ex:RecebimentoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-V-01",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Conforme",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-INV-01",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Violacao",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-V-02",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Conforme",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-INV-02",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Violacao",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-V-03",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Conforme",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-INV-03",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Violacao",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-V-04",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Conforme",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-INV-04",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Violacao",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-V-05",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Conforme",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-INV-05",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Violacao",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-V-06",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Conforme",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-INV-06",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Violacao",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-V-07",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Conforme",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-INV-07",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Violacao",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-V-08",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Conforme",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-INV-08",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Violacao",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-V-09",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Conforme",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-INV-09",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Violacao",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-V-10",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Conforme",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-REGISTROEXTRAVIO-INV-10",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RegistroExtravio-Violacao",
+    "sourceShapes": "ex:RegistroExtravioShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-V-01",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Conforme",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-INV-01",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Violacao",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-V-02",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Conforme",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-INV-02",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Violacao",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-V-03",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Conforme",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-INV-03",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Violacao",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-V-04",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Conforme",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-INV-04",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Violacao",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-V-05",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Conforme",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-INV-05",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Violacao",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-V-06",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Conforme",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-INV-06",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Violacao",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-V-07",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Conforme",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-INV-07",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Violacao",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-V-08",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Conforme",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-INV-08",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Violacao",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-V-09",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Conforme",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-INV-09",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Violacao",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-V-10",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Conforme",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  },
+  {
+    "semanticCaseId": "CASE-RECUPERACAOATIVO-INV-10",
+    "taskId": "NONE",
+    "baseTaskId": "NONE",
+    "conditionsApplicable": "NONE",
+    "initialStateFixture": "semantic-test-fixtures",
+    "sourceRuleIds": "Regra-RecuperacaoAtivo-Violacao",
+    "sourceShapes": "ex:RecuperacaoAtivoShape",
+    "materializationStatus": "RESERVED_POOL"
+  }
+]

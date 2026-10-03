@@ -1,0 +1,43 @@
+{
+  "validationTimestamp": "2026-09-26T09:12:00Z",
+  "dataset": "pilot/asset-management/.bsh/domains/ativos",
+  "totalGraphNodes": 665,
+  "rdfValidation": {
+    "status": "VALID",
+    "jsonldContextValid": true,
+    "nodesParsed": 665,
+    "unresolvedLocalIris": [],
+    "unresolvedCount": 0
+  },
+  "entitiesSummary": {
+    "ativos": 250,
+    "responsaveis": 40,
+    "localizacoes": 20,
+    "eventosHistoricos": 120,
+    "departamentos": 8,
+    "centrosDeCusto": 8,
+    "politicas": 7,
+    "classes": 30,
+    "propriedades": 45
+  },
+  "shaclCoreValidation": {
+    "status": "CONFORMS",
+    "conforms": true,
+    "evaluatedShapes": 18,
+    "violations": 0
+  },
+  "shaclSparqlValidation": {
+    "status": "CONFORMS",
+    "conforms": true,
+    "evaluatedShapes": 5,
+    "violations": 0
+  },
+  "semanticTestFixtures": {
+    "totalCases": 380,
+    "validCases": 200,
+    "invalidCases": 180,
+    "boundaryCases": 40,
+    "multiRuleCases": 40
+  },
+  "finalVerdict": "VALIDATION_PASSED"
+}

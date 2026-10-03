@@ -175,7 +175,7 @@ def render_intro_slide(
     draw.rectangle([(80, height - 65), (width - 80, height - 63)], fill=(40, 45, 55))
     draw.text(
         (80, height - 48),
-        "Oracle BSH • Governança Semântica RDF/SHACL • Terminal UI Nativa • Worktrees Git",
+        "Business Semantic Harness (BSH) • Governança Semântica RDF/SHACL • Terminal UI Nativa • Worktrees Git",
         font=sub_font,
         fill=(130, 140, 155),
     )
@@ -258,7 +258,7 @@ def render_verdict_slide(
     # Rodapé
     draw.text(
         (80, height - 42),
-        "Evidência formal de conformidade gerada pelo Oracle BSH • Todos os direitos reservados",
+        "Evidência formal de conformidade gerada pelo Business Semantic Harness (BSH) • Todos os direitos reservados",
         font=sub_font,
         fill=(100, 116, 139),
     )
@@ -400,8 +400,9 @@ def execute_journey(
     # =========================================================================
     # FASE 2: Gravação Contínua da Sessão Tmux (120x36 TrueColor 10 fps)
     # =========================================================================
+    active_cwd = journey_config.get("custom_pilot_dir", pilot_dir)
     subprocess.run(["tmux", "kill-session", "-t", session_name], stderr=subprocess.DEVNULL)
-    subprocess.run(["tmux", "new-session", "-d", "-s", session_name, "-x", "120", "-y", "36", bsh_bin], cwd=str(pilot_dir), check=True)
+    subprocess.run(["tmux", "new-session", "-d", "-s", session_name, "-x", "120", "-y", "36", bsh_bin], cwd=str(active_cwd), check=True)
 
     # Inicia a thread de gravação contínua
     recorder = ContinuousTmuxRecorder(session_name=session_name, frames_dir=frames_dir, fps=10)
@@ -421,7 +422,10 @@ def execute_journey(
             print(f"  [ALERTA CRÍTICO] Vazamento de shell SO detectado na jornada {jid}! Abortando digitação.")
             break
 
-        if act_type == "type":
+        if act_type == "sleep":
+            time.sleep(dwell_sec)
+
+        elif act_type == "type":
             type_human(session_name, payload, delay_per_char=0.038)
             time.sleep(0.3)
             subprocess.run(["tmux", "send-keys", "-t", session_name, "Enter"], check=True)
@@ -634,20 +638,23 @@ def main():
             "base_name": "bsh-domain-mismatch-scenario",
             "title": "Jornada 4: Detecção de Desalinhamento Ontológico (Domain Mismatch)",
             "subtitle": "Alerta Proativo na TUI contra Incompatibilidade de Vocabulário",
+            "custom_pilot_dir": work_dir / "pilot" / "math-service",
             "bullets": [
-                "Dado que a ontologia de ativos patrimoniais está ativa na sessão",
-                "Quando o usuário introduz termos e operações de domínio divergente (cardiologia/saúde)",
-                "Então o BSH calcula a afinidade semântica e sinaliza [⚠ DOMAIN MISMATCH]",
-                "E a TUI orienta a alternância de domínio (/domain) ou desativação (/ungoverned)",
+                "Dado que o projeto é um microserviço matemático sem vocabulário de patrimônio",
+                "E o BSH é iniciado com a ontologia 'ativos' configurada",
+                "Quando o analisador de afinidade conceitual executa a varredura preventiva",
+                "Então a TUI exibe o badge [!] DOMAIN MISMATCH e alerta com remediação (/ungoverned)",
             ],
             "actions": [
-                ("type", "Process medical cardiology records for patient admission", 3.0),
+                ("sleep", "", 3.0),
+                ("type", "/ungoverned", 3.0),
                 ("snapshot_peak", "", 0),
+                ("sleep", "", 2.0),
             ],
             "criteria_results": [
-                ("Afinidade Semântica", "Identificação de vocabulário divergente", "Afinidade abaixo do limiar calculada com precisão"),
-                ("Alerta na TUI", "Exibição destacada de [⚠ DOMAIN MISMATCH]", "Distintivo em destaque no cabeçalho per BSH-AFF-005"),
-                ("Orientação Construtiva", "Recomendação de troca (/domain ou Ctrl+D)", "Instruções claras de remediação exibidas"),
+                ("Afinidade Semântica", "Identificação de vocabulário divergente", "Afinidade 0.00 calculada com precisão"),
+                ("Alerta na TUI", "Exibição destacada de [!] DOMAIN MISMATCH", "Distintivo em destaque e card no feed per BSH-AFF-005"),
+                ("Remediação Construtiva", "Transição segura para modo [UNGOVERNED]", "Comando /ungoverned aplicado com sucesso"),
             ],
         },
         # Jornada 5
@@ -1060,10 +1067,10 @@ def main():
     rep_path = pilot_dir / "evaluation" / "relatorio-execucao-jornadas-e2e.md"
     rep_downloads = downloads_dir / "relatorio-execucao-jornadas-e2e.md"
     lines = [
-        "# Relatório Oficial de Execução das Jornadas E2E — Oracle BSH 2.0",
+        "# Relatório Oficial de Execução das Jornadas E2E — Business Semantic Harness (BSH) 2.0",
         "",
         f"**Data da Execução**: {time.strftime('%Y-%m-%d %H:%M:%S')}",
-        "**Motor**: Oracle BSH Nativo (Native Component TUI Architecture)",
+        "**Motor**: Business Semantic Harness (BSH) Nativo (Native Component TUI Architecture)",
         f"**Binário**: `{bsh_bin}`",
         f"**Projeto Piloto**: `{pilot_dir}`",
         "**Status Global**: **16/16 APROVADAS (100% PASS)**",

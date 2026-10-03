@@ -1,0 +1,2637 @@
+{
+  "@context": {
+    "ex": "urn:bsh:pilot:ativos:",
+    "bsh": "urn:bsh:ns:v1:",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "@graph": [
+    {
+      "@id": "ex:fix-transf-inv-001",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-002",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-003"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-003"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-003",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-juridico"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-004",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-005",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-006",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-003"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-003"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-007",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-juridico"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-008",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-009",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-010",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-003"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-003"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-011",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-juridico"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-012",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-013",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-014",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-003"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-003"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-015",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-juridico"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-016",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-017",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-018",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-003"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-003"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-019",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-juridico"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-020",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-021",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-022",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-003"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-003"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-023",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-juridico"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-024",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-025",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-026",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-003"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-003"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-027",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-juridico"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-028",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-029",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-transf-inv-030",
+      "@type": "ex:TransferenciaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:novaLocalizacao": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:departamentoDestino": {
+        "@id": "ex:depto-ti"
+      },
+      "ex:solicitante": {
+        "@id": "ex:responsavel-003"
+      },
+      "ex:aprovador": {
+        "@id": "ex:responsavel-003"
+      },
+      "ex:justificativa": "Solicitação com inconsistência semântica proposital",
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-11T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-005"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-inv-001",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-inv-002",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "2500.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Descarte"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-003",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Motivo qualquer"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-004",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-inv-005",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "2500.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Descarte"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-006",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Motivo qualquer"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-007",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-inv-008",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "2500.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Descarte"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-009",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Motivo qualquer"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-010",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-inv-011",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "2500.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Descarte"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-012",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Motivo qualquer"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-013",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-inv-014",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "2500.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Descarte"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-015",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Motivo qualquer"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-016",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-inv-017",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "2500.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Descarte"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-018",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Motivo qualquer"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-019",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-inv-020",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "2500.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Descarte"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-021",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Motivo qualquer"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-022",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-inv-023",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "2500.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Descarte"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-024",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Motivo qualquer"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-025",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-inv-026",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "2500.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Descarte"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-027",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Motivo qualquer"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-028",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-baixa-inv-029",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:valorResidual": {
+        "@value": "2500.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Descarte"
+    },
+    {
+      "@id": "ex:fix-baixa-inv-030",
+      "@type": "ex:BaixaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:valorResidual": {
+        "@value": "0.0",
+        "@type": "xsd:decimal"
+      },
+      "ex:valorAquisicao": {
+        "@value": "8000.00",
+        "@type": "xsd:decimal"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-15T11:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:motivoBaixa": "Motivo qualquer"
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-inv-01",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": false
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-inv-02",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": false
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-inv-03",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": false
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-inv-04",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": false
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-inv-05",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": false
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-inv-06",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": false
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-inv-07",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": false
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-inv-08",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": false
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-inv-09",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": false
+    },
+    {
+      "@id": "ex:fix-alocacaousuario-inv-10",
+      "@type": "ex:AlocacaoUsuario",
+      "ex:estadoAtual": {
+        "@id": "ex:EmManutencao"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:novoResponsavel": {
+        "@id": "ex:responsavel-001"
+      },
+      "ex:termoResponsabilidadeAssinado": false
+    },
+    {
+      "@id": "ex:fix-reservaativo-inv-01",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      }
+    },
+    {
+      "@id": "ex:fix-reservaativo-inv-02",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      }
+    },
+    {
+      "@id": "ex:fix-reservaativo-inv-03",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      }
+    },
+    {
+      "@id": "ex:fix-reservaativo-inv-04",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      }
+    },
+    {
+      "@id": "ex:fix-reservaativo-inv-05",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      }
+    },
+    {
+      "@id": "ex:fix-reservaativo-inv-06",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      }
+    },
+    {
+      "@id": "ex:fix-reservaativo-inv-07",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      }
+    },
+    {
+      "@id": "ex:fix-reservaativo-inv-08",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      }
+    },
+    {
+      "@id": "ex:fix-reservaativo-inv-09",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      }
+    },
+    {
+      "@id": "ex:fix-reservaativo-inv-10",
+      "@type": "ex:ReservaAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmUso"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:solicitanteReserva": {
+        "@id": "ex:responsavel-002"
+      },
+      "ex:dataInicioReserva": {
+        "@value": "2026-04-01",
+        "@type": "xsd:date"
+      },
+      "ex:dataFimReserva": {
+        "@value": "2026-04-10",
+        "@type": "xsd:date"
+      }
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-inv-01",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-inv-02",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-inv-03",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-inv-04",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-inv-05",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-inv-06",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-inv-07",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-inv-08",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-inv-09",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-iniciomanutencao-inv-10",
+      "@type": "ex:InicioManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-inv-01",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-inv-02",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-inv-03",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-inv-04",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-inv-05",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-inv-06",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-inv-07",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-inv-08",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-inv-09",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-conclusaomanutencao-inv-10",
+      "@type": "ex:ConclusaoManutencao",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-envioativo-inv-01",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-envioativo-inv-02",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-envioativo-inv-03",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-envioativo-inv-04",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-envioativo-inv-05",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-envioativo-inv-06",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-envioativo-inv-07",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-envioativo-inv-08",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-envioativo-inv-09",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-envioativo-inv-10",
+      "@type": "ex:EnvioAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:EmTransito"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:origem": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:destino": {
+        "@id": "ex:localizacao-001"
+      },
+      "ex:transportador": "LogExpress"
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-inv-01",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-inv-02",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-inv-03",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-inv-04",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-inv-05",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-inv-06",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-inv-07",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-inv-08",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-inv-09",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-recebimentoativo-inv-10",
+      "@type": "ex:RecebimentoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-registroextravio-inv-01",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "PROTOCOLO-INVALIDO"
+    },
+    {
+      "@id": "ex:fix-registroextravio-inv-02",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "PROTOCOLO-INVALIDO"
+    },
+    {
+      "@id": "ex:fix-registroextravio-inv-03",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "PROTOCOLO-INVALIDO"
+    },
+    {
+      "@id": "ex:fix-registroextravio-inv-04",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "PROTOCOLO-INVALIDO"
+    },
+    {
+      "@id": "ex:fix-registroextravio-inv-05",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "PROTOCOLO-INVALIDO"
+    },
+    {
+      "@id": "ex:fix-registroextravio-inv-06",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "PROTOCOLO-INVALIDO"
+    },
+    {
+      "@id": "ex:fix-registroextravio-inv-07",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "PROTOCOLO-INVALIDO"
+    },
+    {
+      "@id": "ex:fix-registroextravio-inv-08",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "PROTOCOLO-INVALIDO"
+    },
+    {
+      "@id": "ex:fix-registroextravio-inv-09",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "PROTOCOLO-INVALIDO"
+    },
+    {
+      "@id": "ex:fix-registroextravio-inv-10",
+      "@type": "ex:RegistroExtravio",
+      "ex:estadoAtual": {
+        "@id": "ex:Baixado"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      },
+      "ex:protocoloSinistro": "PROTOCOLO-INVALIDO"
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-inv-01",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-inv-02",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-inv-03",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-inv-04",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-inv-05",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-inv-06",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-inv-07",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-inv-08",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-inv-09",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    },
+    {
+      "@id": "ex:fix-recuperacaoativo-inv-10",
+      "@type": "ex:RecuperacaoAtivo",
+      "ex:estadoAtual": {
+        "@id": "ex:Disponivel"
+      },
+      "ex:registradoPor": "auditor@empresa.com",
+      "ex:dataHoraRegistro": {
+        "@value": "2026-03-20T10:00:00Z",
+        "@type": "xsd:dateTime"
+      }
+    }
+  ]
+}

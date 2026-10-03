@@ -1,0 +1,42 @@
+{
+  "status": "APPROVED",
+  "semanticCorpusRobustness": "ROBUST",
+  "ontologySyntaxValid": true,
+  "semanticDataLoadable": true,
+  "shaclShapesLoadable": true,
+  "sparqlConstraintsLoadable": true,
+  "validFixturesConform": false,
+  "invalidFixturesViolate": false,
+  "stableIdentifiers": true,
+  "noLeakInIdentifiers": true,
+  "graphNodesCount": 665,
+  "totalSemanticCases": 380,
+  "distribution": {
+    "validGoverned": 160,
+    "violating": 140,
+    "boundaryValid": 20,
+    "boundaryInvalid": 20,
+    "boundaryTotal": 40,
+    "multiRuleValid": 20,
+    "multiRuleInvalid": 20,
+    "multiRuleTotal": 40
+  },
+  "materialization": {
+    "experimentTasksMaterialized": 18,
+    "enforcementChallengeMaterialized": 120,
+    "validEnforcementCandidates": 60,
+    "invalidEnforcementCandidates": 60,
+    "reservedPool": 242
+  },
+  "hashes": {
+    "semanticDataHash": "175d905c00d0b2cc78fe1f0259a5145a1c258d597ba12350a1e6f544cb9e9402",
+    "semanticCasesHash": "9f396e57788ecaeca2205a3142faaf9c4dedda94a10c50c95a69bb233cef65b5",
+    "semanticFixturesHash": "e93e481af75128e770b75074102c383ab769c719a749a2bcf11c55e1a656524b",
+    "shaclShapesHash": "2b478272ae0c2f495f938ff77fd217392d17a56df1f4d57ba60c7d7613cf4b72",
+    "sparqlConstraintsHash": "92b3ae5336d9a0f241b23444e1fc5d839ba88eb1fc0279f35242e0c454dab2b8",
+    "semanticDomainInventoryHash": "c3ef75d202043eca381f6b4642807cd6cf1457823bb7461bfff3468637a32c14",
+    "shaclCoverageReportHash": "8b5ab43822bc1bbb3ad0dbdf20b7f2b715c882688f5451de23b33f704c681a9f",
+    "sparqlCoverageReportHash": "92b3ae5336d9a0f241b23444e1fc5d839ba88eb1fc0279f35242e0c454dab2b8",
+    "enforcementChallengeCorpusHash": "e7ed85b15b36ea698c58bbe7ebcc553205ab56de956a1bcbfaaa603db374c937"
+  }
+}

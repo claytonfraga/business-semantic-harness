@@ -61,7 +61,7 @@ def render_slide(title: str, subtitle: str, bullets: list[str], output_path: Pat
 
     # Footer
     draw.rectangle([(80, height - 70), (width - 80, height - 68)], fill=(30, 41, 59))
-    draw.text((80, height - 52), "Oracle BSH (Business Semantic Harness) • Native Component TUI Architecture", font=sub_font, fill=(100, 116, 139))
+    draw.text((80, height - 52), "Business Semantic Harness (BSH) • Native Component TUI Architecture", font=sub_font, fill=(100, 116, 139))
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     img.save(output_path)

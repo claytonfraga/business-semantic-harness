@@ -1,0 +1,57 @@
+[
+  {
+    "constraintId": "ex:TransferenciaCompatibilidadeOrganizacionalShape",
+    "ruleId": "Regra-Transf-LotacaoResponsavelDestino",
+    "businessDescription": "Verifica se o novo responsável está ativamente lotado no departamento de destino da transferência.",
+    "operation": "TransferenciaAtivo",
+    "positiveCases": 57,
+    "negativeCases": 17,
+    "boundaryCases": 5,
+    "multiRuleCases": 10,
+    "coverageStatus": "TOTAL"
+  },
+  {
+    "constraintId": "ex:BaixaValorResidualShape",
+    "ruleId": "Regra-Baixa-LaudoTecnicoValorResidual",
+    "businessDescription": "Exige laudo técnico de descarte quando o ativo a ser baixado possuir valor residual contábil positivo.",
+    "operation": "BaixaAtivo",
+    "positiveCases": 70,
+    "negativeCases": 30,
+    "boundaryCases": 10,
+    "multiRuleCases": 10,
+    "coverageStatus": "TOTAL"
+  },
+  {
+    "constraintId": "ex:ReservaConflitoDatasShape",
+    "ruleId": "Regra-Reserva-ConsistenciaDatas",
+    "businessDescription": "Valida que a data de término da reserva seja estritamente posterior ou igual à data de início.",
+    "operation": "ReservaAtivo",
+    "positiveCases": 10,
+    "negativeCases": 10,
+    "boundaryCases": 5,
+    "multiRuleCases": 5,
+    "coverageStatus": "TOTAL"
+  },
+  {
+    "constraintId": "ex:BaixaAltoValorAprovacaoShape",
+    "ruleId": "Regra-Baixa-AlcadaExecutivaAltoValor",
+    "businessDescription": "Exige autorização formal de aprovador de alçada superior para baixa de bens com valor de aquisição > R$ 10.000.",
+    "operation": "BaixaAtivo",
+    "positiveCases": 10,
+    "negativeCases": 10,
+    "boundaryCases": 5,
+    "multiRuleCases": 10,
+    "coverageStatus": "TOTAL"
+  },
+  {
+    "constraintId": "ex:AlocacaoCompatibilidadeDepartamentoShape",
+    "ruleId": "Regra-Alocacao-LotacaoResponsavel",
+    "businessDescription": "Garante que o colaborador que recebe o ativo pertença a um departamento válido cadastrado.",
+    "operation": "AlocacaoUsuario",
+    "positiveCases": 10,
+    "negativeCases": 10,
+    "boundaryCases": 5,
+    "multiRuleCases": 5,
+    "coverageStatus": "TOTAL"
+  }
+]

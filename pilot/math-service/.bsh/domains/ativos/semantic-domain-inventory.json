@@ -1,0 +1,247 @@
+{
+  "domain": "ativos",
+  "baseIri": "urn:bsh:pilot:ativos:",
+  "version": "1.0.0",
+  "classes": [
+    {
+      "id": "ex:Ativo",
+      "type": "rdfs:Class",
+      "label": "Ativo",
+      "comment": "Bem físico identificado e administrado pelo projeto.",
+      "subclasses": [
+        "ex:AtivoTI",
+        "ex:AtivoVeiculo",
+        "ex:AtivoMobiliario",
+        "ex:AtivoEquipamento",
+        "ex:AtivoInstrumentacao"
+      ]
+    },
+    {
+      "id": "ex:AtivoTI",
+      "type": "rdfs:Class",
+      "superClass": "ex:Ativo",
+      "label": "Ativo de TI"
+    },
+    {
+      "id": "ex:AtivoVeiculo",
+      "type": "rdfs:Class",
+      "superClass": "ex:Ativo",
+      "label": "Ativo Veículo"
+    },
+    {
+      "id": "ex:AtivoMobiliario",
+      "type": "rdfs:Class",
+      "superClass": "ex:Ativo",
+      "label": "Ativo Mobiliário"
+    },
+    {
+      "id": "ex:AtivoEquipamento",
+      "type": "rdfs:Class",
+      "superClass": "ex:Ativo",
+      "label": "Ativo Equipamento"
+    },
+    {
+      "id": "ex:AtivoInstrumentacao",
+      "type": "rdfs:Class",
+      "superClass": "ex:Ativo",
+      "label": "Ativo Instrumentação"
+    },
+    {
+      "id": "ex:Pessoa",
+      "type": "rdfs:Class",
+      "label": "Pessoa",
+      "subclasses": [
+        "ex:Responsavel",
+        "ex:Usuario",
+        "ex:Gestor",
+        "ex:Aprovador"
+      ]
+    },
+    { "id": "ex:Responsavel", "superClass": "ex:Pessoa", "label": "Responsável" },
+    { "id": "ex:Usuario", "superClass": "ex:Pessoa", "label": "Usuário" },
+    { "id": "ex:Gestor", "superClass": "ex:Pessoa", "label": "Gestor" },
+    { "id": "ex:Aprovador", "superClass": "ex:Pessoa", "label": "Aprovador" },
+    { "id": "ex:Organizacao", "type": "rdfs:Class", "label": "Organização" },
+    { "id": "ex:UnidadeOrganizacional", "type": "rdfs:Class", "label": "Unidade Organizacional" },
+    { "id": "ex:Departamento", "type": "rdfs:Class", "label": "Departamento" },
+    { "id": "ex:CentroDeCusto", "type": "rdfs:Class", "label": "Centro de Custo" },
+    { "id": "ex:Filial", "type": "rdfs:Class", "label": "Filial" },
+    { "id": "ex:Localizacao", "type": "rdfs:Class", "label": "Localização" },
+    {
+      "id": "ex:AlcadaAprovacao",
+      "type": "rdfs:Class",
+      "label": "Alçada de Aprovação",
+      "subclasses": ["ex:Diretoria", "ex:Controladoria"]
+    },
+    { "id": "ex:Diretoria", "superClass": "ex:AlcadaAprovacao", "label": "Diretoria" },
+    { "id": "ex:Controladoria", "superClass": "ex:AlcadaAprovacao", "label": "Controladoria" },
+    {
+      "id": "ex:Manutencao",
+      "type": "rdfs:Class",
+      "label": "Manutenção",
+      "subclasses": ["ex:ManutencaoPreventiva", "ex:ManutencaoCorretiva"]
+    },
+    { "id": "ex:ManutencaoPreventiva", "superClass": "ex:Manutencao", "label": "Manutenção Preventiva" },
+    { "id": "ex:ManutencaoCorretiva", "superClass": "ex:Manutencao", "label": "Manutenção Corretiva" },
+    { "id": "ex:PlanoManutencao", "type": "rdfs:Class", "label": "Plano de Manutenção" },
+    { "id": "ex:MovimentacaoAtivo", "type": "rdfs:Class", "label": "Movimentação de Ativo" },
+    { "id": "ex:DocumentoMovimentacao", "type": "rdfs:Class", "label": "Documento de Movimentação" },
+    { "id": "ex:RegistroAuditoria", "type": "rdfs:Class", "label": "Registro de Auditoria" },
+    {
+      "id": "ex:EventoPatrimonial",
+      "type": "rdfs:Class",
+      "label": "Evento Patrimonial",
+      "subclasses": [
+        "ex:TransferenciaAtivo",
+        "ex:BaixaAtivo",
+        "ex:AlteracaoResponsavel",
+        "ex:AtualizacaoLocalizacao",
+        "ex:AlocacaoUsuario",
+        "ex:ReservaAtivo",
+        "ex:InicioManutencao",
+        "ex:ConclusaoManutencao",
+        "ex:EnvioAtivo",
+        "ex:RecebimentoAtivo",
+        "ex:RegistroExtravio",
+        "ex:RecuperacaoAtivo"
+      ]
+    }
+  ],
+  "states": [
+    { "id": "ex:Disponivel", "category": "AssetStatus", "label": "Disponível", "terminal": false },
+    { "id": "ex:EmUso", "category": "AssetStatus", "label": "Em uso", "terminal": false },
+    { "id": "ex:Baixado", "category": "AssetStatus", "label": "Baixado", "terminal": true },
+    { "id": "ex:EmManutencao", "category": "AssetStatus", "label": "Em manutenção", "terminal": false },
+    { "id": "ex:EmTransito", "category": "AssetStatus", "label": "Em trânsito", "terminal": false },
+    { "id": "ex:Reservado", "category": "AssetStatus", "label": "Reservado", "terminal": false },
+    { "id": "ex:Extraviado", "category": "AssetStatus", "label": "Extraviado", "terminal": false },
+    { "id": "ex:EmDia", "category": "MaintenanceStatus", "label": "Em dia" },
+    { "id": "ex:Vencida", "category": "MaintenanceStatus", "label": "Vencida" },
+    { "id": "ex:Isento", "category": "MaintenanceStatus", "label": "Isento" },
+    { "id": "ex:CalibracaoEmDia", "category": "CalibrationStatus", "label": "Calibração em dia" },
+    { "id": "ex:CalibracaoVencida", "category": "CalibrationStatus", "label": "Calibração vencida" },
+    { "id": "ex:CalibracaoIsenta", "category": "CalibrationStatus", "label": "Calibração isenta" }
+  ],
+  "properties": [
+    { "id": "ex:codigoPatrimonio", "domain": "ex:Ativo", "range": "xsd:string", "cardinality": "1..1", "pattern": "^PAT-[0-9]{6}$" },
+    { "id": "ex:descricao", "domain": "ex:Ativo", "range": "xsd:string", "cardinality": "0..1" },
+    { "id": "ex:valorAquisicao", "domain": "ex:Ativo", "range": "xsd:decimal", "cardinality": "0..1" },
+    { "id": "ex:dataAquisicao", "domain": "ex:Ativo", "range": "xsd:date", "cardinality": "0..1" },
+    { "id": "ex:valorResidual", "domain": "ex:Ativo", "range": "xsd:decimal", "cardinality": "0..1" },
+    { "id": "ex:percentualDepreciacao", "domain": "ex:Ativo", "range": "xsd:decimal", "cardinality": "0..1" },
+    { "id": "ex:totalmenteDepreciado", "domain": "ex:Ativo", "range": "xsd:boolean", "cardinality": "0..1" },
+    { "id": "ex:fabricante", "domain": "ex:Ativo", "range": "xsd:string", "cardinality": "0..1" },
+    { "id": "ex:modelo", "domain": "ex:Ativo", "range": "xsd:string", "cardinality": "0..1" },
+    { "id": "ex:numeroSerie", "domain": "ex:Ativo", "range": "xsd:string", "cardinality": "0..1" },
+    { "id": "ex:termoResponsabilidadeAssinado", "domain": "ex:AtivoTI", "range": "xsd:boolean", "cardinality": "0..1" },
+    { "id": "ex:enderecoMac", "domain": "ex:AtivoTI", "range": "xsd:string", "cardinality": "0..1" },
+    { "id": "ex:nomeEquipamento", "domain": "ex:AtivoTI", "range": "xsd:string", "cardinality": "0..1" },
+    { "id": "ex:placa", "domain": "ex:AtivoVeiculo", "range": "xsd:string", "cardinality": "0..1", "pattern": "^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$" },
+    { "id": "ex:renavam", "domain": "ex:AtivoVeiculo", "range": "xsd:string", "cardinality": "0..1", "pattern": "^[0-9]{9,11}$" },
+    { "id": "ex:chassi", "domain": "ex:AtivoVeiculo", "range": "xsd:string", "cardinality": "0..1", "pattern": "^[A-HJ-NPR-Z0-9]{17}$" },
+    { "id": "ex:quilometragem", "domain": "ex:AtivoVeiculo", "range": "xsd:integer", "cardinality": "0..1" },
+    { "id": "ex:validadeLicenciamento", "domain": "ex:AtivoVeiculo", "range": "xsd:date", "cardinality": "0..1" },
+    { "id": "ex:materialPredominante", "domain": "ex:AtivoMobiliario", "range": "xsd:string", "cardinality": "0..1" },
+    { "id": "ex:ambienteDestino", "domain": "ex:AtivoMobiliario", "range": "xsd:string", "cardinality": "0..1" },
+    { "id": "ex:statusManutencao", "domain": "ex:AtivoEquipamento", "range": "ex:MaintenanceStatus", "cardinality": "0..1" },
+    { "id": "ex:dataUltimaManutencao", "range": "xsd:date" },
+    { "id": "ex:dataProximaManutencao", "range": "xsd:date" },
+    { "id": "ex:laudoManutencao", "range": "xsd:string" },
+    { "id": "ex:statusCalibracao", "domain": "ex:AtivoInstrumentacao", "range": "ex:CalibrationStatus", "cardinality": "0..1" },
+    { "id": "ex:dataUltimaCalibracao", "range": "xsd:date" },
+    { "id": "ex:dataProximaCalibracao", "range": "xsd:date" },
+    { "id": "ex:certificadoCalibracao", "range": "xsd:string" },
+    { "id": "ex:temResponsavel", "domain": "ex:Ativo", "range": "ex:Responsavel", "cardinality": "0..1" },
+    { "id": "ex:pertenceCentroDeCusto", "domain": "ex:Ativo", "range": "ex:CentroDeCusto", "cardinality": "0..1" },
+    { "id": "ex:pertenceDepartamento", "domain": "ex:Ativo", "range": "ex:Departamento", "cardinality": "0..1" },
+    { "id": "ex:temLocalizacao", "domain": "ex:Ativo", "range": "ex:Localizacao", "cardinality": "0..1" },
+    { "id": "ex:lotadoEmDepartamento", "domain": "ex:Responsavel", "range": "ex:Departamento", "cardinality": "0..1" },
+    { "id": "ex:vinculadoAUnidade", "range": "ex:UnidadeOrganizacional", "cardinality": "0..1" },
+    { "id": "ex:estadoAtual", "domain": "ex:EventoPatrimonial", "range": "ex:AssetStatus", "cardinality": "1..1" },
+    { "id": "ex:estadoDestino", "domain": "ex:EventoPatrimonial", "range": "ex:AssetStatus", "cardinality": "0..1" },
+    { "id": "ex:dataOperacao", "domain": "ex:EventoPatrimonial", "range": "xsd:date", "cardinality": "0..1" },
+    { "id": "ex:justificativa", "domain": "ex:EventoPatrimonial", "range": "xsd:string", "cardinality": "0..1" },
+    { "id": "ex:motivoBaixa", "domain": "ex:BaixaAtivo", "range": "xsd:string", "cardinality": "1..1" },
+    { "id": "ex:novoResponsavel", "domain": "ex:EventoPatrimonial", "range": "ex:Responsavel", "cardinality": "0..1" },
+    { "id": "ex:novaLocalizacao", "domain": "ex:EventoPatrimonial", "range": "ex:Localizacao", "cardinality": "0..1" },
+    { "id": "ex:solicitante", "domain": "ex:EventoPatrimonial", "range": "ex:Pessoa", "cardinality": "0..1" },
+    { "id": "ex:aprovador", "domain": "ex:EventoPatrimonial", "range": "ex:Pessoa", "cardinality": "0..1" },
+    { "id": "ex:solicitanteReserva", "domain": "ex:ReservaAtivo", "range": "ex:Pessoa", "cardinality": "1..1" },
+    { "id": "ex:dataInicioReserva", "domain": "ex:ReservaAtivo", "range": "xsd:date", "cardinality": "1..1" },
+    { "id": "ex:dataFimReserva", "domain": "ex:ReservaAtivo", "range": "xsd:date", "cardinality": "1..1" },
+    { "id": "ex:motivoReserva", "domain": "ex:ReservaAtivo", "range": "xsd:string", "cardinality": "1..1" },
+    { "id": "ex:motivoManutencao", "domain": "ex:InicioManutencao", "range": "xsd:string", "cardinality": "1..1" },
+    { "id": "ex:origem", "domain": "ex:EnvioAtivo", "range": "ex:Localizacao", "cardinality": "1..1" },
+    { "id": "ex:destino", "domain": "ex:EnvioAtivo", "range": "ex:Localizacao", "cardinality": "1..1" },
+    { "id": "ex:transportador", "domain": "ex:EnvioAtivo", "range": "xsd:string", "cardinality": "1..1" },
+    { "id": "ex:movimentacaoReferenciada", "domain": "ex:RecebimentoAtivo", "range": "xsd:string", "cardinality": "1..1" },
+    { "id": "ex:protocoloSinistro", "domain": "ex:RegistroExtravio", "range": "xsd:string", "cardinality": "1..1", "pattern": "^SIN-[0-9]{4}/[0-9]{6}$" },
+    { "id": "ex:laudoRecuperacao", "domain": "ex:RecuperacaoAtivo", "range": "xsd:string", "cardinality": "1..1" },
+    { "id": "ex:laudoTecnicoDescarte", "domain": "ex:BaixaAtivo", "range": "xsd:string", "cardinality": "0..1" },
+    { "id": "ex:registradoPor", "domain": "ex:EventoPatrimonial", "range": "xsd:string", "cardinality": "1..1" },
+    { "id": "ex:dataHoraRegistro", "domain": "ex:EventoPatrimonial", "range": "xsd:dateTime", "cardinality": "1..1" }
+  ],
+  "operations": [
+    { "name": "transfer", "class": "ex:TransferenciaAtivo", "governed": true },
+    { "name": "retire", "class": "ex:BaixaAtivo", "governed": true },
+    { "name": "responsible", "class": "ex:AlteracaoResponsavel", "governed": true },
+    { "name": "location", "class": "ex:AtualizacaoLocalizacao", "governed": true },
+    { "name": "allocate", "class": "ex:AlocacaoUsuario", "governed": true },
+    { "name": "reserve", "class": "ex:ReservaAtivo", "governed": true },
+    { "name": "maintenance", "class": "ex:InicioManutencao", "governed": true },
+    { "name": "reportLoss", "class": "ex:RegistroExtravio", "governed": true },
+    { "name": "recover", "class": "ex:RecuperacaoAtivo", "governed": true }
+  ],
+  "shapes": [
+    { "id": "ex:TransferenciaShape", "targetClass": "ex:TransferenciaAtivo", "type": "SHACL Core" },
+    { "id": "ex:BaixaShape", "targetClass": "ex:BaixaAtivo", "type": "SHACL Core" },
+    { "id": "ex:ResponsavelShape", "targetClass": "ex:AlteracaoResponsavel", "type": "SHACL Core" },
+    { "id": "ex:LocalizacaoShape", "targetClass": "ex:AtualizacaoLocalizacao", "type": "SHACL Core" },
+    { "id": "ex:IdentificacaoPatrimonialShape", "targetClass": "ex:Ativo", "type": "SHACL Core" },
+    { "id": "ex:AtivoTIShape", "targetClass": "ex:AtivoTI", "type": "SHACL Core" },
+    { "id": "ex:AtivoVeiculoShape", "targetClass": "ex:AtivoVeiculo", "type": "SHACL Core" },
+    { "id": "ex:AlocacaoUsuarioShape", "targetClass": "ex:AlocacaoUsuario", "type": "SHACL Core" },
+    { "id": "ex:ReservaAtivoShape", "targetClass": "ex:ReservaAtivo", "type": "SHACL Core" },
+    { "id": "ex:InicioManutencaoShape", "targetClass": "ex:InicioManutencao", "type": "SHACL Core" },
+    { "id": "ex:ConclusaoManutencaoShape", "targetClass": "ex:ConclusaoManutencao", "type": "SHACL Core" },
+    { "id": "ex:EnvioAtivoShape", "targetClass": "ex:EnvioAtivo", "type": "SHACL Core" },
+    { "id": "ex:RecebimentoAtivoShape", "targetClass": "ex:RecebimentoAtivo", "type": "SHACL Core" },
+    { "id": "ex:RegistroExtravioShape", "targetClass": "ex:RegistroExtravio", "type": "SHACL Core" },
+    { "id": "ex:RecuperacaoAtivoShape", "targetClass": "ex:RecuperacaoAtivo", "type": "SHACL Core" },
+    { "id": "ex:ConformidadeManutencaoShape", "targetClass": "ex:AtivoEquipamento", "type": "SHACL Core" },
+    { "id": "ex:ConformidadeCalibracaoShape", "targetClass": "ex:AtivoInstrumentacao", "type": "SHACL Core" },
+    { "id": "ex:AuditoriaShape", "targetClass": "ex:EventoPatrimonial", "type": "SHACL Core" },
+    { "id": "ex:TransferenciaCompatibilidadeOrganizacionalShape", "targetClass": "ex:TransferenciaAtivo", "type": "SHACL-SPARQL" },
+    { "id": "ex:BaixaValorResidualShape", "targetClass": "ex:BaixaAtivo", "type": "SHACL-SPARQL" }
+  ],
+  "policies": [
+    { "id": "ex:justificativa-adequada", "governs": "ex:TransferenciaAtivo", "requiresHumanReview": true },
+    { "id": "ex:motivo-baixa-adequado", "governs": "ex:BaixaAtivo", "requiresHumanReview": true },
+    { "id": "ex:baixa-alto-valor", "governs": "ex:BaixaAtivo", "requiresHumanReview": true },
+    { "id": "ex:baixa-valor-residual", "governs": "ex:BaixaAtivo", "requiresHumanReview": true },
+    { "id": "ex:recuperacao-extraviado", "governs": "ex:RecuperacaoAtivo", "requiresHumanReview": true },
+    { "id": "ex:transferencia-inter-unidades", "governs": "ex:TransferenciaAtivo", "requiresHumanReview": true },
+    { "id": "ex:aprovacao-diretoria-controladoria", "governs": "ex:BaixaAtivo", "requiresHumanReview": true }
+  ],
+  "lifecycleRules": [
+    { "rule": "Ativo em estado Baixado é terminal e não aceita mutações normais (transferência, troca de responsável, mudança de local, baixa subsequente)." },
+    { "rule": "Apenas ativos Disponivel podem ser reservados." },
+    { "rule": "Ativo em manutenção ou extraviado não pode ser alocado a usuário final." },
+    { "rule": "Ativo em trânsito somente pode sofrer recebimento formal." },
+    { "rule": "Ativo extraviado exige laudo formal para ser recuperado e retornar ao estado Disponivel." },
+    { "rule": "Equipamento com manutenção periódica vencida não pode ser enviado para operação." },
+    { "rule": "Instrumentação com calibração vencida exige recertificação antes do uso." }
+  ],
+  "shaclSparqlConstraints": [
+    {
+      "id": "ex:TransferenciaCompatibilidadeOrganizacionalShape",
+      "targetClass": "ex:TransferenciaAtivo",
+      "logic": "FILTER NOT EXISTS { ?responsavel ex:lotadoEmDepartamento ?deptoDestino }"
+    },
+    {
+      "id": "ex:BaixaValorResidualShape",
+      "targetClass": "ex:BaixaAtivo",
+      "logic": "FILTER (?valorResidual > 0) FILTER NOT EXISTS { $this ex:laudoTecnicoDescarte ?laudo . FILTER (BOUND(?laudo) && str(?laudo) != '') }"
+    }
+  ]
+}
