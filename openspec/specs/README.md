@@ -10,6 +10,14 @@ The `.feature` files in this directory are the authoritative behavioral requirem
 
 [opentui-component-tui.feature](opentui-component-tui.feature) records the permanent OpenTUI component rule and behavior-preserving migration contract. The architectural design is in [rebuild-tui-with-opentui](../changes/rebuild-tui-with-opentui/design.md). The original extraction baseline is commit `2afc270`; architecture rules were added on `feature/opentui-component-tui-rewrite`. This preparation does not claim that the TUI rewrite has been implemented.
 
+## Inviolable Architectural Requirement: Domain Agnosticism & Project Sovereignty (Regra de Ouro)
+
+BSH is strictly an ontology-agnostic semantic harness engine.
+1. **Decoupling**: The BSH core package, CLI, TUI, and runtime engine **SHALL NOT** be coupled to any specific domain ontology (such as `ativos`, `saude`, `financeiro`, `telecom`, etc.).
+2. **Project Residency**: Every domain ontology belongs sovereignly and exclusively to its respective project, residing in `<project>/.bsh/domains/<domain>/` (`ontology.jsonld` and `shapes.ttl`).
+3. **No Global/Package Leakage**: Domain ontologies SHALL NEVER be bundled into the BSH distribution package, moved to global directories, or statically baked into the engine.
+4. **Dynamic Extensibility**: If a user implements any new domain ontology, it is introduced by creating its directory inside the project's `.bsh/domains/` folder. BSH discovers, validates, and enforces it dynamically at runtime. (See `@BSH-DIST-013` and `@BSH-ONT-012`).
+
 ## Reading the catalog
 
 Each scenario has a stable `@BSH-<CAPABILITY>-<NUMBER>` identifier. Source comments at the top of each feature identify the code, tests, specification changes, or journeys used for extraction. [requirements-index.json](requirements-index.json) records scenario locations, source references, all 15 journey mappings, and hashes of the source inventory.

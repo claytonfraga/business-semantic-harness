@@ -45,6 +45,11 @@ export interface ChatEntry {
   gateStatus?: 'CONFORMING' | 'VIOLATION';
   violationShape?: string;
   violationRule?: string;
+  violationOperation?: string;
+  violationBusinessRationale?: string;
+  violationRemediation?: string[];
+  alertDiagnostic?: string;
+  alertRemediation?: string[];
   waitingConfirmation?: boolean;
   receiptFiles?: ReceiptFileStat[];
   receiptTotalAdded?: number;

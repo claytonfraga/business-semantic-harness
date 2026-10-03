@@ -101,6 +101,10 @@ BSH_CONFIRM_PROMPT_VIOLATIONS=true
 
 ## Setting Up Domain Governance in a Project
 
+> [!IMPORTANT]
+> **Golden Architectural Rule: Domain Decoupling & Project Sovereignty**
+> The BSH engine and package are strictly domain-agnostic. BSH is never hardcoded or coupled to any single ontology. Every domain ontology belongs sovereignly and exclusively to its respective project, residing in `<project>/.bsh/domains/<domain>/`. Whenever you implement any new ontology (such as healthcare, banking, telecommunications, or logistics), it is placed directly within your project's `.bsh/` directory, and BSH dynamically discovers, validates, and governs it at runtime without any package modification.
+
 To equip any repository with business ontology governance, initialize the BSH structure:
 
 ```bash

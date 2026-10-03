@@ -34,12 +34,13 @@ Funcionalidade: Guarda preventiva de prompts e modos de governança
     Então a guarda não deve inventar uma violação de ativos
 
   @BSH-GUARD-005
-  Cenário: Pedir confirmação antes do modelo
+  Cenário: Pedir confirmação antes do modelo com explicação negocial clara
     Dado um prompt violador e confirmação habilitada
     Quando o prompt é submetido na TUI
     Então deve receber o distintivo "VIOLATION DETECTED" e o banner "PROMPT VIOLATION DETECTED"
     E o BSH deve aguardar resposta humana antes de chamar o modelo
     E deve exibir a regra e a shape relacionadas
+    E deve explicar a operação de negócio identificada, o motivo ontológico da restrição e caminhos de resolução recomendados
 
   @BSH-GUARD-006
   Cenário: Cancelar intenção conflitante

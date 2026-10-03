@@ -138,11 +138,12 @@ Funcionalidade: Enforcement independente e gate de promoção
     E não deve anunciar uma mudança pronta para promoção
 
   @BSH-SEM-018
-  Cenário: Mostrar evidência coerente na TUI
+  Cenário: Mostrar evidência coerente na TUI com explicação negocial
     Dado um resultado de diff ou intenção violadora
     Quando o cartão de gate é renderizado
     Então status "VIOLATION" deve incluir pelo menos um check de falha
     E checks todos positivos não devem contradizer um status de violação
+    E o cartão deve explicar a regra de negócio ontológica violada e ações recomendadas para adequação
     E o diagnóstico da TUI não deve substituir a validação independente da promoção
 
   @BSH-SEM-019

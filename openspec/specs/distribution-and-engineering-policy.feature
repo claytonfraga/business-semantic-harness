@@ -100,3 +100,12 @@ Funcionalidade: Distribuição e regras de engenharia
     Então os comandos devem utilizar "/usr/bin/rtk"
     E interfaces Java devem declarar contratos sem métodos "default"
     E "rtk serve" não deve ser utilizado
+
+  @BSH-DIST-013 @petreo @regra-de-ouro
+  Cenário: Desacoplamento absoluto do produto BSH de qualquer ontologia e independência de domínio
+    Dado o pacote npm, a CLI e os artefatos de distribuição do BSH
+    Quando o produto é construído, testado ou distribuído
+    Então o código do BSH não deve possuir acoplamento rígido a nenhuma ontologia de domínio específica
+    E o pacote distribuído não deve incluir ontologias de negócio de projetos em seu código ou distribuição
+    E o BSH deve operar estritamente como um harness agnóstico capaz de carregar qualquer ontologia válida presente no projeto
+    E as ontologias de domínio pertencem com exclusividade ao projeto respectivo em "<projeto>/.bsh/domains/<dominio>/"

@@ -92,3 +92,13 @@ Funcionalidade: Validação e consulta da base ontológica
     Então o digest SHA-256 deve considerar caminhos ordenados, tamanhos e conteúdo dos arquivos
     E o retrato e a lista de arquivos devem ser imutáveis
     E uma verificação posterior deve rejeitar alterações de projeto ou digest
+
+  @BSH-ONT-012 @petreo @regra-de-ouro
+  Cenário: Desacoplamento absoluto do BSH e residência soberana da ontologia no projeto
+    Dado qualquer projeto governado ou operado pelo BSH
+    Quando o BSH inicia, descobre, valida ou aplica regras ontológicas
+    Então o motor e o pacote BSH não devem ser acoplados a nenhuma ontologia de domínio específica
+    E toda e qualquer ontologia de negócio deve residir estritamente no diretório do seu respectivo projeto em "<projeto>/.bsh/domains/<dominio>/"
+    E nenhuma ontologia de domínio deve residir no pacote BSH, em diretórios globais ou embutida no binário
+    E a implementação de qualquer nova ontologia pelo usuário deve ocorrer criando sua pasta e arquivos no projeto correspondente
+    E o BSH deve carregar e aplicar dinamicamente a ontologia ativa a partir do projeto informado

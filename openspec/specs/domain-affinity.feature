@@ -44,11 +44,12 @@ Funcionalidade: Afinidade semântica entre domínio e código
     E esse resultado histórico deve permanecer distinguível da classificação atual
 
   @BSH-AFF-006
-  Cenário: Alertar antes do primeiro turno
+  Cenário: Alertar antes do primeiro turno com explicação contextual
     Dado um domínio ativo com baixa afinidade
     Quando a TUI inicia ou o usuário troca o domínio
     Então deve verificar afinidade antes da execução seguinte
     E deve exibir "DOMAIN MISMATCH" no cabeçalho e um alerta destacado no feed
+    E deve apresentar o diagnóstico semântico comparando o vocabulário detectado com o escopo do domínio ativo
     E deve orientar o uso de "/domain" ou "/ungoverned"
     E o usuário deve poder prosseguir conscientemente
 

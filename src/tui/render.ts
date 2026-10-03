@@ -256,17 +256,32 @@ export function renderChatEntry(entry: ChatEntry, width: number): string[] {
           lines.push(tuiLine(`  ${ansi.brightYellow}▎${ansi.reset}   ${ansi.yellow}${w}${ansi.reset}`, width));
         }
       }
+      if (entry.alertDiagnostic) {
+        lines.push(tuiLine(`  ${ansi.brightYellow}▎${ansi.reset}   ${ansi.bold}${ansi.white}Diagnóstico:${ansi.reset} ${entry.alertDiagnostic}`, width));
+      }
+      if (entry.alertRemediation && entry.alertRemediation.length > 0) {
+        lines.push(tuiLine(`  ${ansi.brightYellow}▎${ansi.reset}   ${ansi.bold}${ansi.cyan}Opções:${ansi.reset}`, width));
+        for (const rem of entry.alertRemediation) {
+          lines.push(tuiLine(`  ${ansi.brightYellow}▎${ansi.reset}     ${ansi.dim}•${ansi.reset} ${rem}`, width));
+        }
+      }
       lines.push(tuiLine('', width));
       break;
     }
 
     case 'prompt_violation': {
       lines.push(tuiLine(`  ${ansi.brightRed}▎${ansi.reset} ${ansi.bold}${ansi.brightRed}[!] [PROMPT VIOLATION DETECTED]${ansi.reset} ${ansi.dim}[Pre-flight Semantic Guard]${ansi.reset}`, width));
+      if (entry.violationOperation) {
+        lines.push(tuiLine(`  ${ansi.brightRed}▎${ansi.reset}   ${ansi.bold}${ansi.cyan}Operação:${ansi.reset} ${entry.violationOperation}`, width));
+      }
       if (entry.violationShape) {
-        lines.push(tuiLine(`  ${ansi.brightRed}▎${ansi.reset}   ${ansi.bold}${ansi.yellow}Shape Violada:${ansi.reset} ${entry.violationShape}`, width));
+        lines.push(tuiLine(`  ${ansi.brightRed}▎${ansi.reset}   ${ansi.bold}${ansi.yellow}Violated shape:${ansi.reset} ${entry.violationShape}`, width));
       }
       if (entry.violationRule) {
-        lines.push(tuiLine(`  ${ansi.brightRed}▎${ansi.reset}   ${ansi.bold}${ansi.yellow}Regra SHACL:${ansi.reset} ${entry.violationRule}`, width));
+        lines.push(tuiLine(`  ${ansi.brightRed}▎${ansi.reset}   ${ansi.bold}${ansi.yellow}SHACL rule:${ansi.reset} ${entry.violationRule}`, width));
+      }
+      if (entry.violationBusinessRationale) {
+        lines.push(tuiLine(`  ${ansi.brightRed}▎${ansi.reset}   ${ansi.bold}${ansi.white}Motivo Negocial:${ansi.reset} ${entry.violationBusinessRationale}`, width));
       }
       if (entry.content) {
         for (const rawLine of entry.content.split('\n')) {
@@ -274,6 +289,12 @@ export function renderChatEntry(entry: ChatEntry, width: number): string[] {
           for (const w of wrapped) {
             lines.push(tuiLine(`  ${ansi.brightRed}▎${ansi.reset}   ${ansi.red}${w}${ansi.reset}`, width));
           }
+        }
+      }
+      if (entry.violationRemediation && entry.violationRemediation.length > 0) {
+        lines.push(tuiLine(`  ${ansi.brightRed}▎${ansi.reset}   ${ansi.bold}${ansi.cyan}Como Prosseguir:${ansi.reset}`, width));
+        for (const rem of entry.violationRemediation) {
+          lines.push(tuiLine(`  ${ansi.brightRed}▎${ansi.reset}     ${ansi.dim}•${ansi.reset} ${rem}`, width));
         }
       }
       if (entry.waitingConfirmation) {

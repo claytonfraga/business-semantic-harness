@@ -9,6 +9,9 @@ export interface PromptViolationResult {
   shape?: string;
   rule?: string;
   message?: string;
+  operation?: string;
+  businessRationale?: string;
+  remediation?: string[];
   matchedKeywords?: string[];
 }
 
@@ -47,9 +50,15 @@ export function detectPromptViolation(
 
       return {
         isViolating: true,
+        operation: 'Transferência de Custódia de Ativo Patrimonial',
         shape: 'TransferShape (ex:TransferenciaShape)',
         rule: 'Invariante de Ciclo de Vida: Ativo baixado não pode ser transferido.',
         message: 'O prompt solicita a transferência de um ativo em estado Baixado/Retired, violando a regra de integridade do domínio.',
+        businessRationale: 'A baixa encerra o registro contábil e a responsabilidade patrimonial da organização. Um ativo desincorporado não pode sofrer movimentação física nem troca de custódia.',
+        remediation: [
+          'Se o ativo voltou a operar, solicite a reativação patrimonial formal junto ao setor de controle.',
+          'Para transferências válidas, informe o identificador de um ativo ativo ou em uso.',
+        ],
         matchedKeywords: keywords,
       };
     }
@@ -61,9 +70,15 @@ export function detectPromptViolation(
     if (mentionsBaixaAction && mentionsRetired) {
       return {
         isViolating: true,
+        operation: 'Baixa Patrimonial de Ativo',
         shape: 'BaixaShape (ex:BaixaShape)',
         rule: 'Invariante de Estado: Ativo baixado não pode sofrer nova baixa.',
         message: 'O prompt solicita nova baixa para um ativo já baixado.',
+        businessRationale: 'O bem já se encontra formalmente desincorporado no inventário contábil. A duplicação da baixa geraria inconsistência de auditoria e distorção patrimonial.',
+        remediation: [
+          'Verifique o código ou plaqueta do ativo no inventário.',
+          'Consulte o histórico de baixa no sistema patrimonial para obter o termo anterior.',
+        ],
         matchedKeywords: ['baixa', 'ativo baixado'],
       };
     }
@@ -72,9 +87,15 @@ export function detectPromptViolation(
     if (mentionsNoJustification && (mentionsTransfer || mentionsBaixaAction)) {
       return {
         isViolating: true,
+        operation: 'Movimentação / Baixa Sensível de Patrimônio',
         shape: 'TransferShape / BaixaShape',
-        rule: 'Obrigatoriedade de Justificativa e Aprovador.',
+        rule: 'Obrigatoriedade de Justificativa e Aprovador Distinto.',
         message: 'Operações de movimentação ou baixa exigem justificativa e aprovador distinto do solicitante.',
+        businessRationale: 'A governança patrimonial exige trilha de auditoria com justificativa fundamentada e aprovação segregada do solicitante para evitar desvios ou fraudes.',
+        remediation: [
+          'Especifique no prompt a justificativa de negócio da operação.',
+          'Indique um aprovador formal distinto do solicitante da transferência.',
+        ],
         matchedKeywords: ['sem justificativa'],
       };
     }
