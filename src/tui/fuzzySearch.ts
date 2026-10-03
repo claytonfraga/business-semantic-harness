@@ -66,11 +66,14 @@ export function fuzzyScore(target: string, query: string): FuzzyMatchResult | nu
 }
 
 /**
- * Highlights matching indices within text using bold yellow ANSI codes.
+ * Highlights matching indices within text using bold yellow ANSI codes, or plain brackets if requested.
  */
-export function highlightMatches(text: string, indices: number[]): string {
-  if (!indices || indices.length === 0) return `${ansi.cyan}${text}${ansi.reset}`;
+export function highlightMatches(text: string, indices: number[], plain = false): string {
+  if (!indices || indices.length === 0) return plain ? text : `${ansi.cyan}${text}${ansi.reset}`;
   const indexSet = new Set(indices);
+  if (plain) {
+    return Array.from(text).map((char, index) => indexSet.has(index) ? `[${char}]` : char).join('');
+  }
   let res = '';
   for (let i = 0; i < text.length; i++) {
     if (indexSet.has(i)) {

@@ -29,6 +29,8 @@ BSH implements a **multi-layer semantic defense** that governs agent execution f
 
 ## Quick Start
 
+The CLI and noninteractive commands support Node.js 22 or later. Interactive sessions use the package-local Bun 1.4.2 runtime with OpenTUI 0.5.14; no global Bun installation is required. Install optional dependencies to obtain native artifacts for Linux, macOS, or Windows on x64 or ARM64 (Linux musl artifacts are also available). OpenTUI declares a newer Node engine, so npm may display an engine warning on Node 22; the interactive launcher uses Bun instead. An unavailable native runtime produces an actionable diagnostic. Environments enforcing `engine-strict` must account for the upstream OpenTUI engine metadata.
+
 ### 1. Run Instantly with `npx` (No Installation Required)
 
 You can launch and run BSH in any repository immediately without prior global installation:

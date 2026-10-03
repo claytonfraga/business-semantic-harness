@@ -1,0 +1,33 @@
+schema: spec-driven
+
+context: |
+  Language: English
+  Always produce everything in English (code, menus, UI, commits, tests, documentation, and artifacts), EXCEPT the description of .feature files (which remain in Portuguese with '# language: pt').
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+  Portuguese Gherkin .feature files in openspec/specs are the authoritative behavioral requirements. Journey .feature files in test/features/journeys are execution plans derived from those requirements.
+  Markdown design/proposal/tasks artifacts provide rationale and tracking; they MUST NOT introduce acceptance requirements absent from the authoritative .feature files or override them.
+  Update the relevant .feature before implementing a changed requirement, and maintain stable scenario IDs and traceability metadata.
+  Every interactive TUI surface MUST use supported OpenTUI components, preserving implemented behavior. Handwritten ANSI frames, borders, cursor positioning, raw-readline widgets, and parallel custom TUI renderers are prohibited.
+  Preserve noninteractive CLI/headless behavior and verify supported runtime and packaged-distribution compatibility. See openspec/specs/opentui-component-tui.feature.
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always include a "Non-goals" section
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing

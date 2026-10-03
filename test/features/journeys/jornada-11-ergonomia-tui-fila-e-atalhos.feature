@@ -9,11 +9,11 @@ Funcionalidade: Jornada 11 - Ergonomia TUI, Fila Concorrente de Prompts e Atalho
     Dado que uma sessão interativa do BSH está processando um turno com ferramentas ativas
     Quando o usuário digita e envia um segundo prompt antes da conclusão do primeiro
     Então o segundo prompt não bloqueia nem corrompe a interface do terminal
-    E o prompt é inserido no histórico com o distintivo "[Na fila]"
+    E o prompt é inserido no histórico com o distintivo "[QUEUED]"
     E o rodapé atualiza o contador dinâmico de fila "[Queue: 1]"
     E quando o turno atual é finalizado
     Então o próximo prompt da fila é imediatamente processado em ordem FIFO
-    E o distintivo "[Na fila]" é removido da entrada de chat correspondente
+    E o distintivo "[QUEUED]" é removido da entrada de chat correspondente
 
   Cenário: Cancelamento imediato de turno por Duplo Escape (ESC ESC)
     Dado que o modelo ou ferramentas do BSH estão em execução longa no workspace
@@ -26,7 +26,7 @@ Funcionalidade: Jornada 11 - Ergonomia TUI, Fila Concorrente de Prompts e Atalho
   Cenário: Limpeza instantânea do buffer de digitação com Ctrl+C
     Dado que o usuário digitou um texto preliminar incompleto no campo de prompt
     Quando o usuário pressiona "Ctrl+C"
-    Então o buffer de entrada do readline é limpo para uma string vazia
+    Então o buffer do componente de entrada OpenTUI é limpo para uma string vazia
     E o cursor retorna à posição inicial da linha de prompt
     E a sessão interativa do BSH permanece viva e operante sem sair para o shell
 

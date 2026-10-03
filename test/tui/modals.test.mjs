@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { searchModels, fuzzyScore, highlightMatches } from '../../dist/tui/modals.js';
@@ -47,10 +48,8 @@ test('fuzzyScore calculates scores, boundary bonuses, and matching character ind
   assert.equal(noMatch, null, 'Should return null for non-matching patterns');
 });
 
-test('highlightMatches wraps matching characters in bold yellow ANSI escape codes', () => {
-  const highlighted = highlightMatches('deepseek', [0, 4]);
-  assert.ok(highlighted.includes('\x1b[1m\x1b[33md\x1b[0m'), 'Must highlight index 0');
-  assert.ok(highlighted.includes('\x1b[1m\x1b[33ms\x1b[0m'), 'Must highlight index 4');
+test('Given matching indices When a plain textual indication is requested Then matches are indicated without terminal escapes', () => {
+  assert.equal(highlightMatches('deepseek', [0, 4], true), '[d]eep[s]eek');
 });
 
 test('searchModels supports fuzzy subsequence search across reordered tokens', () => {
@@ -69,3 +68,11 @@ test('searchModels supports fuzzy subsequence search across reordered tokens', (
   assert.equal(flashMatches[0].id, 'deepseek/deepseek-v4.1-flash');
 });
 
+
+test('Given BSH-MENU-011 a non-TTY selector When piped search and numeric lines are supplied Then the selection returns without frames or renderer initialization', () => {
+  const code = `import { selectSlashCommandModal } from './dist/tui/modals.js'; console.log('RESULT', await selectSlashCommandModal());`;
+  const result = spawnSync(process.execPath,['--input-type=module','-e',code],{ cwd: process.cwd(), input: 'ex\n1\n',encoding:'utf8' });
+  assert.equal(result.status,0,result.stderr);
+  assert.match(result.stdout,/RESULT \/exit/);
+  assert.doesNotMatch(result.stdout,/\x1b|┌|└/);
+});

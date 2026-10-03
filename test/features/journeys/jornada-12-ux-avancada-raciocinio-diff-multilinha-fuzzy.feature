@@ -10,7 +10,7 @@ Funcionalidade: Jornada 12 - UX Avançada com Raciocínio CoT Retrátil, Diff em
     Dado que um modelo de raciocínio profundo ("deepseek-r1" ou "gemini-thinking") emite cadeia de pensamento
     Quando o raciocínio é concluído e a resposta textual começa a ser emitida
     Então o bloco de raciocínio é automaticamente recolhido para uma linha sintética
-    E exibe "▼ [Raciocínio: ~N tokens · Xs] [Ctrl+O expandir]"
+    E exibe "▼ [Reasoning: ~N tokens · Xs] [Ctrl+O expand]"
     E quando o usuário pressiona "Ctrl+O"
     Então o bloco é expandido exibindo todo o raciocínio preliminar com margem magenta
     E a moldura da TUI preserva a altura total estritamente invariante

@@ -81,3 +81,15 @@ test('Given authenticateViaWebBrowser, when browser hits callback with code, the
     globalThis.fetch = originalFetch;
   }
 });
+
+test('Given BSH-OPENTUI-009 a pending browser login When manual authentication aborts the flow Then the callback server closes and the promise settles', async () => {
+  const controller = new AbortController();
+  let ready;
+  const bound = new Promise(resolve => { ready = resolve; });
+  const pending = authenticateViaWebBrowser({ signal: controller.signal, onUrlReady: ready });
+  const url = await bound;
+  const callback = new URL(url).searchParams.get('callback_url');
+  controller.abort();
+  await assert.rejects(pending, /cancelled/);
+  await assert.rejects(fetch(callback));
+});
