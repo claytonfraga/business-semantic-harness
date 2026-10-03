@@ -107,6 +107,13 @@ export const DEFAULT_SLASH_COMMANDS: SlashCommandDef[] = [
     activeColorName: 'Mint Green',
   },
   {
+    name: '/verbose',
+    description: 'Toggle verbose tool & RPC debug output',
+    category: 'UI',
+    activeColor: theme.commands['/verbose'],
+    activeColorName: 'Lavender Purple',
+  },
+  {
     name: '/exit',
     description: 'Safely exit BSH and restore terminal',
     category: 'System',

@@ -601,7 +601,7 @@ def run_scenario_7(pilot_dir: Path, bsh_bin: str) -> dict:
 
     intro_title = "Jornada 7: BSH como Cliente MCP — Configuração e Consumo de Ferramentas de Terceiros"
     intro_lines = [
-        "Interface: OpenTUI moderna nativa do BSH (binário compilado)",
+        "Interface: Terminal UI moderna nativa do BSH (binário compilado)",
         "Servidor MCP Externo: Context7 (provedor de documentação técnica oficial)",
         "Objetivo da Jornada: O usuário gerencia conexões MCP com /mcp e a IA consome ferramentas externas no turno.",
         "Comportamento Esperado:",
@@ -621,7 +621,7 @@ def run_scenario_7(pilot_dir: Path, bsh_bin: str) -> dict:
     try:
         res = record_scenario(
             session_name="bsh-e2e-mcp-client",
-            title="BSH OpenTUI: MCP Client Configuration & Third-Party Tool Execution",
+            title="BSH TUI: MCP Client Configuration & Third-Party Tool Execution",
             intro_title=intro_title,
             intro_lines=intro_lines,
             command=["env", "OPENROUTER_API_KEY=sk-or-v1-mock-test", bsh_bin, "--project", str(pilot_dir)],
@@ -644,7 +644,7 @@ def run_scenario_8(pilot_dir: Path, bsh_bin: str) -> dict:
 
     intro_title = "Jornada 8: Barra de Rolagem Visual, Histórico por Projeto e Execução Concreta"
     intro_lines = [
-        "Interface: OpenTUI moderna nativa do BSH (binário compilado)",
+        "Interface: Terminal UI moderna nativa do BSH (binário compilado)",
         "Navegação: Histórico de prompts em .bsh/history.json acessível por setas para cima/baixo",
         "Rolagem: Barra visual com thumb '█' e trilha '│', navegável por teclado (/up, /down, /pgup, /pgdn, PageUp/PageDown)",
         "Comportamento Esperado:",
@@ -663,7 +663,7 @@ def run_scenario_8(pilot_dir: Path, bsh_bin: str) -> dict:
 
     res = record_scenario(
         session_name="bsh-e2e-scroll-history",
-        title="BSH OpenTUI: Visual Scrollbar, Project Prompt History & Active Loop",
+        title="BSH TUI: Visual Scrollbar, Project Prompt History & Active Loop",
         intro_title=intro_title,
         intro_lines=intro_lines,
         command=["env", "OPENROUTER_API_KEY=sk-or-v1-mock-test", bsh_bin, "--project", str(pilot_dir)],
@@ -683,7 +683,7 @@ def run_scenario_9(pilot_dir: Path, bsh_bin: str) -> dict:
 
     intro_title = "Jornada 9: Agente de Codificação Autônomo com Ferramentas Especializadas e Diff Gate"
     intro_lines = [
-        "Interface: BSH OpenTUI com Agente de Codificação Autônomo (binário compilado bsh)",
+        "Interface: BSH TUI com Agente de Codificação Autônomo (binário compilado bsh)",
         "Contexto Inicial: Ingestão automática da topologia do workspace e manifestos do projeto",
         "Ferramentas Especializadas: search_code, find_files, read_file, replace_file_content, write_file, run_bash_command",
         "Metodologia: 'Action Over Theory' (Localizar -> Modificar -> Auto-Verificar via /usr/bin/rtk -> Diff)",
@@ -722,7 +722,7 @@ def run_scenario_10(pilot_dir: Path, bsh_bin: str) -> dict:
 
     intro_title = "Jornada 10: Guarda Semântica com Negação e Navegação em Linha Única"
     intro_lines = [
-        "Interface: BSH OpenTUI com Guarda Semântica Refinada e Navegação de Histórico Estabilizada",
+        "Interface: BSH TUI com Guarda Semântica Refinada e Navegação de Histórico Estabilizada",
         "Objetivo 1 (Prevenção de Falso Positivo): 'remover um ativo nao baixado' não deve acionar TransferShape.",
         "Objetivo 2 (Guarda Ontológica Legítima): 'transferir um ativo baixado' deve acionar TransferShape e pausar.",
         "Objetivo 3 (Estabilização da TUI): Navegação com setas cima/baixo mantém estritamente uma única linha de prompt.",
@@ -760,7 +760,7 @@ def run_scenario_11(pilot_dir: Path, bsh_bin: str) -> dict:
 
     intro_title = "Jornada 11: Ergonomia TUI, Fila Concorrente de Prompts e Atalhos de Teclado"
     intro_lines = [
-        "Interface: BSH OpenTUI com Fila Concorrente FIFO, Deduplicação Visual e Atalhos Ágeis",
+        "Interface: BSH TUI com Fila Concorrente FIFO, Deduplicação Visual e Atalhos Ágeis",
         "Objetivo 1 (Deduplicação Visual): Cabeçalho limpo em 3 linhas e rodapé unificado em 4 linhas (7 linhas chrome).",
         "Objetivo 2 (Fila Concorrente FIFO): Prompts enviados durante processamento recebem tag [Na fila] e contador [Queue: N].",
         "Objetivo 3 (Cancelamento Imediato): Tecla [ESC] para confirmações pendentes e duplo Escape (ESC ESC) para o turno.",
@@ -796,7 +796,7 @@ def run_scenario_12(pilot_dir: Path, bsh_bin: str) -> dict:
 
     intro_title = "Jornada 12: UX Avançada com Raciocínio CoT Retrátil, Diff em Tempo Real, Modo Multilinha e Busca Difusa"
     intro_lines = [
-        "Interface: BSH OpenTUI com Suporte a Modelos de Raciocínio Profundo (CoT) e Ergonomia Avançada",
+        "Interface: BSH TUI com Suporte a Modelos de Raciocínio Profundo (CoT) e Ergonomia Avançada",
         "Objetivo 1 (Raciocínio CoT Retrátil): Recolhimento automático de cadeias de pensamento longas (toggle com Ctrl+O).",
         "Objetivo 2 (Diff em Tempo Real): Exibição instantânea do balanço de adições/remoções (+X / -Y) por arquivo alterado.",
         "Objetivo 3 (Modo Multilinha): Suporte a entrada em bloco com aspas triplas (\"\"\") e editor externo via /editor.",
@@ -831,7 +831,7 @@ def run_scenario_13(pilot_dir: Path, bsh_bin: str) -> dict:
 
     intro_title = "Jornada 13: Mecanismo de Instalação e Execução de Skills & Prototipação Rápida"
     intro_lines = [
-        "Interface: BSH OpenTUI com Suporte a Skills Especializadas (Agy / Codex / Claude Code compatibility)",
+        "Interface: BSH TUI com Suporte a Skills Especializadas (Agy / Codex / Claude Code compatibility)",
         "Objetivo 1 (Descoberta Multi-Raiz de Skills): Escaneamento automático de skills em .bsh/skills/, .agents/skills/ e globais.",
         "Objetivo 2 (Inspeção e Ativação Interativa): Acesso via /skills com busca difusa e ativação na sessão.",
         "Objetivo 3 (Skill prototype em Ação): Execução autônoma de diretivas de prototipação rápida para validação de hipóteses.",

@@ -40,6 +40,8 @@ export interface ChatEntry {
   isViolating?: boolean;
   toolName?: string;
   toolArgs?: Record<string, unknown> | string;
+  isError?: boolean;
+  verbose?: boolean;
   gateShape?: string;
   gateChecks?: GateCheckItem[];
   gateStatus?: 'CONFORMING' | 'VIOLATION';

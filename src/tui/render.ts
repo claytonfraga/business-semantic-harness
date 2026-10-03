@@ -1,5 +1,6 @@
 import { ansi, stripAnsi } from './ansi.js';
 import { renderSlashMenuBox } from './slashCommands.js';
+import { formatActionStep } from './entries.js';
 
 import type { RenderState, ChatEntry } from "./state.js";
 export type { RenderState, ChatEntry, GateCheckItem, ReceiptFileStat } from "./state.js";
@@ -211,14 +212,28 @@ export function renderChatEntry(entry: ChatEntry, width: number): string[] {
     }
 
     case 'tool': {
-      const inv = formatToolInvocation(entry.toolName || '', entry.toolArgs || {});
-      lines.push(tuiLine(`  ${ansi.blue}▎${ansi.reset} ${ansi.yellow}>_ Tool:${ansi.reset} ${ansi.bold}${inv}${ansi.reset}`, width));
+      if (entry.verbose) {
+        const inv = formatToolInvocation(entry.toolName || '', entry.toolArgs || {});
+        lines.push(tuiLine(`  ${ansi.blue}▎${ansi.reset} ${ansi.yellow}>_ Tool:${ansi.reset} ${ansi.bold}${inv}${ansi.reset}`, width));
+      } else {
+        const step = formatActionStep(entry.toolName || '', entry.toolArgs || {});
+        const color = step.isEdit ? ansi.brightGreen : step.isOntology ? ansi.magenta : step.isCommand ? ansi.brightYellow : ansi.cyan;
+        lines.push(tuiLine(`  ${ansi.blue}▎${ansi.reset} ${color}${step.action} ${ansi.bold}${step.target}${ansi.reset}`.trimEnd(), width));
+      }
       break;
     }
 
     case 'tool_result': {
-      lines.push(tuiLine(`  ${ansi.dim}▎${ansi.reset}   ${ansi.green}->${ansi.reset} ${entry.content || ''}`, width));
-      lines.push(tuiLine('', width));
+      if (entry.verbose) {
+        lines.push(tuiLine(`  ${ansi.dim}▎${ansi.reset}   ${ansi.green}->${ansi.reset} ${entry.content || ''}`, width));
+        lines.push(tuiLine('', width));
+      } else if (entry.isError) {
+        lines.push(tuiLine(`  ${ansi.brightRed}▎${ansi.reset}   ${ansi.brightRed}✖ ${entry.content || 'Action failed'}${ansi.reset}`, width));
+        lines.push(tuiLine('', width));
+      } else if (entry.content) {
+        lines.push(tuiLine(`  ${ansi.dim}▎${ansi.reset}   ${ansi.dim}↳ ${entry.content}${ansi.reset}`, width));
+        lines.push(tuiLine('', width));
+      }
       break;
     }
 

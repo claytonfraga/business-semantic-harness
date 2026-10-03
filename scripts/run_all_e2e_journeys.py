@@ -175,7 +175,7 @@ def render_intro_slide(
     draw.rectangle([(80, height - 65), (width - 80, height - 63)], fill=(40, 45, 55))
     draw.text(
         (80, height - 48),
-        "Oracle BSH • Governança Semântica RDF/SHACL • OpenTUI Component TUI • Worktrees Git",
+        "Oracle BSH • Governança Semântica RDF/SHACL • Terminal UI Nativa • Worktrees Git",
         font=sub_font,
         fill=(130, 140, 155),
     )
@@ -539,10 +539,13 @@ def execute_journey(
 def main():
     work_dir = Path("/home/clayton/projetos/oracle")
     pilot_dir = work_dir / "pilot" / "asset-management"
-    downloads_dir = Path("/mnt/c/Users/clayt/Downloads/bsh")
+    if Path("/mnt/c/Users/clayt/Downloads").exists():
+        downloads_dir = Path("/mnt/c/Users/clayt/Downloads/bsh")
+    else:
+        downloads_dir = work_dir / "evaluation" / "downloads"
     downloads_dir.mkdir(parents=True, exist_ok=True)
 
-    bsh_bin = "/home/clayton/.nvm/versions/node/v22.19.0/bin/bsh"
+    bsh_bin = shutil.which("bsh") or "/home/clayton/.nvm/versions/node/v22.19.0/bin/bsh"
     print("=== BSH Master E2E Runner 2.0 (Gravação Contínua e Fidedigna) ===")
     print(f"Binário global: {bsh_bin}")
     print(f"Projeto Piloto: {pilot_dir}")
@@ -729,7 +732,7 @@ def main():
                 "Dado múltiplos prompts enviados e persistidos em .bsh/history.json",
                 "Quando o usuário navega com as setas para Cima e Baixo no buffer de entrada",
                 "Então o histórico é recuperado estritamente em linha única sem duplicatas",
-                "E a barra de rolagem visual nativa do OpenTUI reflete a posição da conversa",
+                "E a barra de rolagem visual nativa da TUI reflete a posição da conversa",
             ],
             "actions": [
                 ("type", "First prompt about asset validation rules", 1.5),
@@ -821,7 +824,7 @@ def main():
             "id": 12,
             "base_name": "bsh-advanced-ux-reasoning-diff-fuzzy-scenario",
             "title": "Jornada 12: UX Avançada — Raciocínio CoT Retrátil, Diff e Modo Multilinha",
-            "subtitle": "Visualização Profissional com OpenTUI e Tema GitHub Dark Dimmed",
+            "subtitle": "Visualização Profissional com Terminal UI e Tema GitHub Dark Dimmed",
             "bullets": [
                 "Dado a necessidade de inserir instruções complexas com quebras de linha",
                 "Quando o usuário digita o delimitador triple-quote (\"\"\") no prompt",
@@ -894,12 +897,12 @@ def main():
         {
             "id": 15,
             "base_name": "bsh-slash-commands-menu",
-            "title": "Jornada 15: Paleta Flutuante de Comandos com Barra no OpenTUI",
+            "title": "Jornada 15: Paleta Flutuante de Comandos com Barra na TUI",
             "subtitle": "Acionamento em Prompt Vazio, Rolagem por Janela e Cancelamento Seguro",
             "bullets": [
                 "Dado um prompt de entrada estritamente vazio",
                 "Quando o usuário digita o caractere de barra '/'",
-                "Então a paleta flutuante do OpenTUI abre imediatamente com lista de comandos",
+                "Então a paleta flutuante de comandos abre imediatamente com lista de opções",
                 "E a navegação por setas, busca difusa e cancelamento com Escape operam limpos",
             ],
             "actions": [
@@ -920,12 +923,12 @@ def main():
         {
             "id": 16,
             "base_name": "bsh-opentui-reconstruction-scenario",
-            "title": "Jornada 16: Reconstrução da Arquitetura com Componentes OpenTUI",
+            "title": "Jornada 16: Reconstrução da Arquitetura com Componentes Nativos da TUI",
             "subtitle": "Verificação E2E da Distribuição Global, Responsividade e Governança",
             "bullets": [
                 "Dado o binário global 'bsh' empacotado executando sobre o motor Bun embutido",
                 "Quando as facetas interativas são percorridas (paleta, modais, fila, alertas)",
-                "Então todos os componentes OpenTUI preservam foco, layout e governança",
+                "Então todos os componentes da TUI preservam foco, layout e governança",
                 "E o ciclo de vida completo é comprovado em cópia limpa do piloto",
             ],
             "actions": [
@@ -946,7 +949,7 @@ def main():
             ],
             "criteria_results": [
                 ("Distribuição Global", "Execução com binário 'bsh' instalado no sistema", "Nenhum script TS de desenvolvimento utilizado"),
-                ("Fidelidade OpenTUI", "Paleta, modais e fila coordenados sem sobreposição", "Layout resiliente a redimensionamentos"),
+                ("Fidelidade da TUI", "Paleta, modais e fila coordenados sem sobreposição", "Layout resiliente a redimensionamentos"),
                 ("Governança Integrada", "Detecção e bloqueio SHACL na sessão ativa", "Salvação ontológica atuando em tempo real"),
             ],
         },
@@ -1060,7 +1063,7 @@ def main():
         "# Relatório Oficial de Execução das Jornadas E2E — Oracle BSH 2.0",
         "",
         f"**Data da Execução**: {time.strftime('%Y-%m-%d %H:%M:%S')}",
-        "**Motor**: Oracle BSH Nativo (OpenTUI Component Architecture)",
+        "**Motor**: Oracle BSH Nativo (Native Component TUI Architecture)",
         f"**Binário**: `{bsh_bin}`",
         f"**Projeto Piloto**: `{pilot_dir}`",
         "**Status Global**: **16/16 APROVADAS (100% PASS)**",

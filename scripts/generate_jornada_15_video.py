@@ -124,11 +124,11 @@ def main():
     print("--- [1/5] Generating opening black slide ---")
     slide_path = frames_dir / f"frame_{frame_idx:05d}.png"
     render_slide(
-        title="Jornada 15: Paleta Flutuante de Comandos com Barra no OpenTUI",
+        title="Jornada 15: Paleta Flutuante de Comandos com Barra na TUI",
         subtitle="Verificação E2E Baseada em Especificação (openspec/specs)",
         bullets=[
             "1. Acionamento estrito ao digitar '/' com o prompt vazio",
-            "2. Paleta flutuante OpenTUI compacta (<=72 colunas) com rolagem por janela",
+            "2. Paleta flutuante de comandos compacta (<=72 colunas) com rolagem por janela",
             "3. Navegação por setas com cor distinta e vibrante para cada comando ativo",
             "4. Decisão de NÃO SELECIONAR: pressionar Escape fecha a paleta com limpeza",
             "5. Filtragem em tempo real ('ex'), realce de caracteres e execução com Enter",
@@ -157,7 +157,7 @@ def main():
         time.sleep(0.1)
 
     # ---------------- Step 1: Type '/' in empty prompt ----------------
-    print("--- [3/5] Typing '/' in empty prompt to open floating OpenTUI palette ---")
+    print("--- [3/5] Typing '/' in empty prompt to open floating palette ---")
     subprocess.run(["tmux", "send-keys", "-t", session_name, "-l", "/"], check=True)
     time.sleep(1.5)
 
@@ -165,7 +165,7 @@ def main():
     for _ in range(12):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH TUI: OpenTUI Palette - /model Active (Magenta)", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Slash Palette - /model Active (Magenta)", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     # Navigate Down to /domain (Emerald Green)
@@ -244,7 +244,7 @@ def main():
 
     # Save screenshot of the filtered menu
     screenshot_out.parent.mkdir(parents=True, exist_ok=True)
-    render_terminal_frame(text, "BSH TUI: OpenTUI Floating Slash Palette", screenshot_out)
+    render_terminal_frame(text, "BSH TUI: Floating Slash Palette", screenshot_out)
     print(f"Screenshot final salva em: {screenshot_out}")
 
     # Confirm with Enter

@@ -7,7 +7,7 @@ import { githubDarkDimmedTheme as theme } from '../../dist/tui/theme.js';
 
 const state = { model: 'test-model', governed: true, tokensTotal: 100, domain: 'Synthetic', projectFolder: 'fixture', gitBranch: 'main' };
 
-test('Given BSH-TUI-002 and BSH-OPENTUI-004 When telemetry renders at ordinary width Then duration TPS queue and model usage remain visible', async () => {
+test('Given BSH-TUI-002 When telemetry renders at ordinary width Then duration TPS queue and model usage remain visible', async () => {
   const fixture = await createTestRenderer({ width: 80, height: 24 });
   const view = await createTuiView({ renderer: fixture.renderer });
   try {
@@ -22,14 +22,14 @@ test('Given BSH-TUI-002 and BSH-OPENTUI-004 When telemetry renders at ordinary w
   } finally { view.destroy(); }
 });
 
-test('Given BSH-OPENTUI-014 and BSH-MENU-004 When shared theme is read Then exact roles and unique accents are available', () => {
+test('Given BSH-MENU-004 When shared theme is read Then exact roles and unique accents are available', () => {
   assert.deepEqual(Object.values(theme).filter(value => typeof value === 'string'), ['#22272e', '#2d333b', '#1c2128', '#adbac7', '#768390', '#cdd9e5', '#444c56', '#373e47', '#539bf5', '#316dca', '#57ab5a', '#c69026', '#e5534b', '#986ee2']);
-  assert.equal(new Set(Object.values(theme.commands)).size, 14);
+  assert.equal(new Set(Object.values(theme.commands)).size, 15);
   assert.ok(Object.isFrozen(theme));
   assert.ok(Object.isFrozen(theme.commands));
 });
 
-test('Given BSH-OPENTUI-007 and BSH-TUI-005 When all entry payloads render Then English labels and semantic states are visible', async () => {
+test('Given BSH-TUI-005 When all entry payloads render Then English labels and semantic states are visible', async () => {
   const fixture = await createTestRenderer({ width: 120, height: 65 });
   const view = await createTuiView({ renderer: fixture.renderer });
   try {
@@ -37,7 +37,8 @@ test('Given BSH-OPENTUI-007 and BSH-TUI-005 When all entry payloads render Then 
       { type: 'user', content: 'queued request', isQueued: true },
       { type: 'agent', content: 'progressive answer' },
       { type: 'tool', toolName: 'read_file', toolArgs: { path: 'src/example.ts' } },
-      { type: 'tool_result', content: 'file contents' },
+      { type: 'tool', toolName: 'read_file', toolArgs: { path: 'src/example.ts' }, verbose: true },
+      { type: 'tool_result', content: 'file contents', verbose: true },
       { type: 'gate', gateStatus: 'VIOLATION', gateShape: 'SyntheticShape', gateChecks: [{ ok: false, text: 'invalid synthetic property' }, { ok: true, text: 'valid synthetic property' }] },
       { type: 'alert', content: 'Domain mismatch warning' },
       { type: 'prompt_violation', violationShape: 'SyntheticShape', violationRule: 'Synthetic rule', waitingConfirmation: true },
@@ -52,7 +53,7 @@ test('Given BSH-OPENTUI-007 and BSH-TUI-005 When all entry payloads render Then 
     view.scrollTo("top");
     await fixture.renderOnce();
     const frame = fixture.captureCharFrame();
-    for (const label of ['[QUEUED]', '[BSH Agent]', 'read_file("src/example.ts")', 'Tool result:', 'VIOLATION', 'Promotion blocked', '[+] valid', '[X] invalid', 'Semantic Domain Alert', 'Violated shape:', 'SHACL rule:', 'Press [Enter]', 'IMPLEMENTATION COMPLETED', 'promotion is separate', 'READ / DIAGNOSTIC', 'No file changes', 'Ctrl+O expand', 'visible reasoning body', 'DIFF PREVIEW']) assert.ok(frame.includes(label), label + "\n" + frame);
+    for (const label of ['[QUEUED]', '[BSH Agent]', 'Reading src/example.ts', 'read_file("src/example.ts")', 'Tool result:', 'VIOLATION', 'Promotion blocked', '[+] valid', '[X] invalid', 'Semantic Domain Alert', 'Violated shape:', 'SHACL rule:', 'Press [Enter]', 'IMPLEMENTATION COMPLETED', 'promotion is separate', 'READ / DIAGNOSTIC', 'No file changes', 'Ctrl+O expand', 'visible reasoning body', 'DIFF PREVIEW']) assert.ok(frame.includes(label), label + "\n" + frame);
     assert.ok(!frame.includes('hidden reasoning body'));
     const spans = fixture.captureSpans().lines.flatMap(line => line.spans);
     assert.ok(spans.some(span => span.text.includes('VIOLATION') && span.fg.equals(RGBA.fromHex(theme.error))));
@@ -60,7 +61,7 @@ test('Given BSH-OPENTUI-007 and BSH-TUI-005 When all entry payloads render Then 
   } finally { view.destroy(); }
 });
 
-test('Given BSH-OPENTUI-007 and BSH-OPENTUI-010 When streaming and resizing Then prompt cards scroll and chrome are preserved', async () => {
+test('Given streaming and resizing Then prompt cards scroll and chrome are preserved', async () => {
   const fixture = await createTestRenderer({ width: 80, height: 24 });
   const view = await createTuiView({ renderer: fixture.renderer });
   try {
@@ -101,7 +102,7 @@ test('Given BSH-OPENTUI-007 and BSH-OPENTUI-010 When streaming and resizing Then
   } finally { view.destroy(); }
 });
 
-test('Given BSH-OPENTUI-006 When native input submits and global routing consumes a key Then subscriptions receive prompt and consumed text is excluded', async () => {
+test('Given native input submits and global routing consumes a key Then subscriptions receive prompt and consumed text is excluded', async () => {
   const fixture = await createTestRenderer({ width: 80, height: 20 });
   const view = await createTuiView({ renderer: fixture.renderer });
   try {

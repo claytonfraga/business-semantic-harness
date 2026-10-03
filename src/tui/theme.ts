@@ -10,6 +10,6 @@ export const githubDarkDimmedTheme = Object.freeze({
     '/diff': '#eac55f', '/rules': '#6cb6ff', '/settings': '#f69d50',
     '/affinity': '#4184e4', '/mcp': '#986ee2', '/clear': '#cdd9e5',
     '/done': '#6bc46d', '/help': '#539bf5', '/ungoverned': '#daaa3f',
-    '/governed': '#8ddb8c', '/exit': '#f47067',
+    '/governed': '#8ddb8c', '/verbose': '#b392f0', '/exit': '#f47067',
   }),
 });

@@ -11,7 +11,7 @@ const subprocessEnv = { ...process.env };
 delete subprocessEnv.NODE_TEST_CONTEXT;
 
 // Derived after implementation from BSH-OPENTUI-011/012 and BSH-DIST-002.
-test('Given Node 22 When help or init runs Then OpenTUI is not loaded', async () => {
+test('Given Node 22 When help or init runs Then interactive TUI renderer is not loaded', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'bsh-cli-runtime-'));
   try {
     const loader = join(directory, 'loader.mjs');

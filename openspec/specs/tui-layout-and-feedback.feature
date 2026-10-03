@@ -42,12 +42,13 @@ Funcionalidade: Layout responsivo e feedback da sessão
     E ausência de domínio deve aparecer como "none (inactive)"
 
   @BSH-TUI-005
-  Cenário: Exibir conversa e ferramentas em streaming
+  Cenário: Exibir conversa e ações do agente em streaming
     Dado conteúdo incremental do modelo e chamadas de ferramentas
     Quando os eventos chegam
     Então a conversa deve ser atualizada durante a execução
-    E invocações e resultados de ferramentas devem possuir identificação visual
-    E argumentos longos devem ser resumidos sem exceder a largura
+    E as ferramentas devem ser apresentadas com verbos de ação semânticos em vez de rótulos mecânicos
+    E resultados intermediários de leitura bem-sucedidos não devem poluir o feed com cards duplicados
+    E erros de execução de ferramentas devem ser destacados visualmente
 
   @BSH-TUI-006
   Cenário: Apresentar recibo de implementação real
@@ -111,3 +112,11 @@ Funcionalidade: Layout responsivo e feedback da sessão
     E violações devem impedir a oferta de promoção
     E confirmação de promoção deve usar resposta afirmativa explícita com padrão negativo
     E a mensagem final deve refletir o resultado efetivo da integração
+
+  @BSH-TUI-014
+  Cenário: Alternar modo verboso de depuração de ferramentas
+    Dado uma sessão interativa da TUI
+    Quando o usuário executa o comando "/verbose"
+    Então o modo de depuração deve ser alternado entre conciso e verboso
+    E no modo conciso o feed deve priorizar verbos de ação limpos e recibos consolidados
+    E no modo verboso o feed deve exibir os nomes literais de ferramentas e seus payloads completos
