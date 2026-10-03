@@ -36,6 +36,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.1",
+    "@opentui/core": "0.5.14",
+    "bun": "1.4.2",
     "jsonld": "^9.0.0",
     "n3": "^2.7.12",
     "shacl-engine": "^1.1.2",

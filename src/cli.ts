@@ -8,7 +8,6 @@ import { queryOntology } from './ontology/query.js';
 import { validateProject } from './ontology/validate.js';
 import { resolverRepositorio } from './git/worktree.js';
 import { limparSessao, listarSessoesDoProjeto } from './git/sessions.js';
-import { startTuiSession } from './tui/session.js';
 
 export async function main(argv: string[]): Promise<number> {
   if (argv.length === 1 && (argv[0] === '--version' || argv[0] === '-v')) {
@@ -102,8 +101,9 @@ export async function main(argv: string[]): Promise<number> {
     }
 
     if (command.length === 0 || (command.length === 1 && command[0] === 'tui')) {
-      await startTuiSession({ projectRoot, model, domain });
-      return 0;
+      const { launchTui } = await import('./tui/runtime.js');
+      await launchTui({ projectRoot, model, domain });
+      return Number(process.exitCode ?? 0);
     }
     if (command.length >= 1 && command[0] === 'mcp') {
       const governed = command.includes('--governed') || argsWithoutProject.includes('--governed');

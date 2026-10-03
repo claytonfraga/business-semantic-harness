@@ -21,6 +21,9 @@ Funcionalidade: Distribuição e regras de engenharia
     Então deve conter código compilado, README e licença Apache-2.0
     E a CLI compilada deve possuir permissão executável
     E o ambiente deve atender ao requisito Node.js 22 ou superior
+    E a distribuição deve incluir a dependência local Bun "1.4.2" para executar a TUI com OpenTUI "0.5.14"
+    E comandos não interativos devem executar em Node 22 sem carregar OpenTUI
+    E os artefatos nativos disponíveis devem ser verificados na instalação empacotada
 
   @BSH-DIST-003
   Cenário: Documentar início rápido

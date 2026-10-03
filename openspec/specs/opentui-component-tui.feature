@@ -102,6 +102,11 @@ Funcionalidade: Reconstrução integral da TUI com componentes OpenTUI
     Então instalação e execução devem ser verificadas com o produto empacotado
     E qualquer mudança necessária no runtime suportado deve ser explicitada nos requisitos antes da implementação
     E a incompatibilidade não deve ser ocultada por uma TUI manual de contingência
+    E Node 22 deve permanecer o lançador dos comandos CLI não interativos
+    E a TUI deve executar com Bun "1.4.2" instalado como dependência local do pacote npm
+    E não deve exigir uma instalação global separada de Bun
+    E a ausência do runtime nativo deve produzir diagnóstico acionável em inglês
+    E o lançador deve preservar diretório, ambiente, projeto, modelo, domínio, fluxos do terminal, sinais e código de saída
 
   @BSH-OPENTUI-013
   Cenário: Demonstrar conformidade antes de declarar a migração concluída
