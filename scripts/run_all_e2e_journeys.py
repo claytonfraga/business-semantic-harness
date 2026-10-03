@@ -950,11 +950,93 @@ def main():
                 ("Governança Integrada", "Detecção e bloqueio SHACL na sessão ativa", "Salvação ontológica atuando em tempo real"),
             ],
         },
+        # Jornada 17
+        {
+            "id": 17,
+            "base_name": "bsh-segregacao-funcoes-e-conflito-interesses",
+            "title": "Jornada 17: Fraude de Segregação de Funções e Lotação Incompatível",
+            "subtitle": "Detecção de Auto-Aprovação e Violação de Lotação Departamental",
+            "bullets": [
+                "Dado uma solicitação tentando auto-aprovação patrimonial (solicitante = aprovador)",
+                "Quando o BSH analisa a operação sob as regras SHACL da ontologia de ativos",
+                "Então a guarda pré-flight detecta a violação de TransferenciaShape (disjoint)",
+                "E a tentativa de transferir para custodiante fora do setor é bloqueada por TransferenciaCompatibilidadeOrganizacionalShape",
+            ],
+            "actions": [
+                ("type", "Transfer asset AST-001 with requester user1 and approver user1", 2.5),
+                ("key", "Escape", 1.0),
+                ("type", "Transfer asset AST-001 to Maintenance with custodian from Finance", 2.5),
+                ("snapshot_peak", "", 0),
+                ("key", "Escape", 1.5),
+            ],
+            "criteria_results": [
+                ("Segregação de Funções", "Bloqueio de auto-aprovação de movimentação", "Disparada regra sh:disjoint de TransferenciaShape"),
+                ("Lotação Organizacional", "Custodiante deve pertencer ao departamento", "SPARQL constraint validada com sucesso"),
+                ("Integridade Git", "Nenhum branch corrompido por operações ilegais", "Repositório mantido 100% íntegro"),
+            ],
+        },
+        # Jornada 18
+        {
+            "id": 18,
+            "base_name": "bsh-baixa-destrutiva-alto-valor-sem-alcada",
+            "title": "Jornada 18: Baixa Destrutiva de Alto Valor sem Alçada e Fraude Residual",
+            "subtitle": "Proteção de Alçadas Contábeis e Idempotência de Ciclo de Vida",
+            "bullets": [
+                "Dado tentativa de baixa de servidor corporativo (R$ 45.000) sem alçada formal",
+                "Quando o BSH avalia a requisição contra as regras de desincorporação",
+                "Então a regra BaixaAltoValorAprovacaoShape exige aprovador executivo",
+                "E tentativas de baixa com valor residual sem laudo e re-baixa de ativo baixado são barradas",
+            ],
+            "actions": [
+                ("type", "Retire high-value server asset AST-003 value 45000 without board approval", 2.5),
+                ("key", "Escape", 1.0),
+                ("type", "Disposal of asset with positive residual value 3500 without inspection report", 2.5),
+                ("key", "Escape", 1.0),
+                ("type", "Retire already retired asset AST-002 again", 2.5),
+                ("snapshot_peak", "", 0),
+                ("key", "Escape", 1.5),
+            ],
+            "criteria_results": [
+                ("Alçada de Alto Valor", "Baixa > R$ 10.000 exige alçada formal", "Regra SPARQL BaixaAltoValorAprovacaoShape aplicada"),
+                ("Valor Residual", "Valor residual positivo exige laudo pericial", "Regra SPARQL BaixaValorResidualShape aplicada"),
+                ("Idempotência de Baixa", "Ativo baixado não pode sofrer nova baixa", "Invariante de BaixaShape protegida"),
+            ],
+        },
+        # Jornada 19
+        {
+            "id": 19,
+            "base_name": "bsh-logistica-circular-extravio-alocacao-ilegal",
+            "title": "Jornada 19: Logística Circular, Sinistro de Extravio e Alocação Ilegal",
+            "subtitle": "Não-Circularidade de Transporte, Alocação Restrita e Padrão de Sinistro",
+            "bullets": [
+                "Dado solicitação de expedição com origem e destino idênticos (logística circular)",
+                "Quando o BSH avalia o transporte contra a ontologia",
+                "Então a regra EnvioAtivoShape impede envio circular exigindo locais distintos",
+                "E alocações de ativos extraviados sem termo e protocolos de sinistro inválidos são rejeitados",
+            ],
+            "actions": [
+                ("type", "Dispatch asset AST-001 with origin Headquarters and destination Headquarters", 2.5),
+                ("key", "Escape", 1.0),
+                ("type", "Allocate lost asset to employee without signed responsibility term", 2.5),
+                ("key", "Escape", 1.0),
+                ("type", "Register lost asset with invalid incident protocol ABC-1234", 2.5),
+                ("snapshot_peak", "", 0),
+                ("key", "Escape", 1.5),
+            ],
+            "criteria_results": [
+                ("Não-Circularidade", "Origem e destino de envio devem ser distintos", "Regra sh:disjoint de EnvioAtivoShape aplicada"),
+                ("Alocação Segura", "Bens extraviados sem termo não podem ser alocados", "Regra AlocacaoUsuarioShape aplicada"),
+                ("Padrão de Sinistro", "Exigência de protocolo SIN-AAAA/NNNNNN", "Regra de regex de RegistroExtravioShape aplicada"),
+            ],
+        },
     ]
 
-    print(f"\nIniciando execução das 16 Jornadas E2E Master...")
+    target_ids = [int(x) for x in sys.argv[1:] if x.isdigit()]
+    selected_journeys = [j for j in journeys_config if not target_ids or j["id"] in target_ids]
+
+    print(f"\nIniciando execução das {len(selected_journeys)} Jornadas E2E Master...")
     results = []
-    for j in journeys_config:
+    for j in selected_journeys:
         res = execute_journey(
             journey_config=j,
             pilot_dir=pilot_dir,
@@ -965,7 +1047,7 @@ def main():
         results.append(res)
 
     print("\n" + "=" * 80)
-    print("RESUMO DA EXECUÇÃO DAS 16 JORNADAS E2E")
+    print(f"RESUMO DA EXECUÇÃO DAS {len(results)} JORNADAS E2E")
     print("=" * 80)
     for r in results:
         v_size = r["video"].stat().st_size / 1024

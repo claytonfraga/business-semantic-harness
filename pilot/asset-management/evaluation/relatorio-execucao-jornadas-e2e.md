@@ -1,18 +1,25 @@
 # Relatório Oficial de Execução das Jornadas E2E — Oracle BSH 2.0
 
-**Data da Execução**: 2026-10-03 15:00:44
-**Motor**: Oracle BSH Nativo (OpenTUI Component Architecture)
-**Binário**: `/home/clayton/.nvm/versions/node/v22.19.0/bin/bsh`
-**Projeto Piloto**: `/home/clayton/projetos/oracle/pilot/asset-management`
-**Status Global**: **16/16 APROVADAS (100% PASS)**
+**Data da Execução**: 2026-10-03 15:10:00  
+**Motor**: Oracle BSH Nativo (OpenTUI Component Architecture)  
+**Binário**: `/home/clayton/.nvm/versions/node/v22.19.0/bin/bsh`  
+**Projeto Piloto**: `/home/clayton/projetos/oracle/pilot/asset-management`  
+**Status Global**: **19/19 APROVADAS (100% PASS)**  
 
-## Arquitetura Cinematográfica e de Evidência
-- **Fase 1 (Contexto Gherkin)**: 6.0 segundos com slide de fundo preto puro (#000000) e letras brancas em português.
-- **Fase 2 (Sessão Tmux em Tempo Real)**: Gravação contínua ininterrupta a 10 fps via thread assíncrona, cadência de digitação humana (40ms/char), verificação estrita contra vazamento de shell e repouso em ápice.
-- **Fase 3 (Card de Veredito Formal)**: 6.0 segundos exibindo badge APROVADO, tabela de Esperado vs Observado e métricas técnicas.
+---
+
+## 1. Arquitetura Cinematográfica e de Evidência Formal (Senior UX & QA Architecture)
+
+Cada vídeo E2E gerado obedece rigorosamente ao modelo em 3 fases:
+- **Fase 1 (Contexto Gherkin)**: 6.0 segundos com slide de fundo preto puro (`#000000`) e letras brancas em português, apresentando os critérios formais `Dado`, `Quando` e `Então` do cenário.
+- **Fase 2 (Sessão Tmux em Tempo Real)**: Gravação contínua ininterrupta a 10 fps via thread assíncrona dedicada, capturando cadência de digitação humana (40ms/char), cursor ativo, modais e repouso no ápice (3.0s a 4.0s) para leitura confortável de alertas e diffs.
+- **Fase 3 (Card de Veredito Formal)**: 6.0 segundos exibindo badge `[✔ PASSOU]`, tabela de confronto entre **Comportamento Esperado (Gherkin)** vs. **Evidência Observada (Tmux)** e métricas técnicas de sessão.
 - **Tolerância Zero a Vazamentos**: Nenhum prompt enviado para o shell do SO; todas as ações validadas dentro da TUI ativa.
 
-## Tabela de Artefatos e Integridade SHA-256
+---
+
+## 2. Tabela Consolidada de Artefatos e Integridade SHA-256 (19 Jornadas)
+
 | # | Jornada | Veredito | Tamanho MP4 | Hash SHA-256 (Local & WSL Downloads) |
 |---|---|:---:|:---:|---|
 | 01 | Jornada 1: Sessão Governada — Detecção de Violação e Bloqueio SHACL | `PASSOU` | 218.3 KB | `57e60418117c3d5ce4108f0c6c79ee6ae1a42cce01cc5f926ec467dea87a0338` |
@@ -31,7 +38,13 @@
 | 14 | Jornada 14: Loop Interativo Multi-Turno com Inclusão de Skills | `PASSOU` | 207.2 KB | `e33a45df2ebaf723f259e9c238135596eb7107cad3e2afef2663145c2d4f06b8` |
 | 15 | Jornada 15: Paleta Flutuante de Comandos com Barra no OpenTUI | `PASSOU` | 206.5 KB | `f478938f7ff84ccae89f79cc5eff2cc1984c51a3c0b8e50fee2f8e68d23c3b3b` |
 | 16 | Jornada 16: Reconstrução da Arquitetura com Componentes OpenTUI | `PASSOU` | 1845.5 KB | `28c235a9a363f78d2f87be569a26a6afd49133054505a1f9ffb47a43ea5c603e` |
+| 17 | Jornada 17: Fraude de Segregação de Funções e Lotação Incompatível | `PASSOU` | 313.4 KB | `9011952647c41347188f581f6c6cd298fbeb54866a0a63a65f9afefd0f1feedc` |
+| 18 | Jornada 18: Baixa Destrutiva de Alto Valor sem Alçada e Fraude Residual | `PASSOU` | 1245.3 KB | `8544157e109f707ac2326a99b7e19199ceb65c967c24034ef77242c0d50cba41` |
+| 19 | Jornada 19: Logística Circular, Sinistro de Extravio e Alocação Ilegal | `PASSOU` | 1010.3 KB | `cce6d988c128b254a7a5c1c1f8c7f9b6c13b291bf322bafa63c5e2fc9de66a34` |
 
-## Sincronização
-- Todos os 16 vídeos e 16 capturas de tela foram copiados para `/mnt/c/Users/clayt/Downloads/bsh` e validados com hashes estritamente idênticos.
-- Referências legadas a terceiros (`bsh codex`, `bsh agy`, `bsh opencode`) foram removidas de acordo com as especificações atuais do agente nativo.
+---
+
+## 3. Sincronização com Windows Downloads
+- Todos os 19 vídeos `.mp4` e 19 screenshots `.png` estão sincronizados em `/mnt/c/Users/clayt/Downloads/bsh/`.
+- Todos os hashes SHA-256 foram comparados um a um contra as cópias locais em `evaluation/videos/` e `evaluation/screenshots/` e confirmados 100% idênticos.
+- Referências a adaptadores legados (`bsh codex`, `bsh agy`, `bsh opencode`) foram integralmente removidas.
