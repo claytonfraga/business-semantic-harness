@@ -2,15 +2,88 @@ import { BoxRenderable, TextRenderable, StyledText, fg, type CliRenderer } from 
 import type { ChatEntry, ReceiptFileStat } from './state.js';
 import { githubDarkDimmedTheme as theme } from './theme.js';
 
+export function parseArgs(args: Record<string, unknown> | string): Record<string, unknown> {
+  if (typeof args === 'object' && args !== null) return args;
+  if (typeof args === 'string') {
+    try {
+      const parsed = JSON.parse(args);
+      if (typeof parsed === 'object' && parsed !== null) return parsed;
+    } catch {
+      return { raw: args };
+    }
+  }
+  return {};
+}
+
 export function formatToolInvocation(name: string, args: Record<string, unknown> | string): string {
-  if (typeof args === 'string') return `${name}("${args}")`;
-  if (['read_file', 'write_file', 'replace_file_content'].includes(name)) return `${name}("${String(args.path || '')}")`;
-  if (name === 'list_directory') return `${name}("${String(args.path || '.')}")`;
-  if (name === 'run_bash_command') {
-    const command = String(args.command || '');
+  const parsed = parseArgs(args);
+  if (['read_file', 'write_file', 'replace_file_content'].includes(name) && parsed.path) {
+    return `${name}("${String(parsed.path)}")`;
+  }
+  if (name === 'list_directory') {
+    return `${name}("${String(parsed.path || '.')}")`;
+  }
+  if (name === 'run_bash_command' && parsed.command) {
+    const command = String(parsed.command);
     return `run_bash("${command.length > 55 ? `${command.slice(0, 52)}...` : command}")`;
   }
-  return `${name}(${JSON.stringify(args).slice(0, 50)})`;
+  if (typeof args === 'string' && !parsed.raw) {
+    return `${name}(${args.slice(0, 50)})`;
+  }
+  if (typeof args === 'string' && parsed.raw) {
+    return `${name}("${args}")`;
+  }
+  return `${name}(${JSON.stringify(parsed).slice(0, 50)})`;
+}
+
+export interface ActionStep {
+  action: string;
+  target: string;
+  isEdit: boolean;
+  isCommand: boolean;
+  isOntology: boolean;
+}
+
+export function formatActionStep(name: string, args: Record<string, unknown> | string): ActionStep {
+  const parsed = parseArgs(args);
+  switch (name) {
+    case 'read_file':
+      return { action: '○ Reading', target: String(parsed.path || ''), isEdit: false, isCommand: false, isOntology: false };
+    case 'write_file':
+      return { action: '● Writing', target: String(parsed.path || ''), isEdit: true, isCommand: false, isOntology: false };
+    case 'replace_file_content':
+      return { action: '● Editing', target: String(parsed.path || ''), isEdit: true, isCommand: false, isOntology: false };
+    case 'list_directory':
+      return { action: '○ Exploring', target: String(parsed.path || '.'), isEdit: false, isCommand: false, isOntology: false };
+    case 'search_code': {
+      const q = String(parsed.query || '');
+      return { action: '○ Searching codebase for', target: `"${q.length > 40 ? `${q.slice(0, 37)}...` : q}"`, isEdit: false, isCommand: false, isOntology: false };
+    }
+    case 'find_files': {
+      const p = String(parsed.pattern || '');
+      return { action: '○ Finding files matching', target: `"${p.length > 40 ? `${p.slice(0, 37)}...` : p}"`, isEdit: false, isCommand: false, isOntology: false };
+    }
+    case 'run_bash_command': {
+      const cmd = String(parsed.command || '');
+      return { action: '$', target: cmd.length > 55 ? `${cmd.slice(0, 52)}...` : cmd, isEdit: false, isCommand: true, isOntology: false };
+    }
+    case 'inspect_skill':
+      return { action: '○ Inspecting skill', target: String(parsed.name || ''), isEdit: false, isCommand: false, isOntology: false };
+    case 'bsh_query_ontology':
+      return { action: '◈ Querying ontology', target: String(parsed.domain || parsed.iri || ''), isEdit: false, isCommand: false, isOntology: true };
+    case 'bsh_validate_shacl':
+      return { action: '◈ Validating SHACL', target: String(parsed.shape || parsed.domain || ''), isEdit: false, isCommand: false, isOntology: true };
+    case 'bsh_check_affinity':
+      return { action: '◈ Checking concept affinity', target: String(parsed.domain || ''), isEdit: false, isCommand: false, isOntology: true };
+    case 'context7_search_docs': {
+      const q = String(parsed.query || '');
+      return { action: '○ Searching docs for', target: `"${q.length > 40 ? `${q.slice(0, 37)}...` : q}"`, isEdit: false, isCommand: false, isOntology: false };
+    }
+    default: {
+      const serialized = typeof args === 'string' ? args : JSON.stringify(args);
+      return { action: '○ Executing', target: `${name}(${serialized.slice(0, 45)})`, isEdit: false, isCommand: false, isOntology: false };
+    }
+  }
 }
 
 interface EntryRow { text: string; color: string; stats?: ReceiptFileStat }
@@ -21,8 +94,24 @@ function rowsFor(entry: ChatEntry): EntryRow[] {
     case 'blank': return [row('')];
     case 'user': return [row(`[User]${entry.isViolating ? ' [!] VIOLATION DETECTED' : ''}${entry.isQueued ? ' [QUEUED]' : ''}`, entry.isViolating ? theme.error : theme.accent), row(entry.content || '')];
     case 'agent': return [row('[BSH Agent]', theme.accent), row(entry.content || '')];
-    case 'tool': return [row(`>_ Tool: ${formatToolInvocation(entry.toolName || '', entry.toolArgs || {})}`, theme.accent)];
-    case 'tool_result': return [row(`Tool result: ${entry.content || ''}`)];
+    case 'tool': {
+      if (entry.verbose) {
+        return [row(`>_ Tool: ${formatToolInvocation(entry.toolName || '', entry.toolArgs || {})}`, theme.accent)];
+      }
+      const step = formatActionStep(entry.toolName || '', entry.toolArgs || {});
+      const color = step.isEdit ? theme.success : step.isOntology ? theme.reasoning : step.isCommand ? theme.warning : theme.accent;
+      return [row(`${step.action} ${step.target}`.trim(), color)];
+    }
+    case 'tool_result': {
+      if (entry.verbose) {
+        return [row(`Tool result: ${entry.content || ''}`)];
+      }
+      if (entry.isError) {
+        return [row(`✖ ${entry.content || 'Action failed'}`, theme.error)];
+      }
+      if (!entry.content) return [row('')];
+      return [row(`  ↳ ${entry.content}`, theme.muted)];
+    }
     case 'gate': {
       const violation = entry.gateStatus === 'VIOLATION';
       const rows: EntryRow[] = [

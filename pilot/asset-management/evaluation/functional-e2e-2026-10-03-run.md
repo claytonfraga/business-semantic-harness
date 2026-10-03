@@ -1,4 +1,4 @@
-# Teste Funcional E2E e Jornada 16 — Reconstrução OpenTUI (2026-10-03)
+# Teste Funcional E2E e Jornada 16 — Reconstrução da TUI (2026-10-03)
 
 ## Escopo e Ambiente
 
@@ -69,4 +69,4 @@ Em estrita conformidade com a regra de integridade de avaliação (`@BSH-EVAL-00
 ## 5. Limitações e Correções Propostas
 
 1. **Adaptador Codex**: O binário CLI do BSH atualmente expõe comandos para `tui`, `init`, `domain`, `ontology`, `sessions`, `mcp`, `auth` e `skill`, sem um comando `bsh codex` direto implementado no pacote CLI. Correção proposta: implementar um subcomando `bsh codex` que encapsule a execução governada do Codex CLI com servidor MCP local, atendendo aos cenários de fumaça legados.
-2. **Distribuição Global com Bun**: O pacote npm embute com sucesso o runtime Bun em `node_modules/bun/bin/bun.exe`, permitindo que usuários executem o OpenTUI via Node sem necessidade de instalar Bun previamente no PATH global.
+2. **Distribuição Global com Bun**: O pacote npm embute com sucesso o runtime Bun em `node_modules/bun/bin/bun.exe`, permitindo que usuários executem a TUI interativa via Node sem necessidade de instalar Bun previamente no PATH global.

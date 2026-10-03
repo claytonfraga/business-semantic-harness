@@ -26,7 +26,7 @@ Funcionalidade: Jornada 11 - Ergonomia TUI, Fila Concorrente de Prompts e Atalho
   Cenário: Limpeza instantânea do buffer de digitação com Ctrl+C
     Dado que o usuário digitou um texto preliminar incompleto no campo de prompt
     Quando o usuário pressiona "Ctrl+C"
-    Então o buffer do componente de entrada OpenTUI é limpo para uma string vazia
+    Então o buffer do componente de entrada da TUI é limpo para uma string vazia
     E o cursor retorna à posição inicial da linha de prompt
     E a sessão interativa do BSH permanece viva e operante sem sair para o shell
 

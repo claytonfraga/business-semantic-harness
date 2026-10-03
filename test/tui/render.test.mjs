@@ -8,6 +8,7 @@ import {
   boxedLine,
   tuiLine,
 } from '../../dist/tui/render.js';
+import { formatActionStep } from '../../dist/tui/entries.js';
 import { stripAnsi } from '../../dist/tui/ansi.js';
 
 test('TUI render: wrapText handles long lines and preserves words', () => {
@@ -491,5 +492,92 @@ test('TUI render: renders real-time incremental diff_preview card', () => {
   assert.ok(clean.includes('2 arquivos alterados (+30 / -3)'), 'Must show diff summary totals');
   assert.ok(clean.includes('src/assets/domain/ativo.ts (+12 / -3)'), 'Must list modified file stats');
   assert.equal(tui.split('\n').length, height, 'Must maintain exact fixed height');
+});
+
+test('TUI render: formatActionStep formats semantic action verbs correctly', () => {
+  assert.deepEqual(formatActionStep('read_file', { path: 'src/domain/asset.ts' }), {
+    action: '○ Reading',
+    target: 'src/domain/asset.ts',
+    isEdit: false,
+    isCommand: false,
+    isOntology: false,
+  });
+
+  assert.deepEqual(formatActionStep('replace_file_content', '{"path":"src/routes.ts"}'), {
+    action: '● Editing',
+    target: 'src/routes.ts',
+    isEdit: true,
+    isCommand: false,
+    isOntology: false,
+  });
+
+  assert.deepEqual(formatActionStep('run_bash_command', { command: 'npm test' }), {
+    action: '$',
+    target: 'npm test',
+    isEdit: false,
+    isCommand: true,
+    isOntology: false,
+  });
+
+  assert.deepEqual(formatActionStep('search_code', { query: 'TransferShape' }), {
+    action: '○ Searching codebase for',
+    target: '"TransferShape"',
+    isEdit: false,
+    isCommand: false,
+    isOntology: false,
+  });
+
+  assert.deepEqual(formatActionStep('bsh_query_ontology', { domain: 'ativos' }), {
+    action: '◈ Querying ontology',
+    target: 'ativos',
+    isEdit: false,
+    isCommand: false,
+    isOntology: true,
+  });
+});
+
+test('TUI render: Given BSH-TUI-005 When in concise mode Then semantic action verbs are rendered without raw Tool prefixes', () => {
+  const width = 96;
+  const height = 24;
+
+  const tui = renderCompleteTui(
+    { model: 'deepseek/deepseek-v4.1-flash', governed: true, tokensTotal: 500, width, height },
+    [
+      { type: 'tool', toolName: 'read_file', toolArgs: { path: 'src/domain/asset.ts' } },
+      { type: 'tool', toolName: 'replace_file_content', toolArgs: { path: 'src/routes/transfer.ts' } },
+      { type: 'tool', toolName: 'run_bash_command', toolArgs: { command: 'git status' } },
+    ],
+    '>',
+    width,
+    height
+  );
+
+  const clean = stripAnsi(tui);
+  assert.ok(clean.includes('○ Reading src/domain/asset.ts'), 'Must render action verb Reading');
+  assert.ok(clean.includes('● Editing src/routes/transfer.ts'), 'Must render action verb Editing');
+  assert.ok(clean.includes('$ git status'), 'Must render action verb $ for bash command');
+  assert.ok(!clean.includes('>_ Tool:'), 'Concise mode must NOT render raw >_ Tool: label');
+  assert.equal(tui.split('\n').length, height, 'Must maintain fixed height');
+});
+
+test('TUI render: Given BSH-TUI-014 When verbose flag is active Then literal Tool invocation and tool_result are rendered', () => {
+  const width = 96;
+  const height = 24;
+
+  const tui = renderCompleteTui(
+    { model: 'deepseek/deepseek-v4.1-flash', governed: true, tokensTotal: 500, width, height },
+    [
+      { type: 'tool', toolName: 'read_file', toolArgs: { path: 'src/domain/asset.ts' }, verbose: true },
+      { type: 'tool_result', content: 'export async function getAsset() {}', verbose: true },
+    ],
+    '>',
+    width,
+    height
+  );
+
+  const clean = stripAnsi(tui);
+  assert.ok(clean.includes('>_ Tool: read_file("src/domain/asset.ts")'), 'Verbose mode must render literal Tool invocation');
+  assert.ok(clean.includes('-> export async function getAsset() {}'), 'Verbose mode must render raw tool result');
+  assert.equal(tui.split('\n').length, height, 'Must maintain fixed height');
 });
 

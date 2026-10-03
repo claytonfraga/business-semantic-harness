@@ -4,7 +4,7 @@
 # model-and-domain-selection.feature; prompt-guard-and-governance-mode.feature.
 
 @journey @opentui
-Funcionalidade: Jornada da TUI reconstruída com componentes OpenTUI
+Funcionalidade: Jornada da TUI reconstruída com componentes nativos de terminal
   Como usuário do BSH empacotado e instalado via npm
   Quero executar os fluxos existentes com o tema GitHub Dark Dimmed
   Para verificar a preservação do comportamento e a substituição da interface manual

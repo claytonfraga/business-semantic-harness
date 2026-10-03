@@ -1,18 +1,18 @@
 # language: pt
-Funcionalidade: Jornada 15 - Paleta Flutuante OpenTUI de Comandos Slash
+Funcionalidade: Jornada 15 - Paleta Flutuante de Comandos Slash
 
   Como um usuário interagindo com a interface de terminal do BSH
-  Eu quero que uma paleta flutuante de comandos no padrão OpenTUI abra ao digitar "/" no prompt vazio
+  Eu quero que uma paleta flutuante de comandos abra ao digitar "/" no prompt vazio
   Para que eu possa descobrir, navegar, rolar pelas opções e executar comandos com cores distintas e descrições claras
 
   Contexto:
     Dado que a sessão interativa da TUI do BSH está aberta e ociosa
     E que a linha de entrada do usuário está completamente vazia
 
-  Cenário: Abertura da paleta flutuante OpenTUI no prompt vazio
+  Cenário: Abertura da paleta flutuante no prompt vazio
     Quando o usuário digita "/" no prompt vazio
     Então a paleta flutuante de comandos aparece acima do prompt sem limpar a tela
-    E a paleta exibe os comandos com janela de rolagem "(1-5 of 14) • ↑/↓ scroll"
+    E a paleta exibe os comandos com janela de rolagem "(1-5 of 15) • ↑/↓ scroll"
     E cada comando exibe seu nome, atalho e descrição concisa em inglês dentro de 72 colunas
 
   Cenário: Preservação de "/" como texto literal quando digitado em prompt com conteúdo

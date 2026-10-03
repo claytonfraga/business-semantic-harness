@@ -15,10 +15,10 @@ Funcionalidade: Paleta Flutuante de Comandos Slash no Padrão OpenTUI
     Quando o usuário digita o caractere "/"
     Então a paleta flutuante de comandos deve abrir imediatamente acima do prompt sem limpar a tela
     E a paleta deve ser limitada a no máximo 72 colunas de largura para evitar quebra de linha no terminal
-    E a paleta deve apresentar uma janela rolável de opções com cabeçalho indicando "(1-5 of 14) • ↑/↓ scroll"
+    E a paleta deve apresentar uma janela rolável de opções com cabeçalho indicando "(1-5 of 15) • ↑/↓ scroll"
     E cada linha de comando deve exibir:
       | Campo | Especificação |
-      | Nome do Comando | Prefixo com "/" em destaque (ex: /model, /domain, /skills, /diff, /rules, /settings, /exit) |
+      | Nome do Comando | Prefixo com "/" em destaque (ex: /model, /domain, /skills, /diff, /rules, /settings, /verbose, /exit) |
       | Atalho | Identificador do atalho de teclado quando disponível (ex: [Ctrl+M], [Ctrl+D]) |
       | Descrição | Descrição concisa em inglês com até 42 caracteres sem truncamento ou quebra de linha |
 
@@ -40,7 +40,7 @@ Funcionalidade: Paleta Flutuante de Comandos Slash no Padrão OpenTUI
 
   @BSH-MENU-004
   Cenário: Navegação interativa com rolagem de janela e cores GitHub Dark Dimmed exclusivas por comando
-    Dado que a paleta de comandos slash está aberta com 14 comandos disponíveis
+    Dado que a paleta de comandos slash está aberta com 15 comandos disponíveis
     Quando o usuário navega entre as opções utilizando as setas direcionais para baixo ou para cima
     Então a janela visível deve rolar suavemente exibindo 5 itens por vez
     E cada opção ativa sob foco deve ser destacada com uma cor exclusiva das escalas GitHub Dark Dimmed:
@@ -58,6 +58,7 @@ Funcionalidade: Paleta Flutuante de Comandos Slash no Padrão OpenTUI
       | /help | #539bf5 |
       | /ungoverned | #daaa3f |
       | /governed | #8ddb8c |
+      | /verbose | #b392f0 |
       | /exit | #f47067 |
     E a opção ativa deve exibir o ponteiro "❯" enquanto as opções inativas permanecem atenuadas
 

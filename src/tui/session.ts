@@ -176,6 +176,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   let activeAbortController: AbortController | null = null;
   let promptResolver: ((line: string) => void) | null = null;
   let confirmationResolver: ((line: string) => void) | null = null;
+  let verboseMode = false;
 
   const updateView = (patch: Partial<RenderState> = {}) => {
     const relProject = relative(process.cwd(), projectRoot);
@@ -782,8 +783,21 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   /mcp         - Manage MCP client connections and discover tools (/mcp add <name> <cmd>)
   /diff        - Review workspace code diff and promote to branch
   /rules       - Inspect active SHACL rules for the current domain
+  /verbose     - Toggle verbose tool and RPC debug output
   /clear       - Clear screen and refresh header
   /exit        - End governed session and exit`,
+        });
+        updateView();
+        continue;
+      }
+
+      if (prompt === '/verbose') {
+        verboseMode = !verboseMode;
+        chatEntries.push({
+          type: 'agent',
+          content: verboseMode
+            ? '✔ Modo verboso ATIVADO: exibindo payloads literais de ferramentas e saídas completas.'
+            : '✔ Modo verboso DESATIVADO: exibindo ações concisas e recibos consolidados.',
         });
         updateView();
         continue;
@@ -975,18 +989,42 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
             chatEntries.push({
               type: 'tool',
               toolName: call.name,
-              toolArgs: JSON.stringify(call.args).replace(/"([^"]+)":/g, '$1:'),
+              toolArgs: call.args,
+              verbose: verboseMode,
             });
             updateView();
           },
           onToolCallDone: (call) => {
             const firstLine = (call.result || '').split('\n')[0] || '';
             const preview = firstLine.length > 50 ? `${firstLine.slice(0, 47)}...` : firstLine;
-            chatEntries.push({
-              type: 'tool_result',
-              content: preview,
-            });
-            updateView();
+            const isError = (call.result || '').startsWith('Error executing ');
+
+            if (verboseMode) {
+              chatEntries.push({
+                type: 'tool_result',
+                content: preview,
+                verbose: true,
+                isError,
+              });
+              updateView();
+            } else if (isError) {
+              chatEntries.push({
+                type: 'tool_result',
+                content: preview,
+                verbose: false,
+                isError: true,
+              });
+              updateView();
+            } else if (call.name === 'run_bash_command' && preview.trim()) {
+              chatEntries.push({
+                type: 'tool_result',
+                content: preview,
+                verbose: false,
+                isError: false,
+              });
+              updateView();
+            }
+            // Quiet tools in concise mode do not push a separate tool_result entry
 
             if (sessao && (call.name === 'write_to_file' || call.name === 'replace_file_content')) {
               getGitDiffNumstat(sessao.caminhoWorktree, sessao.commitBase)

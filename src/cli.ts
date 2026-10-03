@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { realpathSync } from 'node:fs';
+import { realpathSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import { addDomain, initProject } from './project/scaffold.js';
@@ -9,9 +9,18 @@ import { validateProject } from './ontology/validate.js';
 import { resolverRepositorio } from './git/worktree.js';
 import { limparSessao, listarSessoesDoProjeto } from './git/sessions.js';
 
+function getVersion(): string {
+  try {
+    const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+    return pkg.version || '0.2.12-beta';
+  } catch {
+    return '0.2.12-beta';
+  }
+}
+
 export async function main(argv: string[]): Promise<number> {
   if (argv.length === 1 && (argv[0] === '--version' || argv[0] === '-v')) {
-    process.stdout.write('0.2.11-beta\n');
+    process.stdout.write(`${getVersion()}\n`);
     return 0;
   }
   if (argv.length === 1 && argv[0] === '--help') {

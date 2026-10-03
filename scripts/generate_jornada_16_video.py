@@ -61,7 +61,7 @@ def render_slide(title: str, subtitle: str, bullets: list[str], output_path: Pat
 
     # Footer
     draw.rectangle([(80, height - 70), (width - 80, height - 68)], fill=(30, 41, 59))
-    draw.text((80, height - 52), "Oracle BSH (Business Semantic Harness) • OpenTUI Component TUI Architecture", font=sub_font, fill=(100, 116, 139))
+    draw.text((80, height - 52), "Oracle BSH (Business Semantic Harness) • Native Component TUI Architecture", font=sub_font, fill=(100, 116, 139))
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     img.save(output_path)
@@ -150,7 +150,7 @@ def main():
     print("--- [2/8] Generating opening black slide (Objectives in Portuguese) ---")
     slide_path = frames_dir / f"frame_{frame_idx:05d}.png"
     render_slide(
-        title="Jornada 16: Reconstrução da Arquitetura com OpenTUI",
+        title="Jornada 16: Reconstrução da Arquitetura da TUI",
         subtitle=f"Lote: {batch_id} • Verificação E2E Baseada em Especificação",
         bullets=[
             "1. Paridade de distribuição CLI: binário global 'bsh' executando no motor Bun empacotado",
@@ -181,7 +181,7 @@ def main():
     for _ in range(12):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: Clean Idle Prompt (GitHub Dark Dimmed)", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Clean Idle Prompt (GitHub Dark Dimmed)", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     # ---------------- Scenario 1: Palette and Selectors Navigation & Escape Cancellation ----------------
@@ -192,7 +192,7 @@ def main():
     for _ in range(8):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: Floating Slash Palette - /model Active", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Floating Slash Palette - /model Active", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     # Navigate Down through palette items
@@ -202,7 +202,7 @@ def main():
         for _ in range(5):
             frame_idx += 1
             text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-            render_terminal_frame(text, f"BSH OpenTUI: Palette Navigation - {cmd_name} Active ({color})", frames_dir / f"frame_{frame_idx:05d}.png")
+            render_terminal_frame(text, f"BSH TUI: Palette Navigation - {cmd_name} Active ({color})", frames_dir / f"frame_{frame_idx:05d}.png")
             time.sleep(0.1)
 
     # Tab cycling
@@ -211,7 +211,7 @@ def main():
     for _ in range(5):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: Tab Cycling in Slash Palette", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Tab Cycling in Slash Palette", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     # Filter with 'ex'
@@ -220,13 +220,13 @@ def main():
         time.sleep(0.2)
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: Real-Time Fuzzy Filter (/exit Crimson)", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Real-Time Fuzzy Filter (/exit Crimson)", frames_dir / f"frame_{frame_idx:05d}.png")
 
     time.sleep(0.8)
     for _ in range(6):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: Filtered /exit Highlighted with '❯' Pointer", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Filtered /exit Highlighted with '❯' Pointer", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     # Dismiss with Escape (DECISION NOT TO SELECT)
@@ -235,7 +235,7 @@ def main():
     for _ in range(8):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: Palette Cancelled (Escape) - Clean Prompt Restored", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Palette Cancelled (Escape) - Clean Prompt Restored", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     # Open /model dialog
@@ -244,7 +244,7 @@ def main():
     for _ in range(8):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: Model Selector Dialog - Browsing Models", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Model Selector Dialog - Browsing Models", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     subprocess.run(["tmux", "send-keys", "-t", session_name, "Down"], check=True)
@@ -258,7 +258,7 @@ def main():
     for _ in range(8):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: Domain Selector Dialog - Ativos Domain Active", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Domain Selector Dialog - Ativos Domain Active", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     subprocess.run(["tmux", "send-keys", "-t", session_name, "Escape"], check=True)
@@ -270,7 +270,7 @@ def main():
     for _ in range(8):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: Skills Dialog with ScrollBox Detail Budgeting", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Skills Dialog with ScrollBox Detail Budgeting", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     subprocess.run(["tmux", "send-keys", "-t", session_name, "Escape"], check=True)
@@ -289,7 +289,7 @@ def main():
     for _ in range(12):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: FIFO Queue Active ([QUEUED] Badge & Queue:1)", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: FIFO Queue Active ([QUEUED] Badge & Queue:1)", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     # Toggle reasoning with Ctrl+O
@@ -298,7 +298,7 @@ def main():
     for _ in range(8):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: Reasoning Card Toggled via Ctrl+O", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Reasoning Card Toggled via Ctrl+O", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     # Width Responsiveness: 140 columns
@@ -307,7 +307,7 @@ def main():
     for _ in range(6):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: Responsive Layout at 140 Columns (Wide)", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Responsive Layout at 140 Columns (Wide)", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     # Width Responsiveness: 80 columns
@@ -316,7 +316,7 @@ def main():
     for _ in range(6):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: Responsive Layout at 80 Columns (Standard)", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Responsive Layout at 80 Columns (Standard)", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     # Width Responsiveness: 60 columns
@@ -325,7 +325,7 @@ def main():
     for _ in range(6):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: Responsive Layout at 60 Columns (Compact)", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Responsive Layout at 60 Columns (Compact)", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     # Width Responsiveness: 35 columns
@@ -334,7 +334,7 @@ def main():
     for _ in range(6):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: Responsive Layout at 35 Columns (Minimum Safe)", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Responsive Layout at 35 Columns (Minimum Safe)", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     # Restore to 120 columns
@@ -349,7 +349,7 @@ def main():
     for _ in range(12):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: Governance Alert & SHACL Policy Evaluation", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Governance Alert & SHACL Policy Evaluation", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     # Cancel conflicting request with Escape
@@ -358,7 +358,7 @@ def main():
     for _ in range(8):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: Conflict Cancelled (Escape) - No Files Modified", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Conflict Cancelled (Escape) - No Files Modified", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     # ---------------- Scenario 5: Clean Exit ----------------
@@ -373,13 +373,13 @@ def main():
     # Capture final screenshot of the filtered /exit palette
     text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
     screenshot_out.parent.mkdir(parents=True, exist_ok=True)
-    render_terminal_frame(text, "BSH OpenTUI: Verified Component Architecture Final State", screenshot_out)
+    render_terminal_frame(text, "BSH TUI: Verified Component Architecture Final State", screenshot_out)
     print(f"Final screenshot saved: {screenshot_out}")
 
     for _ in range(10):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: /exit Ready for Dispatch", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: /exit Ready for Dispatch", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     subprocess.run(["tmux", "send-keys", "-t", session_name, "Enter"], check=True)
@@ -389,7 +389,7 @@ def main():
     for _ in range(10):
         frame_idx += 1
         text = subprocess.run(["tmux", "capture-pane", "-t", session_name, "-p"], capture_output=True, text=True, check=True).stdout
-        render_terminal_frame(text, "BSH OpenTUI: Terminal Restored & Process Exited Cleanly", frames_dir / f"frame_{frame_idx:05d}.png")
+        render_terminal_frame(text, "BSH TUI: Terminal Restored & Process Exited Cleanly", frames_dir / f"frame_{frame_idx:05d}.png")
         time.sleep(0.1)
 
     subprocess.run(["tmux", "kill-session", "-t", session_name], stderr=subprocess.DEVNULL)

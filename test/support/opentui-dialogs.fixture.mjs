@@ -26,7 +26,7 @@ test('Given BSH-MENU-005/007/008/009/010 When palette query and navigation chang
     pending = selectSlashCommandModal(undefined, '', ui.view); await ui.renderOnce(); ui.mockInput.pressBackspace(); assert.equal(await pending,null);
   } finally { ui.view.destroy(); }
 });
-test('Given BSH-OPENTUI-017/018/019 When dialogs resize across 20/35/60/80/140 columns Then query and selected value persist with actions visible', async () => {
+test('Given dialogs resize across 20/35/60/80/140 columns Then query and selected value persist with actions visible', async () => {
   const ui = await setup(140);
   try {
     const pending = selectSlashCommandModal(undefined, '', ui.view); await ui.renderOnce();
@@ -39,7 +39,7 @@ test('Given BSH-OPENTUI-017/018/019 When dialogs resize across 20/35/60/80/140 c
     ui.mockInput.pressEnter(); assert.equal(await pending,'/exit');
   } finally { ui.view.destroy(); }
 });
-test('Given BSH-AUTH-006/010 and OPENTUI009 When a key is typed, edited and pasted Then native normal and selected captures contain masks only', async () => {
+test('Given BSH-AUTH-006/010 When a key is typed, edited and pasted Then native normal and selected captures contain masks only', async () => {
   const ui = await setup();
   try {
     const pending = ui.view.question({ title: 'Authentication', message: 'Paste a key', secret: true }); await ui.renderOnce();
@@ -52,7 +52,7 @@ test('Given BSH-AUTH-006/010 and OPENTUI009 When a key is typed, edited and past
     await ui.mockInput.typeText('discard-me'); ui.mockInput.pressEscape(); assert.equal(await cancelled,null); assert.ok(ui.view.input.focused);
   } finally { ui.view.destroy(); }
 });
-test('Given BSH-OPENTUI-008 When promotion is blocked or settings toggle Then blocked diff never promotes and settings preserve model/domain', async () => {
+test('Given promotion is blocked or settings toggle Then blocked diff never promotes and settings preserve model/domain', async () => {
   const ui = await setup();
   try {
     const blocked = diffReviewModal('+ changed', false, ['Rule violated'],ui.view); await ui.renderOnce(); assert.match(ui.captureCharFrame(), /BLOCKED/); await ui.mockInput.typeText('y'); ui.mockInput.pressEnter(); assert.equal(await blocked,false);
@@ -74,7 +74,7 @@ test('Given BSH-MENU-003/006 When query exit is typed Then slash palette resolve
   } finally { ui.view.destroy(); }
 });
 
-test('Given BSH-OPENTUI-017/019 When dialogs render at 35x24 Then list rows, pointer, and scrollable details do not overlap', async () => {
+test('Given dialogs render at 35x24 Then list rows, pointer, and scrollable details do not overlap', async () => {
   const ui = await setup(35);
   ui.resize(35, 24);
   try {
@@ -111,7 +111,7 @@ test('Given BSH-MENU-001/004 When slash palette opens at 80 columns Then shortcu
     const frame = ui.captureCharFrame();
     assert.match(frame, /❯ 1\. \/model\s+\[Ctrl\+M\]/);
     assert.match(frame, /2\. \/domain\s+\[Ctrl\+D\]/);
-    assert.match(frame, /\(1-5 of 14\) • ↑\/↓ scroll/);
+    assert.match(frame, /\(1-5 of 15\) • ↑\/↓ scroll/);
     ui.mockInput.pressEscape();
     await pending;
   } finally { ui.view.destroy(); }
@@ -127,7 +127,7 @@ test('Given BSH-SELECT-002 twelve filtered models When index 12 is entered Then 
   } finally { ui.view.destroy(); }
 });
 
-test('Given BSH-OPENTUI-010 a pending secret dialog When the owning view is destroyed Then its promise settles and input is cleared', async () => {
+test('Given a pending secret dialog When the owning view is destroyed Then its promise settles and input is cleared', async () => {
   const ui = await setup();
   const pending = ui.view.question({ title: 'Authentication',message:'Key',secret:true });
   await ui.renderOnce(); await ui.mockInput.typeText('discard-on-destroy');

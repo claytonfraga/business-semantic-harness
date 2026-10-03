@@ -82,7 +82,7 @@ test('Given authenticateViaWebBrowser, when browser hits callback with code, the
   }
 });
 
-test('Given BSH-OPENTUI-009 a pending browser login When manual authentication aborts the flow Then the callback server closes and the promise settles', async () => {
+test('Given a pending browser login When manual authentication aborts the flow Then the callback server closes and the promise settles', async () => {
   const controller = new AbortController();
   let ready;
   const bound = new Promise(resolve => { ready = resolve; });
