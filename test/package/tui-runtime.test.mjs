@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, writeFile, copyFile, rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { tmpdir, constants } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { openSync, closeSync } from 'node:fs';
@@ -53,6 +53,9 @@ test('Given a package-local Bun runtime When the TUI launches Then options envir
     closeSync(cliFd);
     assert.equal(cli.status, 7, cli.stderr);
     assert.deepEqual(JSON.parse(cli.stdout).options, options);
+    await writeFile(join(directory, 'session.js'), 'export async function startTuiSession() { process.kill(process.pid, "SIGKILL"); }');
+    const killed = spawnSync(process.execPath, ['--input-type=module', '-e', runner], { cwd: directory, env: subprocessEnv, encoding: 'utf8', timeout: 10000 });
+    assert.equal(killed.status, 128 + constants.signals.SIGKILL, killed.stderr);
   } finally { await rm(directory, { recursive: true, force: true }); }
 });
 

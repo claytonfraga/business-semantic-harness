@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
+import { constants } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import type { TuiSessionOptions } from './session.js';
 
@@ -39,7 +40,7 @@ export async function launchTui(options: TuiSessionOptions): Promise<void> {
     await new Promise<void>((accept, reject) => {
       child.once('error', (error) => reject(new Error(`Unable to start the package-local Bun runtime: ${error.message}. Reinstall business-semantic-harness with optional dependencies enabled.`)));
       child.once('exit', (code, signal) => {
-        process.exitCode = code ?? (signal === 'SIGINT' ? 130 : signal === 'SIGHUP' ? 129 : 143);
+        process.exitCode = code ?? (signal ? 128 + constants.signals[signal] : 1);
         accept();
       });
     });

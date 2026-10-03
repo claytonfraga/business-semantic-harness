@@ -42,3 +42,9 @@ Combined targeted runs exposed an additional existing `global-bin` test failure;
 No global Bun requirement and no engine bump. Standard npm installation on Node22 is empirically proven, with upstream warning. Engine-strict rejects the OpenTUI dependency on Node22; this remains an explicitly documented installation limitation. Only current Linux x64 native execution was empirically verified; other supported artifacts were verified through registry metadata, not runtime execution. No supported-platform claims extend to FreeBSD/Android for OpenTUI.
 
 No manual renderer was migrated or retained as a new fallback; existing TUI remains the next migration task. No network sandbox escalation was necessary. No push or CI dispatch occurred, and no E2E approval is claimed. Signal forwarding is implemented; terminal ownership and component shutdown will be verified by subsequent renderer lifecycle tasks.
+
+## Review round 1 correction
+
+Corrected child signal status preservation using `128 + os.constants.signals[signal]` instead of treating signals other than SIGINT/SIGHUP as SIGTERM. The runtime test, derived from BSH-OPENTUI-012 after implementation, now actually terminates the Bun child with SIGKILL and expects status 137 on this platform; existing child exit 7 and CLI propagation assertions remain.
+
+`/usr/bin/rtk npm run build` passed. `/usr/bin/rtk npm run quality` passed (60 files checked, no fixes). `/usr/bin/rtk node --test test/package/tui-runtime.test.mjs test/cli/*.test.mjs` passed all three file suites.
