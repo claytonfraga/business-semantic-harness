@@ -147,6 +147,12 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         chatEntries.push({
           type: 'alert',
           content: `${aff.summary}\n↳ Ações: digite /domain para trocar, /ungoverned para desabilitar o harness ontológico, ou prossiga normalmente.`,
+          alertDiagnostic: `O vocabulário do projeto possui baixa afinidade com os conceitos formais da ontologia '${domainId}'. Operar com domínio desalinhado pode gerar código sem validação de regras de negócio.`,
+          alertRemediation: [
+            '/domain ou [Ctrl+D] - Selecionar o domínio ontológico correspondente',
+            '/ungoverned ou [Ctrl+G] - Operar como agente geral sem validação SHACL',
+            'Prosseguir normalmente se a solicitação for intencional',
+          ],
         });
       }
     } catch {
@@ -813,8 +819,11 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         chatEntries.push({ type: 'user', content: prompt, isViolating: true });
         chatEntries.push({
           type: 'prompt_violation',
+          violationOperation: promptViolation.operation,
           violationShape: promptViolation.shape,
           violationRule: promptViolation.rule,
+          violationBusinessRationale: promptViolation.businessRationale,
+          violationRemediation: promptViolation.remediation,
           content: `${promptViolation.message}\n` +
             (promptViolation.matchedKeywords ? `Termos identificados: ${promptViolation.matchedKeywords.join(', ')}` : ''),
           waitingConfirmation: confirmPromptViolations,

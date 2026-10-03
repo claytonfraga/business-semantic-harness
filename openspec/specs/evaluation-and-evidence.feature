@@ -64,9 +64,8 @@ Funcionalidade: Avaliação funcional, métricas e evidências
     Dado qualquer teste E2E ou de fumaça
     Quando é executado
     Então deve registrar captura tmux com nome descritivo em "evaluation/screenshots" ou "screenshots"
-    E uma jornada E2E deve gerar vídeo ".mp4" em "evaluation/videos"
-    E o vídeo deve incluir slide inicial preto com letras brancas apresentando objetivos
-    E o slide e os demais artefatos externos a ".feature" devem estar em inglês
+    E o vídeo deve incluir slide inicial com fundo preto e letras brancas apresentando objetivos em português
+    E os demais relatórios e artefatos de auditoria externos a ".feature" devem estar em inglês
 
   @BSH-EVAL-009
   Cenário: Preservar legibilidade do vídeo

@@ -14,7 +14,7 @@ Funcionalidade: Jornada da TUI reconstruída com componentes OpenTUI
     E que o projeto selecionado é uma cópia limpa do piloto com sua própria ontologia
     E que a ontologia dessa cópia foi validada antes da sessão
     E que cada execução possui batchId e sessão tmux persistente
-    E que a gravação MP4 começa com objetivos em inglês sobre fundo preto e letras brancas
+    E que a gravação MP4 começa com objetivos em português sobre fundo preto e letras brancas
     E que respostas de um provedor local controlado são identificadas como simulação
 
   @BSH-OPENTUI-005 @BSH-OPENTUI-014 @BSH-OPENTUI-015

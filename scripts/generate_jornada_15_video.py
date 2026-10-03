@@ -124,14 +124,14 @@ def main():
     print("--- [1/5] Generating opening black slide ---")
     slide_path = frames_dir / f"frame_{frame_idx:05d}.png"
     render_slide(
-        title="Journey 15: OpenTUI Slash Commands Floating Palette",
-        subtitle="Specification-Driven E2E Verification (openspec/specs)",
+        title="Jornada 15: Paleta Flutuante de Comandos com Barra no OpenTUI",
+        subtitle="Verificação E2E Baseada em Especificação (openspec/specs)",
         bullets=[
-            "1. Triggered strictly upon typing '/' in an empty prompt",
-            "2. Compact floating OpenTUI palette (<=72 cols) with windowed scrolling",
-            "3. Arrow navigation with distinct vibrant color for each active command",
-            "4. Decision NOT TO SELECT: pressing Escape dismisses palette cleanly",
-            "5. Real-time filtering ('ex'), character highlight, and Enter execution",
+            "1. Acionamento estrito ao digitar '/' com o prompt vazio",
+            "2. Paleta flutuante OpenTUI compacta (<=72 colunas) com rolagem por janela",
+            "3. Navegação por setas com cor distinta e vibrante para cada comando ativo",
+            "4. Decisão de NÃO SELECIONAR: pressionar Escape fecha a paleta com limpeza",
+            "5. Filtragem em tempo real ('ex'), realce de caracteres e execução com Enter",
         ],
         output_path=slide_path
     )

@@ -147,19 +147,19 @@ def main():
 
     frame_idx = 0
 
-    print("--- [2/8] Generating opening black slide (Objectives in English) ---")
+    print("--- [2/8] Generating opening black slide (Objectives in Portuguese) ---")
     slide_path = frames_dir / f"frame_{frame_idx:05d}.png"
     render_slide(
-        title="Journey 16: OpenTUI Architecture Reconstruction",
-        subtitle=f"Batch: {batch_id} • Specification-Driven E2E Verification",
+        title="Jornada 16: Reconstrução da Arquitetura com OpenTUI",
+        subtitle=f"Lote: {batch_id} • Verificação E2E Baseada em Especificação",
         bullets=[
-            "1. Packaged CLI distribution parity: global 'bsh' binary running on Bun runtime",
-            "2. Floating slash palette: triggered on empty prompt '/', arrow/Tab cycling, Escape cancel",
-            "3. Native selectors (/model, /domain, /skills) with search and safe dismissal",
-            "4. FIFO prompt queuing ([QUEUED] badge), reasoning toggle (Ctrl+O), and conversation scroll",
-            "5. Responsive width adaptation across 35, 60, 80, and 140 columns without overlaps",
-            "6. Governed code modification vs conflicting modification cancellation (Escape)",
-            "7. Codex adapter check: record blocked before first turn upon refusal",
+            "1. Paridade de distribuição CLI: binário global 'bsh' executando no motor Bun empacotado",
+            "2. Paleta flutuante com barra: acionada com prompt vazio '/', rolagem Tab/setas e cancelamento com Escape",
+            "3. Seletores nativos (/model, /domain, /skills) com busca difusa e fechamento seguro",
+            "4. Fila de prompts FIFO (distintivo [QUEUED]), alternância de raciocínio (Ctrl+O) e rolagem",
+            "5. Adaptação responsiva de largura em 35, 60, 80 e 140 colunas sem quebras visuais",
+            "6. Modificação de código governada vs cancelamento de conflito de governança (Escape)",
+            "7. Verificação do adaptador Codex: recusa registrada como bloqueado antes do primeiro turno",
         ],
         output_path=slide_path
     )

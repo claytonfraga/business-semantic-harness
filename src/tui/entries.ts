@@ -25,15 +25,66 @@ function rowsFor(entry: ChatEntry): EntryRow[] {
     case 'tool_result': return [row(`Tool result: ${entry.content || ''}`)];
     case 'gate': {
       const violation = entry.gateStatus === 'VIOLATION';
-      return [row(`Semantic Gate [SHACL: ${entry.gateShape || 'TransferShape'}] ${violation ? '[X] VIOLATION' : '[OK] CONFORMING'}`, violation ? theme.error : theme.success),
+      const rows: EntryRow[] = [
+        row(`Semantic Gate [SHACL: ${entry.gateShape || 'TransferShape'}] ${violation ? '[X] VIOLATION' : '[OK] CONFORMING'}`, violation ? theme.error : theme.success),
         ...(entry.gateChecks || []).map(check => row(`${check.ok ? '[+]' : '[X]'} ${check.text}`, check.ok ? theme.success : theme.error)),
-        row(violation ? 'Status: VIOLATION (Promotion blocked)' : 'Status: CONFORMING (Ready to promote)', violation ? theme.error : theme.success)];
+        row(violation ? 'Status: VIOLATION (Promotion blocked)' : 'Status: CONFORMING (Ready to promote)', violation ? theme.error : theme.success),
+      ];
+      if (violation) {
+        if (entry.violationBusinessRationale) {
+          rows.push(row(`Fundamento Ontológico: ${entry.violationBusinessRationale}`, theme.text));
+        }
+        rows.push(row('✓ Repositório seguro: Branch master preservado no worktree isolado.', theme.success));
+        rows.push(row('Ações Recomendadas: Adequar o código para respeitar a invariante ou /diff para revisar.', theme.muted));
+      }
+      return rows;
     }
-    case 'alert': return [row('[!] Semantic Domain Alert', theme.warning), row(entry.content || '', theme.warning)];
-    case 'prompt_violation': return [row('[!] PROMPT VIOLATION DETECTED [Pre-flight Semantic Guard]', theme.error),
-      ...(entry.violationShape ? [row(`Violated shape: ${entry.violationShape}`, theme.warning)] : []),
-      ...(entry.violationRule ? [row(`SHACL rule: ${entry.violationRule}`, theme.warning)] : []), row(entry.content || '', theme.error),
-      ...(entry.waitingConfirmation ? [row('Press [Enter] to proceed or [Escape] / /cancel to discard', theme.warning)] : [])];
+    case 'alert': {
+      const rows: EntryRow[] = [
+        row('[!] Semantic Domain Alert', theme.warning),
+        row(entry.content || '', theme.warning),
+      ];
+      if (entry.alertDiagnostic) {
+        rows.push(row(`Diagnóstico: ${entry.alertDiagnostic}`, theme.text));
+      }
+      if (entry.alertRemediation && entry.alertRemediation.length > 0) {
+        rows.push(row('Opções Recomendadas:', theme.accent));
+        for (const item of entry.alertRemediation) {
+          rows.push(row(`  • ${item}`, theme.muted));
+        }
+      }
+      return rows;
+    }
+    case 'prompt_violation': {
+      const rows: EntryRow[] = [
+        row('[!] PROMPT VIOLATION DETECTED [Pre-flight Semantic Guard]', theme.error),
+      ];
+      if (entry.violationOperation) {
+        rows.push(row(`Operação Identificada: ${entry.violationOperation}`, theme.accent));
+      }
+      if (entry.violationShape) {
+        rows.push(row(`Violated shape: ${entry.violationShape}`, theme.warning));
+      }
+      if (entry.violationRule) {
+        rows.push(row(`SHACL rule: ${entry.violationRule}`, theme.warning));
+      }
+      if (entry.violationBusinessRationale) {
+        rows.push(row(`Motivo Negocial: ${entry.violationBusinessRationale}`, theme.text));
+      }
+      if (entry.content) {
+        rows.push(row(entry.content, theme.error));
+      }
+      if (entry.violationRemediation && entry.violationRemediation.length > 0) {
+        rows.push(row('Como Prosseguir:', theme.accent));
+        entry.violationRemediation.forEach((rem, idx) => {
+          rows.push(row(`  ${idx + 1}. ${rem}`, theme.muted));
+        });
+      }
+      if (entry.waitingConfirmation) {
+        rows.push(row('Press [Enter] to proceed or [Escape] / /cancel to discard', theme.warning));
+      }
+      return rows;
+    }
     case 'implementation_receipt': return entry.receiptHasChanges
       ? [row(`[IMPLEMENTATION COMPLETED] [Modified files: ${entry.receiptFiles?.length || 0}]`, theme.success), ...files(entry.receiptFiles || []), row(`Changes saved to workspace (+${entry.receiptTotalAdded || 0} / -${entry.receiptTotalRemoved || 0} lines); promotion is separate.`, theme.success)]
       : [row('[READ / DIAGNOSTIC]', theme.accent), row('No file changes were saved in this response.', theme.muted)];
