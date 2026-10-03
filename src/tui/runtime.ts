@@ -49,6 +49,16 @@ export async function launchTui(options: TuiSessionOptions): Promise<void> {
   }
 }
 
+export async function launchAuth(manual: boolean): Promise<number> {
+  const child = spawn(resolvePackageBun(), [fileURLToPath(import.meta.url), '--auth', ...(manual ? ['--manual'] : [])], { cwd: process.cwd(), env: process.env, stdio: 'inherit' });
+  return await new Promise<number>((resolve, reject) => { child.once('error', reject); child.once('exit', code => resolve(code ?? 1)); });
+}
+
 if ('Bun' in globalThis && process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  await launchTui(JSON.parse(process.argv[2] ?? '{}') as TuiSessionOptions);
+  if (process.argv[2] === '--auth') {
+    const { handleAuthCommand } = await import('../cli/authCommand.js');
+    process.exitCode = await handleAuthCommand(['login', ...process.argv.slice(3)]);
+  } else {
+    await launchTui(JSON.parse(process.argv[2] ?? '{}') as TuiSessionOptions);
+  }
 }

@@ -1,4 +1,3 @@
-import { ansi } from './ansi.js';
 import type { OpenRouterModel } from '../client/openrouter/types.js';
 
 export interface FuzzyMatchResult {
@@ -65,21 +64,10 @@ export function fuzzyScore(target: string, query: string): FuzzyMatchResult | nu
   };
 }
 
-/**
- * Highlights matching indices within text using bold yellow ANSI codes.
- */
+/** Plain match indication for textual protocols; native widgets use styled spans. */
 export function highlightMatches(text: string, indices: number[]): string {
-  if (!indices || indices.length === 0) return `${ansi.cyan}${text}${ansi.reset}`;
-  const indexSet = new Set(indices);
-  let res = '';
-  for (let i = 0; i < text.length; i++) {
-    if (indexSet.has(i)) {
-      res += `${ansi.bold}${ansi.yellow}${text[i]}${ansi.reset}`;
-    } else {
-      res += `${ansi.cyan}${text[i]}${ansi.reset}`;
-    }
-  }
-  return res;
+  const selected = new Set(indices);
+  return Array.from(text).map((char, index) => selected.has(index) ? `[${char}]` : char).join('');
 }
 
 /**

@@ -6,7 +6,7 @@ import {
 } from '../../dist/tui/slashCommands.js';
 
 describe('Slash Commands Menu Unit Suite (Given/When/Then)', () => {
-  it('Given o catálogo de comandos slash padrão do BSH, When filtrado sem termo de busca, Then retorna todos os comandos essenciais com descrições', () => {
+  it('Given BSH-MENU-001 default commands When filtering without a query Then all commands and descriptions are available', () => {
     const results = filterSlashCommands('');
 
     assert.ok(results.length >= 12);
@@ -22,14 +22,13 @@ describe('Slash Commands Menu Unit Suite (Given/When/Then)', () => {
     assert.ok(commandNames.includes('/exit'));
     assert.ok(commandNames.includes('/help'));
 
-    // Verifica que cada comando possui descrição clara
     for (const item of results) {
       assert.ok(item.command.description.length > 10);
       assert.match(item.command.name, /^\/[a-z]+/);
     }
   });
 
-  it('Given o catálogo de comandos, When filtrado por "ex", Then prioriza /exit com alta pontuação', () => {
+  it('Given BSH-MENU-003 commands When searching ex Then exit ranks first', () => {
     const results = filterSlashCommands('ex');
 
     assert.ok(results.length > 0);
@@ -37,7 +36,7 @@ describe('Slash Commands Menu Unit Suite (Given/When/Then)', () => {
     assert.match(results[0].command.description, /safely exit/i);
   });
 
-  it('Given o catálogo de comandos, When filtrado por "domain", Then retorna o comando com atalho Ctrl+D e categoria Governance', () => {
+  it('Given BSH-MENU-003 commands When searching domain Then its shortcut and category remain available', () => {
     const results = filterSlashCommands('domain');
 
     assert.ok(results.length > 0);
@@ -46,7 +45,7 @@ describe('Slash Commands Menu Unit Suite (Given/When/Then)', () => {
     assert.strictEqual(results[0].command.category, 'Governance');
   });
 
-  it('Given o catálogo de comandos, When filtrado por "model", Then retorna o comando com atalho Ctrl+M e categoria Config', () => {
+  it('Given BSH-MENU-003 commands When searching model Then its shortcut and category remain available', () => {
     const results = filterSlashCommands('/model');
 
     assert.ok(results.length > 0);
@@ -55,84 +54,22 @@ describe('Slash Commands Menu Unit Suite (Given/When/Then)', () => {
     assert.strictEqual(results[0].command.category, 'Config');
   });
 
-  it('Given a regra de disparo da TUI, When a tecla "/" é pressionada em linha vazia, Then o menu deve ser acionado', () => {
-    const isTrigger = (char, line, isModalOpen, isExecutingTurn) => {
-      return (
-        !isExecutingTurn &&
-        !isModalOpen &&
-        char === '/' &&
-        (line.trim().length === 0 || line.trim() === '/')
-      );
-    };
-
-    assert.strictEqual(isTrigger('/', '', false, false), true);
-    assert.strictEqual(isTrigger('/', '   ', false, false), true);
-    assert.strictEqual(isTrigger('/', '/', false, false), true); // readline já inseriu o caractere
-  });
-
-  it('Given a regra de disparo da TUI, When a tecla "/" é digitada com texto já existente no buffer, Then o menu NÃO deve ser acionado', () => {
-    const isTrigger = (char, line, isModalOpen, isExecutingTurn) => {
-      return (
-        !isExecutingTurn &&
-        !isModalOpen &&
-        char === '/' &&
-        (line.trim().length === 0 || line.trim() === '/')
-      );
-    };
-
-    assert.strictEqual(isTrigger('/', 'crie rota /api', false, false), false);
-    assert.strictEqual(isTrigger('/', 'verificar /src/core', false, false), false);
-    assert.strictEqual(isTrigger('/', '', true, false), false); // modal já aberto
-    assert.strictEqual(isTrigger('/', '', false, true), false); // turno em execução
-  });
-
-  it('Given todos os comandos do catálogo, When inspecionadas suas cores ativas, Then cada opção ativa possui uma cor exclusiva diferente das demais', () => {
+  it('Given BSH-MENU-004 commands When inspecting active colors Then each uses its distinct theme accent', () => {
     const activeColors = DEFAULT_SLASH_COMMANDS.map((c) => c.activeColor);
     const uniqueColors = new Set(activeColors);
 
-    // Todos os 14 comandos devem ter cores exclusivas
     assert.strictEqual(uniqueColors.size, DEFAULT_SLASH_COMMANDS.length);
 
-    // Verificar se cores conhecidas estão associadas corretamente
     const modelCmd = DEFAULT_SLASH_COMMANDS.find((c) => c.name === '/model');
     const domainCmd = DEFAULT_SLASH_COMMANDS.find((c) => c.name === '/domain');
     const exitCmd = DEFAULT_SLASH_COMMANDS.find((c) => c.name === '/exit');
 
-    assert.ok(modelCmd.activeColor.includes('177m') || modelCmd.activeColorName === 'Magenta');
-    assert.ok(domainCmd.activeColor.includes('48m') || domainCmd.activeColorName === 'Emerald Green');
-    assert.ok(exitCmd.activeColor.includes('196m') || exitCmd.activeColorName === 'Crimson');
+    assert.equal(modelCmd.activeColor, '#b083f0');
+    assert.equal(domainCmd.activeColor, '#57ab5a');
+    assert.equal(exitCmd.activeColor, '#f47067');
 
-    // Nenhuma cor de comando coincide com a de outro
     assert.notStrictEqual(modelCmd.activeColor, domainCmd.activeColor);
     assert.notStrictEqual(domainCmd.activeColor, exitCmd.activeColor);
   });
 
-  it('Given um comando slash formatado para exibição, When a opção está ativa, Then inclui o ponteiro ❯ e a cor exclusiva do comando', async () => {
-    const { formatSlashCommandLine } = await import('../../dist/tui/slashCommands.js');
-    const cmd = DEFAULT_SLASH_COMMANDS.find((c) => c.name === '/exit');
-
-    const activeLine = formatSlashCommandLine(cmd, 13, true);
-    assert.ok(activeLine.includes('❯'), 'Deve conter ponteiro de foco ❯');
-    assert.ok(activeLine.includes(cmd.activeColor), 'Deve conter a cor exclusiva do comando ativo');
-    assert.ok(activeLine.includes('/exit'), 'Deve conter o nome do comando');
-
-    const inactiveLine = formatSlashCommandLine(cmd, 13, false);
-    assert.ok(!inactiveLine.includes('❯'), 'Não deve conter ponteiro de foco ❯ quando inativo');
-  });
-
-  it('Given o renderizador OpenTUI renderSlashMenuBox, When executado com 14 comandos e pageSize 5, Then retorna 7 linhas limitadas a 72 colunas com rolagem', async () => {
-    const { renderSlashMenuBox } = await import('../../dist/tui/slashCommands.js');
-    const lines = renderSlashMenuBox({ selectedIndex: 0, scrollOffset: 0, pageSize: 5, query: '' }, 72);
-
-    assert.strictEqual(lines.length, 7, 'Deve renderizar exatamente 7 linhas (top border, 5 itens, bottom border)');
-    for (const line of lines) {
-      // Limpeza de sequências ANSI para checar largura visual
-      const visible = line.replace(/\x1b\[[0-9;]*m/g, '');
-      assert.ok(visible.length <= 72, `Linha não deve extrapolar 72 colunas: visual=${visible.length}`);
-    }
-    assert.ok(lines[0].includes('1-5 of 14'), 'Cabeçalho deve indicar janela de rolagem');
-    assert.ok(lines[0].includes('scroll'), 'Cabeçalho deve indicar rolagem');
-    assert.ok(lines[6].includes('Select') && lines[6].includes('Dismiss'), 'Rodapé deve conter instruções em inglês');
-  });
 });
-

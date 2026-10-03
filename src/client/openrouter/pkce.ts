@@ -56,10 +56,12 @@ export function generatePkceCodes(): PkceCodes {
 export async function exchangeCodeForApiKey(
   code: string,
   verifier: string,
-  baseUrl = 'https://openrouter.ai/api/v1'
+  baseUrl = 'https://openrouter.ai/api/v1',
+  signal?: AbortSignal
 ): Promise<string> {
   const cleanBase = baseUrl.replace(/\/+$/, '');
   const response = await fetch(`${cleanBase}/auth/keys`, {
+    signal,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -85,6 +87,7 @@ export async function exchangeCodeForApiKey(
 }
 
 export interface WebAuthServerOptions {
+  signal?: AbortSignal;
   port?: number;
   timeoutMs?: number;
   openRouterAuthUrl?: string;
@@ -106,13 +109,18 @@ export async function authenticateViaWebBrowser(
     let server: Server | null = null;
     let timeoutTimer: NodeJS.Timeout | null = null;
 
+    const abort = () => { cleanup(); reject(new Error('Authentication cancelled')); };
     const cleanup = () => {
+      options.signal?.removeEventListener('abort', abort);
       if (timeoutTimer) clearTimeout(timeoutTimer);
       if (server) {
         server.close();
         server = null;
       }
     };
+
+    if (options.signal?.aborted) { reject(new Error('Authentication cancelled')); return; }
+    options.signal?.addEventListener('abort', abort, { once: true });
 
     server = createServer(async (req, res) => {
       try {
@@ -159,7 +167,7 @@ export async function authenticateViaWebBrowser(
 
           // Exchange code for API key
           try {
-            const apiKey = await exchangeCodeForApiKey(code, verifier);
+            const apiKey = await exchangeCodeForApiKey(code, verifier, undefined, options.signal);
             resolve({ apiKey });
           } catch (exchangeErr) {
             reject(exchangeErr);

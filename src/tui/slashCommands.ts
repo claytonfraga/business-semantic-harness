@@ -1,5 +1,7 @@
 import { ansi, stripAnsi } from './ansi.js';
-import { fuzzyScore, highlightMatches } from './fuzzySearch.js';
+import { highlightMatches } from './fuzzySearch.js';
+import { githubDarkDimmedTheme as theme } from './theme.js';
+import { fuzzyScore } from './fuzzySearch.js';
 
 export interface SlashCommandDef {
   name: string;
@@ -16,7 +18,7 @@ export const DEFAULT_SLASH_COMMANDS: SlashCommandDef[] = [
     description: 'Switch active LLM model via fuzzy search',
     shortcut: 'Ctrl+M',
     category: 'Config',
-    activeColor: '\x1b[1;38;5;177m',
+    activeColor: theme.commands['/model'],
     activeColorName: 'Magenta',
   },
   {
@@ -24,91 +26,91 @@ export const DEFAULT_SLASH_COMMANDS: SlashCommandDef[] = [
     description: 'Select domain ontology & SHACL rules',
     shortcut: 'Ctrl+D',
     category: 'Governance',
-    activeColor: '\x1b[1;38;5;48m',
+    activeColor: theme.commands['/domain'],
     activeColorName: 'Emerald Green',
   },
   {
     name: '/skills',
     description: 'Manage & execute operational skills',
     category: 'Skills',
-    activeColor: '\x1b[1;38;5;51m',
+    activeColor: theme.commands['/skills'],
     activeColorName: 'Electric Cyan',
   },
   {
     name: '/diff',
     description: 'Review workspace diff & promote changes',
     category: 'System',
-    activeColor: '\x1b[1;38;5;220m',
+    activeColor: theme.commands['/diff'],
     activeColorName: 'Golden Yellow',
   },
   {
     name: '/rules',
     description: 'Inspect active SHACL shapes & rules',
     category: 'Governance',
-    activeColor: '\x1b[1;38;5;75m',
+    activeColor: theme.commands['/rules'],
     activeColorName: 'Sky Blue',
   },
   {
     name: '/settings',
     description: 'Configure session & prompt preferences',
     category: 'Config',
-    activeColor: '\x1b[1;38;5;208m',
+    activeColor: theme.commands['/settings'],
     activeColorName: 'Peach Orange',
   },
   {
     name: '/affinity',
     description: 'Check semantic ontology affinity',
     category: 'Governance',
-    activeColor: '\x1b[1;38;5;43m',
+    activeColor: theme.commands['/affinity'],
     activeColorName: 'Turquoise',
   },
   {
     name: '/mcp',
     description: 'Manage Model Context Protocol tools',
     category: 'System',
-    activeColor: '\x1b[1;38;5;141m',
+    activeColor: theme.commands['/mcp'],
     activeColorName: 'Violet',
   },
   {
     name: '/clear',
     description: 'Clear screen & reset message viewport',
     category: 'UI',
-    activeColor: '\x1b[1;38;5;253m',
+    activeColor: theme.commands['/clear'],
     activeColorName: 'Bright Silver',
   },
   {
     name: '/done',
     description: 'Finalize skill loop & save deliverables',
     category: 'Skills',
-    activeColor: '\x1b[1;38;5;154m',
+    activeColor: theme.commands['/done'],
     activeColorName: 'Lime Green',
   },
   {
     name: '/help',
     description: 'Display available commands & shortcuts',
     category: 'UI',
-    activeColor: '\x1b[1;38;5;39m',
+    activeColor: theme.commands['/help'],
     activeColorName: 'Royal Blue',
   },
   {
     name: '/ungoverned',
     description: 'Bypass SHACL semantic governance',
     category: 'Governance',
-    activeColor: '\x1b[1;38;5;209m',
+    activeColor: theme.commands['/ungoverned'],
     activeColorName: 'Warm Amber',
   },
   {
     name: '/governed',
     description: 'Enforce strict SHACL domain rules',
     category: 'Governance',
-    activeColor: '\x1b[1;38;5;49m',
+    activeColor: theme.commands['/governed'],
     activeColorName: 'Mint Green',
   },
   {
     name: '/exit',
     description: 'Safely exit BSH and restore terminal',
     category: 'System',
-    activeColor: '\x1b[1;38;5;196m',
+    activeColor: theme.commands['/exit'],
     activeColorName: 'Crimson',
   },
 ];
@@ -172,7 +174,7 @@ export function filterSlashCommands(
 export function getSlashCommandActiveColor(name: string): string {
   const normalized = name.startsWith('/') ? name.toLowerCase() : `/${name.toLowerCase()}`;
   const found = DEFAULT_SLASH_COMMANDS.find((c) => c.name.toLowerCase() === normalized);
-  return found?.activeColor || '\x1b[1;38;5;51m';
+  return found?.activeColor || theme.accent;
 }
 
 export interface SlashMenuOverlayState {
@@ -182,6 +184,8 @@ export interface SlashMenuOverlayState {
   query: string;
 }
 
+
+/** @deprecated Temporary legacy session bridge; task 4 removes it. */
 export function formatSlashCommandLine(
   command: SlashCommandDef,
   index: number,

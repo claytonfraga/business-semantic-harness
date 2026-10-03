@@ -1,9 +1,10 @@
 import { BoxRenderable, TextRenderable, TextareaRenderable, ScrollBoxRenderable, createCliRenderer, type CliRenderer, type KeyEvent } from '@opentui/core';
+import { createDialogHost, setActiveDialogHost, type DialogHost } from './dialogs.js';
 import { createEntryComponent } from './entries.js';
 import type { ChatEntry, RenderState } from './state.js';
 import { githubDarkDimmedTheme as theme } from './theme.js';
 
-export interface TuiView {
+export interface TuiView extends DialogHost {
   readonly renderer: CliRenderer;
   readonly root: BoxRenderable;
   readonly input: TextareaRenderable;
@@ -49,7 +50,13 @@ export async function createTuiView(options: { renderer?: CliRenderer } = {}): P
   input.onSubmit = () => { for (const listener of submissions) listener(input.plainText); };
   input.focus();
   let destroyed = false;
+  const dialogs = await createDialogHost(renderer, () => input.focus());
+  setActiveDialogHost(dialogs);
   return {
+    select: options => dialogs.select(options),
+    question: options => dialogs.question(options),
+    notice: (title, content) => dialogs.notice(title, content),
+    get dialogActive() { return dialogs.dialogActive; },
     renderer, root, input, scroll,
     update(state, entries) {
       const status = !state.governed ? 'UNGOVERNED' : state.alignmentStatus === 'MISMATCH' ? 'DOMAIN MISMATCH' : 'GOVERNED';
@@ -88,6 +95,6 @@ export async function createTuiView(options: { renderer?: CliRenderer } = {}): P
     onKeypress(listener) { keyListeners.add(listener); return () => { keyListeners.delete(listener); }; },
     suspend: () => renderer.suspend(),
     resume: () => { renderer.resume(); input.focus(); },
-    destroy() { if (destroyed) return; destroyed = true; renderer.keyInput.off('keypress', routeKey); submissions.clear(); keyListeners.clear(); renderer.destroy(); },
+    destroy() { if (destroyed) return; destroyed = true; setActiveDialogHost(undefined); renderer.keyInput.off('keypress', routeKey); submissions.clear(); keyListeners.clear(); renderer.destroy(); },
   };
 }

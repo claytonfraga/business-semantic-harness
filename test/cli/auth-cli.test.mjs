@@ -25,7 +25,7 @@ test('Given no active credentials, When bsh auth status is called, Then it repor
 
     const code = await main(['--project', tempXdg, 'auth', 'status']);
     assert.equal(code, 0);
-    assert.match(stdoutData, /Não autenticado/);
+    assert.match(stdoutData, /Unauthenticated/);
     assert.match(stdoutData, /bsh auth login/);
   } finally {
     process.stdout.write = originalWrite;
@@ -63,8 +63,8 @@ test('Given active credentials in user store, When bsh auth status is called, Th
 
     const code = await main(['--project', tempXdg, 'auth', 'status']);
     assert.equal(code, 0);
-    assert.match(stdoutData, /Autenticado/);
-    assert.match(stdoutData, /Cofre Global do Usuário/);
+    assert.match(stdoutData, /Authenticated/);
+    assert.match(stdoutData, /User credential store/);
     assert.match(stdoutData, /sk-or-v1••••••••9999/);
     assert.doesNotMatch(stdoutData, /my-secret-key/, 'Full secret must not be exposed');
   } finally {
@@ -103,12 +103,12 @@ test('Given credentials in user store, When bsh auth logout is called, Then cred
 
     const logoutCode = await main(['--project', tempXdg, 'auth', 'logout']);
     assert.equal(logoutCode, 0);
-    assert.match(stdoutData, /removida com sucesso/);
+    assert.match(stdoutData, /removed from/);
 
     stdoutData = '';
     const statusCode = await main(['--project', tempXdg, 'auth', 'status']);
     assert.equal(statusCode, 0);
-    assert.match(stdoutData, /Não autenticado/);
+    assert.match(stdoutData, /Unauthenticated/);
   } finally {
     process.stdout.write = originalWrite;
     if (originalApiKey !== undefined) {
