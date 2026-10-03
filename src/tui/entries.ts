@@ -1,0 +1,73 @@
+import { BoxRenderable, TextRenderable, StyledText, fg, type CliRenderer } from '@opentui/core';
+import type { ChatEntry, ReceiptFileStat } from './state.js';
+import { githubDarkDimmedTheme as theme } from './theme.js';
+
+export function formatToolInvocation(name: string, args: Record<string, unknown> | string): string {
+  if (typeof args === 'string') return `${name}("${args}")`;
+  if (['read_file', 'write_file', 'replace_file_content'].includes(name)) return `${name}("${String(args.path || '')}")`;
+  if (name === 'list_directory') return `${name}("${String(args.path || '.')}")`;
+  if (name === 'run_bash_command') {
+    const command = String(args.command || '');
+    return `run_bash("${command.length > 55 ? `${command.slice(0, 52)}...` : command}")`;
+  }
+  return `${name}(${JSON.stringify(args).slice(0, 50)})`;
+}
+
+interface EntryRow { text: string; color: string; stats?: ReceiptFileStat }
+function rowsFor(entry: ChatEntry): EntryRow[] {
+  const row = (text: string, color: string = theme.text): EntryRow => ({ text, color });
+  const files = (stats: ReceiptFileStat[]) => stats.map(stat => ({ text: stat.path, color: theme.text, stats: stat }));
+  switch (entry.type) {
+    case 'blank': return [row('')];
+    case 'user': return [row(`[User]${entry.isViolating ? ' [!] VIOLATION DETECTED' : ''}${entry.isQueued ? ' [QUEUED]' : ''}`, entry.isViolating ? theme.error : theme.accent), row(entry.content || '')];
+    case 'agent': return [row('[BSH Agent]', theme.accent), row(entry.content || '')];
+    case 'tool': return [row(`>_ Tool: ${formatToolInvocation(entry.toolName || '', entry.toolArgs || {})}`, theme.accent)];
+    case 'tool_result': return [row(`Tool result: ${entry.content || ''}`)];
+    case 'gate': {
+      const violation = entry.gateStatus === 'VIOLATION';
+      return [row(`Semantic Gate [SHACL: ${entry.gateShape || 'TransferShape'}] ${violation ? '[X] VIOLATION' : '[OK] CONFORMING'}`, violation ? theme.error : theme.success),
+        ...(entry.gateChecks || []).map(check => row(`${check.ok ? '[+]' : '[X]'} ${check.text}`, check.ok ? theme.success : theme.error)),
+        row(violation ? 'Status: VIOLATION (Promotion blocked)' : 'Status: CONFORMING (Ready to promote)', violation ? theme.error : theme.success)];
+    }
+    case 'alert': return [row('[!] Semantic Domain Alert', theme.warning), row(entry.content || '', theme.warning)];
+    case 'prompt_violation': return [row('[!] PROMPT VIOLATION DETECTED [Pre-flight Semantic Guard]', theme.error),
+      ...(entry.violationShape ? [row(`Violated shape: ${entry.violationShape}`, theme.warning)] : []),
+      ...(entry.violationRule ? [row(`SHACL rule: ${entry.violationRule}`, theme.warning)] : []), row(entry.content || '', theme.error),
+      ...(entry.waitingConfirmation ? [row('Press [Enter] to proceed or [Escape] / /cancel to discard', theme.warning)] : [])];
+    case 'implementation_receipt': return entry.receiptHasChanges
+      ? [row(`[IMPLEMENTATION COMPLETED] [Modified files: ${entry.receiptFiles?.length || 0}]`, theme.success), ...files(entry.receiptFiles || []), row(`Changes saved to workspace (+${entry.receiptTotalAdded || 0} / -${entry.receiptTotalRemoved || 0} lines); promotion is separate.`, theme.success)]
+      : [row('[READ / DIAGNOSTIC]', theme.accent), row('No file changes were saved in this response.', theme.muted)];
+    case 'reasoning': {
+      const collapsed = entry.reasoningCollapsed ?? true;
+      const duration = entry.reasoningDurationMs ? ` · ${(entry.reasoningDurationMs / 1000).toFixed(1)}s` : '';
+      return [row(`${collapsed ? "▼" : "▲"} [Reasoning: ~${entry.reasoningTokens ?? Math.max(1, Math.round((entry.content || '').length / 4))} tokens${duration}] [Ctrl+O ${collapsed ? 'expand' : 'collapse'}]`, theme.reasoning), ...(collapsed ? [] : [row(entry.content || '', theme.muted)])];
+    }
+    case 'diff_preview': return [row(`[DIFF PREVIEW] [${entry.diffFiles?.length || 0} changed files (+${entry.diffTotalAdded || 0} / -${entry.diffTotalRemoved || 0})]`, theme.accent), ...files((entry.diffFiles || []).slice(0, 8)), ...(entry.diffFiles && entry.diffFiles.length > 8 ? [row(`... and ${entry.diffFiles.length - 8} more files`, theme.muted)] : [])];
+  }
+}
+
+/** Retains card and row identity as streaming payloads change. */
+export function createEntryComponent(renderer: CliRenderer, id: string) {
+  const component = new BoxRenderable(renderer, { id, width: '100%', flexDirection: 'column', flexShrink: 0, paddingBottom: 1, backgroundColor: theme.background });
+  const texts: TextRenderable[] = [];
+  return {
+    component,
+    update(entry: ChatEntry): void {
+      const rows = rowsFor(entry);
+      while (texts.length > rows.length) {
+        const text = texts.pop();
+        if (text) { component.remove(text); text.destroy(); }
+      }
+      rows.forEach((row, index) => {
+        let text = texts[index];
+        if (!text) {
+          text = new TextRenderable(renderer, { id: `${id}-row-${index}`, width: '100%', flexShrink: 0, wrapMode: 'word', fg: row.color, bg: theme.background });
+          texts.push(text);
+          component.add(text);
+        }
+        text.fg = row.color;
+        text.content = row.stats ? new StyledText([fg(theme.text)(`${row.text} (`), fg(theme.success)(`+${row.stats.linesAdded}`), fg(theme.text)(' / '), fg(theme.error)(`-${row.stats.linesRemoved}`), fg(theme.text)(')')]) : row.text;
+      });
+    },
+  };
+}
