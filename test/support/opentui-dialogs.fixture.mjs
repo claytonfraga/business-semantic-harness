@@ -70,3 +70,10 @@ test('Given BSH-SELECT-002 twelve filtered models When index 12 is entered Then 
     ui.mockInput.pressEnter(); assert.equal(await pending,models[11].id);
   } finally { ui.view.destroy(); }
 });
+
+test('Given BSH-OPENTUI-010 a pending secret dialog When the owning view is destroyed Then its promise settles and input is cleared', async () => {
+  const ui = await setup();
+  const pending = ui.view.question({ title: 'Authentication',message:'Key',secret:true });
+  await ui.renderOnce(); await ui.mockInput.typeText('discard-on-destroy');
+  ui.view.destroy(); assert.equal(await pending,null);
+});
