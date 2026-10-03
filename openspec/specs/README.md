@@ -65,6 +65,7 @@ Requirements for capability behavior live here; journey execution plans remain i
 | 13 | SKILL, TOOLS, SEM | [jornada-13-mecanismo-de-skills-e-prototipacao.feature](../../test/features/journeys/jornada-13-mecanismo-de-skills-e-prototipacao.feature) |
 | 14 | SKILL, TOOLS | [jornada-14-instalacao-e-inclusao-dinamica-de-skills.feature](../../test/features/journeys/jornada-14-instalacao-e-inclusao-dinamica-de-skills.feature) |
 | 15 | MENU, INPUT | [jornada-15-menu-de-comandos-barra.feature](../../test/features/journeys/jornada-15-menu-de-comandos-barra.feature) |
+| 16 | OPENTUI, MENU, INPUT, TUI | [jornada-16-reconstrucao-opentui.feature](../../test/features/journeys/jornada-16-reconstrucao-opentui.feature) |
 
 All journeys also depend on the `EVAL` evidence policy. Journey 6 describes external Agy integration over MCP; the Codex functional-session policy remains a separate adapter obligation. The native CLI currently has no `codex` subcommand.
 
