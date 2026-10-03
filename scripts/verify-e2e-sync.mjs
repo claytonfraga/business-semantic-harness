@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { existsSync, readFileSync, statSync, mkdirSync, copyFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { createHash } from 'node:crypto';
 
@@ -37,17 +37,15 @@ const wslDownloadsDir = '/mnt/c/Users/clayt/Downloads/bsh';
 const isWslAvailable = existsSync('/mnt/c/Users/clayt/Downloads');
 
 console.log('='.repeat(80));
-console.log('VERIFICAÇÃO DE VÍDEOS E SINCRONIZAÇÃO E2E WSL');
+console.log('VERIFICAÇÃO DE VÍDEOS E SINCRONIZAÇÃO E2E WSL (ARQUIVOS NOVOS)');
 console.log('='.repeat(80));
 console.log(`Diretório Local de Vídeos: ${localVideosDir}`);
 console.log(`Diretório WSL de Downloads: ${wslDownloadsDir} (disponível: ${isWslAvailable})`);
 console.log('');
 
-if (isWslAvailable) {
-  mkdirSync(wslDownloadsDir, { recursive: true });
-}
-
 let totalErrors = 0;
+const now = Date.now();
+const MAX_AGE_MS = 60 * 60 * 1000; // Máximo 1 hora
 
 for (const j of JOURNEYS) {
   const localVideo = join(localVideosDir, `${j.name}.mp4`);
@@ -64,16 +62,23 @@ for (const j of JOURNEYS) {
     continue;
   }
 
-  const vSize = statSync(localVideo).size;
-  const sSize = statSync(localScreenshot).size;
+  const vStat = statSync(localVideo);
+  const sStat = statSync(localScreenshot);
 
-  if (vSize < 10000) {
-    console.error(`[ERRO] Jornada ${String(j.id).padStart(2, '0')}: Vídeo corrompido ou vazio (${vSize} bytes)`);
+  if (vStat.size < 10000) {
+    console.error(`[ERRO] Jornada ${String(j.id).padStart(2, '0')}: Vídeo corrompido ou vazio (${vStat.size} bytes)`);
     totalErrors++;
     continue;
   }
-  if (sSize < 5000) {
-    console.error(`[ERRO] Jornada ${String(j.id).padStart(2, '0')}: Screenshot corrompida ou vazia (${sSize} bytes)`);
+  if (sStat.size < 5000) {
+    console.error(`[ERRO] Jornada ${String(j.id).padStart(2, '0')}: Screenshot corrompida ou vazia (${sStat.size} bytes)`);
+    totalErrors++;
+    continue;
+  }
+
+  // Verifica se o arquivo é recente (gerado nesta sessão)
+  if (now - vStat.mtimeMs > MAX_AGE_MS) {
+    console.error(`[ERRO] Jornada ${String(j.id).padStart(2, '0')}: Vídeo é antigo (${new Date(vStat.mtimeMs).toISOString()}), não foi regerado!`);
     totalErrors++;
     continue;
   }
@@ -86,10 +91,14 @@ for (const j of JOURNEYS) {
     const wslScreenshot = join(wslDownloadsDir, `${j.name}.png`);
 
     if (!existsSync(wslVideo)) {
-      copyFileSync(localVideo, wslVideo);
+      console.error(`[ERRO] Jornada ${String(j.id).padStart(2, '0')}: Vídeo não sincronizado em WSL: ${wslVideo}`);
+      totalErrors++;
+      continue;
     }
     if (!existsSync(wslScreenshot)) {
-      copyFileSync(localScreenshot, wslScreenshot);
+      console.error(`[ERRO] Jornada ${String(j.id).padStart(2, '0')}: Screenshot não sincronizada em WSL: ${wslScreenshot}`);
+      totalErrors++;
+      continue;
     }
 
     const wslVideoHash = sha256(wslVideo);
@@ -109,7 +118,7 @@ for (const j of JOURNEYS) {
     }
   }
 
-  console.log(`✔ Jornada ${String(j.id).padStart(2, '0')}: [OK] ${j.name}.mp4 (${(vSize / 1024).toFixed(1)} KB) | SHA-256: ${localVideoHash.slice(0, 16)}...`);
+  console.log(`✔ Jornada ${String(j.id).padStart(2, '0')}: [OK NOVO] ${j.name}.mp4 (${(vStat.size / 1024).toFixed(1)} KB) | SHA-256: ${localVideoHash.slice(0, 16)}...`);
 }
 
 console.log('');
@@ -117,6 +126,6 @@ if (totalErrors > 0) {
   console.error(`Falha na verificação de integridade E2E: ${totalErrors} erro(s) encontrado(s).`);
   process.exit(1);
 } else {
-  console.log(`✔ Todas as ${JOURNEYS.length} jornadas possuem vídeos válidos e estão 100% sincronizadas com SHA-256 idêntico!`);
+  console.log(`✔ Todas as ${JOURNEYS.length} jornadas foram regeradas do zero, são recentes e estão 100% sincronizadas com SHA-256 idêntico!`);
   process.exit(0);
 }
