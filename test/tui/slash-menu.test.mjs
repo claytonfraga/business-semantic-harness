@@ -61,12 +61,13 @@ describe('Slash Commands Menu Unit Suite (Given/When/Then)', () => {
         !isExecutingTurn &&
         !isModalOpen &&
         char === '/' &&
-        line.trim().length === 0
+        (line.trim().length === 0 || line.trim() === '/')
       );
     };
 
     assert.strictEqual(isTrigger('/', '', false, false), true);
     assert.strictEqual(isTrigger('/', '   ', false, false), true);
+    assert.strictEqual(isTrigger('/', '/', false, false), true); // readline já inseriu o caractere
   });
 
   it('Given a regra de disparo da TUI, When a tecla "/" é digitada com texto já existente no buffer, Then o menu NÃO deve ser acionado', () => {
@@ -75,11 +76,12 @@ describe('Slash Commands Menu Unit Suite (Given/When/Then)', () => {
         !isExecutingTurn &&
         !isModalOpen &&
         char === '/' &&
-        line.trim().length === 0
+        (line.trim().length === 0 || line.trim() === '/')
       );
     };
 
     assert.strictEqual(isTrigger('/', 'crie rota /api', false, false), false);
+    assert.strictEqual(isTrigger('/', 'verificar /src/core', false, false), false);
     assert.strictEqual(isTrigger('/', '', true, false), false); // modal já aberto
     assert.strictEqual(isTrigger('/', '', false, true), false); // turno em execução
   });

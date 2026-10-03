@@ -439,8 +439,8 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     if (
       !isExecutingTurn &&
       !isModalOpen &&
-      (_str === '/' || key.sequence === '/') &&
-      currentLine.trim().length === 0
+      (_str === '/' || key.sequence === '/' || key.name === '/') &&
+      (currentLine.trim().length === 0 || currentLine.trim() === '/')
     ) {
       (rl as unknown as { line: string; cursor: number }).line = '';
       (rl as unknown as { cursor: number }).cursor = 0;
