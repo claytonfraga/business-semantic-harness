@@ -7,43 +7,42 @@ Funcionalidade: Contratos históricos de adaptador e exemplo de domínio de aute
   Eu quero identificar os contratos descritos no guia original
   Para distinguir funcionalidades legadas e exemplos de domínio da CLI nativa atual
 
-  @BSH-LEGACY-001 @historical @gap @adapter_codex
-  Cenário: Iniciar adaptador Codex governado
-    Dado um projeto Git com ontologia validada e Codex instalado e autenticado
-    Quando o usuário executa "bsh codex" ou "bsh codex --project <caminho>"
-    Então o contrato histórico prevê abertura da TUI real do Codex por "codex --remote"
-    E prevê um "codex app-server" controlado pelo BSH
-    E esse contrato não deve ser confundido com a CLI nativa OpenRouter atual
+  @BSH-LEGACY-001 @historical
+  Cenário: Descontinuação de adaptadores externos de terceiros
+    Dado a evolução da arquitetura do BSH para um agente autônomo nativo
+    Quando o suporte a adaptadores históricos externos é avaliado
+    Então o BSH estabelece que a execução é provida pelo agente de codificação nativo integrado
+    E adaptadores externos de terceiros são declarados descontinuados e desprovidos de suporte
 
-  @BSH-LEGACY-002 @historical @gap @adapter_codex
-  Cenário: Preservar configuração global do Codex
-    Dado o adaptador histórico em execução
-    Quando prepara sua configuração
-    Então deve usar um "CODEX_HOME" privado
-    E a instalação e configuração globais do Codex devem permanecer intactas
+  @BSH-LEGACY-002 @historical
+  Cenário: Preservação de configurações e isolamento no agente nativo
+    Dado o agente autônomo nativo em execução
+    Quando prepara seu ambiente de execução
+    Então deve operar sobre worktrees isolados e variáveis controladas
+    E a configuração global do ambiente do usuário deve permanecer intacta
 
-  @BSH-LEGACY-003 @historical @gap @adapter_codex
-  Cenário: Configurar sandbox do adaptador
-    Dado uma sessão histórica Codex em worktree isolada
+  @BSH-LEGACY-003 @historical
+  Cenário: Configurar sandbox seguro no agente nativo
+    Dado uma sessão do BSH em worktree isolada
     Quando o sandbox é preparado
-    Então deve usar "workspace-write" com raiz gravável na worktree por padrão
-    E a opção histórica "BSH_CODEX_SANDBOX=danger-full-access" deve ser distinguida do padrão
+    Então deve usar workspace controlado com raiz gravável na worktree por padrão
+    E o branch principal e checkout original devem permanecer protegidos
 
-  @BSH-LEGACY-004 @historical @adapter_codex
-  Cenário: Injetar governança no adaptador
-    Dado uma sessão histórica de agente externo
+  @BSH-LEGACY-004 @historical
+  Cenário: Injetar governança semântica no agente nativo
+    Dado uma sessão interativa do agente nativo
     Quando o agente recebe suas instruções
-    Então deve receber contexto de governança e servidor MCP local
+    Então deve receber contexto ontológico e ferramentas MCP de governança
     E deve consultar a ontologia antes de modificar código
-    E deve relatar conflitos por "bsh_report_conflict"
+    E deve relatar conflitos negociais diretamente ao Semantic Gate
 
   @BSH-LEGACY-005 @historical
   Cenário: Decidir exceção sem contornar enforcement
     Dado alertas de conflito durante uma sessão
-    Quando o usuário decide sobre uma exceção ao final
+    Quando o usuário decide sobre uma alteração ao final
     Então a recusa deve descartar o candidato sem alterar a origem
     E uma aprovação humana não deve substituir uma decisão independente de promoção válida
-    E o fluxo consultivo histórico deve ser distinguido do enforcement atual
+    E a salvaguarda ontológica ativa deve ser soberana
 
   @BSH-LEGACY-006 @example
   Cenário: Validar login no exemplo de autenticação

@@ -28,21 +28,21 @@ Funcionalidade: Avaliação funcional, métricas e evidências
     Então a cópia deve conter sua própria ontologia em ".bsh/domains"
     E essa ontologia deve ser validada antes da sessão
 
-  @BSH-EVAL-004 @adapter_codex @gap
+  @BSH-EVAL-004 @agent_nativo
   Cenário: Executar casos positivos e negativos reais
     Dado dois casos definidos previamente, um conforme e outro contrário a uma regra
-    Quando um teste funcional do adaptador Codex é executado
-    Então deve abrir "bsh codex" na pasta do piloto em sessão persistente tmux ou herdr
-    E o processo deve receber solicitações reais e tentar modificar a cópia limpa
+    Quando um teste funcional do agente nativo BSH é executado
+    Então deve abrir a sessão interativa "bsh" na pasta do piloto em sessão persistente tmux ou herdr
+    E o processo deve receber solicitações reais e interagir sobre o workspace do piloto
     E chamadas HTTP diretas não devem substituir a sessão do agente
 
   @BSH-EVAL-005
   Cenário: Classificar bloqueio antes do primeiro turno
-    Dado que "bsh codex" recusa iniciar
+    Dado que "bsh" recusa iniciar ou falha na validação ontológica
     Quando a avaliação registra o resultado
     Então ambos os casos devem ser marcados como bloqueados antes do primeiro turno
     E o diagnóstico deve ser preservado
-    E Codex direto não deve substituir a execução nem produzir aprovação funcional
+    E execuções não governadas não devem produzir aprovação funcional indevida
 
   @BSH-EVAL-006
   Cenário: Comparar estado e decisões
@@ -65,6 +65,7 @@ Funcionalidade: Avaliação funcional, métricas e evidências
     Quando é executado
     Então deve registrar captura tmux com nome descritivo em "evaluation/screenshots" ou "screenshots"
     E o vídeo deve incluir slide inicial com fundo preto e letras brancas apresentando objetivos em português
+    E deve apresentar gravação contínua e realista da sessão tmux e card final de veredito comparando o esperado e o observado
     E os demais relatórios e artefatos de auditoria externos a ".feature" devem estar em inglês
 
   @BSH-EVAL-009
@@ -85,11 +86,9 @@ Funcionalidade: Avaliação funcional, métricas e evidências
 
   @BSH-EVAL-011
   Cenário: Relatar economia com baseline comparável
-    Dado tokens de Codex direto e tokens do BSH medidos em casos comparáveis
-    Quando a economia é calculada
-    Então tokens economizados devem ser baseline menos tokens BSH
-    E o percentual deve ser calculado sobre o baseline
-    E economia negativa deve permanecer negativa
+    Dado tokens de execução desgovernada e tokens do BSH governado medidos em casos comparáveis
+    Quando o impacto do harness é calculado
+    Então a sobrecarga ou economia deve ser calculada a partir de medições empíricas
     E ausência de baseline medido não deve produzir economia fictícia
 
   @BSH-EVAL-012
