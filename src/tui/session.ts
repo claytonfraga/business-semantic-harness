@@ -26,6 +26,7 @@ import { promoverSessao } from '../git/promotion.js';
 import { ansi } from './ansi.js';
 import { renderCompleteTui, type ChatEntry } from './render.js';
 import { promptApiKeyModal, selectModelModal, selectDomainModal, diffReviewModal, settingsModal, selectSkillModal, selectSlashCommandModal } from './modals.js';
+import { filterSlashCommands, DEFAULT_SLASH_COMMANDS, type SlashMenuOverlayState } from './slashCommands.js';
 import { SkillRegistry } from '../skills/registry.js';
 import { installSkillPackage } from '../skills/installer.js';
 import { detectSkillInvocation, detectSemanticSkillNeed } from '../skills/activation.js';
@@ -162,6 +163,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
   const exitGuard = new ExitGuard({ windowMs: 1500 });
   let exitRequested = false;
+  let activeSlashMenu: SlashMenuOverlayState | null = null;
 
   const redrawScreen = (currentPrompt = '') => {
     const cols = process.stdout.columns && process.stdout.columns >= 50 ? process.stdout.columns : 96;
@@ -202,11 +204,12 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       queueLength: inputQueue.length,
       ctrlCExitAlert: exitGuard.isExitPending(),
       activeSkill: activeSkillNames.length > 0 ? activeSkillNames.join(', ') : undefined,
+      slashMenu: activeSlashMenu || undefined,
     }, chatEntries, currentPrompt, cols, rows);
 
     process.stdout.write(`\x1b[?7l\x1b[H${frame}\x1b[?7h`);
     const promptRow = rows - 2;
-    const promptCol = 7 + (rl ? (rl as unknown as { cursor?: number }).cursor || 0 : 0);
+    const promptCol = 7 + (activeSlashMenu ? 1 + activeSlashMenu.query.length : (rl ? (rl as unknown as { cursor?: number }).cursor || 0 : 0));
     process.stdout.write(`\x1b[${promptRow};${promptCol}H`);
   };
 
@@ -303,7 +306,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   };
 
   rl.on('line', (line: string) => {
-    if (isModalOpen) {
+    if (isModalOpen || activeSlashMenu) {
       return;
     }
 
@@ -335,6 +338,14 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   });
 
   const onCtrlCAction = () => {
+    if (activeSlashMenu) {
+      activeSlashMenu = null;
+      (rl as unknown as { line: string; cursor: number }).line = '';
+      (rl as unknown as { cursor: number }).cursor = 0;
+      redrawScreen('');
+      return;
+    }
+
     if (inputQueue.cancelMultiline()) {
       chatEntries.push({
         type: 'agent',
@@ -401,6 +412,92 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   const onKeypress = (_str: string, key: Key) => {
     if (!key || isModalOpen) return;
 
+    // Handle interactive OpenTUI Slash Menu
+    if (activeSlashMenu) {
+      (rl as unknown as { line: string; cursor: number }).line = '';
+      (rl as unknown as { cursor: number }).cursor = 0;
+
+      const scored = filterSlashCommands(activeSlashMenu.query, DEFAULT_SLASH_COMMANDS);
+      const total = scored.length;
+
+      // Escape or Ctrl+C: dismiss menu without selecting
+      if (key.name === 'escape' || (key.ctrl && key.name === 'c')) {
+        activeSlashMenu = null;
+        redrawScreen('');
+        return;
+      }
+
+      // Enter / Return: select highlighted command
+      if (key.name === 'return' || key.name === 'enter') {
+        const selected = scored[activeSlashMenu.selectedIndex]?.command.name;
+        activeSlashMenu = null;
+        if (selected) {
+          dispatchPrompt(selected);
+        } else {
+          redrawScreen('');
+        }
+        return;
+      }
+
+      // Up arrow: navigate up with wrap-around
+      if (key.name === 'up') {
+        if (total > 0) {
+          activeSlashMenu.selectedIndex = (activeSlashMenu.selectedIndex - 1 + total) % total;
+          redrawScreen(`/${activeSlashMenu.query}`);
+        }
+        return;
+      }
+
+      // Down arrow or Tab: navigate down with wrap-around
+      if (key.name === 'down' || key.name === 'tab') {
+        if (total > 0) {
+          activeSlashMenu.selectedIndex = (activeSlashMenu.selectedIndex + 1) % total;
+          redrawScreen(`/${activeSlashMenu.query}`);
+        }
+        return;
+      }
+
+      // Backspace: delete character or close if query is empty
+      if (key.name === 'backspace') {
+        if (activeSlashMenu.query.length > 0) {
+          activeSlashMenu.query = activeSlashMenu.query.slice(0, -1);
+          activeSlashMenu.selectedIndex = 0;
+          activeSlashMenu.scrollOffset = 0;
+          redrawScreen(`/${activeSlashMenu.query}`);
+        } else {
+          activeSlashMenu = null;
+          redrawScreen('');
+        }
+        return;
+      }
+
+      // Direct digit 1-9 selection when query is empty
+      if (!activeSlashMenu.query && /^[1-9]$/.test(key.name || '')) {
+        const num = parseInt(key.name || '', 10);
+        if (num >= 1 && num <= total) {
+          const selected = scored[num - 1]?.command.name;
+          activeSlashMenu = null;
+          if (selected) {
+            dispatchPrompt(selected);
+          } else {
+            redrawScreen('');
+          }
+          return;
+        }
+      }
+
+      // Printable characters for search filter
+      if (_str && _str.length === 1 && !key.ctrl && !key.meta) {
+        activeSlashMenu.query += _str;
+        activeSlashMenu.selectedIndex = 0;
+        activeSlashMenu.scrollOffset = 0;
+        redrawScreen(`/${activeSlashMenu.query}`);
+        return;
+      }
+
+      return;
+    }
+
     // Ctrl+C handled via ExitGuard
     if (key.ctrl && key.name === 'c') {
       onCtrlCAction();
@@ -439,12 +536,19 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     if (
       !isExecutingTurn &&
       !isModalOpen &&
+      !activeSlashMenu &&
       (_str === '/' || key.sequence === '/' || key.name === '/') &&
       (currentLine.trim().length === 0 || currentLine.trim() === '/')
     ) {
       (rl as unknown as { line: string; cursor: number }).line = '';
       (rl as unknown as { cursor: number }).cursor = 0;
-      dispatchPrompt('/');
+      activeSlashMenu = {
+        selectedIndex: 0,
+        scrollOffset: 0,
+        pageSize: 5,
+        query: '',
+      };
+      redrawScreen('/');
       return;
     }
 

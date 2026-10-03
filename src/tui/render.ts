@@ -1,4 +1,5 @@
 import { ansi, stripAnsi } from './ansi.js';
+import { renderSlashMenuBox, type SlashMenuOverlayState } from './slashCommands.js';
 
 export interface RenderState {
   model: string;
@@ -20,6 +21,7 @@ export interface RenderState {
   queueLength?: number;
   ctrlCExitAlert?: boolean;
   activeSkill?: string;
+  slashMenu?: SlashMenuOverlayState;
 }
 
 export interface GateCheckItem {
@@ -460,6 +462,15 @@ export function renderCompleteTui(
       const baseLine = tuiLine(line, width - 1);
       return `${baseLine}${scrollChar}`;
     });
+  }
+
+  // Overlay compact OpenTUI-style floating command palette above prompt
+  if (state.slashMenu) {
+    const paletteLines = renderSlashMenuBox(state.slashMenu, Math.min(width - 4, 72));
+    const startIdx = Math.max(0, viewportLines.length - paletteLines.length);
+    for (let p = 0; p < paletteLines.length && startIdx + p < viewportLines.length; p++) {
+      viewportLines[startIdx + p] = tuiLine(`  ${paletteLines[p]}`, width);
+    }
   }
 
   const promptDisplay = currentPrompt !== undefined ? currentPrompt : `${ansi.dim}[Type your prompt here...]${ansi.reset}`;

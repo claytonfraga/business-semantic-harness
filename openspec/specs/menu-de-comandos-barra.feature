@@ -1,71 +1,71 @@
 # language: pt
-Funcionalidade: Menu Interativo de Comandos de Barra no Prompt do BSH
+Funcionalidade: Paleta Flutuante de Comandos Slash no Padrão OpenTUI
 
-  Como um engenheiro de software operando a TUI do BSH
-  Eu quero que ao digitar o caractere "/" com o prompt de entrada vazio seja exibido um menu interativo com todas as opções disponíveis e suas descrições
-  Para descobrir e acionar comandos e ferramentas do harness com facilidade e sem necessidade de memorização prévia
+  Como um engenheiro de software operando a interface TUI do BSH
+  Eu quero uma paleta flutuante e ergonômica de comandos no padrão OpenTUI ao digitar "/" com o prompt vazio
+  Para descobrir e acionar comandos do harness com facilidade, navegação por rolagem de janela, cores exclusivas por comando e descrições concisas sem quebrar o layout do terminal
 
   Contexto:
-    Dado que a sessão interativa do BSH está inicializada e aguardando entrada do usuário
-    E que a interface TUI está no estado ocioso pronta para receber comandos
+    Dado que a sessão interativa da TUI do BSH está inicializada e ociosa
+    E que a linha de entrada do prompt está estritamente vazia
 
-  Cenário: Acionamento imediato do menu de comandos de barra em prompt vazio
-    Dado que a linha de entrada do prompt está estritamente vazia
-    Quando o usuário pressiona a tecla "/"
-    Então o sistema deve abrir imediatamente o menu de comandos de barra sem exigir a tecla Enter
-    E o menu deve apresentar a lista de todos os comandos disponíveis no BSH
-    E cada opção deve exibir:
-      | Campo | Descrição |
-      | Nome do Comando | Prefixo com "/" em destaque (ex: /model, /domain, /skills, /diff, /rules, /settings, /mcp, /exit) |
-      | Descrição | Explicação clara do que o comando faz ou contém |
-      | Atalho de Teclado | Atalho rápido associado quando existente (ex: Ctrl+M, Ctrl+D) |
-      | Categoria | Classificação funcional (Governança, Configuração, Sistema, Skills, Interface) |
+  Cenário: Exibição instantânea da paleta de comandos flutuante OpenTUI em prompt vazio
+    Dado que o prompt de entrada está estritamente vazio
+    Quando o usuário digita o caractere "/"
+    Então a paleta flutuante de comandos deve abrir imediatamente acima do prompt sem limpar a tela
+    E a paleta deve ser limitada a no máximo 72 colunas de largura para evitar quebra de linha no terminal
+    E a paleta deve apresentar uma janela rolável de opções com cabeçalho indicando "(1-5 of 14) • ↑/↓ scroll"
+    E cada linha de comando deve exibir:
+      | Campo | Especificação |
+      | Nome do Comando | Prefixo com "/" em destaque (ex: /model, /domain, /skills, /diff, /rules, /settings, /exit) |
+      | Atalho | Identificador do atalho de teclado quando disponível (ex: [Ctrl+M], [Ctrl+D]) |
+      | Descrição | Descrição concisa em inglês com até 42 caracteres sem truncamento ou quebra de linha |
 
-  Cenário: Preservação do caractere "/" como texto literal quando o prompt não estiver vazio
-    Dado que o usuário já digitou texto no prompt de entrada como "analisar o módulo /src/core"
+  Cenário: Preservação do caractere "/" como texto literal quando o prompt já contiver texto
+    Dado que o usuário já digitou texto no prompt de entrada como "analisar a rota /api/v1/auth"
     Quando o usuário pressiona a tecla "/"
     Então o caractere "/" deve ser tratado como texto literal comum
-    E nenhum menu modal deve ser disparado
-    E o cursor deve avançar normalmente na linha de edição
+    And nenhuma paleta de comandos ou modal deve ser disparado
+    And o cursor deve avançar normalmente no buffer de edição
 
-  Cenário: Filtragem instantânea e busca difusa de comandos no menu
-    Dado que o menu de comandos de barra está aberto
-    Quando o usuário digita um termo de busca como "ex" ou "dom"
-    Então a lista deve atualizar dinamicamente exibindo apenas as opções correspondentes
-    E os caracteres coincidentes devem ser destacados visualmente
+  Cenário: Filtragem instantânea de comandos por busca
+    Dado que a paleta de comandos slash está aberta
+    Quando o usuário digita um termo como "ex" ou "mod"
+    Então a lista deve atualizar em tempo real exibindo apenas as opções correspondentes
+    E o cabeçalho deve exibir o filtro ativo e o total de correspondências
+    E os caracteres correspondentes no nome do comando devem ser realçados
 
-  Cenário: Navegação interativa com cor exclusiva para cada opção ativa
-    Dado que o menu de comandos de barra está aberto exibindo os comandos disponíveis
-    Quando o usuário navega entre as opções utilizando as setas de direção para cima ou para baixo
-    Então a opção sob o cursor deve se tornar a opção ativa
-    E cada opção ativa deve exibir uma cor visual exclusiva e diferente das demais opções:
+  Cenário: Navegação interativa com rolagem de janela e cores vibrantes exclusivas por comando
+    Dado que a paleta de comandos slash está aberta com 14 comandos disponíveis
+    Quando o usuário navega entre as opções utilizando as setas direcionais para baixo ou para cima
+    Então a janela visível deve rolar suavemente exibindo 5 itens por vez
+    E cada opção ativa sob foco deve ser destacada com uma cor exclusiva da paleta ANSI-256:
       | Comando | Cor Ativa Exclusiva |
-      | /model | Magenta / Roxo Vibrante |
-      | /domain | Verde Esmeralda |
-      | /skills | Ciano Elétrico |
-      | /diff | Amarelo Dourado |
-      | /rules | Azul Céu |
-      | /settings | Laranja Pêssego |
-      | /affinity | Turquesa / Aqua |
-      | /mcp | Violeta Elétrico |
-      | /clear | Prata Brilhante |
-      | /done | Verde Limão |
-      | /help | Azul Royal |
-      | /ungoverned | Âmbar Quente |
-      | /governed | Menta Refrescante |
-      | /exit | Carmesim / Vermelho |
-    E a opção ativa deve exibir um marcador de foco enquanto as opções inativas permanecem em tom atenuado
+      | /model | Magenta / Orchid (\x1b[1;38;5;177m) |
+      | /domain | Verde Esmeralda (\x1b[1;38;5;48m) |
+      | /skills | Ciano Elétrico (\x1b[1;38;5;51m) |
+      | /diff | Amarelo Dourado (\x1b[1;38;5;220m) |
+      | /rules | Azul Céu (\x1b[1;38;5;75m) |
+      | /settings | Laranja Pêssego (\x1b[1;38;5;208m) |
+      | /affinity | Turquesa (\x1b[1;38;5;43m) |
+      | /mcp | Violeta (\x1b[1;38;5;141m) |
+      | /clear | Prata Brilhante (\x1b[1;38;5;253m) |
+      | /done | Verde Limão (\x1b[1;38;5;154m) |
+      | /help | Azul Royal (\x1b[1;38;5;39m) |
+      | /ungoverned | Âmbar Quente (\x1b[1;38;5;209m) |
+      | /governed | Menta (\x1b[1;38;5;49m) |
+      | /exit | Carmesim (\x1b[1;38;5;196m) |
+    E a opção ativa deve exibir o ponteiro "❯" enquanto as opções inativas permanecem atenuadas
 
-  Cenário: Opção de não selecionar e fechamento do menu
-    Dado que o menu de comandos de barra está aberto e o usuário navegou entre opções
-    Quando o usuário opta por não selecionar nenhuma opção pressionando a tecla "Escape" ou "q"
-    Então o menu deve ser fechado imediatamente
+  Cenário: Cancelamento e decisão de não selecionar sem despachar comandos
+    Dado que a paleta de comandos slash está aberta e o usuário navegou pelas opções
+    Quando o usuário opta por não selecionar nenhuma opção pressionando "Escape" ou "Backspace" com filtro vazio
+    Então a paleta deve fechar imediatamente
     E nenhum comando deve ser despachado para execução
-    E o prompt da TUI deve ser restaurado em seu estado limpo original
+    E o prompt da TUI deve ser restaurado em seu estado limpo original sem resíduos visuais
 
-  Cenário: Seleção e despacho de comando a partir do menu
-    Dado que o menu de comandos de barra está aberto
-    Quando o usuário navega até a opção desejada e pressiona a tecla "Enter" ou digita seu número ordinal
-    Então o menu deve ser fechado
-    E o comando selecionado deve ser despachado imediatamente para execução no BSH
-
+  Cenário: Seleção e despacho de comando a partir da paleta
+    Dado que a paleta de comandos slash está aberta
+    Quando o usuário navega até o comando desejado e pressiona "Enter" ou digita seu número ordinal
+    Então a paleta deve fechar imediatamente
+    E o comando selecionado deve ser despachado e executado pelo BSH

@@ -402,7 +402,7 @@ export async function selectSkillModal(
 import {
   DEFAULT_SLASH_COMMANDS,
   filterSlashCommands,
-  formatSlashCommandLine,
+  renderSlashMenuBox,
   type SlashCommandDef,
 } from './slashCommands.js';
 
@@ -413,39 +413,26 @@ async function runInteractiveSlashMenu(
   return new Promise((resolve) => {
     let query = (initialQuery || '').trim();
     let selectedIndex = 0;
+    let scrollOffset = 0;
 
     const render = () => {
       const scored = filterSlashCommands(query, commands);
-      const visibleItems = scored.slice(0, 14);
-      if (selectedIndex >= visibleItems.length) {
-        selectedIndex = Math.max(0, visibleItems.length - 1);
+      const total = scored.length;
+      if (selectedIndex >= total) {
+        selectedIndex = Math.max(0, total - 1);
       }
 
-      const lines: string[] = [
-        'Navegue com [↑/↓], filtre digitando ou selecione com [Enter]. Pressione [Esc] para voltar sem selecionar.',
-        `Filtro atual: ${query ? `${ansi.yellow}${query}${ansi.reset}` : `${ansi.dim}(todos os comandos)${ansi.reset}`}`,
-        '',
-      ];
+      const boxLines = renderSlashMenuBox(
+        { selectedIndex, scrollOffset, pageSize: 6, query },
+        72,
+        commands
+      );
 
-      if (visibleItems.length === 0) {
-        lines.push(`  ${ansi.red}Nenhum comando correspondente ao filtro "${query}".${ansi.reset}`);
-      } else {
-        for (let i = 0; i < visibleItems.length; i++) {
-          const { command, indices } = visibleItems[i];
-          const isActive = (i === selectedIndex);
-          const highlightedName = query && indices.length > 0
-            ? highlightMatches(command.name, indices)
-            : undefined;
-          lines.push(formatSlashCommandLine(command, i, isActive, highlightedName));
-        }
+      process.stdout.write('\x1b[2J\x1b[H\n');
+      for (const line of boxLines) {
+        process.stdout.write(`  ${line}\n`);
       }
-
-      lines.push('');
-      lines.push(`${ansi.dim}[↑/↓] Navegar  [Enter] Selecionar  [1-9] Escolha direta  [Esc/q] Não selecionar (voltar)${ansi.reset}`);
-
-      process.stdout.write('\x1b[2J\x1b[H');
-      process.stdout.write(`\n${box('Menu de Comandos Disponíveis no BSH', lines, 82)}\n`);
-      process.stdout.write(`\n${ansi.bold}Filtro ou navegação: ${ansi.reset}${query}`);
+      process.stdout.write(`\n  ${ansi.bold}Search or navigate: ${ansi.reset}/${query}`);
     };
 
     nodeReadline.emitKeypressEvents(process.stdin);
@@ -469,9 +456,9 @@ async function runInteractiveSlashMenu(
       if (!key) return;
 
       const scored = filterSlashCommands(query, commands);
-      const visibleItems = scored.slice(0, 14);
+      const total = scored.length;
 
-      // Cancel / Não selecionar
+      // Cancel / Dismiss
       if (key.name === 'escape' || (key.ctrl && key.name === 'c') || (key.name === 'q' && !query)) {
         cleanup(null);
         return;
@@ -479,26 +466,27 @@ async function runInteractiveSlashMenu(
 
       // Up arrow or 'k' when no query
       if (key.name === 'up' || (key.name === 'k' && !query)) {
-        if (visibleItems.length > 0) {
-          selectedIndex = (selectedIndex - 1 + visibleItems.length) % visibleItems.length;
+        if (total > 0) {
+          selectedIndex = (selectedIndex - 1 + total) % total;
+          if (selectedIndex < scrollOffset) {
+            scrollOffset = selectedIndex;
+          } else if (selectedIndex >= scrollOffset + 6) {
+            scrollOffset = selectedIndex - 6 + 1;
+          }
           render();
         }
         return;
       }
 
-      // Down arrow or 'j' when no query
-      if (key.name === 'down' || (key.name === 'j' && !query)) {
-        if (visibleItems.length > 0) {
-          selectedIndex = (selectedIndex + 1) % visibleItems.length;
-          render();
-        }
-        return;
-      }
-
-      // Tab key
-      if (key.name === 'tab') {
-        if (visibleItems.length > 0) {
-          selectedIndex = (selectedIndex + 1) % visibleItems.length;
+      // Down arrow or 'j' when no query or tab
+      if (key.name === 'down' || (key.name === 'j' && !query) || key.name === 'tab') {
+        if (total > 0) {
+          selectedIndex = (selectedIndex + 1) % total;
+          if (selectedIndex >= scrollOffset + 6) {
+            scrollOffset = selectedIndex - 6 + 1;
+          } else if (selectedIndex < scrollOffset) {
+            scrollOffset = selectedIndex;
+          }
           render();
         }
         return;
@@ -506,8 +494,8 @@ async function runInteractiveSlashMenu(
 
       // Enter / Return
       if (key.name === 'return' || key.name === 'enter') {
-        if (visibleItems.length > 0 && visibleItems[selectedIndex]) {
-          cleanup(visibleItems[selectedIndex].command.name);
+        if (total > 0 && scored[selectedIndex]) {
+          cleanup(scored[selectedIndex].command.name);
         } else {
           cleanup(null);
         }
@@ -517,8 +505,8 @@ async function runInteractiveSlashMenu(
       // Direct number selection '1' to '9' when query is empty
       if (!query && /^[1-9]$/.test(key.name || '')) {
         const num = parseInt(key.name || '', 10);
-        if (num >= 1 && num <= visibleItems.length) {
-          cleanup(visibleItems[num - 1].command.name);
+        if (num >= 1 && num <= total) {
+          cleanup(scored[num - 1].command.name);
           return;
         }
       }
@@ -528,6 +516,7 @@ async function runInteractiveSlashMenu(
         if (query.length > 0) {
           query = query.slice(0, -1);
           selectedIndex = 0;
+          scrollOffset = 0;
           render();
         }
         return;
@@ -537,6 +526,7 @@ async function runInteractiveSlashMenu(
       if (_str && _str.length === 1 && !key.ctrl && !key.meta) {
         query += _str;
         selectedIndex = 0;
+        scrollOffset = 0;
         render();
       }
     };
@@ -552,45 +542,30 @@ async function runFallbackSlashMenu(
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   let query = (initialQuery || '').trim();
   let selectedIndex = 0;
+  const scrollOffset = 0;
 
   try {
     while (true) {
       const scored = filterSlashCommands(query, commands);
-      const visibleItems = scored.slice(0, 14);
+      const total = scored.length;
 
-      const lines: string[] = [
-        'Selecione uma opção digitando seu número ou termo de busca.',
-        `Filtro atual: ${query ? `${ansi.yellow}${query}${ansi.reset}` : `${ansi.dim}(todos os comandos)${ansi.reset}`}`,
-        '',
-      ];
+      const boxLines = renderSlashMenuBox(
+        { selectedIndex, scrollOffset, pageSize: 6, query },
+        72,
+        commands
+      );
 
-      if (visibleItems.length === 0) {
-        lines.push(`  ${ansi.red}Nenhum comando correspondente ao filtro "${query}".${ansi.reset}`);
-      } else {
-        for (let i = 0; i < visibleItems.length; i++) {
-          const { command, indices } = visibleItems[i];
-          const isActive = (i === selectedIndex);
-          const highlightedName = query && indices.length > 0
-            ? highlightMatches(command.name, indices)
-            : undefined;
-          lines.push(formatSlashCommandLine(command, i, isActive, highlightedName));
-        }
-      }
+      console.log(`\n${boxLines.map((l) => `  ${l}`).join('\n')}`);
 
-      lines.push('');
-      lines.push(`Comandos: [1-${visibleItems.length}] selecionar | Digite termo para filtrar | q ou Enter para voltar`);
-
-      console.log(`\n${box('Menu de Comandos Disponíveis no BSH', lines, 82)}`);
-
-      const answer = (await rl.question(`\n${ansi.bold}Escolha um comando [1-${visibleItems.length} / busca / q / Esc]: ${ansi.reset}`)).trim();
+      const answer = (await rl.question(`\n${ansi.bold}Choice [1-${Math.min(total, 6)} / search / q to close]: ${ansi.reset}`)).trim();
       if (!answer || answer.toLowerCase() === 'q') {
         return null;
       }
 
       // Check direct number selection
       const num = parseInt(answer, 10);
-      if (!Number.isNaN(num) && num >= 1 && num <= visibleItems.length) {
-        return visibleItems[num - 1].command.name;
+      if (!Number.isNaN(num) && num >= 1 && num <= scored.length) {
+        return scored[num - 1].command.name;
       }
 
       // Check if user typed an exact command name like "/exit" or "exit"
@@ -601,11 +576,8 @@ async function runFallbackSlashMenu(
       }
 
       // If user typed a search term that narrows to exactly 1 result and pressed Enter
-      if (visibleItems.length === 1 && answer.length >= 2) {
-        const firstMatchName = visibleItems[0].command.name.toLowerCase();
-        if (firstMatchName.includes(answer.toLowerCase())) {
-          return visibleItems[0].command.name;
-        }
+      if (scored.length === 1 && answer.length >= 2) {
+        return scored[0].command.name;
       }
 
       // Otherwise update search query
