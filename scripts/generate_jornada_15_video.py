@@ -115,6 +115,7 @@ def main():
 
     session_name = "bsh-jornada-15-slash"
     video_out = work_dir / "evaluation" / "videos" / "bsh-slash-commands-menu.mp4"
+    screenshot_out = work_dir / "evaluation" / "screenshots" / "bsh-slash-commands-menu.png"
     wsl_downloads = Path("/mnt/c/Users/clayt/Downloads/bsh")
     wsl_downloads.mkdir(parents=True, exist_ok=True)
 
