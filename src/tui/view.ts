@@ -32,7 +32,10 @@ export async function createTuiView(options: { renderer?: CliRenderer } = {}): P
   const scroll = new ScrollBoxRenderable(renderer, { id: 'bsh-conversation', width: '100%', flexGrow: 1, minHeight: 0, stickyScroll: true, stickyStart: 'bottom', scrollX: false, contentOptions: { flexDirection: 'column', backgroundColor: theme.background }, scrollbarOptions: { trackOptions: { backgroundColor: theme.recessed, foregroundColor: theme.accent } } });
   const footer = new BoxRenderable(renderer, { id: 'bsh-footer', height: 4, width: '100%', flexShrink: 0, flexDirection: 'column', backgroundColor: theme.panel });
   const input = new TextareaRenderable(renderer, { id: 'bsh-prompt', width: '100%', height: 1, textColor: theme.text, backgroundColor: theme.recessed, focusedBackgroundColor: theme.recessed, focusedTextColor: theme.emphasis, selectionBg: theme.selection, selectionFg: theme.emphasis, placeholder: 'Type your prompt here...', placeholderColor: theme.muted, keyBindings: [{ name: 'return', action: 'submit' }, { name: 'return', shift: true, action: 'newline' }] });
-  const telemetry = new TextRenderable(renderer, { id: 'bsh-telemetry', width: '100%', height: 1, fg: theme.text });
+  const telemetry = new BoxRenderable(renderer, { id: 'bsh-telemetry', width: '100%', height: 1, flexDirection: 'row' });
+  const execution = new TextRenderable(renderer, { id: 'bsh-execution-telemetry', height: 1, flexShrink: 0, fg: theme.warning });
+  const usage = new TextRenderable(renderer, { id: 'bsh-usage-telemetry', height: 1, flexGrow: 1, minWidth: 0, fg: theme.text });
+  telemetry.add(execution); telemetry.add(usage);
   const shortcuts = new TextRenderable(renderer, { id: 'bsh-shortcuts', width: '100%', height: 1, fg: theme.muted, content: '/ commands · Ctrl+D domain · Ctrl+G governance · Ctrl+O reasoning' });
   const alert = new TextRenderable(renderer, { id: 'bsh-exit-alert', width: '100%', height: 1, fg: theme.warning });
   footer.add(input); footer.add(telemetry); footer.add(shortcuts); footer.add(alert);
@@ -55,7 +58,14 @@ export async function createTuiView(options: { renderer?: CliRenderer } = {}): P
       const ontology = state.ontologySummary || state.domain;
       context.content = `Project: ${state.projectFolder || 'project'} · Branch: ${state.gitBranch || 'non-git'} · Ontology: ${ontology ? `${ontology} (${state.governed ? 'SHACL active' : 'inactive'})` : 'none (inactive)'}${state.activeSkill ? ` · Skill: ${state.activeSkill} [ACTIVE]` : ''}${state.alignmentWarning ? ` · ${state.alignmentWarning}` : ''}`;
       const total = state.contextLength || 131072;
-      telemetry.content = `Model: ${state.model} · Context: ${Math.round(total / 1024)}k · Tokens: ${state.tokensTotal} (${(state.tokensTotal / total * 100).toFixed(1)}%) · Cost: $${(state.sessionCost || 0).toFixed(4)}${state.generationDurationMs !== undefined ? ` · ${(state.generationDurationMs / 1000).toFixed(1)}s` : ''}${state.generationTps !== undefined ? ` · ${state.generationTps.toFixed(1)} TPS` : ''}${state.queueLength ? ` · QUEUED: ${state.queueLength}` : ''}`;
+      const activeMetrics = [
+        ...(state.queueLength ? [`Queue:${state.queueLength}`] : []),
+        ...(state.generationDurationMs !== undefined ? [`${(state.generationDurationMs / 1000).toFixed(1)}s`] : []),
+        ...(state.generationTps !== undefined ? [`${state.generationTps.toFixed(1)} TPS`] : []),
+      ];
+      execution.visible = activeMetrics.length > 0;
+      execution.content = `${activeMetrics.join(' · ')} · `;
+      usage.content = `Model: ${state.model} · ${state.tokensTotal}/${Math.round(total / 1024)}k ctx (${(state.tokensTotal / total * 100).toFixed(1)}%) · $${(state.sessionCost || 0).toFixed(4)}`;
       alert.content = state.ctrlCExitAlert ? 'Press Ctrl+C again to exit' : '';
       while (cards.length > entries.length) {
         const card = cards.pop(); snapshots.pop();

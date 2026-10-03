@@ -7,6 +7,21 @@ import { githubDarkDimmedTheme as theme } from '../../dist/tui/theme.js';
 
 const state = { model: 'test-model', governed: true, tokensTotal: 100, domain: 'Synthetic', projectFolder: 'fixture', gitBranch: 'main' };
 
+test('Given BSH-TUI-002 and BSH-OPENTUI-004 When telemetry renders at ordinary width Then duration TPS queue and model usage remain visible', async () => {
+  const fixture = await createTestRenderer({ width: 80, height: 24 });
+  const view = await createTuiView({ renderer: fixture.renderer });
+  try {
+    view.update({ ...state, generationDurationMs: 2000, generationTps: 50, queueLength: 2 }, []);
+    await fixture.renderOnce();
+    const frame = fixture.captureCharFrame();
+    for (const metric of ['Queue:2', '2.0s', '50.0 TPS', 'Model: test-model', '100/128k ctx', '(0.1%)', '$0.0000', 'Ctrl+D']) assert.ok(frame.includes(metric), metric + '\n' + frame);
+    fixture.resize(35, 12);
+    await fixture.renderOnce();
+    const narrow = fixture.captureCharFrame();
+    for (const metric of ['Queue:2', '2.0s', '50.0 TPS']) assert.ok(narrow.includes(metric), metric + '\n' + narrow);
+  } finally { view.destroy(); }
+});
+
 test('Given BSH-OPENTUI-014 and BSH-MENU-004 When shared theme is read Then exact roles and unique accents are available', () => {
   assert.deepEqual(Object.values(theme).filter(value => typeof value === 'string'), ['#22272e', '#2d333b', '#1c2128', '#adbac7', '#768390', '#cdd9e5', '#444c56', '#373e47', '#539bf5', '#316dca', '#57ab5a', '#c69026', '#e5534b', '#986ee2']);
   assert.equal(new Set(Object.values(theme.commands)).size, 14);

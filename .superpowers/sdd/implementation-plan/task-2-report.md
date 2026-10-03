@@ -37,3 +37,9 @@ Tests were written after implementation against BSH-OPENTUI-006/007/010/013/014/
 ## Deferred integration and limits
 
 Per the root integration ruling, existing manual render exports remain temporarily callable by the old session. Task 4 must replace the session boundary and delete those exports and string-frame tests; this staged task is not a claim that migration is complete. Slash palette and dialogs are task 3; this view exposes the renderer/root boundary needed for those native components. Agent commands and shortcuts are routed by task 4, rather than implemented in the view. Actual terminal dimensions override legacy state width/height fields. Narrow telemetry is clipped by its native fixed row; no manual truncation or terminal padding is used. This task did not run a packaged functional journey or E2E, and produces no E2E success claim or screenshot/video evidence.
+
+## Review round 1: visible telemetry
+
+Resolved the independent review P2 about clipped duration, TPS and queue at 80 columns. The footer now composes a native horizontal Box with separate execution and usage Text components. Queue, duration and TPS have a fixed intrinsic allocation ahead of compact model, token/context usage and cost text; native layout handles remaining space. The 80x24 regression capture shows all those metrics with `test-model`, 100 tokens, a two-second generation, 50 TPS and queue length two. A 35x12 capture verifies active queue/duration/TPS remain visible when usage detail has less room. No handwritten padding, frame, truncation or resize listener was introduced.
+
+Verification: `/usr/bin/rtk npm run build`, `/usr/bin/rtk npm run quality` and `/usr/bin/rtk node --test test/tui/opentui-components.test.mjs` pass. The Node wrapper now runs five official Bun component scenarios. Full packaged journeys and E2E remain deferred to integration.
