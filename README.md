@@ -8,6 +8,8 @@
 
 The **Business Semantic Harness (BSH)** is an autonomous, ontology-governed AI software engineering client with direct **OpenRouter integration**. 
 
+The [semantic validation contract](openspec/semantic-validation-profile.md) specifies the supported selection, completeness, inference and SHACL execution profile. The [semantic suite reconciliation](docs/semantic-suite-reconciliation.md) records the operational regression contract and its evidence limits.
+
 BSH guarantees that AI coding models modify codebases **without violating business rules and domain invariants**. Instead of relying on prompt instructions or model self-discipline, BSH enforces domain rules deterministically using formal W3C RDF/OWL ontologies and SHACL constraint shapes stored directly inside your repository.
 
 ---
@@ -126,7 +128,8 @@ This creates the canonical governance directory inside your repository:
     └── domains/
         └── assets/
             ├── ontology.jsonld           # OWL/RDF domain vocabulary (classes, properties, states)
-            └── shapes.ttl                # Verifiable business rules (SHACL Core & SPARQL)
+            ├── shapes.ttl                # Verifiable business rules (SHACL Core & SPARQL)
+            └── enforcement.json          # Governance rules mapping code changes to semantic operations
 ```
 
 ### 1. Defining Business Concepts (`ontology.jsonld`)
@@ -177,7 +180,44 @@ ex:TransferShape a sh:NodeShape ;
   ] .
 ```
 
-### 3. Validating Ontologies & Rules
+### 3. Defining Semantic Operations & Rules (`enforcement.json`)
+
+To recognize candidate code modifications and map them to semantic operations evaluated during gate promotion, declare governance rules in `enforcement.json` (or reference a custom path via `enforcement` in `.bsh/project.json`):
+
+```json
+{
+  "schemaVersion": 1,
+  "regras": [
+    {
+      "id": "regra-transferencia-ativo",
+      "operacao": "AssetTransfer",
+      "quando": {
+        "caminho": "src/services/assetService.ts",
+        "adicionou": "transferAsset"
+      },
+      "fatos": [
+        {
+          "propriedade": "currentState",
+          "valor": "Retired",
+          "determinacao": "observado",
+          "origem": "code"
+        }
+      ],
+      "evidenciasRequeridas": [
+        {
+          "tipo": "estrutural",
+          "propriedade": "currentState",
+          "obrigatoria": true
+        }
+      ]
+    }
+  ]
+}
+```
+
+The governance loader validates `enforcement.json` on the project root, distinguishing between missing configurations, invalid JSON/schema definitions, and file read errors.
+
+### 4. Validating Ontologies & Rules
 
 Before opening an interactive session, validate your domain files for syntactical and logical integrity:
 
@@ -296,6 +336,10 @@ When an interactive session starts, BSH automatically connects to declared serve
 ---
 
 ## Code Quality & CI Verification
+
+Controlled experiment APIs separate candidate generation, context queries, semantic enforcement and actual promotion. They preserve replayable inputs, clustered paired analyses and operational cost measurements. See [Controlled evaluation](docs/controlled-evaluation.md), [Operational metrics](docs/evaluation-metrics.md) and [Local SPARQL library selection](docs/sparql-library-selection.md).
+
+`npm run install:local` validates, builds, packs and installs the local tarball globally without publishing it. To separate preparation from installation, use `npm run install:local -- --prepare-only`, then `npm run install:local -- --install-prepared`. The pipeline verifies the tarball SHA-256 and every installed distribution file and stores its receipt in `.bsh/local/packages/last-install.json`. It runs unit and module integration tests; it does not invoke E2E.
 
 BSH maintains strict engineering standards:
 

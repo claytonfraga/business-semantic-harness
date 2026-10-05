@@ -119,90 +119,22 @@ test('Given isActionPrompt, when evaluating imperative coding requests vs inform
   assert.equal(isActionPrompt(''), false);
 });
 
-test('Given runAgentTurn with an action prompt, when model stops after reading without modifying files, then loop re-engages autonomously until changes are applied', async () => {
-  const tempDir = mkdtempSync(join(tmpdir(), 'bsh-loop-test-'));
+test('Given an action refused by a business rule When the model ends without tools Then no automatic mutation retry is inserted', async () => {
+  const tempDir = mkdtempSync(join(tmpdir(), 'bsh-refusal-test-'));
   try {
-    let callIndex = 0;
-    const streamCalls = [];
-
+    let calls = 0;
     const mockClient = {
-      async *streamChat(params) {
-        callIndex++;
-        streamCalls.push(params);
-
-        if (callIndex === 1) {
-          // Turn 1: Model inspects file using read_file
-          yield {
-            delta: {
-              tool_calls: [
-                {
-                  index: 0,
-                  id: 'call_read_1',
-                  type: 'function',
-                  function: {
-                    name: 'read_file',
-                    arguments: JSON.stringify({ path: 'nonexistent.txt' }),
-                  },
-                },
-              ],
-            },
-          };
-        } else if (callIndex === 2) {
-          // Turn 2: Model emits text with NO tool calls, trying to stop without modifying files
-          yield {
-            delta: {
-              content: 'Here is what the code should look like:\n```typescript\napp.post(...)\n```',
-            },
-          };
-        } else if (callIndex === 3) {
-          // Turn 3: Model receives the continuation prompt and actually writes the file!
-          yield {
-            delta: {
-              tool_calls: [
-                {
-                  index: 0,
-                  id: 'call_write_1',
-                  type: 'function',
-                  function: {
-                    name: 'write_file',
-                    arguments: JSON.stringify({ path: 'endpoint.ts', content: 'export const transferEndpoint = () => {};' }),
-                  },
-                },
-              ],
-            },
-          };
-        } else {
-          // Turn 4: Model confirms the file modification
-          yield {
-            delta: {
-              content: 'Successfully created the transfer endpoint in endpoint.ts.',
-            },
-          };
-        }
+      async *streamChat() {
+        calls++;
+        yield { delta: { content: 'The business rule forbids this operation. No files were changed.' } };
       },
     };
-
-    const toolEvents = [];
-    const result = await runAgentTurn({
-      client: mockClient,
-      model: 'deepseek/deepseek-chat',
-      workspaceRoot: tempDir,
-      messages: [{ role: 'user', content: 'faça um endpoint pra transferir um ativo não baixado' }],
-      onToolCallDone: (e) => toolEvents.push(e),
-    });
-
-    // Verify that loop did NOT terminate at turn 2! It continued to turn 4!
-    assert.equal(result.completed, true);
-    assert.equal(result.turnsExecuted, 4, 'Must execute 4 turns with autonomous continuation');
-    assert.equal(result.modifiedFiles.length, 1);
-    assert.equal(result.modifiedFiles[0], 'endpoint.ts');
-    assert.ok(result.allMessages.length >= 6);
-
-    // Verify continuation prompt was injected
-    const continuationMsg = result.allMessages.find(
-      (m) => m.role === 'user' && typeof m.content === 'string' && m.content.includes('NO files have been modified')
-    );
-    assert.ok(continuationMsg, 'Continuation prompt must be injected into conversation');
+    const result = await runAgentTurn({ client: mockClient, model: 'fixture', workspaceRoot: tempDir,
+      messages: [{ role: 'user', content: 'Implement the forbidden operation' }] });
+    assert.equal(calls, 1);
+    assert.deepEqual(result.modifiedFiles, []);
+    assert.equal(result.toolCallsExecuted, 0);
+    assert.equal(result.allMessages.filter((message) => message.role === 'user').length, 1);
   } finally {
     rmSync(tempDir, { recursive: true, force: true });
   }

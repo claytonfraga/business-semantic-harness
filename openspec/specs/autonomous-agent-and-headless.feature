@@ -20,7 +20,7 @@ Funcionalidade: Agente autônomo e execução sem TUI
     Dado uma solicitação de implementação ou correção
     Quando o agente processa a tarefa
     Então suas diretivas devem exigir localizar, ler, editar e validar o código
-    E deve usar ferramentas de escrita para concluir uma mudança solicitada
+    E deve usar ferramentas de escrita para concluir uma mudança autorizada e necessária
     E deve apresentar arquivos alterados e resultado objetivo
 
   @BSH-AGENT-003
@@ -31,10 +31,12 @@ Funcionalidade: Agente autônomo e execução sem TUI
     E pedidos imperativos ou alvos de codificação devem seguir o ciclo de ação
 
   @BSH-AGENT-004
-  Cenário: Impedir encerramento prematuro sem edição
+  Cenário: Encerrar com relato fiel sem exigir mutação
     Dado um pedido de ação que ainda não produziu arquivos alterados
     Quando o modelo responde sem novas ferramentas antes do limite de turnos
-    Então o loop deve solicitar edição concreta e continuar
+    Então o loop deve encerrar sem inserir uma nova ordem automática de escrita
+    E deve preservar o diagnóstico de bloqueio ou erro quando registrado
+    E uma recusa por regra de negócio não deve provocar insistência em mutação
     E o limite de turnos deve impedir repetição infinita
 
   @BSH-AGENT-005
@@ -80,6 +82,8 @@ Funcionalidade: Agente autônomo e execução sem TUI
     Então o agente deve executar sem TUI com contexto e ferramentas do projeto
     E deve mostrar progresso, resposta, diff e resultado do gate
     E deve encerrar com código 0 para sucesso e 1 para falha ou violação
+    E bloqueio por regra, erro de ferramenta ou limite de turnos deve encerrar com código 1 mesmo sem alterações
+    E deve exibir o desfecho observado e os arquivos realmente alterados no turno
 
   @BSH-AGENT-011
   Cenário: Ler prompt de arquivo

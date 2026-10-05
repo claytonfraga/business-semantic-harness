@@ -102,3 +102,39 @@ Funcionalidade: Validação e consulta da base ontológica
     E nenhuma ontologia de domínio deve residir no pacote BSH, em diretórios globais ou embutida no binário
     E a implementação de qualquer nova ontologia pelo usuário deve ocorrer criando sua pasta e arquivos no projeto correspondente
     E o BSH deve carregar e aplicar dinamicamente a ontologia ativa a partir do projeto informado
+
+  @BSH-ONT-013
+  Cenário: Consolidação dos pacotes de domínio e externalização de heurísticas
+    Dado um pacote de domínio versionado com ontologia, shapes, políticas e regras
+    Quando o BSH carrega os domínios configurados para o projeto
+    Então regras e aliases de vocabulário devem pertencer ao respectivo pacote de domínio e não ao código do motor
+    E ontologia, shapes, políticas e correspondências devem possuir identidade e versão recuperáveis
+    E o suporte a um domínio não deve implicar suporte automático a qualquer linguagem
+    E compatibilidade e dependências entre pacotes devem ser declaradas
+    E incompatibilidades entre pacotes devem produzir diagnóstico antes da execução governada
+    E operações compostas devem identificar relações entre conceitos, estados e unidades
+    E consultas SPARQL com perguntas de competência devem validar os resultados esperados
+
+  @BSH-ONT-PROFILE-001
+  Cenário: Declarar o perfil semântico operacional sem confundir seleção com o motor
+    Dado o perfil público de validação e um grafo candidato independente
+    Quando o BSH informa suas capacidades
+    Então a seleção por operação deve declarar correspondência exata de sh:targetClass
+    E a completude deve declarar que exige fatos observados para caminhos IRI diretos com sh:minCount positivo em propriedades imediatas
+    E caminhos complexos, alternativas e restrições aninhadas devem ser validados pelo motor SHACL sem alegar análise geral de completude
+    E o motor deve preservar alvos de classe, nó, sujeitos e objetos, caminhos, alternativas lógicas e restrições aninhadas de SHACL Core e SHACL-SPARQL
+    E não deve alegar inferência RDF/OWL geral nem materializar fatos ausentes
+    E deve declarar a resolução de subclasses presentes no grafo de shapes pelo motor
+    E consultas gerais SPARQL devem permanecer distintas de restrições SHACL-SPARQL
+    E ausência de fato obrigatório no candidato deve resultar em indeterminação sem aprovação automática
+
+  @BSH-ONT-EXECUTION-001
+  Cenário: Registrar execução real e atribuir violações por identidade estruturada
+    Dado múltiplos shapes incluindo um sem alvos no candidato
+    Quando o motor valida restrições distintas
+    Então shapes selecionados devem permanecer distintos dos shapes efetivamente exercitados
+    E a evidência de execução deve identificar shape de origem, shapes ancestrais, declarações de alvo, nó de foco e componente de restrição
+    E cada violação deve preservar o identificador estruturado do shape de origem e do componente
+    E mensagens iguais não devem alterar a associação de uma violação
+    E detalhes de ramos lógicos devem compor evidência sem virar violações independentes do resultado principal
+    E ausência de restrição exercitada não deve indicar validação concluída

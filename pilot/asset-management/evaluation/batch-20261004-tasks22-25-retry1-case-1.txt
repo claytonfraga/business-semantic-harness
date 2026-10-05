@@ -1,0 +1,36 @@
+BSH [Business Semantic Harness] · GOVERNED
+Project: bsh-pilot-batch-20261004-tasks22-25-retry1 · Branch: main · Ontology: ativos v1.0.0 (40 classes, 23 shapes) (SHACL active)
+
+
+1. **File Modified**: `src/assets/domain/asset.ts`
+   - **Change Made**: Added an English comment to the `transfer` method specifying that it validates the required input parameters:
+responsible, justification, and location.
+
+### Existing Validation Limitation:
+- The validation explicitly ensures that `responsible`, `justification`, and `location` are provided as input parameters for the asset
+transfer to proceed. If any required parameter is missing, an error will be thrown due to the use of the `required` function in the
+implementation.
+
+### Validation or Promotion Limitations:
+- Any attempt to transfer an asset that is either `Baixado` (retired) or without the required input (responsible, justification, location)
+will be rejected, blocking the transfer process.
+
+The modifications passed all tests successfully, confirming that the functionality was preserved while adding the necessary comment for
+clarity.
+
+[IMPLEMENTATION COMPLETED] [Modified files: 1]
+src/assets/domain/asset.ts (+1 / -1)
+Current candidate diff (+1 / -1 lines); promotion is separate.
+Observed task outcome: completed
+
+Semantic Gate [SHACL: AtivosGovernanceShape] [!] VIOLATION
+[X] Nenhuma operação semântica reconhecida para as alterações do diff
+Status: VIOLATION (Promotion blocked)
+Inspeção preliminar de workspace. Não constitui autorização definitiva de promoção nem substitui o gate de integração.
+✓ Repositório seguro: Branch master preservado no worktree isolado.
+Ações Recomendadas: Adequar o código para respeitar a invariante ou /diff para revisar.
+                                                                                                                                           █
+Type your prompt here...
+14.5s · 6898.5 TPS · Model: openai/gpt-4o-mini · 100205/125k ctx (78.3%) · $0.0000
+/ commands · Ctrl+D domain · Ctrl+G governance · Ctrl+O reasoning
+

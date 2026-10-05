@@ -20,6 +20,7 @@ import {
   type SessaoWorktree,
 } from '../git/worktree.js';
 import { promoverSessao } from '../git/promotion.js';
+import { createProductionFactsExtractor } from '../enforcement/evidenceAdapters.js';
 import { ansi } from './ansi.js';
 import type { ChatEntry, RenderState } from './state.js';
 import { promptApiKeyModal, selectModelModal, selectDomainModal, diffReviewModal, settingsModal, selectSkillModal, selectSlashCommandModal } from './modals.js';
@@ -40,6 +41,7 @@ export interface TuiSessionOptions {
   model?: string;
   domain?: string;
   view?: TuiView;
+  allowDirectExecution?: boolean;
 }
 
 export async function startTuiSession(options: TuiSessionOptions = {}): Promise<void> {
@@ -92,7 +94,9 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   let sessao: SessaoWorktree | null = null;
   let workspaceRoot = projectRoot;
   let activeGitBranch: string | undefined;
-  if (await gitDisponivel()) {
+  const gitAvailable = await gitDisponivel();
+
+  if (gitAvailable) {
     try {
       const repoRoot = await resolverRepositorio(projectRoot);
       activeGitBranch = await branchAtual(repoRoot);
@@ -104,16 +108,34 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         incluirEstadoLocal: true,
       });
       workspaceRoot = sessao.caminhoWorktree;
-    } catch {
-      // Non-git project fallback: work directly in projectRoot
+    } catch (err) {
+      if (activeDomainId && !options.allowDirectExecution) {
+        console.log(`${ansi.red}Erro: Falha ao criar worktree de isolamento no modo governado: ${err instanceof Error ? err.message : String(err)}. Execução direta exige seleção explícita.${ansi.reset}`);
+        return;
+      }
     }
+  } else {
+    if (activeDomainId && !options.allowDirectExecution) {
+      console.log(`${ansi.red}Erro: Git indisponível para criar worktree de isolamento no modo governado. Execução direta exige seleção explícita.${ansi.reset}`);
+      return;
+    }
+  }
+
+  if (activeDomainId && !sessao && !options.allowDirectExecution) {
+    console.log(`${ansi.red}Erro: O modo governado exige isolamento por worktree. Para operar diretamente no repositório, selecione explicitamente o modo direto ou desative a governança (/ungoverned).${ansi.reset}`);
+    return;
   }
 
   // 5. Workspace Context Discovery
   const workspaceSummary = await inspectWorkspace(projectRoot);
 
   // 6. View & Component State
-  let tokensTotal = 1420;
+  let tokensTotal = 0;
+  let tokensPrompt = 0;
+  let tokensCompletion = 0;
+  let tokensCached = 0;
+  let tokensReasoning = 0;
+  let telemetryStatus: 'MEASURED' | 'ESTIMATED' | 'UNAVAILABLE' = 'MEASURED';
   let lastGateConforming = true;
   let lastGateViolations: string[] = [];
   let alignmentStatus: 'ALIGNED' | 'MISMATCH' | 'INSUFFICIENT_DATA' = 'ALIGNED';
@@ -206,6 +228,11 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       alignmentStatus,
       alignmentWarning,
       tokensTotal,
+      tokensPrompt,
+      tokensCompletion,
+      tokensCached,
+      tokensReasoning,
+      telemetryStatus,
       generationDurationMs: lastTurnDurationMs,
       generationTps: lastTurnTps,
       queueLength: inputQueue.length,
@@ -253,6 +280,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     exitGuard,
     history: initialHistory,
     isExecutingTurn: () => isExecutingTurn,
+    isAwaitingConfirmation: () => confirmationResolver !== null,
     onDispatch: (prompt) => dispatchPrompt(prompt),
     onAbortTurn: (reason) => {
       if (activeAbortController) {
@@ -724,10 +752,46 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         const diffText = sessao ? await git(sessao.caminhoWorktree, ['diff', sessao.commitBase]).catch(() => '') : '';
         const shouldPromote = await diffReviewModal(diffText, lastGateConforming, lastGateViolations, view);
         if (shouldPromote && sessao) {
-          await promoverSessao(sessao);
+          const promotion = await promoverSessao(sessao, {
+            extractCandidateFacts: createProductionFactsExtractor(sessao.caminhoWorktree),
+          });
+          if (promotion.status === 'promovido') {
+            chatEntries.push({
+              type: 'agent',
+              content: `✔ Mudanças promovidas com sucesso para ${sessao.branchOrigem}! (commit: ${promotion.commitIntegrado?.slice(0, 8) || 'OK'})`,
+            });
+          } else if (promotion.status === 'bloqueado') {
+            chatEntries.push({
+              type: 'agent',
+              content: `✖ Promoção bloqueada na etapa [${promotion.etapaBloqueio || 'GOVERNANCE'}]: ${promotion.motivoBloqueio || promotion.detalhes}`,
+            });
+          } else if (promotion.status === 'falha-validacao') {
+            chatEntries.push({
+              type: 'agent',
+              content: `✖ Falha de validação técnica na worktree: ${promotion.detalhes}`,
+            });
+          } else if (promotion.status === 'conflitado') {
+            chatEntries.push({
+              type: 'agent',
+              content: `✖ Conflito na reconciliação Git com a branch de origem: ${promotion.detalhes}`,
+            });
+          }
+        }
+        updateView();
+        continue;
+      }
+
+      if (prompt === '/discard') {
+        if (!sessao) {
           chatEntries.push({
             type: 'agent',
-            content: `✔ Mudanças promovidas com sucesso para ${sessao.branchOrigem}!`,
+            content: 'Nenhuma sessão em worktree ativa para descartar.',
+          });
+        } else {
+          await removerSessaoWorktree(sessao, true);
+          chatEntries.push({
+            type: 'agent',
+            content: `✔ Candidato e branch da sessão '${sessao.branchSessao}' foram descartados permanentemente.`,
           });
         }
         updateView();
@@ -1082,36 +1146,36 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
             projectRoot,
           });
 
-          chatEntries.push({
-            type: 'implementation_receipt',
-            receiptHasChanges: diffGateResult.hasChanges,
-            receiptFiles: diffGateResult.fileStats || [],
-            receiptTotalAdded: diffGateResult.linesAdded,
-            receiptTotalRemoved: diffGateResult.linesRemoved,
-          });
         }
 
+        const receiptFiles = turnResult.modifiedFiles.map(path =>
+          diffGateResult?.fileStats?.find(file => file.path === path)
+          ?? { path, linesAdded: 0, linesRemoved: 0 });
+        chatEntries.push({
+          type: 'implementation_receipt',
+          receiptHasChanges: receiptFiles.length > 0,
+          receiptFiles,
+          receiptTotalAdded: receiptFiles.reduce((total, file) => total + file.linesAdded, 0),
+          receiptTotalRemoved: receiptFiles.reduce((total, file) => total + file.linesRemoved, 0),
+          receiptOutcome: turnResult.outcome,
+          receiptDiagnostics: turnResult.toolFailures.map(failure => `${failure.tool}: ${failure.reason}`),
+        });
+
         if (validator && sessao && diffGateResult) {
-          const isViolation = !diffGateResult.conforming || promptViolation.isViolating;
+          // Prompt triage is shown separately; it is not executed SHACL evidence.
+          const isViolation = diffGateResult.gateStatus === 'VIOLATION';
 
           if (isViolation) {
             lastGateConforming = false;
             const violationsList = diffGateResult.violations.length > 0
               ? diffGateResult.violations
-              : promptViolation.isViolating && promptViolation.rule
-                ? [promptViolation.rule]
-                : [
-                  'State transition invalid: Retired asset cannot be transferred',
-                  'Required fields missing: adequateJustification, approver',
-                ];
+              : ['Semantic validation reported a violation'];
             lastGateViolations = violationsList;
 
             let checks = diffGateResult.checks;
             const hasFailingCheck = checks.some((c) => !c.ok);
             if (!hasFailingCheck) {
-              const failureText = promptViolation.isViolating && promptViolation.rule
-                ? `${promptViolation.shape || 'DomainShape'}: ${promptViolation.rule}`
-                : violationsList[0] || 'Violação ontológica detectada no Gate Semântico';
+              const failureText = violationsList[0] || 'Semantic validation reported a violation';
               checks = [
                 ...checks,
                 { ok: false, text: failureText },
@@ -1120,35 +1184,57 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
             chatEntries.push({
               type: 'gate',
-              gateShape: promptViolation.isViolating
-                ? (promptViolation.shape || diffGateResult.shapeName || 'TransferShape')
-                : (diffGateResult.shapeName || 'TransferShape'),
+              gateShape: diffGateResult.shapeName,
               gateChecks: checks,
               gateStatus: 'VIOLATION',
+              gateScope: diffGateResult.scope,
+              gateIsPreliminary: diffGateResult.isPreliminary,
+              gateDisclaimer: diffGateResult.disclaimer,
+              gateOperations: diffGateResult.operations,
+              gateRestrictions: diffGateResult.restrictions,
+              gateEvidences: diffGateResult.evidences,
+              gateReasons: diffGateResult.reasons,
+              gateReferences: diffGateResult.references,
             });
           } else {
-            lastGateConforming = true;
+            lastGateConforming = diffGateResult.conforming;
             lastGateViolations = [];
-            const checks: { ok: boolean; text: string }[] = diffGateResult.checks.length > 0
-              ? diffGateResult.checks
-              : [
-                { ok: true, text: 'State transition valid (InOperation -> Transferred)' },
-                { ok: true, text: 'Required fields present (newOwner, newLocation)' },
-              ];
-
             chatEntries.push({
               type: 'gate',
-              gateShape: diffGateResult.shapeName || 'TransferShape',
-              gateChecks: checks,
-              gateStatus: 'CONFORMING',
+              gateShape: diffGateResult.shapeName,
+              gateChecks: diffGateResult.checks,
+              gateStatus: diffGateResult.gateStatus,
+              gateScope: diffGateResult.scope,
+              gateIsPreliminary: diffGateResult.isPreliminary,
+              gateDisclaimer: diffGateResult.disclaimer,
+              gateOperations: diffGateResult.operations,
+              gateRestrictions: diffGateResult.restrictions,
+              gateEvidences: diffGateResult.evidences,
+              gateReasons: diffGateResult.reasons,
+              gateReferences: diffGateResult.references,
             });
+          }
+        }
+
+        if (turnResult.telemetry) {
+          telemetryStatus = turnResult.telemetry.status;
+          if (turnResult.telemetry.status === 'MEASURED') {
+            tokensTotal += turnResult.telemetry.totalTokens;
+            tokensPrompt += turnResult.telemetry.promptTokens;
+            tokensCompletion += turnResult.telemetry.completionTokens;
+            if (turnResult.telemetry.cachedTokens) tokensCached += turnResult.telemetry.cachedTokens;
+            if (turnResult.telemetry.reasoningTokens) tokensReasoning += turnResult.telemetry.reasoningTokens;
+          } else if (turnResult.telemetry.status === 'ESTIMATED') {
+            tokensTotal += turnResult.telemetry.totalTokens;
+            tokensPrompt += turnResult.telemetry.promptTokens;
+            tokensCompletion += turnResult.telemetry.completionTokens;
           }
         }
 
         const elapsed = performance.now() - turnStartTime;
         lastTurnDurationMs = elapsed;
-        lastTurnTps = elapsed > 0 ? (turnTokensCount / (elapsed / 1000)) : 0;
-        tokensTotal += 350;
+        const turnTokens = turnResult.telemetry?.totalTokens ?? turnTokensCount;
+        lastTurnTps = elapsed > 0 ? (turnTokens / (elapsed / 1000)) : 0;
         updateView();
       } catch (err: unknown) {
         if (activeAbortController?.signal.aborted) {
@@ -1171,7 +1257,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     await mcpManager.close().catch(() => undefined);
     if (sessao) {
       try {
-        await removerSessaoWorktree(sessao);
+        await removerSessaoWorktree(sessao, false);
       } catch {
         // Best-effort cleanup
       }

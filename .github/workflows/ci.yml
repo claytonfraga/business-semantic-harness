@@ -16,5 +16,7 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - run: npm run quality
       - run: npm test
-      - run: npm run test:e2e
+      - name: Semantic integration and E2E pipeline
+        run: npm run test:e2e

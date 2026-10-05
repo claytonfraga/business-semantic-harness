@@ -1,8 +1,10 @@
-import { readFile, writeFile, readdir, stat } from 'node:fs/promises';
-import { isAbsolute, resolve, sep, relative, join } from 'node:path';
-import { spawn } from 'node:child_process';
+import { readFile, readdir, stat, lstat, realpath, open, mkdir } from 'node:fs/promises';
+import { constants } from 'node:fs';
+import { isAbsolute, resolve, sep, relative, join, dirname } from 'node:path';
+import { spawn, spawnSync } from 'node:child_process';
 import type { ToolDefinition } from '../client/openrouter/types.js';
 import { SkillRegistry } from '../skills/registry.js';
+import type { ApprovalBroker } from '../decision/broker.js';
 
 export const AGENT_TOOLS: ToolDefinition[] = [
   {
@@ -204,28 +206,300 @@ async function findFilesInDir(
   }
 }
 
+export const SAFE_ENV_ALLOWLIST: readonly string[] = [
+  'PATH',
+  'HOME',
+  'USER',
+  'LOGNAME',
+  'SHELL',
+  'LANG',
+  'LC_ALL',
+  'LC_CTYPE',
+  'TERM',
+  'PAGER',
+  'TMPDIR',
+  'NODE_PATH',
+];
+
+export function buildSafeEnv(
+  extraEnv?: Record<string, string>,
+  allowedKeys: readonly string[] = SAFE_ENV_ALLOWLIST
+): Record<string, string> {
+  const env: Record<string, string> = {};
+  const allowedSet = new Set(allowedKeys);
+  for (const key of allowedSet) {
+    const val = process.env[key];
+    if (typeof val === 'string') {
+      env[key] = val;
+    }
+  }
+  // Tool processes must not wait for a host's interactive pager.
+  env.PAGER = 'cat';
+  if (extraEnv) {
+    for (const [k, v] of Object.entries(extraEnv)) {
+      if (typeof v === 'string') {
+        env[k] = v;
+      }
+    }
+  }
+  return env;
+}
+
+let _bwrapAvailable: boolean | null = null;
+
+export function isBwrapAvailable(): boolean {
+  if (_bwrapAvailable !== null) return _bwrapAvailable;
+  try {
+    const res = spawnSync('bwrap', ['--version'], { stdio: 'ignore' });
+    _bwrapAvailable = res.status === 0;
+  } catch {
+    _bwrapAvailable = false;
+  }
+  return _bwrapAvailable;
+}
+
+export function setBwrapAvailableForTesting(val: boolean | null): void {
+  _bwrapAvailable = val;
+}
+
+export interface ResolveSafePathOptions {
+  forWriting?: boolean;
+  allowRoot?: boolean;
+}
+
+export interface WorkspaceToolExecutorOptions {
+  allowNetwork?: boolean;
+  confinement?: boolean;
+  allowedEnvVars?: readonly string[];
+  extraEnv?: Record<string, string>;
+  broker?: ApprovalBroker;
+}
+
 export class WorkspaceToolExecutor {
   private workspaceRoot: string;
   private projectRoot: string;
+  private allowNetwork: boolean;
+  private confinement: boolean;
+  private allowedEnvVars: readonly string[];
+  private extraEnv: Record<string, string>;
+  private broker?: ApprovalBroker;
 
-  constructor(workspaceRoot: string, projectRoot?: string) {
+  constructor(
+    workspaceRoot: string,
+    projectRootOrOptions?: string | WorkspaceToolExecutorOptions,
+    maybeOptions?: WorkspaceToolExecutorOptions
+  ) {
     this.workspaceRoot = resolve(workspaceRoot);
-    this.projectRoot = resolve(projectRoot || workspaceRoot);
+    if (typeof projectRootOrOptions === 'string') {
+      this.projectRoot = resolve(projectRootOrOptions);
+      this.allowNetwork = maybeOptions?.allowNetwork ?? false;
+      this.confinement = maybeOptions?.confinement ?? true;
+      this.allowedEnvVars = maybeOptions?.allowedEnvVars ?? SAFE_ENV_ALLOWLIST;
+      this.extraEnv = maybeOptions?.extraEnv ?? {};
+      this.broker = maybeOptions?.broker;
+    } else {
+      this.projectRoot = resolve(workspaceRoot);
+      const opts = projectRootOrOptions ?? {};
+      this.allowNetwork = opts.allowNetwork ?? false;
+      this.confinement = opts.confinement ?? true;
+      this.allowedEnvVars = opts.allowedEnvVars ?? SAFE_ENV_ALLOWLIST;
+      this.extraEnv = opts.extraEnv ?? {};
+      this.broker = opts.broker;
+    }
   }
 
-  private resolveSafePath(relPath: string): string {
+  setBroker(broker: ApprovalBroker): void {
+    this.broker = broker;
+  }
+
+  async getCanonicalWorkspaceRoot(): Promise<string> {
+    return await realpath(this.workspaceRoot);
+  }
+
+  private isInsideCanonicalRoot(canonicalRoot: string, targetPath: string): boolean {
+    const fromRoot = relative(canonicalRoot, targetPath);
+    return Boolean(
+      fromRoot &&
+      fromRoot !== '..' &&
+      !fromRoot.startsWith(`..${sep}`) &&
+      !isAbsolute(fromRoot)
+    );
+  }
+
+  async resolveSafePath(
+    relPath: string,
+    options: ResolveSafePathOptions = {}
+  ): Promise<string> {
     const cleanRel = (relPath || '').trim();
-    if (isAbsolute(cleanRel)) {
-      throw new Error(`Absolute paths are not allowed: ${cleanRel}`);
+    if (!cleanRel) {
+      if (options.allowRoot) {
+        return await this.getCanonicalWorkspaceRoot();
+      }
+      throw new Error('Path escapes workspace: empty path');
     }
-    const resolved = resolve(this.workspaceRoot, cleanRel);
-    if (!resolved.startsWith(this.workspaceRoot + sep) && resolved !== this.workspaceRoot) {
+
+    if (isAbsolute(cleanRel)) {
+      throw new Error(`Path escapes workspace: absolute paths are not allowed: ${cleanRel}`);
+    }
+
+    const canonicalRoot = await this.getCanonicalWorkspaceRoot();
+    const lexicalTarget = resolve(canonicalRoot, cleanRel);
+
+    if (lexicalTarget === canonicalRoot) {
+      if (options.allowRoot) {
+        return canonicalRoot;
+      }
       throw new Error(`Path escapes workspace: ${cleanRel}`);
     }
-    return resolved;
+
+    if (!lexicalTarget.startsWith(canonicalRoot + sep)) {
+      throw new Error(`Path escapes workspace: ${cleanRel}`);
+    }
+
+    if (options.forWriting) {
+      const fromRootLexical = relative(canonicalRoot, lexicalTarget);
+      const firstSegmentLexical = fromRootLexical.split(sep)[0];
+      if (firstSegmentLexical === '.git' || firstSegmentLexical === '.bsh') {
+        throw new Error(`Write access denied: protected path ${cleanRel}`);
+      }
+    }
+
+    // Check if lexicalTarget exists
+    let targetExists = false;
+    let isSymlink = false;
+    try {
+      const st = await lstat(lexicalTarget);
+      targetExists = true;
+      isSymlink = st.isSymbolicLink();
+    } catch (err: unknown) {
+      if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
+        throw err;
+      }
+    }
+
+    if (targetExists) {
+      let canonicalTarget: string;
+      try {
+        canonicalTarget = await realpath(lexicalTarget);
+      } catch (err: unknown) {
+        if (isSymlink) {
+          throw new Error(`Path escapes workspace via symlink: ${cleanRel}`);
+        }
+        throw err;
+      }
+
+      const isValid = options.allowRoot
+        ? canonicalTarget === canonicalRoot || this.isInsideCanonicalRoot(canonicalRoot, canonicalTarget)
+        : this.isInsideCanonicalRoot(canonicalRoot, canonicalTarget);
+
+      if (!isValid) {
+        throw new Error(`Path escapes workspace: ${cleanRel}`);
+      }
+
+      if (options.forWriting) {
+        const fromRootTarget = relative(canonicalRoot, canonicalTarget);
+        const firstSegmentTarget = fromRootTarget.split(sep)[0];
+        if (firstSegmentTarget === '.git' || firstSegmentTarget === '.bsh') {
+          throw new Error(`Write access denied: protected path ${cleanRel}`);
+        }
+      }
+
+      return canonicalTarget;
+    }
+
+    // Target does not exist yet (e.g. for write_file creating a new file).
+    // Inspect ancestor directories up to canonicalRoot to ensure no ancestor escapes workspace via symlink.
+    let currentDir = dirname(lexicalTarget);
+    let checkedAncestor = false;
+
+    while (currentDir.length >= canonicalRoot.length) {
+      try {
+        await lstat(currentDir);
+        const canonicalAncestor = await realpath(currentDir);
+        const ancestorValid =
+          canonicalAncestor === canonicalRoot || this.isInsideCanonicalRoot(canonicalRoot, canonicalAncestor);
+        if (!ancestorValid) {
+          throw new Error(`Path escapes workspace: ${cleanRel}`);
+        }
+        checkedAncestor = true;
+        break;
+      } catch (err: unknown) {
+        if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+          const parent = dirname(currentDir);
+          if (parent === currentDir) break;
+          currentDir = parent;
+        } else {
+          throw err;
+        }
+      }
+    }
+
+    if (!checkedAncestor) {
+      throw new Error(`Path escapes workspace: ${cleanRel}`);
+    }
+
+    return lexicalTarget;
+  }
+
+  private async assertFileDescriptorInsideRoot(fd: number, canonicalRoot: string, fallbackPath: string): Promise<void> {
+    let canonicalFd: string | null = null;
+    const fdProcPath = `/proc/self/fd/${fd}`;
+    try {
+      canonicalFd = await realpath(fdProcPath);
+    } catch {
+      try {
+        canonicalFd = await realpath(fallbackPath);
+      } catch {
+        canonicalFd = null;
+      }
+    }
+
+    if (canonicalFd) {
+      if (canonicalFd === canonicalRoot || !this.isInsideCanonicalRoot(canonicalRoot, canonicalFd)) {
+        throw new Error(`Path escapes workspace: ${fallbackPath}`);
+      }
+    }
+  }
+
+  private async safeReadFile(filePath: string): Promise<string> {
+    const canonicalRoot = await this.getCanonicalWorkspaceRoot();
+    const handle = await open(filePath, 'r');
+    try {
+      await this.assertFileDescriptorInsideRoot(handle.fd, canonicalRoot, filePath);
+      return await handle.readFile('utf8');
+    } finally {
+      await handle.close();
+    }
+  }
+
+  private async safeWriteFile(filePath: string, content: string): Promise<void> {
+    const canonicalRoot = await this.getCanonicalWorkspaceRoot();
+    const dir = dirname(filePath);
+    await mkdir(dir, { recursive: true });
+
+    // Open file handle with O_CREAT | O_RDWR (without O_TRUNC to prevent premature truncation before verification)
+    const handle = await open(filePath, constants.O_CREAT | constants.O_RDWR);
+    try {
+      await this.assertFileDescriptorInsideRoot(handle.fd, canonicalRoot, filePath);
+      await handle.truncate(0);
+      await handle.writeFile(content, 'utf8');
+    } finally {
+      await handle.close();
+    }
   }
 
   async executeTool(name: string, args: Record<string, unknown>): Promise<string> {
+    if (this.broker) {
+      const auth = await this.broker.authorizeToolCall({
+        tool: name,
+        args,
+        domain: 'default',
+      });
+      if (!auth.allowed) {
+        throw new Error(`Tool '${name}' denied by approval broker: ${auth.reason}`);
+      }
+    }
+
     switch (name) {
       case 'search_code': {
         const query = String(args.query || '');
@@ -234,7 +508,7 @@ export class WorkspaceToolExecutor {
         }
         const isRegex = Boolean(args.is_regex);
         const prefix = String(args.path_prefix || '');
-        const targetDir = prefix ? this.resolveSafePath(prefix) : this.workspaceRoot;
+        const targetDir = prefix ? await this.resolveSafePath(prefix, { allowRoot: true }) : await this.getCanonicalWorkspaceRoot();
         const maxResults = typeof args.max_results === 'number' ? Math.min(100, Math.max(1, args.max_results)) : 30;
 
         let regex: RegExp;
@@ -249,7 +523,7 @@ export class WorkspaceToolExecutor {
         }
 
         const results: string[] = [];
-        await searchCodeInDir(targetDir, this.workspaceRoot, regex, maxResults, results);
+        await searchCodeInDir(targetDir, await this.getCanonicalWorkspaceRoot(), regex, maxResults, results);
         if (results.length === 0) {
           return `No matches found for query: "${query}"`;
         }
@@ -263,7 +537,8 @@ export class WorkspaceToolExecutor {
         }
         const maxResults = typeof args.max_results === 'number' ? Math.min(200, Math.max(1, args.max_results)) : 50;
         const results: string[] = [];
-        await findFilesInDir(this.workspaceRoot, this.workspaceRoot, pattern, maxResults, results);
+        const canonicalRoot = await this.getCanonicalWorkspaceRoot();
+        await findFilesInDir(canonicalRoot, canonicalRoot, pattern, maxResults, results);
         if (results.length === 0) {
           return `No files found matching pattern: "${pattern}"`;
         }
@@ -271,8 +546,8 @@ export class WorkspaceToolExecutor {
       }
 
       case 'read_file': {
-        const filePath = this.resolveSafePath(String(args.path || ''));
-        const content = await readFile(filePath, 'utf8');
+        const filePath = await this.resolveSafePath(String(args.path || ''));
+        const content = await this.safeReadFile(filePath);
         const startLine = typeof args.start_line === 'number' ? args.start_line : 1;
         const endLine = typeof args.end_line === 'number' ? args.end_line : undefined;
 
@@ -285,27 +560,27 @@ export class WorkspaceToolExecutor {
       }
 
       case 'write_file': {
-        const filePath = this.resolveSafePath(String(args.path || ''));
+        const filePath = await this.resolveSafePath(String(args.path || ''), { forWriting: true });
         const content = String(args.content ?? '');
-        await writeFile(filePath, content, 'utf8');
+        await this.safeWriteFile(filePath, content);
         return `Successfully wrote ${content.length} characters to ${String(args.path)}`;
       }
 
       case 'replace_file_content': {
-        const filePath = this.resolveSafePath(String(args.path || ''));
+        const filePath = await this.resolveSafePath(String(args.path || ''), { forWriting: true });
         const target = String(args.target_content ?? '');
         const replacement = String(args.replacement_content ?? '');
-        const current = await readFile(filePath, 'utf8');
+        const current = await this.safeReadFile(filePath);
         if (!current.includes(target)) {
           throw new Error(`Target content not found in file: ${String(args.path)}`);
         }
         const updated = current.replace(target, replacement);
-        await writeFile(filePath, updated, 'utf8');
+        await this.safeWriteFile(filePath, updated);
         return `Successfully replaced target content in ${String(args.path)}`;
       }
 
       case 'list_directory': {
-        const dirPath = this.resolveSafePath(String(args.path || '.'));
+        const dirPath = await this.resolveSafePath(String(args.path || '.'), { allowRoot: true });
         const entries = await readdir(dirPath, { withFileTypes: true });
         const list = entries.map((e) => (e.isDirectory() ? `${e.name}/` : e.name));
         return list.join('\n');
@@ -313,10 +588,50 @@ export class WorkspaceToolExecutor {
 
       case 'run_bash_command': {
         const cmd = String(args.command || '');
+        const safeEnv = buildSafeEnv(this.extraEnv, this.allowedEnvVars);
+        const canonicalWorkspace = await this.getCanonicalWorkspaceRoot();
+
+        let commandBinary = 'bash';
+        let commandArgs = ['-c', cmd];
+
+        if (this.confinement && isBwrapAvailable()) {
+          commandBinary = 'bwrap';
+          const bwrapArgs: string[] = [
+            '--ro-bind', '/', '/',
+            '--dev', '/dev',
+            '--proc', '/proc',
+            '--tmpfs', '/tmp',
+            '--bind', canonicalWorkspace, canonicalWorkspace,
+          ];
+
+          const gitPath = join(canonicalWorkspace, '.git');
+          try {
+            await lstat(gitPath);
+            bwrapArgs.push('--ro-bind', gitPath, gitPath);
+          } catch {
+            // .git not present
+          }
+
+          const bshPath = join(canonicalWorkspace, '.bsh');
+          try {
+            await lstat(bshPath);
+            bwrapArgs.push('--ro-bind', bshPath, bshPath);
+          } catch {
+            // .bsh not present
+          }
+
+          if (!this.allowNetwork) {
+            bwrapArgs.push('--unshare-net');
+          }
+
+          bwrapArgs.push('bash', '-c', cmd);
+          commandArgs = bwrapArgs;
+        }
+
         return new Promise<string>((resolvePromise) => {
-          const proc = spawn('bash', ['-c', cmd], {
+          const proc = spawn(commandBinary, commandArgs, {
             cwd: this.workspaceRoot,
-            env: { ...process.env, PAGER: 'cat' },
+            env: safeEnv,
           });
 
           let stdout = '';

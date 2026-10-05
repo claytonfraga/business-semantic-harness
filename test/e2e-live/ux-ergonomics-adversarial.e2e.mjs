@@ -358,7 +358,9 @@ test('Given a Semantic Gate entry, when rendered, then violation and conforming 
     16
   );
 
-  assert.ok(renderedConforming.includes('[OK] CONFORMING'), 'Conforming gate must show [OK] CONFORMING');
+  assert.ok(renderedConforming.includes('Status: CONFORMING'), 'Conforming gate must retain its visible status even when the long shape header is truncated');
+  assert.ok(renderedConforming.includes('subject to promotion gate'), 'Preliminary conformance must disclose the final authorization requirement');
+  assert.ok(!renderedConforming.includes('Ready to promote'), 'Preliminary inspection cannot claim promotion is authorized');
   assert.ok(!renderedConforming.includes('[X]'), 'Conforming gate must NEVER contain [X] failure indicators');
   assert.ok(!renderedConforming.includes('[!] VIOLATION'), 'Conforming gate must NEVER contain [!] VIOLATION');
 });
@@ -390,4 +392,3 @@ test('Given double escape timing window (500ms latch), when ESC key events arriv
   handleEscKey(t);
   assert.equal(cancelled, true, 'Second fast ESC (<=500ms) MUST trigger immediate cancellation');
 });
-

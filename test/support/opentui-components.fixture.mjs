@@ -61,6 +61,28 @@ test('Given BSH-TUI-005 When all entry payloads render Then English labels and s
   } finally { view.destroy(); }
 });
 
+test('Given an indeterminate gate and partial failed task When native cards render Then no semantic approval or task completion is claimed', async () => {
+  const fixture = await createTestRenderer({ width: 140, height: 30 });
+  const view = await createTuiView({ renderer: fixture.renderer });
+  try {
+    view.update(state, [
+      { type: 'gate', gateStatus: 'INDETERMINATE', gateChecks: [{ ok: false, text: 'No constraint execution evidence' }] },
+      { type: 'implementation_receipt', receiptHasChanges: true, receiptOutcome: 'tool_error',
+        receiptFiles: [{ path: 'partial.js', linesAdded: 1, linesRemoved: 0 }],
+        receiptDiagnostics: ['replace_file_content: target absent'] },
+    ]);
+    await fixture.renderOnce();
+    const frame = fixture.captureCharFrame();
+    for (const label of ['INDETERMINATE', 'Promotion blocked', 'WORKSPACE CHANGES OBSERVED', 'partial.js', 'tool_error', 'target absent']) {
+      assert.ok(frame.includes(label), label + '\n' + frame);
+    }
+    assert.ok(!frame.includes('CONFORMING'));
+    assert.ok(!frame.includes('Ready to promote'));
+    assert.ok(!frame.includes('IMPLEMENTATION COMPLETED'));
+    assert.ok(!frame.includes('TransferShape'));
+  } finally { view.destroy(); }
+});
+
 test('Given streaming and resizing Then prompt cards scroll and chrome are preserved', async () => {
   const fixture = await createTestRenderer({ width: 80, height: 24 });
   const view = await createTuiView({ renderer: fixture.renderer });

@@ -1,8 +1,20 @@
 import type { OpenRouterClient } from '../client/openrouter/client.js';
-import type { ChatMessage, ToolCall } from '../client/openrouter/types.js';
+import type { ChatMessage, ToolCall, StreamUsage } from '../client/openrouter/types.js';
 import { AGENT_TOOLS, WorkspaceToolExecutor } from './tools.js';
 import type { McpClientManager } from '../mcp/clientManager.js';
 import type { WorkspaceSummary } from './workspaceContext.js';
+import type { ApprovalBroker } from '../decision/broker.js';
+import { captureWorkspaceSnapshot, observedChangedFiles } from './workspaceChanges.js';
+
+export interface TelemetryUsage {
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  cachedTokens?: number;
+  reasoningTokens?: number;
+  status: 'MEASURED' | 'ESTIMATED' | 'UNAVAILABLE';
+  providerReported: boolean;
+}
 
 export interface AgentLoopOptions {
   client: OpenRouterClient;
@@ -12,8 +24,12 @@ export interface AgentLoopOptions {
   messages: ChatMessage[];
   systemPrompt?: string;
   maxTurns?: number;
+  /** Maximum output tokens requested per model turn. */
+  maxTokens?: number;
   signal?: AbortSignal;
   mcpManager?: McpClientManager;
+  broker?: ApprovalBroker;
+  domain?: string;
   onDelta?: (text: string) => void;
   onReasoningDelta?: (text: string) => void;
   onAssistantMessage?: (msg: { content: string; intermediate: boolean }) => void;
@@ -21,13 +37,27 @@ export interface AgentLoopOptions {
   onToolCallDone?: (call: { name: string; result: string }) => void;
 }
 
+export type AgentOutcome = 'completed' | 'rule_blocked' | 'tool_error' | 'turn_limit';
+
+export interface AgentToolFailure {
+  tool: string;
+  callId: string;
+  kind: 'rule_blocked' | 'tool_error';
+  reason: string;
+  evidence?: 'approval_broker' | 'agent_declared' | 'tool_execution';
+  ruleId?: string;
+}
+
 export interface AgentTurnResult {
+  outcome: AgentOutcome;
+  toolFailures: AgentToolFailure[];
   completed: boolean;
   finalAssistantMessage: ChatMessage;
   turnsExecuted: number;
   allMessages: ChatMessage[];
   modifiedFiles: string[];
   toolCallsExecuted: number;
+  telemetry?: TelemetryUsage;
 }
 
 export function isActionPrompt(prompt: string): boolean {
@@ -74,12 +104,12 @@ export function buildCodingAgentSystemPrompt(options: {
   parts.push(
     '',
     'MANDATORY CODING METHODOLOGY & AUTONOMOUS ACTION LOOP:',
-    '1. AUTONOMOUS END-TO-END EXECUTION: You are an autonomous coding agent, NOT a conversational Q&A bot. When the user asks you to create an endpoint, implement a feature, modify code, or perform an operation, YOU MUST COMPLETE THE TASK BY MODIFYING THE FILES IN THE WORKSPACE DIRECTLY.',
-    '2. NEVER STOP WITHOUT WRITING CODE: If the user asked for an action, endpoint, or code change, DO NOT just inspect files and print code snippets in the chat. You must call `replace_file_content` or `write_file` to write the changes directly to disk.',
-    '3. LOCATE TARGET FILES: Check the workspace context or use `find_files`/`list_directory` to find where endpoints, routes, controllers, or models are defined (e.g. `src/assets/infrastructure/asset-http-server.ts`, `src/server.ts`). When using `search_code`, specify concise query keywords.',
+    '1. AUTONOMOUS END-TO-END EXECUTION: You are an autonomous coding agent, NOT a conversational Q&A bot. When the user asks you to create an endpoint, implement a feature, modify code, or perform an operation, complete authorized tasks using workspace tools and respect business rules and tool failures.',
+    '2. RESPECT OUTCOMES: Apply authorized changes when needed. If a business rule forbids the request, a tool fails, or the requested state already exists, explain the observed outcome. Never mutate merely to satisfy an action classification or bypass a refusal.',
+    '3. LOCATE TARGET FILES: Check the workspace context or use `find_files`/`list_directory` to find the actual endpoints, routes, controllers, or models in this project. When using `search_code`, specify concise query keywords.',
     '4. SURGICAL EDITS: Read the file with `read_file` to understand the exact context, then apply edits with `replace_file_content` or `write_file`.',
     '5. SELF-VERIFY: Run test commands with `run_bash_command` (using `/usr/bin/rtk npm test` or `/usr/bin/rtk`) to ensure your modifications compile and pass tests.',
-    '6. CONCISE COMPLETION: Explain what files you modified and what endpoint/feature was implemented.'
+    '6. CONCISE COMPLETION: Explain the files actually changed and the observed outcome. For a business-rule refusal, call `report_task_outcome` with outcome `rule_blocked`, the rule identifier and reason; this records an agent-declared refusal, not validator proof.'
   );
 
   if (options.workspaceSummary?.formattedContext) {
@@ -95,16 +125,61 @@ export function buildCodingAgentSystemPrompt(options: {
 
 export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurnResult> {
   const executor = new WorkspaceToolExecutor(options.workspaceRoot, options.projectRoot);
+  if (options.broker) {
+    executor.setBroker(options.broker);
+    options.mcpManager?.setBroker(options.broker);
+  }
   const maxTurns = options.maxTurns ?? 10;
   let turns = 0;
   let toolCallsExecuted = 0;
-  const modifiedFilesSet = new Set<string>();
+  const initialWorkspace = await captureWorkspaceSnapshot(options.workspaceRoot);
+  const toolFailures: AgentToolFailure[] = [];
+  const observedFiles = async () => observedChangedFiles(initialWorkspace, await captureWorkspaceSnapshot(options.workspaceRoot));
 
   const conversation: ChatMessage[] = [];
   if (options.systemPrompt && !options.messages.some((m) => m.role === 'system')) {
     conversation.push({ role: 'system', content: options.systemPrompt });
   }
   conversation.push(...options.messages);
+
+  let totalPromptTokens = 0;
+  let totalCompletionTokens = 0;
+  let totalTotalTokens = 0;
+  let totalCachedTokens = 0;
+  let totalReasoningTokens = 0;
+  let anyProviderReported = false;
+  let totalEstimatedPromptTokens = 0;
+  let totalEstimatedCompletionTokens = 0;
+
+  const getTelemetry = (): TelemetryUsage => {
+    if (anyProviderReported) {
+      return {
+        promptTokens: totalPromptTokens,
+        completionTokens: totalCompletionTokens,
+        totalTokens: totalTotalTokens,
+        cachedTokens: totalCachedTokens > 0 ? totalCachedTokens : undefined,
+        reasoningTokens: totalReasoningTokens > 0 ? totalReasoningTokens : undefined,
+        status: 'MEASURED',
+        providerReported: true,
+      };
+    }
+    if (totalEstimatedPromptTokens + totalEstimatedCompletionTokens > 0) {
+      return {
+        promptTokens: totalEstimatedPromptTokens,
+        completionTokens: totalEstimatedCompletionTokens,
+        totalTokens: totalEstimatedPromptTokens + totalEstimatedCompletionTokens,
+        status: 'ESTIMATED',
+        providerReported: false,
+      };
+    }
+    return {
+      promptTokens: 0,
+      completionTokens: 0,
+      totalTokens: 0,
+      status: 'UNAVAILABLE',
+      providerReported: false,
+    };
+  };
 
   while (turns < maxTurns) {
     turns++;
@@ -113,19 +188,41 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
     }
 
     let assistantContent = '';
+    let turnUsage: StreamUsage | undefined;
     const pendingToolCalls: Map<number, { id: string; name: string; arguments: string }> = new Map();
 
     const tools = [
       ...AGENT_TOOLS,
+      {
+        type: 'function' as const,
+        function: {
+          name: 'report_task_outcome',
+          description: 'Record an agent-declared business-rule refusal without modifying the workspace. This is not independent validation evidence.',
+          parameters: {
+            type: 'object',
+            properties: {
+              outcome: { type: 'string', enum: ['rule_blocked'] },
+              ruleId: { type: 'string' },
+              reason: { type: 'string' },
+            },
+            required: ['outcome', 'ruleId', 'reason'],
+          },
+        },
+      },
       ...(options.mcpManager ? options.mcpManager.getToolDefinitions() : []),
     ];
 
     for await (const chunk of options.client.streamChat({
       model: options.model,
+      maxTokens: options.maxTokens,
       messages: conversation,
       tools,
       signal: options.signal,
     })) {
+      if (chunk.usage) {
+        turnUsage = chunk.usage;
+      }
+
       if (chunk.delta?.content) {
         assistantContent += chunk.delta.content;
         options.onDelta?.(chunk.delta.content);
@@ -148,6 +245,26 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
           if (tc.function?.arguments) entry.arguments += tc.function.arguments;
         }
       }
+    }
+
+    if (turnUsage) {
+      anyProviderReported = true;
+      const promptTok = turnUsage.prompt_tokens ?? 0;
+      const compTok = turnUsage.completion_tokens ?? 0;
+      const totTok = turnUsage.total_tokens ?? (promptTok + compTok);
+      const cachedTok = turnUsage.prompt_tokens_details?.cached_tokens ?? turnUsage.cached_tokens ?? 0;
+      const reasoningTok = turnUsage.completion_tokens_details?.reasoning_tokens ?? turnUsage.reasoning_tokens ?? 0;
+
+      totalPromptTokens += promptTok;
+      totalCompletionTokens += compTok;
+      totalTotalTokens += totTok;
+      totalCachedTokens += cachedTok;
+      totalReasoningTokens += reasoningTok;
+    } else {
+      const estPrompt = Math.ceil(JSON.stringify(conversation).length / 4);
+      const estComp = Math.ceil(assistantContent.length / 4);
+      totalEstimatedPromptTokens += estPrompt;
+      totalEstimatedCompletionTokens += estComp;
     }
 
     const toolCallsList: ToolCall[] = Array.from(pendingToolCalls.values()).map((p) => ({
@@ -175,28 +292,19 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
 
     // If no tool calls in this turn
     if (toolCallsList.length === 0) {
-      // Find the user's task request in conversation
-      const lastUserMsg = conversation.slice().reverse().find((m) => m.role === 'user');
-      const userPrompt = typeof lastUserMsg?.content === 'string' ? lastUserMsg.content : '';
-      const isActionRequest = isActionPrompt(userPrompt);
-
-      // If user requested an action/endpoint/code modification, but the model has not modified any files yet,
-      // and we haven't exhausted turns, prompt the model to proceed with file edits rather than stopping.
-      if (isActionRequest && modifiedFilesSet.size === 0 && turns < maxTurns) {
-        conversation.push({
-          role: 'user',
-          content: 'You investigated the codebase or presented code in chat, but NO files have been modified in the workspace yet. The user explicitly requested an implementation or code change. As an autonomous coding agent, you must execute the changes directly: locate the target file (such as routes, controllers, or domain services) and call `replace_file_content` or `write_file` to apply the implementation in the code now.',
-        });
-        continue;
-      }
-
+      const outcome: AgentOutcome = toolFailures.some((failure) => failure.kind === 'rule_blocked')
+        ? 'rule_blocked'
+        : toolFailures.length > 0 ? 'tool_error' : 'completed';
       return {
-        completed: true,
+        completed: outcome === 'completed',
+        outcome,
+        toolFailures,
         finalAssistantMessage: assistantMsg,
         turnsExecuted: turns,
         allMessages: conversation.filter((m) => m.role !== 'system'),
-        modifiedFiles: Array.from(modifiedFilesSet),
+        modifiedFiles: await observedFiles(),
         toolCallsExecuted,
+        telemetry: getTelemetry(),
       };
     }
 
@@ -210,15 +318,52 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
         parsedArgs = {};
       }
 
-      if (tc.function.name === 'write_file' || tc.function.name === 'replace_file_content') {
-        if (parsedArgs.path) {
-          modifiedFilesSet.add(String(parsedArgs.path));
-        }
-      }
-
       options.onToolCallStart?.({ name: tc.function.name, args: parsedArgs });
 
       let resultText = '';
+
+      if (tc.function.name === 'report_task_outcome') {
+        if (parsedArgs.outcome === 'rule_blocked' && typeof parsedArgs.ruleId === 'string' && parsedArgs.ruleId.trim()
+          && typeof parsedArgs.reason === 'string' && parsedArgs.reason.trim()) {
+          toolFailures.push({ tool: tc.function.name, callId: tc.id, kind: 'rule_blocked',
+            reason: parsedArgs.reason, ruleId: parsedArgs.ruleId, evidence: 'agent_declared' });
+          resultText = `Agent-declared business-rule refusal recorded: ${parsedArgs.ruleId}: ${parsedArgs.reason}`;
+        } else {
+          resultText = 'Invalid outcome report: rule_blocked requires a nonempty ruleId and reason.';
+          toolFailures.push({ tool: tc.function.name, callId: tc.id, kind: 'tool_error', reason: resultText, evidence: 'tool_execution' });
+        }
+        options.onToolCallDone?.({ name: tc.function.name, result: resultText });
+        conversation.push({ role: 'tool', tool_call_id: tc.id, name: tc.function.name, content: resultText });
+        continue;
+      }
+
+      if (options.broker) {
+        const isMcp = Boolean(options.mcpManager?.hasTool(tc.function.name));
+        const mcpTool = isMcp ? options.mcpManager?.getTool(tc.function.name) : undefined;
+        const readOnly = mcpTool ? mcpTool.readOnly : undefined;
+
+        const auth = await options.broker.authorizeToolCall({
+          tool: tc.function.name,
+          args: parsedArgs,
+          readOnly,
+          domain: options.domain || 'default',
+          actionId: tc.id,
+        });
+
+        if (!auth.allowed) {
+          resultText = `Execution of tool '${tc.function.name}' denied by approval broker: ${auth.reason}`;
+          toolFailures.push({ tool: tc.function.name, callId: tc.id, kind: 'rule_blocked', reason: auth.reason, evidence: 'approval_broker' });
+          options.onToolCallDone?.({ name: tc.function.name, result: resultText });
+          conversation.push({
+            role: 'tool',
+            tool_call_id: tc.id,
+            name: tc.function.name,
+            content: resultText,
+          });
+          continue;
+        }
+      }
+
       try {
         if (options.mcpManager?.hasTool(tc.function.name)) {
           resultText = await options.mcpManager.callTool(tc.function.name, parsedArgs);
@@ -227,6 +372,15 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
         }
       } catch (err: unknown) {
         resultText = `Error executing ${tc.function.name}: ${err instanceof Error ? err.message : String(err)}`;
+        toolFailures.push({ tool: tc.function.name, callId: tc.id, kind: 'tool_error', reason: resultText });
+      }
+
+      if (tc.function.name === 'run_bash_command' && /^(?:Exit code: (?!0(?:\n|$))|Command timed out|Process error:)/.test(resultText)) {
+        toolFailures.push({ tool: tc.function.name, callId: tc.id, kind: 'tool_error', reason: resultText });
+      }
+
+      if (options.broker) {
+        await options.broker.recordToolResult(tc.id, tc.function.name, resultText, options.domain || 'default').catch(() => undefined);
       }
 
       options.onToolCallDone?.({ name: tc.function.name, result: resultText });
@@ -242,10 +396,13 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
 
   return {
     completed: false,
+    outcome: 'turn_limit',
+    toolFailures,
     finalAssistantMessage: conversation[conversation.length - 1],
     turnsExecuted: turns,
     allMessages: conversation.filter((m) => m.role !== 'system'),
-    modifiedFiles: Array.from(modifiedFilesSet),
+    modifiedFiles: await observedFiles(),
     toolCallsExecuted,
+    telemetry: getTelemetry(),
   };
 }

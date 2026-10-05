@@ -96,3 +96,23 @@ Funcionalidade: Servidor MCP de governança e propostas locais
     Então deve encontrar exemplos de execução global e por npx
     E deve encontrar configurações para Claude Desktop e Cursor
     E o catálogo deve distinguir ferramentas por modo de operação
+
+  @BSH-MCPS-013
+  Cenário: Persistência recuperável e ciclo de vida de propostas de patch via MCP
+    Dado uma proposta de alteração submetida pela ferramenta "bsh_propose_patch"
+    Quando o patch é recebido pelo servidor MCP
+    Então a proposta deve receber um identificador recuperável e ser persistida no armazenamento local
+    E conteúdo, digest e contexto de submissão devem permanecer vinculados
+    E a proposta deve admitir os estados "UNDER_REVIEW", "AUTHORIZED", "APPLIED" e "REJECTED"
+    E a confirmação de submissão só deve ocorrer após persistência bem-sucedida
+    E falhas de armazenamento devem produzir erro sem confirmação de envio
+
+  @BSH-MCPS-014
+  Cenário: Delimitação consultiva da validação de fatos autodeclarados por MCP
+    Dado fatos em formato Turtle enviados à ferramenta "bsh_validate_shacl"
+    Quando a validação é executada
+    Então a resposta deve declarar expressamente que a validação é consultiva e não atesta correspondência com o código do projeto
+    E fatos autodeclarados pelo cliente não devem substituir evidências extraídas pelo host
+    E a autorização de promoção deve exigir evidências vinculadas ao candidato pelo mecanismo de extração do host
+    E a integração deve informar seu papel consultivo sem autorizar isoladamente um candidato
+

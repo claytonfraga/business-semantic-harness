@@ -1,0 +1,16 @@
+{
+  "installedRoot": "/home/clayton/.nvm/versions/node/v22.19.0/lib/node_modules/business-semantic-harness",
+  "cliVersion": "0.2.12-beta",
+  "bunVersion": "1.4.2",
+  "openTuiModule": "OpenTUI import verified",
+  "ask": {
+    "status": "SUCCESS",
+    "boolean": false,
+    "engine": "@comunica/query-sparql-rdfjs-lite@5.4.1"
+  },
+  "select": {
+    "status": "EMPTY",
+    "engine": "@comunica/query-sparql-rdfjs-lite@5.4.1"
+  },
+  "e2eExecuted": false
+}

@@ -52,6 +52,7 @@ Funcionalidade: Guarda preventiva de prompts e modos de governança
   @BSH-GUARD-007
   Cenário: Prosseguir sem conceder promoção
     Dado que o usuário confirma o prosseguimento de um prompt violador
+    E pode confirmar pressionando "Enter" com o campo vazio enquanto a confirmação está pendente
     Quando o agente inicia a execução
     Então deve continuar no workspace isolado sob governança
     E a confirmação de intenção não deve autorizar automaticamente a promoção de código violador
@@ -86,3 +87,12 @@ Funcionalidade: Guarda preventiva de prompts e modos de governança
     Quando o usuário pressiona "Ctrl+G" ou "Ctrl+L"
     Então os atalhos devem executar a alternância de governança e a limpeza previstas na especificação da interface
     E a semântica de "Ctrl+G" deve ser reconciliada com a descrição histórica de revisão de diff
+
+  @BSH-GUARD-012
+  Cenário: Triagem heurística de intenção do prompt e diferenciação de testes
+    Dado um prompt submetido à triagem prévia
+    Quando a intenção é analisada
+    Então a interface deve identificar a análise como heurística de intenção e não afirmar consulta ontológica ou execução SHACL não ocorridas
+    E pedidos para implementar testes de uma proibição devem ser diferenciados de pedidos para violá-la
+    E uma negação local não deve alterar indevidamente a classificação de toda a solicitação
+    E a triagem deve registrar mecanismo, resultado e limitações

@@ -21,7 +21,10 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: npm
       - run: npm ci
+      - run: npm run quality
       - run: npm test
+      - name: Semantic integration and E2E pipeline
+        run: npm run test:e2e
       - name: Pack the installable tarball
         run: |
           mkdir -p release-assets

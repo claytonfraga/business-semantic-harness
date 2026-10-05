@@ -16,6 +16,16 @@ export interface AuditEvent {
   decision: 'allow' | 'deny';
   actor?: string;
   reason: string;
+  candidateCommit?: string;
+  tool?: string;
+  authorizedArguments?: unknown;
+  result?: string;
+  responsible?: string;
+  justification?: string;
+  version?: string;
+  meaningReviewJustification?: string;
+  contractChangeType?: string;
+  contractDigest?: string;
 }
 
 function redact(value: string, secrets: readonly string[]): string {
@@ -43,6 +53,10 @@ export async function appendAudit(root: string, event: AuditEvent, secrets: read
       rules: event.rules.map((rule) => redact(rule, secrets)),
       actor: event.actor ? redact(event.actor, secrets) : undefined,
       reason: redact(event.reason, secrets),
+      responsible: event.responsible ? redact(event.responsible, secrets) : undefined,
+      justification: event.justification ? redact(event.justification, secrets) : undefined,
+      tool: event.tool ? redact(event.tool, secrets) : undefined,
+      result: event.result ? redact(event.result, secrets) : undefined,
     };
     const line = `${JSON.stringify(clean)}\n`;
     await handle.writeFile(line, 'utf8');
