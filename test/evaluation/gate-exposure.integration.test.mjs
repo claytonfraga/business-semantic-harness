@@ -1,12 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { execFile } from 'node:child_process';
 import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { promisify } from 'node:util';
-
-const exec = promisify(execFile);
+import { runCommand as exec } from '../support/command-runner.mjs';
 
 test('Given fixed synthetic conforming violating and absent candidates, When the production validation exposure runs, Then it separates validation outcomes from unobserved promotion metrics (BSH-EXP-001 BSH-EXP-006)', async () => {
   const root = await mkdtemp(join(tmpdir(), 'bsh-exposure-integration-'));
@@ -33,7 +30,7 @@ ex:Shape a sh:NodeShape ; sh:targetClass ex:Action ; sh:property [ sh:path ex:va
       { id: 'unrecognized', expected: 'INVALID', path: 'evaluation/fixtures/unrecognized.ttl' },
     ]));
     // Module integration, not a CLI/TUI E2E or an agent session. No validator mock.
-    await exec('/usr/bin/rtk', ['node', resolve('scripts/gate-exposure.mjs'), root, join(root, 'output')]);
+    await exec('node', [resolve('scripts/gate-exposure.mjs'), root, join(root, 'output')]);
     const result = JSON.parse(await readFile(join(root, 'output/gate-exposure-results.json'), 'utf8'));
     assert.equal(result.falseBlocks, null);
     assert.equal(result.violationsPromoted, null);

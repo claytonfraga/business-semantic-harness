@@ -1,15 +1,12 @@
 import assert from 'node:assert/strict';
-import { execFile } from 'node:child_process';
 import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { promisify } from 'node:util';
 import { test } from 'node:test';
 import { criarSessaoWorktree, git, removerSessaoWorktree } from '../../dist/git/worktree.js';
 import { evaluateWorkspaceDiffGate } from '../../dist/enforcement/diffGate.js';
 import { evaluateGovernance } from '../../dist/enforcement/governanceDecision.js';
-
-const run = promisify(execFile);
+import { runCommand as run } from '../support/command-runner.mjs';
 const PREFIX = '@prefix ex: <urn:reconciled:> .\n@prefix sh: <http://www.w3.org/ns/shacl#> .\n';
 const graph = (value) => `${PREFIX}\nex:candidate a ex:Item${value === null ? '' : ` ; ex:val "${value}"`} .\n`;
 
@@ -89,7 +86,7 @@ ex:ItemShape a sh:NodeShape ;
 
   await writeFile(join(repo, 'src/app.js'), 'export const val = 1;\n');
 
-  await run('/usr/bin/rtk', ['git', 'init', '-q', '-b', 'master', repo]);
+  await run('git', ['init', '-q', '-b', 'master', repo]);
   await git(repo, ['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'add', '-A']);
   await git(repo, ['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'base']);
   const base = (await git(repo, ['rev-parse', 'HEAD'])).trim();

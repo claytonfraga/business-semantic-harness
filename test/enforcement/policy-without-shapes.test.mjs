@@ -1,17 +1,14 @@
 import assert from 'node:assert/strict';
-import { execFile } from 'node:child_process';
 import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { promisify } from 'node:util';
 import { test } from 'node:test';
 import { criarSessaoWorktree, git, removerSessaoWorktree } from '../../dist/git/worktree.js';
 import { promoverSessao } from '../../dist/git/promotion.js';
 import { evaluateGovernance } from '../../dist/enforcement/governanceDecision.js';
 import { createOntologySnapshot } from '../../dist/ontology/query.js';
 import { validarOperacao } from '../../dist/enforcement/validadorSemantico.js';
-
-const run = promisify(execFile);
+import { runCommand as run } from '../support/command-runner.mjs';
 const gatesOk = async () => ({ ok: true, saida: 'ok' });
 const PREFIX = '@prefix ex: <urn:generic:> .';
 const graph = (value) => `${PREFIX}\nex:candidate a ex:Action${value === null ? '' : ` ; ex:value "${value}"`} .\n`;
@@ -45,7 +42,7 @@ ex:ActionShape a sh:NodeShape ; sh:targetClass ex:${shapes ? 'Action' : 'Other'}
   }] }));
   await writeFile(join(repo, 'src/module.js'), 'export const value = 1;\n');
   if (generic) await rm(join(repo, '.bsh'), { recursive: true });
-  await run('/usr/bin/rtk', ['git', 'init', '-q', '-b', 'master', repo]);
+  await run('git', ['init', '-q', '-b', 'master', repo]);
   await git(repo, ['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'add', '-A']);
   await git(repo, ['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'base']);
   const base = (await git(repo, ['rev-parse', 'HEAD'])).trim();

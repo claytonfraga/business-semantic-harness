@@ -1,12 +1,11 @@
 // Requirements: BSH-EXP-001/002/003/009. Real Git, extractor, SHACL and npm gates; native-generation case mocks only model transport explicitly.
 import assert from 'node:assert/strict';
-import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { promisify } from 'node:util';
 import { test } from 'node:test';
+import { runCommand as exec } from '../support/command-runner.mjs';
 import { criarSessaoWorktree, git, removerSessaoWorktree } from '../../dist/git/worktree.js';
 import { evaluateProductionCandidate, getProductionIdentity, runProductionGates, createProductionStages } from '../../dist/evaluation/production.js';
 import { createNativeGeneration } from '../../dist/evaluation/generation.js';
@@ -15,7 +14,6 @@ import { loadExperimentRun, replayExperimentRun } from '../../dist/evaluation/re
 import { parseShapes } from '../../dist/ontology/rdf.js';
 import { validateData } from '../../dist/ontology/validate.js';
 
-const exec = promisify(execFile);
 const hash = value => createHash('sha256').update(value).digest('hex');
 
 async function fixture(t, candidate = 'valid') {
@@ -34,15 +32,15 @@ async function fixture(t, candidate = 'valid') {
   await writeFile(join(repo, 'ignored.bin'), Buffer.from([0, 128, 255, 10, 0]));
   await writeFile(join(repo, 'substituted.txt'), '$Format:%H$\n');
   for (const args of [['init', '-b', 'main'], ['config', 'user.name', 'QA'], ['config', 'user.email', 'qa@local.invalid'], ['add', '.'], ['commit', '-m', 'Synthetic baseline']]) {
-    await exec('/usr/bin/rtk', ['git', '-C', repo, ...args]);
+    await exec('git', ['-C', repo, ...args]);
   }
   const baseCommit = (await git(repo, ['rev-parse', 'HEAD'])).trim();
   const session = await criarSessaoWorktree({ repositorioOrigem: repo, branchOrigem: 'main', commitBase: baseCommit, diretorioBase: join(root, 'worktrees') });
   t.after(async () => { await removerSessaoWorktree(session, true); await rm(root, { recursive: true, force: true }); });
   if (candidate === null) return { session, repo };
   await writeFile(join(session.caminhoWorktree, 'src/change.js'), `export const observed = "${candidate === 'valid' ? 'READY' : 'BLOCKED'}";\nexport function change_${candidate}(){ return observed; }\n`);
-  await exec('/usr/bin/rtk', ['git', '-C', session.caminhoWorktree, 'add', '.']);
-  await exec('/usr/bin/rtk', ['git', '-C', session.caminhoWorktree, 'commit', '-m', 'Synthetic candidate']);
+  await exec('git', ['-C', session.caminhoWorktree, 'add', '.']);
+  await exec('git', ['-C', session.caminhoWorktree, 'commit', '-m', 'Synthetic candidate']);
   return { session, repo };
 }
 
@@ -157,8 +155,8 @@ for (const script of ['quality', 'test', 'pretest', 'check']) {
     const packageManifest = JSON.parse(await readFile(packagePath, 'utf8'));
     packageManifest.scripts[script] = 'true';
     await writeFile(packagePath, JSON.stringify(packageManifest));
-    await exec('/usr/bin/rtk', ['git', '-C', session.caminhoWorktree, 'add', 'package.json']);
-    await exec('/usr/bin/rtk', ['git', '-C', session.caminhoWorktree, 'commit', '-m', `Weaken ${script} gate for negative regression`]);
+    await exec('git', ['-C', session.caminhoWorktree, 'add', 'package.json']);
+    await exec('git', ['-C', session.caminhoWorktree, 'commit', '-m', `Weaken ${script} gate for negative regression`]);
     assert.equal((await git(session.caminhoWorktree, ['status', '--porcelain', '--untracked-files=all'])).trim(), '');
     await assert.rejects(runProductionGates(session, ['npm run quality', 'npm test']),
       /gate implementation changed/);
@@ -168,8 +166,8 @@ for (const script of ['quality', 'test', 'pretest', 'check']) {
 
 async function advanceOrigin(repo) {
   await writeFile(join(repo, 'src/advanced-base.js'), 'export const baselineRevision = 2;\n');
-  await exec('/usr/bin/rtk', ['git', '-C', repo, 'add', 'src/advanced-base.js']);
-  await exec('/usr/bin/rtk', ['git', '-C', repo, 'commit', '-m', 'Advance controlled origin for negative regression']);
+  await exec('git', ['-C', repo, 'add', 'src/advanced-base.js']);
+  await exec('git', ['-C', repo, 'commit', '-m', 'Advance controlled origin for negative regression']);
 }
 
 test('Given an origin advanced after the fresh worktree was created, When native generation receives a recalculated origin base hash, Then it rejects the stale starting base before model requests (BSH-EXP-002)', async t => {
