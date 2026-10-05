@@ -21,6 +21,15 @@ Funcionalidade: Avaliação funcional, métricas e evidências
     Então deve usar o binário global "bsh" empacotado e instalado via npm
     E scripts TypeScript diretos como tsx, ts-node ou node src não devem substituir o produto distribuído
 
+  @BSH-EVAL-015
+  Cenário: Instalar a versão atual globalmente e testar somente o binário
+    Dado um teste funcional ou E2E do BSH
+    Quando o teste é preparado
+    Então a versão atual do pacote deve ser construída e instalada globalmente via npm antes da primeira sessão
+    E a versão reportada por "bsh --version" deve coincidir com a versão de "package.json"
+    E o teste deve exercitar exclusivamente o binário global "bsh" e nunca o código-fonte
+    E se a versão instalada divergir da versão atual, o caso deve ser marcado como bloqueado antes do primeiro turno
+
   @BSH-EVAL-003
   Cenário: Validar ontologia da cópia de projeto
     Dado uma cópia limpa do piloto selecionada para teste
