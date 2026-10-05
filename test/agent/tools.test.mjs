@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { WorkspaceToolExecutor, AGENT_TOOLS } from '../../dist/agent/tools.js';
 
-test('AGENT_TOOLS contains search_code and find_files', () => {
+test('Given BSH-TOOLS-001 agent tool definitions When inspecting registered tools Then they include search_code, find_files, read_file, write_file and replace_file_content', () => {
   const toolNames = AGENT_TOOLS.map((t) => t.function.name);
   assert.ok(toolNames.includes('search_code'), 'Deveria conter search_code');
   assert.ok(toolNames.includes('find_files'), 'Deveria conter find_files');
@@ -15,7 +15,7 @@ test('AGENT_TOOLS contains search_code and find_files', () => {
   assert.ok(toolNames.includes('run_bash_command'), 'Deveria conter run_bash_command');
 });
 
-test('WorkspaceToolExecutor: search_code finds string occurrences with line numbers', async () => {
+test('Given BSH-TOOLS-002 a code search query When WorkspaceToolExecutor search_code executes Then occurrences are returned with relative path and line numbers', async () => {
   const tempDir = await mkdtemp(join(tmpdir(), 'bsh-tools-test-'));
   try {
     await mkdir(join(tempDir, 'src'), { recursive: true });
@@ -31,7 +31,7 @@ test('WorkspaceToolExecutor: search_code finds string occurrences with line numb
   }
 });
 
-test('WorkspaceToolExecutor: find_files finds matching files by pattern', async () => {
+test('Given BSH-TOOLS-004 a file name pattern When WorkspaceToolExecutor find_files executes Then matching relative paths are returned', async () => {
   const tempDir = await mkdtemp(join(tmpdir(), 'bsh-find-test-'));
   try {
     await mkdir(join(tempDir, 'src', 'governance'), { recursive: true });
@@ -47,7 +47,7 @@ test('WorkspaceToolExecutor: find_files finds matching files by pattern', async 
   }
 });
 
-test('WorkspaceToolExecutor: write_file and replace_file_content modify workspace correctly', async () => {
+test('Given BSH-TOOLS-007 write and replacement calls When WorkspaceToolExecutor write_file and replace_file_content execute Then files are updated accurately', async () => {
   const tempDir = await mkdtemp(join(tmpdir(), 'bsh-edit-test-'));
   try {
     const executor = new WorkspaceToolExecutor(tempDir);

@@ -18,54 +18,54 @@ function operacao(nome, fatos) {
   };
 }
 
-test('Caso A: Given a Disponivel asset changed with the required fields, then it is conforme', async () => {
+test('Given BSH-SEM-002 a Disponivel asset When validating AlteracaoResponsavel with required fields Then status is conforme', async () => {
   const snapshot = await createOntologySnapshot(raiz);
   const resultado = await validarOperacao(raiz, snapshot, operacao('AlteracaoResponsavel', [['estadoAtual', 'Disponivel'], ['novoResponsavel', 'Resp']]));
   assert.equal(resultado.status, 'conforme');
 });
 
-test('Caso B: Given a Baixado asset transferred, then TransferenciaShape is a violation', async () => {
+test('Given BSH-SEM-003 a Baixado asset When validating TransferenciaAtivo Then status is violacao matching TransferenciaShape', async () => {
   const snapshot = await createOntologySnapshot(raiz);
   const resultado = await validarOperacao(raiz, snapshot, operacao('TransferenciaAtivo', [['estadoAtual', 'Baixado'], ['novoResponsavel', 'Resp'], ['novaLocalizacao', 'Almoxarifado']]));
   assert.equal(resultado.status, 'violacao');
   assert.match(resultado.shape ?? '', /TransferenciaShape/);
 });
 
-test('Caso C: Given a Baixado asset with a responsible change, then ResponsavelShape is a violation', async () => {
+test('Given BSH-SEM-003 a Baixado asset When validating AlteracaoResponsavel Then status is violacao matching ResponsavelShape', async () => {
   const snapshot = await createOntologySnapshot(raiz);
   const resultado = await validarOperacao(raiz, snapshot, operacao('AlteracaoResponsavel', [['estadoAtual', 'Baixado'], ['novoResponsavel', 'Resp']]));
   assert.equal(resultado.status, 'violacao');
   assert.match(resultado.shape ?? '', /ResponsavelShape/);
 });
 
-test('Caso D: Given a Baixado asset with a location change, then LocalizacaoShape is a violation', async () => {
+test('Given BSH-SEM-003 a Baixado asset When validating AtualizacaoLocalizacao Then status is violacao matching LocalizacaoShape', async () => {
   const snapshot = await createOntologySnapshot(raiz);
   const resultado = await validarOperacao(raiz, snapshot, operacao('AtualizacaoLocalizacao', [['estadoAtual', 'Baixado'], ['novaLocalizacao', 'Almoxarifado']]));
   assert.equal(resultado.status, 'violacao');
   assert.match(resultado.shape ?? '', /LocalizacaoShape/);
 });
 
-test('Caso E: Given an operation subject to a human-review policy, then it is revisao_humana', async () => {
+test('Given BSH-SEM-003 an operation subject to human-review policy When validating TransferenciaAtivo Then status is revisao_humana', async () => {
   const snapshot = await createOntologySnapshot(raiz);
   const resultado = await validarOperacao(raiz, snapshot, operacao('TransferenciaAtivo', [['estadoAtual', 'Disponivel'], ['novoResponsavel', 'Resp'], ['novaLocalizacao', 'Almoxarifado']]));
   assert.equal(resultado.status, 'revisao_humana');
   assert.equal(resultado.requerRevisaoHumana, true);
 });
 
-test('Caso F: Given a governed operation with an undetermined required fact, then it is indeterminado', async () => {
+test('Given BSH-SEM-002 a governed operation with an undetermined required fact When validating TransferenciaAtivo Then status is indeterminado', async () => {
   const snapshot = await createOntologySnapshot(raiz);
   const resultado = await validarOperacao(raiz, snapshot, operacao('TransferenciaAtivo', [['estadoAtual', 'Disponivel'], ['novoResponsavel', null, 'indeterminado'], ['novaLocalizacao', 'Almoxarifado']]));
   assert.equal(resultado.status, 'indeterminado');
 });
 
-test('Caso G: Given an operation with no governed knowledge, then it does not invent a violation', async () => {
+test('Given BSH-SEM-001 an operation with no governed knowledge When validating OperacaoNaoGovernada Then status is conforme and governado is false', async () => {
   const snapshot = await createOntologySnapshot(raiz);
   const resultado = await validarOperacao(raiz, snapshot, operacao('OperacaoNaoGovernada', []));
   assert.equal(resultado.status, 'conforme');
   assert.equal(resultado.governado, false);
 });
 
-test('Caso H: Given a governed violation and no conflict report, then the independent enforcement still blocks', async () => {
+test('Given BSH-SEM-004 a governed violation with no conflict report When avaliarOperacoes evaluates batch Then status is violacao and bloquear is true', async () => {
   const snapshot = await createOntologySnapshot(raiz);
   const lote = await avaliarOperacoes(raiz, snapshot, [
     operacao('TransferenciaAtivo', [['estadoAtual', 'Baixado'], ['novoResponsavel', 'Resp'], ['novaLocalizacao', 'Almoxarifado']]),

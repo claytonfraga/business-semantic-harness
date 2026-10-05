@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { test } from 'node:test';
 
-test('Given a Linux bin symlink and an external codebase, when BSH runs there, then it initializes that project', () => {
+test('Given a Linux bin symlink and an external codebase When BSH runs there Then it initializes that project', () => {
   const temp = mkdtempSync(join(tmpdir(), 'bsh-installed-'));
   const project = join(temp, 'codebase');
   mkdirSync(project);

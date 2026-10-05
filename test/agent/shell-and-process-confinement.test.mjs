@@ -6,7 +6,7 @@ import test from 'node:test';
 import { WorkspaceToolExecutor, buildSafeEnv, SAFE_ENV_ALLOWLIST } from '../../dist/agent/tools.js';
 import { McpClientManager } from '../../dist/mcp/clientManager.js';
 
-test('Given an agent executing a shell command (R5), when attempting to write outside authorized workspace, then the write is blocked and external control file remains unmodified', async () => {
+test('Given an agent executing a shell command (R5) When attempting to write outside authorized workspace Then the write is blocked and external control file remains unmodified', async () => {
   const workspaceDir = await mkdtemp(join(tmpdir(), 'bsh-ws-'));
   const externalDir = await mkdtemp(join(tmpdir(), 'bsh-ext-'));
   try {
@@ -31,7 +31,7 @@ test('Given an agent executing a shell command (R5), when attempting to write ou
   }
 });
 
-test('Given an agent executing a shell command, when attempting to write to .git or .bsh, then writes are blocked and files remain unmodified', async () => {
+test('Given an agent executing a shell command When attempting to write to .git or .bsh Then writes are blocked and files remain unmodified', async () => {
   const workspaceDir = await mkdtemp(join(tmpdir(), 'bsh-ws-'));
   try {
     const gitDir = join(workspaceDir, '.git');
@@ -66,7 +66,7 @@ test('Given an agent executing a shell command, when attempting to write to .git
   }
 });
 
-test('Given file tools (write_file and replace_file_content), when attempting to target .git or .bsh, then write access is denied', async () => {
+test('Given file tools (write_file and replace_file_content) When attempting to target .git or .bsh Then write access is denied', async () => {
   const workspaceDir = await mkdtemp(join(tmpdir(), 'bsh-ws-'));
   try {
     const gitDir = join(workspaceDir, '.git');
@@ -110,7 +110,7 @@ test('Given file tools (write_file and replace_file_content), when attempting to
   }
 });
 
-test('Given host environment variables with secrets, when run_bash_command executes, then secrets are not inherited and only safe variables are provided', async () => {
+test('Given host environment variables with secrets When run_bash_command executes Then secrets are not inherited and only safe variables are provided', async () => {
   const workspaceDir = await mkdtemp(join(tmpdir(), 'bsh-ws-'));
   const secretKey = 'TEST_BSH_SECRET_KEY_' + Date.now();
   process.env[secretKey] = 'SUPER_SECRET_TOKEN_12345';
@@ -127,7 +127,7 @@ test('Given host environment variables with secrets, when run_bash_command execu
   }
 });
 
-test('Given network policy (allowNetwork: false), when run_bash_command attempts external connections, then network access is denied', async () => {
+test('Given network policy (allowNetwork: false) When run_bash_command attempts external connections Then network access is denied', async () => {
   const workspaceDir = await mkdtemp(join(tmpdir(), 'bsh-ws-'));
   try {
     const executor = new WorkspaceToolExecutor(workspaceDir, undefined, { allowNetwork: false });
@@ -149,7 +149,7 @@ test('Given network policy (allowNetwork: false), when run_bash_command attempts
   }
 });
 
-test('Given buildSafeEnv, when filtering process.env, then only allowlisted variables and explicit extras are retained', () => {
+test('Given buildSafeEnv When filtering process.env Then only allowlisted variables and explicit extras are retained', () => {
   const secretKey = 'HOST_SECRET_VAR_' + Date.now();
   const previousPager = process.env.PAGER;
   process.env[secretKey] = 'HOST_SECRET';
@@ -173,7 +173,7 @@ test('Given BSH-TOOLS-013 explicit process configuration When the safe environme
   assert.equal(buildSafeEnv({ PAGER: 'custom-pager' }).PAGER, 'custom-pager');
 });
 
-test('Given McpClientManager, when configuring servers, then environment is restricted without inheriting arbitrary secrets', async () => {
+test('Given McpClientManager When configuring servers Then environment is restricted without inheriting arbitrary secrets', async () => {
   const secretKey = 'MCP_SECRET_VAR_' + Date.now();
   process.env[secretKey] = 'TOP_SECRET_MCP';
   try {

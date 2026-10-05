@@ -9,7 +9,7 @@ import { WorkspaceToolExecutor } from '../../dist/agent/tools.js';
 import { McpClientManager } from '../../dist/mcp/clientManager.js';
 import { runAgentTurn } from '../../dist/agent/agentLoop.js';
 
-test('Given a mutating native tool (write_file), when the broker denies authorization, then the file is not written and the denial is audited', async () => {
+test('Given a mutating native tool (write_file) When the broker denies authorization Then the file is not written and the denial is audited', async () => {
   const root = await mkdtemp(join(tmpdir(), 'bsh-broker-test-'));
   try {
     // Broker configured with human reviewer that denies
@@ -53,7 +53,7 @@ test('Given a mutating native tool (write_file), when the broker denies authoriz
   }
 });
 
-test('Given a mutating native tool (write_file), when the human approves via broker, then the file is written and audit logs tool, authorized arguments, decision, and result', async () => {
+test('Given a mutating native tool (write_file) When the human approves via broker Then the file is written and audit logs tool, authorized arguments, decision, and result', async () => {
   const root = await mkdtemp(join(tmpdir(), 'bsh-broker-test-'));
   try {
     const broker = new ApprovalBroker(root, async () => ({
@@ -86,7 +86,7 @@ test('Given a mutating native tool (write_file), when the human approves via bro
   }
 });
 
-test('Given a read-only tool (read_file), when dispatched, then it is authorized as read-only and audited without human prompt', async () => {
+test('Given a read-only tool (read_file) When dispatched Then it is authorized as read-only and audited without human prompt', async () => {
   const root = await mkdtemp(join(tmpdir(), 'bsh-broker-test-'));
   try {
     let askCalled = false;
@@ -114,7 +114,7 @@ test('Given a read-only tool (read_file), when dispatched, then it is authorized
   }
 });
 
-test('Given a tool declared readOnly: true, when attempting a mutating action, then the broker denies execution', async () => {
+test('Given a tool declared readOnly: true When attempting a mutating action Then the broker denies execution', async () => {
   const root = await mkdtemp(join(tmpdir(), 'bsh-broker-test-'));
   try {
     const broker = new ApprovalBroker(root);
@@ -139,7 +139,7 @@ test('Given a tool declared readOnly: true, when attempting a mutating action, t
   }
 });
 
-test('Given runAgentTurn with ApprovalBroker, when model proposes a mutating tool call that broker denies, then the call never executes and conversation contains denial', async () => {
+test('Given runAgentTurn with ApprovalBroker When model proposes a mutating tool call that broker denies Then the call never executes and conversation contains denial', async () => {
   const root = await mkdtemp(join(tmpdir(), 'bsh-agent-broker-'));
   try {
     let executorInvoked = false;
@@ -194,7 +194,7 @@ test('Given runAgentTurn with ApprovalBroker, when model proposes a mutating too
   }
 });
 
-test('Given McpClientManager, when an MCP tool call is dispatched with a broker, then the call cannot bypass the broker', async () => {
+test('Given McpClientManager When an MCP tool call is dispatched with a broker Then the call cannot bypass the broker', async () => {
   const root = await mkdtemp(join(tmpdir(), 'bsh-mcp-broker-'));
   try {
     const broker = new ApprovalBroker(root, async () => ({

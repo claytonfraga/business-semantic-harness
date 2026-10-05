@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { getAvailableDomains, loadDomainValidator } from '../../dist/governance/domainRegistry.js';
 
-test('Given pilot asset-management project, when getAvailableDomains is called, then ativos domain is discovered with stats', async () => {
+test('Given pilot asset-management project When getAvailableDomains is called Then ativos domain is discovered with stats', async () => {
   const pilotRoot = resolve('pilot/asset-management');
   const domains = await getAvailableDomains(pilotRoot);
   assert.equal(domains.length, 1);
@@ -13,7 +13,7 @@ test('Given pilot asset-management project, when getAvailableDomains is called, 
   assert.ok(ativos.shapesCount > 0, 'shapesCount should be greater than 0');
 });
 
-test('Given pilot asset-management project, when loadDomainValidator is called for ativos, then validator is initialized', async () => {
+test('Given pilot asset-management project When loadDomainValidator is called for ativos Then validator is initialized', async () => {
   const pilotRoot = resolve('pilot/asset-management');
   const validator = await loadDomainValidator(pilotRoot, 'ativos');
   assert.equal(validator.domainId, 'ativos');

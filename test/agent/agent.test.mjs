@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import { WorkspaceToolExecutor } from '../../dist/agent/tools.js';
 import { runAgentTurn, isActionPrompt } from '../../dist/agent/agentLoop.js';
 
-test('Given WorkspaceToolExecutor, when write_file, read_file and replace_file_content are called, then operations succeed inside workspace', async () => {
+test('Given WorkspaceToolExecutor When write_file, read_file and replace_file_content are called Then operations succeed inside workspace', async () => {
   const tempDir = mkdtempSync(join(tmpdir(), 'bsh-tools-test-'));
   try {
     const executor = new WorkspaceToolExecutor(tempDir);
@@ -34,7 +34,7 @@ test('Given WorkspaceToolExecutor, when write_file, read_file and replace_file_c
   }
 });
 
-test('Given WorkspaceToolExecutor, when path traversal is attempted, then it is blocked', async () => {
+test('Given WorkspaceToolExecutor When path traversal is attempted Then it is blocked', async () => {
   const tempDir = mkdtempSync(join(tmpdir(), 'bsh-escape-test-'));
   try {
     const executor = new WorkspaceToolExecutor(tempDir);
@@ -49,7 +49,7 @@ test('Given WorkspaceToolExecutor, when path traversal is attempted, then it is 
   }
 });
 
-test('Given runAgentTurn, when model emits a tool call, then tool is executed and turn finishes', async () => {
+test('Given runAgentTurn When model emits a tool call Then tool is executed and turn finishes', async () => {
   const tempDir = mkdtempSync(join(tmpdir(), 'bsh-agent-test-'));
   try {
     let callIndex = 0;
@@ -103,7 +103,7 @@ test('Given runAgentTurn, when model emits a tool call, then tool is executed an
   }
 });
 
-test('Given isActionPrompt, when evaluating imperative coding requests vs informational questions, then classifies correctly', () => {
+test('Given isActionPrompt When evaluating imperative coding requests vs informational questions Then classifies correctly', () => {
   // Imperative action requests
   assert.equal(isActionPrompt('faça um endpoint pra transferir um ativo não baixado'), true);
   assert.equal(isActionPrompt('crie uma rota de exclusão no servidor HTTP'), true);
@@ -140,7 +140,7 @@ test('Given an action refused by a business rule When the model ends without too
   }
 });
 
-test('Given runAgentTurn, when model generates explanation before tool call, then onAssistantMessage is invoked', async () => {
+test('Given runAgentTurn When model generates explanation before tool call Then onAssistantMessage is invoked', async () => {
   const tempDir = mkdtempSync(join(tmpdir(), 'bsh-agent-msg-test-'));
   try {
     let callIndex = 0;

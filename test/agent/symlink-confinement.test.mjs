@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import test from 'node:test';
 import { WorkspaceToolExecutor } from '../../dist/agent/tools.js';
 
-test('Given an internal symlink pointing to an external control file (R4), when write_file is attempted, then it is blocked and external file remains unmodified', async () => {
+test('Given an internal symlink pointing to an external control file (R4) When write_file is attempted Then it is blocked and external file remains unmodified', async () => {
   const workspaceDir = await mkdtemp(join(tmpdir(), 'bsh-ws-'));
   const externalDir = await mkdtemp(join(tmpdir(), 'bsh-ext-'));
   try {
@@ -39,7 +39,7 @@ test('Given an internal symlink pointing to an external control file (R4), when 
   }
 });
 
-test('Given an internal symlink pointing to an external file, when read_file or replace_file_content is attempted, then access is rejected and file is not modified', async () => {
+test('Given an internal symlink pointing to an external file When read_file or replace_file_content is attempted Then access is rejected and file is not modified', async () => {
   const workspaceDir = await mkdtemp(join(tmpdir(), 'bsh-ws-'));
   const externalDir = await mkdtemp(join(tmpdir(), 'bsh-ext-'));
   try {
@@ -80,7 +80,7 @@ test('Given an internal symlink pointing to an external file, when read_file or 
   }
 });
 
-test('Given an internal symlink pointing to an external directory, when creating a new file inside it, then the operation is rejected before file creation', async () => {
+test('Given an internal symlink pointing to an external directory When creating a new file inside it Then the operation is rejected before file creation', async () => {
   const workspaceDir = await mkdtemp(join(tmpdir(), 'bsh-ws-'));
   const externalDir = await mkdtemp(join(tmpdir(), 'bsh-ext-'));
   try {
@@ -112,7 +112,7 @@ test('Given an internal symlink pointing to an external directory, when creating
   }
 });
 
-test('Given an internal symlink pointing to an external directory with nested non-existent path, when write_file is attempted, then ancestor check rejects it', async () => {
+test('Given an internal symlink pointing to an external directory with nested non-existent path When write_file is attempted Then ancestor check rejects it', async () => {
   const workspaceDir = await mkdtemp(join(tmpdir(), 'bsh-ws-'));
   const externalDir = await mkdtemp(join(tmpdir(), 'bsh-ext-'));
   try {
@@ -136,7 +136,7 @@ test('Given an internal symlink pointing to an external directory with nested no
   }
 });
 
-test('Given an internal symlink pointing to an external directory, when list_directory or search_code is attempted, then access is rejected', async () => {
+test('Given an internal symlink pointing to an external directory When list_directory or search_code is attempted Then access is rejected', async () => {
   const workspaceDir = await mkdtemp(join(tmpdir(), 'bsh-ws-'));
   const externalDir = await mkdtemp(join(tmpdir(), 'bsh-ext-'));
   try {
@@ -168,7 +168,7 @@ test('Given an internal symlink pointing to an external directory, when list_dir
   }
 });
 
-test('Given an internal symlink pointing to an internal file or directory, when accessed, then operations succeed inside workspace', async () => {
+test('Given an internal symlink pointing to an internal file or directory When accessed Then operations succeed inside workspace', async () => {
   const workspaceDir = await mkdtemp(join(tmpdir(), 'bsh-ws-'));
   try {
     await mkdir(join(workspaceDir, 'src'), { recursive: true });
@@ -196,7 +196,7 @@ test('Given an internal symlink pointing to an internal file or directory, when 
   }
 });
 
-test('Given file descriptor inspection (TOCTOU mitigation), when writing with safeWriteFile, then external file is never truncated or overwritten', async () => {
+test('Given file descriptor inspection (TOCTOU mitigation) When writing with safeWriteFile Then external file is never truncated or overwritten', async () => {
   const workspaceDir = await mkdtemp(join(tmpdir(), 'bsh-ws-'));
   const externalDir = await mkdtemp(join(tmpdir(), 'bsh-ext-'));
   try {

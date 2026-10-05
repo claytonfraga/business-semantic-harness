@@ -26,7 +26,7 @@ function novoRepositorio(nome) {
 
 after(() => rmSync(raiz, { recursive: true, force: true }));
 
-test('Given a registered session, when listing, then it reports state, branch and worktree', async () => {
+test('Given a registered session When listing Then it reports state, branch and worktree', async () => {
   const repo = novoRepositorio('listar');
   const sessao = await criarSessaoWorktree({ repositorioOrigem: repo, branchOrigem: await branchAtual(repo), commitBase: await commitAtual(repo), diretorioBase: worktrees });
   await gravarSessao(repo, sessao, 'WORKTREE_READY');
@@ -38,7 +38,7 @@ test('Given a registered session, when listing, then it reports state, branch an
   assert.equal(encontrada.orfa, false);
 });
 
-test('Given a registered session, when cleaned, then the worktree and branch are removed', async () => {
+test('Given a registered session When cleaned Then the worktree and branch are removed', async () => {
   const repo = novoRepositorio('limpar');
   const sessao = await criarSessaoWorktree({ repositorioOrigem: repo, branchOrigem: await branchAtual(repo), commitBase: await commitAtual(repo), diretorioBase: worktrees });
   await gravarSessao(repo, sessao, 'CONFLICTED');
@@ -49,7 +49,7 @@ test('Given a registered session, when cleaned, then the worktree and branch are
   assert.equal(branches, '');
 });
 
-test('Given a session id that does not exist, when cleaning, then it reports not found', async () => {
+test('Given a session id that does not exist When cleaning Then it reports not found', async () => {
   const repo = novoRepositorio('inexistente');
   const resultado = await limparSessao(repo, 'nao-existe');
   assert.equal(resultado.removida, false);

@@ -15,7 +15,7 @@ async function projectWith(files) {
   return root;
 }
 
-test('Given a project backup, when a file is added, edited and removed, then all three changes are detected', async () => {
+test('Given a project backup When a file is added, edited and removed Then all three changes are detected', async () => {
   const root = await projectWith({ 'src/keep.ts': 'export const keep = 1;\n', 'src/edit.ts': 'versao original\n', 'src/remove.ts': 'para remover\n' });
   const backup = await mkdtemp(join(tmpdir(), 'bsh-backup-'));
   try {
@@ -36,7 +36,7 @@ test('Given a project backup, when a file is added, edited and removed, then all
   }
 });
 
-test('Given changes against a backup, when reverted, then the project returns to the backed up content', async () => {
+test('Given changes against a backup When reverted Then the project returns to the backed up content', async () => {
   const root = await projectWith({ 'src/edit.ts': 'versao original\n' });
   const backup = await mkdtemp(join(tmpdir(), 'bsh-backup-'));
   try {
