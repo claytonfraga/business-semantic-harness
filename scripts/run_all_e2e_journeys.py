@@ -836,7 +836,7 @@ def main():
                 "Dado a necessidade de inserir instruções complexas com quebras de linha",
                 "Quando o usuário digita o delimitador triple-quote (\"\"\") no prompt",
                 "Então o modo multilinha é ativado com indentação e quebra controlada",
-                "E o streaming de raciocínio é recolhido elegantemente per BSH-STREAM-004",
+                "E o streaming de raciocínio é recolhido elegantemente per BSH-TUI-009",
             ],
             "actions": [
                 ("type", "\"\"\"", 0.8),
