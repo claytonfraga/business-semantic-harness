@@ -251,6 +251,8 @@ bsh --project /path/to/project --domain assets --direct --prompt "Explain AssetT
 
 The production contract and payload-level regressions are tracked in [Production request governance](openspec/specs/production-request-governance.feature). Preparation supplies knowledge and authorization for dispatch; it does not assert that a future candidate satisfies the ontology.
 
+`npm run test:e2e` preserves the semantic, tool, MCP and Git integration suites. Locally it also records the installed global `bsh` in a persistent tmux session against the sovereign pilot and its configured model. Journey 20 checks an exact comment-only candidate, independent host tool approval, cancellation of a conflicting request, and unchanged origin bytes. Batch manifests determine success from observed assertions; screenshots, continuous video and the dated report are synchronized to WSL Downloads with matching hashes. Token attribution remains explicitly unavailable when no comparable measurement exists. CI runs the automated suites; live provider recordings and WSL synchronization require the local environment. Successful pull request CI additionally preserves an installable tarball and SHA-256 checksum, without publishing a release or npm version.
+
 A domain may declare request correspondences in its `.bsh/project.json` entry, for example:
 
 ```json

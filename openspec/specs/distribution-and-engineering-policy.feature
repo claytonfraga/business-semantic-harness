@@ -46,6 +46,8 @@ Funcionalidade: Distribuição e regras de engenharia
     Quando o workflow CI executa
     Então deve instalar dependências de forma reproduzível com "npm ci"
     E deve executar testes e a suíte E2E no ambiente Node.js configurado
+    E após aprovação dos checks deve preservar o pacote instalável e seu checksum SHA-256 como artefatos do pull request
+    E essa geração de artefatos não deve publicar versão no npm nem criar release sem evento autorizado
 
   @BSH-DIST-006
   Cenário: Gerar release verificável

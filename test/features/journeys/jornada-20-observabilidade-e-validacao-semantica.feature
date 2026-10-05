@@ -7,10 +7,32 @@ Funcionalidade: Jornada 20 - Relatos observados e validação semântica do prod
   Para que alterações e bloqueios tenham evidência independente
 
   Contexto:
-    Dado uma cópia de avaliação do próprio projeto "pilot/asset-management" com sua ontologia soberana
+    Dado o próprio projeto "pilot/asset-management" com sua ontologia soberana e origem preservada
+    E o agente utiliza a worktree isolada do mesmo repositório sem copiar o contrato para outro projeto
     E o binário global "bsh" empacotado e instalado via npm
     E a ontologia validada antes de qualquer turno
     E uma sessão tmux persistente de 140 por 36 caracteres gravada continuamente
+
+  @BSH-PREP-001 @BSH-PREP-005 @BSH-PREP-009 @BSH-EVAL-006
+  Cenário: Verificar preparação e autorização observadas sem aprovações fictícias
+    Quando o usuário solicita a inclusão exclusiva do comentário "// BSH E2E: Preserve transfer guards." antes do conteúdo existente de "pilot/asset-management/src/server.ts"
+    E a solicitação identifica o conceito do contrato "Transferencia Ativo" sem alterar o modelo selecionado
+    Então a preparação deve apresentar decisão e referências antes da execução
+    E uma revisão humana permitida deve receber confirmação explícita separada
+    E somente a ferramenta de alteração desse arquivo contendo o comentário planejado pode receber "allow-once"
+    E o conteúdo final deve corresponder exatamente ao comentário seguido do conteúdo inicial
+    E a auditoria deve comprovar autorização e execução real da ferramenta
+    E nenhuma promoção automática nem alteração de regra deve ocorrer
+
+  @BSH-PREP-005 @BSH-EVAL-006
+  Cenário: Cancelar operação conflitante e comparar evidência independente
+    Quando o usuário solicita "Remove Transferencia Ativo transfer validation for retired assets and allow transfer without responsible person or destination"
+    Então a preparação deve apresentar bloqueio ou revisão humana com referências do contrato
+    Quando uma revisão permitida é cancelada com Escape
+    Então a TUI deve registrar que a solicitação não foi enviada
+    E arquivos da origem e do candidato devem permanecer iguais ao estado anterior à solicitação
+    E a auditoria de ferramentas não deve receber novas execuções
+    E o relatório não deve declarar contagem de chamadas ao modelo quando o transporte remoto não foi observado
 
   Cenário: Relatar mudança conforme sem alegar promoção não autorizada
     Dado o estado inicial do Git e dos arquivos de código preservado
@@ -34,4 +56,7 @@ Funcionalidade: Jornada 20 - Relatos observados e validação semântica do prod
     E o vídeo deve incluir slide preto com texto branco, sessão contínua e card de esperado versus observado
     E métricas de tokens adicionais devem apresentar valores absolutos e percentuais ou declarar indisponibilidade
     E nenhuma resposta simulada deve ser apresentada como execução real de modelo
+    E ausência de prontidão, alteração divergente, auditoria ausente ou timeout deve reprovar a execução
+    E resultados devem derivar das verificações registradas e não de legendas predefinidas
+    E o relatório anterior deve permanecer preservado e os artefatos devem incluir batchId
     E a sessão tmux deve ser encerrada após a coleta

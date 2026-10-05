@@ -25,3 +25,14 @@ jobs:
       - run: npm test
       - name: Semantic integration and E2E pipeline
         run: npm run test:e2e
+      - name: Pack the verified pull request distribution
+        run: |
+          mkdir -p ci-distribution
+          npm pack --ignore-scripts --pack-destination ci-distribution
+          cd ci-distribution
+          sha256sum *.tgz > SHA256SUMS
+      - name: Preserve the verified distribution and checksums
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsh-verified-distribution
+          path: ci-distribution/

@@ -3617,7 +3617,12 @@
         "test/support/record_bsh_e2e_video.py",
         "test/support/tmux-screenshot.py",
         "pilot/asset-management/evaluation",
-        "pilot/asset-management/scripts/generate_semantic_reports.py"
+        "pilot/asset-management/scripts/generate_semantic_reports.py",
+        "scripts/run-production-e2e.py",
+        "scripts/run_all_e2e_journeys.py",
+        "scripts/verify-e2e-sync.mjs",
+        "test/evaluation/e2e-evidence-verifier.test.mjs",
+        "test/features/journeys/jornada-20-observabilidade-e-validacao-semantica.feature"
       ],
       "tags": [],
       "line": 40
@@ -3633,7 +3638,12 @@
         "test/support/record_bsh_e2e_video.py",
         "test/support/tmux-screenshot.py",
         "pilot/asset-management/evaluation",
-        "pilot/asset-management/scripts/generate_semantic_reports.py"
+        "pilot/asset-management/scripts/generate_semantic_reports.py",
+        "scripts/run-production-e2e.py",
+        "scripts/run_all_e2e_journeys.py",
+        "scripts/verify-e2e-sync.mjs",
+        "test/evaluation/e2e-evidence-verifier.test.mjs",
+        "test/features/journeys/jornada-20-observabilidade-e-validacao-semantica.feature"
       ],
       "tags": [],
       "line": 48
@@ -3649,7 +3659,12 @@
         "test/support/record_bsh_e2e_video.py",
         "test/support/tmux-screenshot.py",
         "pilot/asset-management/evaluation",
-        "pilot/asset-management/scripts/generate_semantic_reports.py"
+        "pilot/asset-management/scripts/generate_semantic_reports.py",
+        "scripts/run-production-e2e.py",
+        "scripts/run_all_e2e_journeys.py",
+        "scripts/verify-e2e-sync.mjs",
+        "test/evaluation/e2e-evidence-verifier.test.mjs",
+        "test/features/journeys/jornada-20-observabilidade-e-validacao-semantica.feature"
       ],
       "tags": [],
       "line": 55
@@ -3665,7 +3680,12 @@
         "test/support/record_bsh_e2e_video.py",
         "test/support/tmux-screenshot.py",
         "pilot/asset-management/evaluation",
-        "pilot/asset-management/scripts/generate_semantic_reports.py"
+        "pilot/asset-management/scripts/generate_semantic_reports.py",
+        "scripts/run-production-e2e.py",
+        "scripts/run_all_e2e_journeys.py",
+        "scripts/verify-e2e-sync.mjs",
+        "test/evaluation/e2e-evidence-verifier.test.mjs",
+        "test/features/journeys/jornada-20-observabilidade-e-validacao-semantica.feature"
       ],
       "tags": [],
       "line": 63
@@ -3681,7 +3701,12 @@
         "test/support/record_bsh_e2e_video.py",
         "test/support/tmux-screenshot.py",
         "pilot/asset-management/evaluation",
-        "pilot/asset-management/scripts/generate_semantic_reports.py"
+        "pilot/asset-management/scripts/generate_semantic_reports.py",
+        "scripts/run-production-e2e.py",
+        "scripts/run_all_e2e_journeys.py",
+        "scripts/verify-e2e-sync.mjs",
+        "test/evaluation/e2e-evidence-verifier.test.mjs",
+        "test/features/journeys/jornada-20-observabilidade-e-validacao-semantica.feature"
       ],
       "tags": [],
       "line": 72
@@ -3697,7 +3722,12 @@
         "test/support/record_bsh_e2e_video.py",
         "test/support/tmux-screenshot.py",
         "pilot/asset-management/evaluation",
-        "pilot/asset-management/scripts/generate_semantic_reports.py"
+        "pilot/asset-management/scripts/generate_semantic_reports.py",
+        "scripts/run-production-e2e.py",
+        "scripts/run_all_e2e_journeys.py",
+        "scripts/verify-e2e-sync.mjs",
+        "test/evaluation/e2e-evidence-verifier.test.mjs",
+        "test/features/journeys/jornada-20-observabilidade-e-validacao-semantica.feature"
       ],
       "tags": [],
       "line": 80
@@ -3745,7 +3775,12 @@
         "test/support/record_bsh_e2e_video.py",
         "test/support/tmux-screenshot.py",
         "pilot/asset-management/evaluation",
-        "pilot/asset-management/scripts/generate_semantic_reports.py"
+        "pilot/asset-management/scripts/generate_semantic_reports.py",
+        "scripts/run-production-e2e.py",
+        "scripts/run_all_e2e_journeys.py",
+        "scripts/verify-e2e-sync.mjs",
+        "test/evaluation/e2e-evidence-verifier.test.mjs",
+        "test/features/journeys/jornada-20-observabilidade-e-validacao-semantica.feature"
       ],
       "tags": [],
       "line": 105
@@ -6540,7 +6575,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "2a1b3c31b0fb435b52419ca03810b58c21a15f777096ea6ac6bfb18ae36f8d3d",
+      "sha256": "d5d8fb3612c4a361bc347402ed7fc0b9049aeff38bdf3645ef5bcc5904bed9b5",
       "capabilities": [
         "CLI",
         "DIST",
@@ -7977,7 +8012,7 @@
     },
     {
       "path": ".github/workflows/ci.yml",
-      "sha256": "f48e51d1ab8b9685dce3e324e0b50c24d5762883af1cde3af44740f4c14f3806",
+      "sha256": "2c8b6fc7fb8f886eab4ad60e26e7181db2c7c60c0954a3cebb43874fc83e1780",
       "capabilities": [
         "DIST"
       ]
@@ -8019,7 +8054,7 @@
     },
     {
       "path": "test/features/journeys/jornada-20-observabilidade-e-validacao-semantica.feature",
-      "sha256": "5a4cae30280ae68d8bfd59867b093e862617aa0f13f15699fbf9b43eaab55e0c",
+      "sha256": "7d7465df8c006b5117836bc11f698bf6bf1c61927adb930c8b67669a1cc08fa4",
       "capabilities": [
         "SEM"
       ]
@@ -8310,6 +8345,55 @@
       "sha256": "83ac6adcfce1c07246cd2db1387c91d25e55396f07809bb0325242470ac1b242",
       "capabilities": [
         "PREP"
+      ]
+    },
+    {
+      "path": "scripts/run-production-e2e.py",
+      "sha256": "27e2c909f6af57ce147c617f7a24a5544c6b0768b5310e0529b2f08f1e8c6ef6",
+      "capabilities": [
+        "EVAL"
+      ]
+    },
+    {
+      "path": "scripts/run_all_e2e_journeys.py",
+      "sha256": "25a432f9affc8479b679805cd1c716d7a9aeadfc0706389b9faa37025cc66fd1",
+      "capabilities": [
+        "EVAL"
+      ]
+    },
+    {
+      "path": "scripts/verify-e2e-sync.mjs",
+      "sha256": "74576824b0925a71c9db3faab6e7a2027b6be707b0170628f5c48810f683d183",
+      "capabilities": [
+        "EVAL"
+      ]
+    },
+    {
+      "path": "test/evaluation/e2e-evidence-verifier.test.mjs",
+      "sha256": "5ed09ea87ecf2f0d10bbec1f006ef1428c17f2991bbeeb532c1e868cd78effc2",
+      "capabilities": [
+        "EVAL"
+      ]
+    },
+    {
+      "path": "pilot/asset-management/test/server.test.mjs",
+      "sha256": "11fe289a037c4d6b085a1a631e01d79915702d26a0ce4c229d2f2d0d2d5d9ed6",
+      "capabilities": [
+        "ASSET"
+      ]
+    },
+    {
+      "path": "openspec/changes/rebuild-tui-with-opentui/design.md",
+      "sha256": "a88e376de5fa93fbf6cb990337b6516f8d032041fa450a5cc27e5024821a4700",
+      "capabilities": [
+        "OPENTUI"
+      ]
+    },
+    {
+      "path": "openspec/specs/semantic-enforcement-and-promotion-gate.feature",
+      "sha256": "de56f1aef67618941cef6c19dda76c5c2f927dad0438f5327a30d6e52adc5583",
+      "capabilities": [
+        "SEM"
       ]
     }
   ],
