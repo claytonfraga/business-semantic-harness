@@ -12,9 +12,9 @@ import { limparSessao, listarSessoesDoProjeto } from './git/sessions.js';
 function getVersion(): string {
   try {
     const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
-    return pkg.version || '0.2.12-beta';
+    return typeof pkg.version === 'string' && pkg.version.length > 0 ? pkg.version : '0.0.0-unknown';
   } catch {
-    return '0.2.12-beta';
+    return '0.0.0-unknown';
   }
 }
 
