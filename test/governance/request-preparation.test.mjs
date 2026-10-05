@@ -155,3 +155,93 @@ test('Given BSH-PREP-008 effective skill source identity When the skill changes 
   assert.equal(staleLoaded.status, 'CONFIGURATION_ERROR');
   assert.match(staleLoaded.reason, /Skill source changed/);
 });
+
+const payloadOf = (result) => JSON.parse(result.contextMessage.content.split('\n').slice(1).join('\n'));
+
+test('Given BSH-PREP-012 combined informative and execution instructions When prepared Then the execution clause is never exempted', async t => {
+  const { root } = await project(t);
+  for (const prompt of [
+    'Explain Publish. Implement Publish',
+    'Explique Publish. Implemente Publish',
+    'Inspect Publish and execute Publish',
+    'Write tests that block Publish and implement Publish',
+    'Escreva testes. Implemente Publish',
+  ]) {
+    assert.equal((await prepare(root, prompt)).status, 'BLOCK', prompt);
+  }
+  for (const prompt of [
+    'Explain the Publish rule',
+    'Explique a regra Publish',
+    'Write tests that block Publish',
+    'Escreva testes que bloqueiam Publish',
+  ]) {
+    assert.equal((await prepare(root, prompt)).status, 'ALLOW', prompt);
+  }
+});
+
+test('Given BSH-PREP-013 a declared correspondence by path When prepared Then the local operation resolves to the sovereign IRI and policies apply without shapes', async t => {
+  const { root, ontology, ontologyPath } = await project(t, 'ALLOW');
+  ontology['@graph'][2]['bsh:requiresHumanReview'] = true;
+  await writeFile(ontologyPath, JSON.stringify(ontology));
+  await writeFile(join(root, '.bsh/domains/example/enforcement.json'), JSON.stringify({ regras: [
+    { id: 'service-publish', operacao: 'Publish', quando: { caminho: 'src/service.js' }, fatos: [] },
+  ] }));
+  const result = await prepare(root, 'Implement src/service.js');
+  assert.equal(result.status, 'HUMAN_REVIEW', result.reason);
+  assert.ok(payloadOf(result).identifiedOperations.includes('urn:example:Publish'));
+  assert.match(result.contextMessage.content, /requiresHumanReview|review/iu);
+});
+
+test('Given BSH-PREP-013 an inexistent operation correspondence When prepared Then no implicit authorization occurs', async t => {
+  const { root } = await project(t, 'ALLOW');
+  await writeFile(join(root, '.bsh/domains/example/enforcement.json'), JSON.stringify({ regras: [
+    { id: 'service-missing', operacao: 'MissingOperation', quando: { caminho: 'src/service.js' }, fatos: [] },
+  ] }));
+  const result = await prepare(root, 'Implement src/service.js');
+  assert.equal(result.status, 'INSUFFICIENT_INFORMATION');
+  assert.ok(result.limitations.some(item => item.includes('sovereign operation identity')), result.limitations.join('; '));
+});
+
+async function domainIndependentProject(t) {
+  const root = await mkdtemp(join(tmpdir(), 'bsh-preparation-independent-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const directory = join(root, '.bsh/domains/synthetic');
+  await mkdir(directory, { recursive: true });
+  await writeFile(join(root, '.bsh/project.json'), JSON.stringify({ schemaVersion: 1, projectId: 'synthetic-independent',
+    domains: [{ id: 'example', version: '1.0.0', baseIri: 'urn:synthetic:', ontology: 'domains/synthetic/ontology.jsonld', shapes: 'domains/synthetic/shapes.ttl' }] }));
+  const graph = [
+    { '@id': 'ex:domain', '@type': 'bsh:Domain', 'bsh:version': '1.0.0' },
+    { '@id': 'ex:Widget', '@type': 'rdfs:Class', 'rdfs:label': 'Widget' },
+    { '@id': 'ex:WidgetIT', '@type': 'rdfs:Class', 'rdfs:subClassOf': { '@id': 'ex:Widget' }, 'rdfs:label': 'Widget de TI' },
+    { '@id': 'ex:TransferWidget', '@type': 'rdfs:Class', 'rdfs:label': 'Transfer widget' },
+    { '@id': 'ex:transfer-policy', '@type': 'bsh:Policy', 'bsh:governs': { '@id': 'ex:TransferWidget' }, 'bsh:requiresHumanReview': true, 'rdfs:comment': 'Transfers require review.' },
+  ];
+  await writeFile(join(directory, 'ontology.jsonld'), JSON.stringify({ '@context': { ex: 'urn:synthetic:', bsh: 'urn:bsh:ns:v1:', rdfs: 'http://www.w3.org/2000/01/rdf-schema#' }, '@graph': graph }));
+  await writeFile(join(directory, 'shapes.ttl'), '');
+  return { root };
+}
+
+test('Given BSH-PREP-014 mentioned concepts without an established operation When prepared Then uncertainty applies', async t => {
+  const { root } = await domainIndependentProject(t);
+  const result = await prepare(root, 'Move a widget');
+  assert.equal(result.status, 'INSUFFICIENT_INFORMATION', result.reason);
+  const recognized = payloadOf(result);
+  assert.ok(recognized.selectedConcepts.includes('urn:synthetic:Widget'));
+  assert.deepEqual(recognized.identifiedOperations, []);
+});
+
+test('Given BSH-PREP-014 a governed operation matched independently When prepared Then its policy applies', async t => {
+  const { root } = await domainIndependentProject(t);
+  const result = await prepare(root, 'Implement transfer widget');
+  assert.equal(result.status, 'HUMAN_REVIEW', result.reason);
+  assert.ok(payloadOf(result).identifiedOperations.includes('urn:synthetic:TransferWidget'));
+});
+
+test('Given BSH-PREP-014 a short acronym token When matching Then it is not dropped and keeps subclasses distinct', async t => {
+  const { root } = await domainIndependentProject(t);
+  const broad = payloadOf(await prepare(root, 'Execute Widget'));
+  assert.ok(!broad.selectedConcepts.includes('urn:synthetic:WidgetIT'));
+  const specific = payloadOf(await prepare(root, 'Execute widget de TI'));
+  assert.ok(specific.selectedConcepts.includes('urn:synthetic:WidgetIT'));
+});
+

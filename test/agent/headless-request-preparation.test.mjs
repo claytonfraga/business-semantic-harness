@@ -138,6 +138,25 @@ test("Given a changed contract after preparation When headless reaches transport
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
+test("Given BSH-PREP-015 a selected-model window too small When headless prepares Then no provider call occurs and a budget diagnostic is produced", async () => {
+  const { root } = await fixture();
+  try {
+    const result = await capture(root, "Explain Publish rule", { contextLength: 1024 });
+    assert.equal(result.code, 6, result.diagnostic);
+    assert.equal(result.calls.length, 0);
+    assert.match(result.diagnostic, /CONTEXT_BUDGET/);
+    assert.match(result.diagnostic, /exceeds the selected model window/);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test("Given BSH-PREP-015 a sufficient selected-model window When headless prepares Then the representative request is dispatched once", async () => {
+  const { root } = await fixture();
+  try {
+    const result = await capture(root, "Explain Publish rule", { contextLength: 1000000 });
+    assert.equal(result.calls.length, 1, result.diagnostic);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
 test("Given a governed native mutation without a host approval When headless dispatches Then the broker denies before effects and records the decision", async () => {
   const { root } = await fixture();
   try {

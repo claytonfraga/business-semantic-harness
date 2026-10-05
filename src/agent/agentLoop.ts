@@ -5,6 +5,7 @@ import type { McpClientManager } from '../mcp/clientManager.js';
 import type { WorkspaceSummary } from './workspaceContext.js';
 import type { ApprovalBroker } from '../decision/broker.js';
 import { BrokerAuthorizationError } from '../decision/broker.js';
+import { assertContextBudget } from '../governance/contextBudget.js';
 import { captureWorkspaceSnapshot, observedChangedFiles } from './workspaceChanges.js';
 
 export interface TelemetryUsage {
@@ -27,6 +28,8 @@ export interface AgentLoopOptions {
   maxTurns?: number;
   /** Maximum output tokens requested per model turn. */
   maxTokens?: number;
+  /** Selected model context window; when provided, every dispatch is bounded by it. */
+  contextLength?: number;
   signal?: AbortSignal;
   mcpManager?: McpClientManager;
   broker?: ApprovalBroker;
@@ -215,6 +218,12 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
     ];
 
     await options.beforeModelRequest?.();
+    assertContextBudget({
+      contextLength: options.contextLength,
+      messages: conversation,
+      tools,
+      reservedResponseTokens: options.maxTokens ?? 4096,
+    });
     for await (const chunk of options.client.streamChat({
       model: options.model,
       maxTokens: options.maxTokens,

@@ -100,3 +100,42 @@ Funcionalidade: Preparação ontológica de cada solicitação nas entradas de p
     E regras modificadas devem alterar contexto ou decisão
     E chamadas pagas não devem ser necessárias
     E mocks de preparação isolada ou mensagens de interface não devem substituir evidência do fluxo real
+
+  @BSH-PREP-012
+  Cenário: Avaliar todas as instruções e finalidades combinadas
+    Dado uma proibição de executar uma operação declarada no contrato
+    Quando solicitação efetiva ou diretivas de skills combinam explicação, inspeção ou testes com execução
+    Então a finalidade informativa não deve isentar a execução presente em outra instrução
+    E separadores, listas e conjunções em português ou inglês devem receber tratamento consistente
+    E interpretação incerta deve aplicar a política de incerteza ou revisão sem autorização implícita
+    Mas explicar a regra ou escrever exclusivamente testes de bloqueio deve continuar permitido
+
+  @BSH-PREP-013
+  Cenário: Resolver operações pela identidade soberana do domínio
+    Dado correspondências declaradas por caminho, aliases ou nome de operação
+    Quando uma operação usa nome local ou IRI completo
+    Então deve resolver a mesma identidade usando baseIri do domínio de origem
+    E políticas devem produzir decisões equivalentes independentemente da existência de shapes
+    E domínios dependentes com nomes locais iguais devem permanecer distintos
+    E correspondência inexistente ou ambígua deve impedir autorização implícita
+
+  @BSH-PREP-014
+  Cenário: Separar conceitos mencionados de operações estabelecidas
+    Dado conceitos, operações e aliases do contrato soberano
+    Quando uma solicitação pede execução
+    Então entidades, estados e propriedades mencionadas não devem substituir reconhecimento da operação
+    E ausência de operação estabelecida deve aplicar a política de incerteza configurada
+    E tokens curtos distintivos como TI devem permanecer significativos na correspondência
+    E explicações e inspeções autorizadas devem preservar seu comportamento
+
+  @BSH-PREP-015
+  Cenário: Verificar o orçamento completo antes de cada envio
+    Dado a janela do modelo escolhido e reserva explícita para resposta
+    Quando TUI ou headless prepara uma chamada inicial ou posterior
+    Então deve estimar o payload completo incluindo sistema, contrato, skills, histórico e ferramentas
+    E contratos e representações equivalentes não devem ser repetidos sem necessidade
+    E proveniência, referências e dependências devem permanecer recuperáveis
+    E contexto que excede a janela conhecida deve interromper antes da chamada ao provedor com diagnóstico
+    E limite desconhecido deve ser reportado contra um piso conservador, sem truncar nem substituir o modelo
+    E nenhuma regra ou dependência deve ser truncada silenciosamente nem o modelo substituído
+    E o método de estimativa e suas limitações devem permanecer declarados

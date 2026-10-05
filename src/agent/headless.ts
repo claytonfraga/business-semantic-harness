@@ -3,6 +3,7 @@ import { OpenRouterClient } from '../client/openrouter/client.js';
 import { getAvailableDomains } from '../governance/domainRegistry.js';
 import { ApprovalBroker, type AskHuman } from '../decision/broker.js';
 import { prepareGovernedRequest, assertPreparedRequestCurrent } from '../governance/requestPreparation.js';
+import { ContextBudgetError } from '../governance/contextBudget.js';
 import {
   branchAtual,
   commitAtual,
@@ -32,6 +33,8 @@ export interface HeadlessOptions {
   client?: OpenRouterClient;
   /** A programmatic host approver; CLI requests never grant tool permission. */
   askToolApproval?: AskHuman;
+  /** Selected model context window; when omitted the host resolves it when possible. */
+  contextLength?: number;
 }
 
 export async function runHeadlessCodingSession(options: HeadlessOptions): Promise<number> {
@@ -70,7 +73,6 @@ export async function runHeadlessCodingSession(options: HeadlessOptions): Promis
     const semanticMatch = detectSemanticSkillNeed(prompt, discoveredSkills);
     if (semanticMatch) activeSkillNames.push(semanticMatch.name);
   }
-  const skillsContext = skillRegistry.formatSkillsForPrompt(discoveredSkills, activeSkillNames);
   const activeSkillsContext = skillRegistry.formatSkillsForPrompt(
     discoveredSkills.filter(skill => activeSkillNames.includes(skill.name)), activeSkillNames);
   const prepared = await prepareGovernedRequest({ projectRoot, domainId: activeDomainId,
@@ -90,6 +92,18 @@ export async function runHeadlessCodingSession(options: HeadlessOptions): Promis
   if (!authCheck.valid) {
     process.stderr.write(`Invalid OpenRouter credential: ${authCheck.error || 'Authentication failed'}\n`);
     return 1;
+  }
+
+  // Resolve the selected model window for host-created clients; an injected
+  // transport keeps its own contract and may pass contextLength explicitly.
+  let contextLength = options.contextLength;
+  if (contextLength === undefined && !options.client) {
+    try {
+      const models = await client.getModels();
+      contextLength = models.find(model => model.id === activeModel)?.context_length;
+    } catch {
+      contextLength = undefined;
+    }
   }
 
   // 3. Workspace Context Discovery
@@ -142,7 +156,7 @@ export async function runHeadlessCodingSession(options: HeadlessOptions): Promis
     workspaceSummary,
     domainId: activeDomainId,
     governed,
-    skillsContext,
+    skillsContext: activeSkillsContext,
   });
 
   process.stdout.write(`\x1b[1m\x1b[97mPrompt:\x1b[39m\x1b[22m ${effectivePrompt}\n\n`);
@@ -161,6 +175,7 @@ export async function runHeadlessCodingSession(options: HeadlessOptions): Promis
       messages: [prepared.contextMessage, { role: 'user', content: prompt }],
       broker,
       domain: activeDomainId,
+      contextLength,
       beforeModelRequest: () => assertPreparedRequestCurrent(projectRoot, prepared),
       systemPrompt,
       mcpManager,
@@ -246,6 +261,12 @@ export async function runHeadlessCodingSession(options: HeadlessOptions): Promis
     }
 
     return gateResult.conforming ? 0 : 1;
+  } catch (error) {
+    if (error instanceof ContextBudgetError) {
+      process.stderr.write(`Request not sent [CONTEXT_BUDGET]: ${error.result.diagnostic}\n`);
+      return 6;
+    }
+    throw error;
   } finally {
     await mcpManager.close().catch(() => undefined);
     if (sessao) {

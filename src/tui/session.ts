@@ -917,7 +917,6 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
       // BSH-PREP-001..009: retrieve the actual contract before dispatching each request.
       const allDiscoveredSkills = await skillRegistry.discover();
-      const skillsContext = skillRegistry.formatSkillsForPrompt(allDiscoveredSkills, activeSkillNames);
       const activeSkillsContext = skillRegistry.formatSkillsForPrompt(
         allDiscoveredSkills.filter(skill => activeSkillNames.includes(skill.name)), activeSkillNames);
       let prepared = await prepareGovernedRequest({
@@ -973,7 +972,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         workspaceSummary,
         domainId: activeDomainId,
         governed: !explicitlyUngoverned,
-        skillsContext,
+        skillsContext: activeSkillsContext,
       });
 
       isExecutingTurn = true;
@@ -993,6 +992,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           systemPrompt,
           broker,
           domain: activeDomainId,
+          contextLength: getActiveContextLength(),
           beforeModelRequest: () => assertPreparedRequestCurrent(projectRoot, prepared),
           signal: activeAbortController.signal,
           mcpManager,

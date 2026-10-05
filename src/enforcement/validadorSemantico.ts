@@ -7,6 +7,7 @@ import { parseOntology, parseShapes } from '../ontology/rdf.js';
 import { assertOntologySnapshot, type OntologySnapshot } from '../ontology/query.js';
 import { validateData } from '../ontology/validate.js';
 import { BSH_TERMS } from '../vocabulary/bsh.js';
+import { ehIri, resolverIdentidadeOperacao } from './identidadeOperacao.js';
 import type { OperacaoSemantica, ResultadoEnforcement } from './operacaoSemantica.js';
 
 const { namedNode } = DataFactory;
@@ -17,10 +18,6 @@ const SH_TARGET_CLASS = namedNode('http://www.w3.org/ns/shacl#targetClass');
 const SH_PROPERTY = namedNode('http://www.w3.org/ns/shacl#property');
 const SH_PATH = namedNode('http://www.w3.org/ns/shacl#path');
 const SH_MIN_COUNT = namedNode('http://www.w3.org/ns/shacl#minCount');
-
-function ehIri(valor: string): boolean {
-  return valor.startsWith('http:') || valor.startsWith('https:') || valor.startsWith('urn:');
-}
 
 function termo(valor: string): string {
   return ehIri(valor) ? `<${valor}>` : `ex:${valor}`;
@@ -51,7 +48,7 @@ export async function validarOperacao(
     return resultado;
   }
   const base = dominio.baseIri;
-  const classe = ehIri(operacao.operacao) ? operacao.operacao : `${base}${operacao.operacao}`;
+  const classe = resolverIdentidadeOperacao(operacao.operacao, base);
   const ontology = await parseOntology(await readFile(await resolveProjectFile(root, `.bsh/${dominio.ontology}`), 'utf8'));
   const shapes = parseShapes(await readFile(await resolveProjectFile(root, `.bsh/${dominio.shapes}`), 'utf8'));
   if (Array.isArray(operacao.dependenciasDominio) && operacao.dependenciasDominio.length > 0) {
