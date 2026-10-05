@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { actionDigest, type ActionEvaluation, type ProposedAction } from './evaluate.js';
 import { appendAudit, type AuditEvent } from './audit.js';
 import { assertOntologySnapshot, type OntologySnapshot } from '../ontology/query.js';
@@ -29,6 +29,7 @@ export interface ToolCallParams {
   domain?: string;
   readOnly?: boolean;
   actionId?: string;
+  external?: boolean;
 }
 
 export interface ToolAuthorization {
@@ -37,6 +38,13 @@ export interface ToolAuthorization {
   reason: string;
   actor?: string;
   token?: string;
+}
+
+export class BrokerAuthorizationError extends Error {
+  constructor(tool: string, reason: string) {
+    super(`Tool '${tool}' denied by approval broker: ${reason}`);
+    this.name = 'BrokerAuthorizationError';
+  }
 }
 
 export interface ContractApprovalParams {
@@ -56,31 +64,20 @@ export function isMutatingTool(name: string, readOnlyOverride?: boolean): boolea
   if (['read_file', 'list_directory', 'search_code', 'find_files', 'inspect_skill'].includes(lower)) {
     return false;
   }
-  if (['write_file', 'replace_file_content', 'run_bash_command'].includes(lower)) {
-    return true;
-  }
-  return (
-    lower.includes('mutate') ||
-    lower.includes('write') ||
-    lower.includes('create') ||
-    lower.includes('delete') ||
-    lower.includes('remove') ||
-    lower.includes('update') ||
-    lower.includes('patch') ||
-    lower.includes('modify') ||
-    lower.includes('edit') ||
-    lower.includes('execute') ||
-    lower.includes('run') ||
-    lower.includes('apply') ||
-    lower.includes('post') ||
-    lower.includes('put') ||
-    lower.includes('send')
-  );
+  // Unknown external tool effects require review unless the host supplies a
+  // read-only declaration. A benign name is not evidence of benign effects.
+  return true;
+}
+
+function contradictsReadOnly(name: string): boolean {
+  return /(?:^|_)(?:mutate|write|replace|create|delete|remove|update|patch|modify|edit|execute|run|apply|post|put|send)(?:_|$)/i.test(name);
 }
 
 export class ApprovalBroker {
   private readonly grants = new Map<string, string>();
   private readonly usedActions = new Set<string>();
+  private readonly usedToolActions = new Set<string>();
+  private requestGuard?: () => Promise<void>;
 
   constructor(
     private readonly root: string,
@@ -89,13 +86,32 @@ export class ApprovalBroker {
     private readonly secrets: readonly string[] = []
   ) {}
 
+  setRequestGuard(guard: (() => Promise<void>) | undefined): void {
+    this.requestGuard = guard;
+  }
+
   async authorizeToolCall(call: ToolCallParams): Promise<ToolAuthorization> {
     const actionId = call.actionId || randomUUID();
     const domain = call.domain || 'default';
-    const mutates = isMutatingTool(call.tool, call.readOnly);
+    const authorizedArgs = structuredClone(call.args);
+    const argumentsDigest = createHash('sha256').update(JSON.stringify(authorizedArgs)).digest('hex');
+    try {
+      if (this.usedToolActions.has(actionId)) throw new Error('Tool action identifier has already been consumed');
+      this.usedToolActions.add(actionId);
+      await this.requestGuard?.();
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      await appendAudit(this.root, {
+        time: new Date().toISOString(), actionId, domain, actionDigest: argumentsDigest,
+        snapshotDigest: '', rules: [], evaluation: 'deny-on-failure', confidence: 'complete',
+        decision: 'deny', reason, tool: call.tool, result: 'DENIED_REQUEST_GUARD',
+      }, this.secrets).catch(() => undefined);
+      return { allowed: false, decision: 'deny', reason };
+    }
+    const mutates = call.external && call.readOnly !== true ? true : isMutatingTool(call.tool, call.readOnly);
 
     // If tool was declared readOnly but attempts a mutating action
-    if (call.readOnly === true && isMutatingTool(call.tool, false)) {
+    if (call.readOnly === true && contradictsReadOnly(call.tool)) {
       const reason = `Tool '${call.tool}' is declared read-only but attempted a mutating action`;
       const event: AuditEvent = {
         time: new Date().toISOString(),
@@ -109,7 +125,7 @@ export class ApprovalBroker {
         decision: 'deny',
         reason,
         tool: call.tool,
-        authorizedArguments: call.args,
+        authorizedArguments: authorizedArgs,
         result: 'DENIED_READONLY_VIOLATION',
       };
       await appendAudit(this.root, event, this.secrets).catch(() => undefined);
@@ -131,10 +147,14 @@ export class ApprovalBroker {
         decision: 'allow',
         reason,
         tool: call.tool,
-        authorizedArguments: call.args,
+        authorizedArguments: authorizedArgs,
         result: 'AUTHORIZED_READONLY',
       };
-      await appendAudit(this.root, event, this.secrets).catch(() => undefined);
+      try {
+        await appendAudit(this.root, event, this.secrets);
+      } catch {
+        return { allowed: false, decision: 'deny', reason: 'Failed to persist authorization audit' };
+      }
       return { allowed: true, decision: 'allow', reason };
     }
 
@@ -150,7 +170,7 @@ export class ApprovalBroker {
           action: {
             id: actionId,
             tool: call.tool,
-            arguments: call.args,
+            arguments: structuredClone(authorizedArgs),
             domain,
             mutates: true,
             intercepted: true,
@@ -171,7 +191,7 @@ export class ApprovalBroker {
         const answer = await Promise.race([
           this.ask(question),
           new Promise<never>((_, reject) => {
-            timer = setTimeout(() => reject(new Error('Tempo limite da pergunta excedido')), this.timeoutMs);
+            timer = setTimeout(() => reject(new Error('Human approval timed out')), this.timeoutMs);
           }),
         ]);
 
@@ -191,6 +211,16 @@ export class ApprovalBroker {
       reason = `Mutating tool '${call.tool}' denied: human approval required`;
     }
 
+    try {
+      await this.requestGuard?.();
+      if (createHash('sha256').update(JSON.stringify(call.args)).digest('hex') !== argumentsDigest) {
+        throw new Error('Tool arguments changed while authorization was pending');
+      }
+    } catch (error) {
+      decision = 'deny';
+      reason = error instanceof Error ? error.message : String(error);
+    }
+
     const event: AuditEvent = {
       time: new Date().toISOString(),
       actionId,
@@ -204,10 +234,14 @@ export class ApprovalBroker {
       actor,
       reason,
       tool: call.tool,
-      authorizedArguments: decision === 'allow' ? call.args : undefined,
+      authorizedArguments: decision === 'allow' ? authorizedArgs : undefined,
       result: decision === 'allow' ? 'AUTHORIZED' : 'DENIED',
     };
-    await appendAudit(this.root, event, this.secrets).catch(() => undefined);
+    try {
+      await appendAudit(this.root, event, this.secrets);
+    } catch {
+      return { allowed: false, decision: 'deny', reason: 'Failed to persist authorization audit' };
+    }
 
     if (decision === 'deny') {
       return { allowed: false, decision: 'deny', reason };

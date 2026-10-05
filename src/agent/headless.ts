@@ -1,6 +1,8 @@
 import { loadEnvConfig } from '../config/env.js';
 import { OpenRouterClient } from '../client/openrouter/client.js';
-import { getAvailableDomains, loadDomainValidator } from '../governance/domainRegistry.js';
+import { getAvailableDomains } from '../governance/domainRegistry.js';
+import { ApprovalBroker, type AskHuman } from '../decision/broker.js';
+import { prepareGovernedRequest, assertPreparedRequestCurrent } from '../governance/requestPreparation.js';
 import {
   branchAtual,
   commitAtual,
@@ -24,6 +26,12 @@ export interface HeadlessOptions {
   domain?: string;
   autoPromote?: boolean;
   allowDirectExecution?: boolean;
+  /** Explicitly select execution without project governance. */
+  ungoverned?: boolean;
+  /** Host transport injection; preparation and dispatch remain production code. */
+  client?: OpenRouterClient;
+  /** A programmatic host approver; CLI requests never grant tool permission. */
+  askToolApproval?: AskHuman;
 }
 
 export async function runHeadlessCodingSession(options: HeadlessOptions): Promise<number> {
@@ -34,32 +42,54 @@ export async function runHeadlessCodingSession(options: HeadlessOptions): Promis
   // 1. Config & Auth
   const env = await loadEnvConfig(projectRoot);
   const apiKey = env.openRouterApiKey;
-  if (!apiKey) {
+  if (!apiKey && !options.client) {
     process.stderr.write('Erro: OPENROUTER_API_KEY não configurada. Defina a variável de ambiente ou execute a TUI para autenticar.\n');
     return 1;
   }
 
-  const client = new OpenRouterClient({ apiKey });
-  const authCheck = await client.verifyApiKey();
-  if (!authCheck.valid) {
-    process.stderr.write(`Erro: Chave OpenRouter inválida: ${authCheck.error || 'Autenticação falhou'}\n`);
-    return 1;
-  }
+  const client = options.client ?? new OpenRouterClient({ apiKey: apiKey ?? '' });
 
   // 2. Models & Domain
   const activeModel = options.model || env.defaultModel || 'deepseek/deepseek-v4.1-flash';
-  const availableDomains = await getAvailableDomains(projectRoot);
-  let activeDomainId = options.domain || env.defaultDomain || (availableDomains.length > 0 ? availableDomains[0].id : undefined);
-
-  let governed = false;
-  if (activeDomainId) {
-    try {
-      await loadDomainValidator(projectRoot, activeDomainId);
-      governed = true;
-      process.stdout.write(`\x1b[32m✔ Governança ontológica ativa para o domínio: ${activeDomainId}\x1b[39m\n`);
-    } catch {
-      activeDomainId = undefined;
-    }
+  let activeDomainId = options.domain || env.defaultDomain;
+  if (!activeDomainId && !options.ungoverned) {
+    // Discovery is advisory; preparation owns configuration diagnostics.
+    try { activeDomainId = (await getAvailableDomains(projectRoot))[0]?.id; } catch { /* diagnosed below */ }
+  }
+  const { SkillRegistry } = await import('../skills/registry.js');
+  const { detectSkillInvocation, detectSemanticSkillNeed } = await import('../skills/activation.js');
+  const skillRegistry = new SkillRegistry(projectRoot);
+  const discoveredSkills = await skillRegistry.discover();
+  const invocation = detectSkillInvocation(prompt, discoveredSkills);
+  let effectivePrompt = prompt;
+  const activeSkillNames: string[] = [];
+  if (invocation.matchedSkill) {
+    activeSkillNames.push(invocation.matchedSkill.name);
+    effectivePrompt = invocation.effectivePrompt;
+  } else {
+    const semanticMatch = detectSemanticSkillNeed(prompt, discoveredSkills);
+    if (semanticMatch) activeSkillNames.push(semanticMatch.name);
+  }
+  const skillsContext = skillRegistry.formatSkillsForPrompt(discoveredSkills, activeSkillNames);
+  const activeSkillsContext = skillRegistry.formatSkillsForPrompt(
+    discoveredSkills.filter(skill => activeSkillNames.includes(skill.name)), activeSkillNames);
+  const prepared = await prepareGovernedRequest({ projectRoot, domainId: activeDomainId,
+    ungoverned: options.ungoverned, originalPrompt: prompt, effectivePrompt, skillsContext: activeSkillsContext,
+    skillSources: discoveredSkills.filter(skill => activeSkillNames.includes(skill.name))
+      .map(skill => ({ path: skill.filePath, sha256: skill.sourceHash })) });
+  process.stdout.write(`Request governance: ${prepared.status}; ${prepared.reason}\n`);
+  for (const reference of prepared.references) process.stdout.write(`Contract reference: ${reference}\n`);
+  if (prepared.status !== 'ALLOW') {
+    process.stderr.write(`Request not sent [${prepared.diagnosticCode ?? prepared.status}]: ${prepared.reason}\n`);
+    return prepared.status === 'HUMAN_REVIEW' ? 2 : prepared.status === 'BLOCK' ? 3
+      : prepared.status === 'INSUFFICIENT_INFORMATION' ? 4 : 5;
+  }
+  activeDomainId = options.ungoverned ? undefined : prepared.domainId;
+  const governed = !options.ungoverned;
+  const authCheck = await client.verifyApiKey();
+  if (!authCheck.valid) {
+    process.stderr.write(`Invalid OpenRouter credential: ${authCheck.error || 'Authentication failed'}\n`);
+    return 1;
   }
 
   // 3. Workspace Context Discovery
@@ -108,40 +138,6 @@ export async function runHeadlessCodingSession(options: HeadlessOptions): Promis
   const mcpManager = new McpClientManager();
   await mcpManager.loadFromProject(projectRoot);
 
-  // 6. Pre-flight Semantic Guard: Consulta à ontologia e SHACL antes de chamar o agente
-  if (activeDomainId && governed) {
-    const { detectPromptViolation } = await import('../enforcement/promptGuard.js');
-    const promptViolation = detectPromptViolation(prompt, activeDomainId);
-    if (promptViolation.isViolating) {
-      process.stderr.write(`\x1b[31m[ALERTA DE VIOLAÇÃO PRÉVIA - ${promptViolation.shape}]\x1b[39m ${promptViolation.message}\n`);
-    } else {
-      process.stdout.write(`\x1b[32m✔ Triagem prévia de prompt (heurística de intenção): Prompt em conformidade inicial com '${activeDomainId}' (não substitui validação SHACL)\x1b[39m\n`);
-    }
-  }
-
-  const { SkillRegistry } = await import('../skills/registry.js');
-  const { detectSkillInvocation, detectSemanticSkillNeed } = await import('../skills/activation.js');
-  const skillRegistry = new SkillRegistry(projectRoot);
-  const discoveredSkills = await skillRegistry.discover();
-
-  const invocation = detectSkillInvocation(prompt, discoveredSkills);
-  let effectivePrompt = prompt;
-  const activeSkillNames: string[] = [];
-
-  if (invocation.matchedSkill) {
-    activeSkillNames.push(invocation.matchedSkill.name);
-    effectivePrompt = invocation.effectivePrompt;
-    process.stdout.write(`\x1b[35m✔ Invocação de Skill detectada: [${invocation.matchedSkill.name}]\x1b[39m\n`);
-  } else {
-    const semanticMatch = detectSemanticSkillNeed(prompt, discoveredSkills);
-    if (semanticMatch) {
-      activeSkillNames.push(semanticMatch.name);
-      process.stdout.write(`\x1b[35mℹ Diretivas da skill recomendada ativadas: [${semanticMatch.name}]\x1b[39m\n`);
-    }
-  }
-
-  const skillsContext = skillRegistry.formatSkillsForPrompt(discoveredSkills, activeSkillNames);
-
   const systemPrompt = buildCodingAgentSystemPrompt({
     workspaceSummary,
     domainId: activeDomainId,
@@ -153,6 +149,8 @@ export async function runHeadlessCodingSession(options: HeadlessOptions): Promis
 
   let promotionResult: import('../git/promotion.js').ResultadoPromocao | null = null;
   let hasWorkspaceChanges = false;
+  const broker = governed ? new ApprovalBroker(projectRoot, options.askToolApproval) : undefined;
+  broker?.setRequestGuard(() => assertPreparedRequestCurrent(projectRoot, prepared));
 
   try {
     const turnResult = await runAgentTurn({
@@ -160,7 +158,10 @@ export async function runHeadlessCodingSession(options: HeadlessOptions): Promis
       model: activeModel,
       workspaceRoot,
       projectRoot,
-      messages: [{ role: 'user', content: effectivePrompt }],
+      messages: [prepared.contextMessage, { role: 'user', content: prompt }],
+      broker,
+      domain: activeDomainId,
+      beforeModelRequest: () => assertPreparedRequestCurrent(projectRoot, prepared),
       systemPrompt,
       mcpManager,
       onToolCallStart: (call) => {

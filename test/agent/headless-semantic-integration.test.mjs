@@ -1,4 +1,4 @@
-// Only provider authentication and model streaming are mocked. Headless execution,
+// Provider authentication/model transport and the host human tool approval are mocked. Headless execution,
 // native tools, extraction, SHACL, technical gates, worktrees and Git are real.
 // Requirements: BSH-AGENT-010/013, BSH-SEM-036, REQ-AGENT-OBSERVED-OUTCOME.
 import assert from 'node:assert/strict';
@@ -24,7 +24,7 @@ async function session(status, fn) {
   const baseIri = 'urn:headless-qa:';
   await writeFile(join(repo, '.gitignore'), '.bsh/local/\n');
   await writeFile(join(repo, '.bsh/project.json'), JSON.stringify({ schemaVersion: 1, projectId: 'headless-qa',
-    domains: [{ id: 'synthetic', version: '1.0.0', baseIri, ontology: 'domains/synthetic/ontology.jsonld',
+    domains: [{ id: 'synthetic', version: '1.0.0', baseIri, aliases: { Publish: ['publication'] }, ontology: 'domains/synthetic/ontology.jsonld',
       shapes: 'domains/synthetic/shapes.ttl', enforcement: 'domains/synthetic/enforcement.json' }] }));
   await writeFile(join(domain, 'ontology.jsonld'), JSON.stringify({
     '@context': { ex: baseIri, bsh: 'urn:bsh:ns:v1:', rdfs: 'http://www.w3.org/2000/01/rdf-schema#' },
@@ -78,6 +78,7 @@ test('Given a candidate When loaded Then publication state exists', async () => 
   };
   try {
     const exitCode = await runHeadlessCodingSession({ projectRoot: repo, model: 'provider-fixture', domain: 'synthetic',
+      askToolApproval: async () => ({ choice: 'allow-once', actor: 'identified-fixture-reviewer', reason: 'Authorize this exact synthetic native tool call' }),
       prompt: 'Implement publication according to the active rule', autoPromote: true });
     await fn({ exitCode, output, repo, before, calls });
   } finally {

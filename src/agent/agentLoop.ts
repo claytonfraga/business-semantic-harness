@@ -4,6 +4,7 @@ import { AGENT_TOOLS, WorkspaceToolExecutor } from './tools.js';
 import type { McpClientManager } from '../mcp/clientManager.js';
 import type { WorkspaceSummary } from './workspaceContext.js';
 import type { ApprovalBroker } from '../decision/broker.js';
+import { BrokerAuthorizationError } from '../decision/broker.js';
 import { captureWorkspaceSnapshot, observedChangedFiles } from './workspaceChanges.js';
 
 export interface TelemetryUsage {
@@ -29,6 +30,7 @@ export interface AgentLoopOptions {
   signal?: AbortSignal;
   mcpManager?: McpClientManager;
   broker?: ApprovalBroker;
+  beforeModelRequest?: () => Promise<void>;
   domain?: string;
   onDelta?: (text: string) => void;
   onReasoningDelta?: (text: string) => void;
@@ -127,8 +129,8 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
   const executor = new WorkspaceToolExecutor(options.workspaceRoot, options.projectRoot);
   if (options.broker) {
     executor.setBroker(options.broker);
-    options.mcpManager?.setBroker(options.broker);
   }
+  options.mcpManager?.setBroker(options.broker);
   const maxTurns = options.maxTurns ?? 10;
   let turns = 0;
   let toolCallsExecuted = 0;
@@ -137,7 +139,7 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
   const observedFiles = async () => observedChangedFiles(initialWorkspace, await captureWorkspaceSnapshot(options.workspaceRoot));
 
   const conversation: ChatMessage[] = [];
-  if (options.systemPrompt && !options.messages.some((m) => m.role === 'system')) {
+  if (options.systemPrompt && !options.messages.some((m) => m.role === 'system' && m.content === options.systemPrompt)) {
     conversation.push({ role: 'system', content: options.systemPrompt });
   }
   conversation.push(...options.messages);
@@ -212,6 +214,7 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
       ...(options.mcpManager ? options.mcpManager.getToolDefinitions() : []),
     ];
 
+    await options.beforeModelRequest?.();
     for await (const chunk of options.client.streamChat({
       model: options.model,
       maxTokens: options.maxTokens,
@@ -321,6 +324,7 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
       options.onToolCallStart?.({ name: tc.function.name, args: parsedArgs });
 
       let resultText = '';
+      let nativeExecutionCompleted = false;
 
       if (tc.function.name === 'report_task_outcome') {
         if (parsedArgs.outcome === 'rule_blocked' && typeof parsedArgs.ruleId === 'string' && parsedArgs.ruleId.trim()
@@ -337,49 +341,24 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
         continue;
       }
 
-      if (options.broker) {
-        const isMcp = Boolean(options.mcpManager?.hasTool(tc.function.name));
-        const mcpTool = isMcp ? options.mcpManager?.getTool(tc.function.name) : undefined;
-        const readOnly = mcpTool ? mcpTool.readOnly : undefined;
-
-        const auth = await options.broker.authorizeToolCall({
-          tool: tc.function.name,
-          args: parsedArgs,
-          readOnly,
-          domain: options.domain || 'default',
-          actionId: tc.id,
-        });
-
-        if (!auth.allowed) {
-          resultText = `Execution of tool '${tc.function.name}' denied by approval broker: ${auth.reason}`;
-          toolFailures.push({ tool: tc.function.name, callId: tc.id, kind: 'rule_blocked', reason: auth.reason, evidence: 'approval_broker' });
-          options.onToolCallDone?.({ name: tc.function.name, result: resultText });
-          conversation.push({
-            role: 'tool',
-            tool_call_id: tc.id,
-            name: tc.function.name,
-            content: resultText,
-          });
-          continue;
-        }
-      }
-
       try {
         if (options.mcpManager?.hasTool(tc.function.name)) {
-          resultText = await options.mcpManager.callTool(tc.function.name, parsedArgs);
+          resultText = await options.mcpManager.callTool(tc.function.name, parsedArgs, undefined, tc.id, options.domain);
         } else {
-          resultText = await executor.executeTool(tc.function.name, parsedArgs);
+          resultText = await executor.executeTool(tc.function.name, parsedArgs, tc.id, options.domain);
+          nativeExecutionCompleted = true;
         }
       } catch (err: unknown) {
         resultText = `Error executing ${tc.function.name}: ${err instanceof Error ? err.message : String(err)}`;
-        toolFailures.push({ tool: tc.function.name, callId: tc.id, kind: 'tool_error', reason: resultText });
+        toolFailures.push({ tool: tc.function.name, callId: tc.id, kind: err instanceof BrokerAuthorizationError ? 'rule_blocked' : 'tool_error',
+          reason: resultText, evidence: err instanceof BrokerAuthorizationError ? 'approval_broker' : 'tool_execution' });
       }
 
       if (tc.function.name === 'run_bash_command' && /^(?:Exit code: (?!0(?:\n|$))|Command timed out|Process error:)/.test(resultText)) {
         toolFailures.push({ tool: tc.function.name, callId: tc.id, kind: 'tool_error', reason: resultText });
       }
 
-      if (options.broker) {
+      if (options.broker && nativeExecutionCompleted) {
         await options.broker.recordToolResult(tc.id, tc.function.name, resultText, options.domain || 'default').catch(() => undefined);
       }
 

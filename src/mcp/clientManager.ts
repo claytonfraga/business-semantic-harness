@@ -1,10 +1,11 @@
 import { readFile } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import type { ToolDefinition } from '../client/openrouter/types.js';
 import { buildSafeEnv } from '../agent/tools.js';
-import type { ApprovalBroker } from '../decision/broker.js';
+import { BrokerAuthorizationError, type ApprovalBroker } from '../decision/broker.js';
 
 export interface McpServerConfig {
   command: string;
@@ -32,7 +33,7 @@ export class McpClientManager {
   private tools: Map<string, ConnectedTool> = new Map();
   private broker?: ApprovalBroker;
 
-  setBroker(broker: ApprovalBroker): void {
+  setBroker(broker: ApprovalBroker | undefined): void {
     this.broker = broker;
   }
 
@@ -108,7 +109,7 @@ export class McpClientManager {
     return this.tools.get(name);
   }
 
-  async callTool(name: string, args: Record<string, unknown>, overrideBroker?: ApprovalBroker): Promise<string> {
+  async callTool(name: string, args: Record<string, unknown>, overrideBroker?: ApprovalBroker, actionId: string = randomUUID(), domain?: string): Promise<string> {
     const tool = this.tools.get(name);
     if (!tool) {
       throw new Error(`Tool '${name}' not found in any connected MCP server.`);
@@ -143,10 +144,12 @@ export class McpClientManager {
         tool: name,
         args,
         readOnly: entry.config.readOnly || tool.readOnly,
-        domain: entry.config.env?.BSH_DOMAIN || 'default',
+        domain: domain || entry.config.env?.BSH_DOMAIN || 'default',
+        actionId,
+        external: true,
       });
       if (!auth.allowed) {
-        throw new Error(`MCP tool '${name}' denied by approval broker: ${auth.reason}`);
+        throw new BrokerAuthorizationError(name, auth.reason);
       }
     }
 
@@ -166,7 +169,7 @@ export class McpClientManager {
 
     const text = content.map((c) => c.type === 'text' ? (c.text ?? '') : JSON.stringify(c)).join('\n');
     if (activeBroker) {
-      await activeBroker.recordToolResult(name, name, text, entry.config.env?.BSH_DOMAIN || 'default').catch(() => undefined);
+      await activeBroker.recordToolResult(actionId, name, text, domain || entry.config.env?.BSH_DOMAIN || 'default').catch(() => undefined);
     }
     return text;
   }

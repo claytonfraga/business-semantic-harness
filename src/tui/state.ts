@@ -70,6 +70,7 @@ export interface ChatEntry {
   alertDiagnostic?: string;
   alertRemediation?: string[];
   waitingConfirmation?: boolean;
+  requestDecision?: import('../governance/requestPreparation.js').RequestPreparationStatus;
   receiptFiles?: ReceiptFileStat[];
   receiptTotalAdded?: number;
   receiptTotalRemoved?: number;

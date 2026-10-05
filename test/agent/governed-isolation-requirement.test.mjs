@@ -97,7 +97,7 @@ test('Given governed execution When worktree creation fails Then execution inter
     try {
       exitCode = await runHeadlessCodingSession({
         projectRoot: repo,
-        prompt: 'modify main.ts',
+        prompt: 'modify Action in main.ts',
         domain: 'iso',
         allowDirectExecution: false,
       });
@@ -151,7 +151,7 @@ test('Given governed execution When direct execution is explicitly allowed Then 
     try {
       await runHeadlessCodingSession({
         projectRoot: repo,
-        prompt: 'check direct',
+        prompt: 'Inspect Action in direct mode',
         domain: 'iso',
         allowDirectExecution: true,
       }).catch(() => {});
@@ -167,4 +167,3 @@ test('Given governed execution When direct execution is explicitly allowed Then 
     await rm(root, { recursive: true, force: true });
   }
 });
-

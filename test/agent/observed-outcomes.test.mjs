@@ -59,7 +59,8 @@ test('Given preexisting Git dirt and shell creation rename and deletion When the
 }));
 
 test('Given a fixture MCP tool that writes a file When the agent executes it Then observed files include the external tool change', async () => fixture(async root => {
-  const mcpManager = { getToolDefinitions: () => [], hasTool: name => name === 'fixture_mcp_write',
+  // Transport double implements the production manager's host broker attachment.
+  const mcpManager = { setBroker: () => {}, getToolDefinitions: () => [], hasTool: name => name === 'fixture_mcp_write',
     async callTool() { await writeFile(join(root, 'mcp.txt'), 'external change'); return 'Written'; } };
   const result = await run(root, [[['fixture_mcp_write', {}]]], { mcpManager });
   assert.deepEqual(result.modifiedFiles, ['mcp.txt']);

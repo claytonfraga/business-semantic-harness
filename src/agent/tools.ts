@@ -5,6 +5,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import type { ToolDefinition } from '../client/openrouter/types.js';
 import { SkillRegistry } from '../skills/registry.js';
 import type { ApprovalBroker } from '../decision/broker.js';
+import { BrokerAuthorizationError } from '../decision/broker.js';
 
 export const AGENT_TOOLS: ToolDefinition[] = [
   {
@@ -488,15 +489,16 @@ export class WorkspaceToolExecutor {
     }
   }
 
-  async executeTool(name: string, args: Record<string, unknown>): Promise<string> {
+  async executeTool(name: string, args: Record<string, unknown>, actionId?: string, domain?: string): Promise<string> {
     if (this.broker) {
       const auth = await this.broker.authorizeToolCall({
+        actionId,
+        domain,
         tool: name,
         args,
-        domain: 'default',
       });
       if (!auth.allowed) {
-        throw new Error(`Tool '${name}' denied by approval broker: ${auth.reason}`);
+        throw new BrokerAuthorizationError(name, auth.reason);
       }
     }
 

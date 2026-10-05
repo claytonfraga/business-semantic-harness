@@ -35,6 +35,25 @@ export interface ProjectDomain {
   aliases?: Record<string, string[]>;
   compositeOperations?: CompositeOperation[];
   sparqlQueries?: CompetencyQuestionQuery[];
+  requestGovernance?: RequestGovernance;
+}
+
+export interface RequestGovernance {
+  unmatchedMutation: 'ALLOW' | 'HUMAN_REVIEW' | 'INSUFFICIENT_INFORMATION';
+  rules: Array<{ id: string; pattern: string; effect: 'ALLOW' | 'BLOCK' | 'HUMAN_REVIEW'; reference: string; purposes?: Array<'EXECUTION' | 'EXPLANATION' | 'INSPECTION' | 'TESTING'> }>;
+}
+
+function requestGovernance(value: unknown): RequestGovernance | undefined {
+  if (value === undefined) return undefined;
+  if (!isRecord(value) || !['ALLOW', 'HUMAN_REVIEW', 'INSUFFICIENT_INFORMATION'].includes(String(value.unmatchedMutation)) || !Array.isArray(value.rules)) {
+    throw new Error('Invalid requestGovernance configuration');
+  }
+  for (const rule of value.rules) {
+    if (!isRecord(rule) || typeof rule.id !== 'string' || !rule.id || typeof rule.pattern !== 'string' || !rule.pattern || rule.pattern.length > 1000 || typeof rule.reference !== 'string' || !rule.reference || !['ALLOW', 'BLOCK', 'HUMAN_REVIEW'].includes(String(rule.effect))) throw new Error('Invalid requestGovernance rule');
+    if (rule.purposes !== undefined && (!Array.isArray(rule.purposes) || !rule.purposes.length || rule.purposes.some(p => !['EXECUTION', 'EXPLANATION', 'INSPECTION', 'TESTING'].includes(String(p))))) throw new Error('Invalid requestGovernance purposes');
+    try { new RegExp(rule.pattern, 'iu'); } catch { throw new Error('Invalid requestGovernance pattern'); }
+  }
+  return value as unknown as RequestGovernance;
 }
 
 export interface ProjectManifest {
@@ -190,6 +209,7 @@ export async function loadManifest(projectRoot: string): Promise<ProjectManifest
       aliases,
       compositeOperations,
       sparqlQueries,
+      requestGovernance: requestGovernance(item.requestGovernance),
     };
   });
 

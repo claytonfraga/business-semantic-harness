@@ -150,25 +150,25 @@ function rowsFor(entry: ChatEntry): EntryRow[] {
     }
     case 'prompt_violation': {
       const rows: EntryRow[] = [
-        row('[!] PROMPT VIOLATION DETECTED [Pre-flight Semantic Guard]', theme.error),
+        row(entry.requestDecision === 'HUMAN_REVIEW' ? '[!] REQUEST REVIEW REQUIRED [Project contract]' : '[!] PROMPT VIOLATION DETECTED [Pre-flight Semantic Guard]', theme.warning),
       ];
       if (entry.violationOperation) {
-        rows.push(row(`Operação Identificada: ${entry.violationOperation}`, theme.accent));
+        rows.push(row(`Identified operation: ${entry.violationOperation}`, theme.accent));
       }
       if (entry.violationShape) {
         rows.push(row(`Violated shape: ${entry.violationShape}`, theme.warning));
       }
       if (entry.violationRule) {
-        rows.push(row(`SHACL rule: ${entry.violationRule}`, theme.warning));
+        rows.push(row(`${entry.requestDecision ? 'Contract references' : 'SHACL rule'}: ${entry.violationRule}`, theme.warning));
       }
       if (entry.violationBusinessRationale) {
-        rows.push(row(`Motivo Negocial: ${entry.violationBusinessRationale}`, theme.text));
+        rows.push(row(`Business rationale: ${entry.violationBusinessRationale}`, theme.text));
       }
       if (entry.content) {
         rows.push(row(entry.content, theme.error));
       }
       if (entry.violationRemediation && entry.violationRemediation.length > 0) {
-        rows.push(row('Como Prosseguir:', theme.accent));
+        rows.push(row('How to proceed:', theme.accent));
         entry.violationRemediation.forEach((rem, idx) => {
           rows.push(row(`  ${idx + 1}. ${rem}`, theme.muted));
         });

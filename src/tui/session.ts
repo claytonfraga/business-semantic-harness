@@ -28,7 +28,8 @@ import { DEFAULT_SLASH_COMMANDS } from './slashCommands.js';
 import { SkillRegistry } from '../skills/registry.js';
 import { installSkillPackage } from '../skills/installer.js';
 import { detectSkillInvocation, detectSemanticSkillNeed } from '../skills/activation.js';
-import { detectPromptViolation } from '../enforcement/promptGuard.js';
+import { prepareGovernedRequest, approvePreparedRequest, assertPreparedRequestCurrent } from '../governance/requestPreparation.js';
+import { ApprovalBroker } from '../decision/broker.js';
 import { McpClientManager } from '../mcp/clientManager.js';
 import { loadPromptHistory, savePromptHistory } from './history.js';
 import { InputQueueManager } from './inputQueue.js';
@@ -42,6 +43,9 @@ export interface TuiSessionOptions {
   domain?: string;
   view?: TuiView;
   allowDirectExecution?: boolean;
+  ungoverned?: boolean;
+  /** Controlled model transport; the production preparation and dispatch remain unchanged. */
+  client?: OpenRouterClient;
 }
 
 export async function startTuiSession(options: TuiSessionOptions = {}): Promise<void> {
@@ -52,7 +56,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   let apiKey = env.openRouterApiKey;
   let confirmPromptViolations = env.confirmPromptViolations ?? true;
 
-  if (!apiKey) {
+  if (!apiKey && !options.client) {
     const auth = await promptApiKeyModal(options.view);
     if (!auth?.apiKey) {
       console.log(`${ansi.red}OpenRouter authentication is required to use BSH. Exiting.${ansi.reset}`);
@@ -61,7 +65,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     apiKey = auth.apiKey;
   }
 
-  const client = new OpenRouterClient({ apiKey });
+  const client = options.client ?? new OpenRouterClient({ apiKey: apiKey ?? '' });
   const authCheck = await client.verifyApiKey();
   if (!authCheck.valid) {
     console.log(`${ansi.red}Invalid OpenRouter API Key: ${authCheck.error || 'Authentication failed'}${ansi.reset}`);
@@ -73,22 +77,29 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   const modelsList = await client.getModels().catch(() => []);
 
   // 3. Domain & Governance Discovery
-  const availableDomains = await getAvailableDomains(projectRoot);
+  let availableDomains = await getAvailableDomains(projectRoot);
   let activeDomainId = options.domain || env.defaultDomain || (availableDomains.length > 0 ? availableDomains[0].id : undefined);
+  let explicitlyUngoverned = options.ungoverned === true;
 
   let validator: DomainValidator | null = null;
-  if (activeDomainId) {
+  if (!explicitlyUngoverned) {
+    const readiness = await prepareGovernedRequest({ projectRoot, domainId: activeDomainId, originalPrompt: 'Inspect the project contract.' });
+    if (readiness.status === 'CONFIGURATION_ERROR') {
+      console.error(`Governed session stopped: ${readiness.diagnosticCode}: ${readiness.reason}`);
+      return;
+    }
+  }
+  if (activeDomainId && !explicitlyUngoverned) {
     try {
       validator = await loadDomainValidator(projectRoot, activeDomainId);
     } catch (err: unknown) {
-      console.log(`${ansi.yellow}Warning: Could not load domain '${activeDomainId}': ${err instanceof Error ? err.message : String(err)}${ansi.reset}`);
-      activeDomainId = undefined;
+      console.error(`Governed session stopped: could not load '${activeDomainId}': ${err instanceof Error ? err.message : String(err)}`);
+      return;
     }
   }
 
   // MCP Client Manager (.bsh/mcp.json)
   const mcpManager = new McpClientManager();
-  await mcpManager.loadFromProject(projectRoot);
 
   // 4. Git Worktree Isolation
   let sessao: SessaoWorktree | null = null;
@@ -109,22 +120,23 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       });
       workspaceRoot = sessao.caminhoWorktree;
     } catch (err) {
-      if (activeDomainId && !options.allowDirectExecution) {
+      if (!explicitlyUngoverned && !options.allowDirectExecution) {
         console.log(`${ansi.red}Erro: Falha ao criar worktree de isolamento no modo governado: ${err instanceof Error ? err.message : String(err)}. Execução direta exige seleção explícita.${ansi.reset}`);
         return;
       }
     }
   } else {
-    if (activeDomainId && !options.allowDirectExecution) {
+    if (!explicitlyUngoverned && !options.allowDirectExecution) {
       console.log(`${ansi.red}Erro: Git indisponível para criar worktree de isolamento no modo governado. Execução direta exige seleção explícita.${ansi.reset}`);
       return;
     }
   }
 
-  if (activeDomainId && !sessao && !options.allowDirectExecution) {
+  if (!explicitlyUngoverned && !sessao && !options.allowDirectExecution) {
     console.log(`${ansi.red}Erro: O modo governado exige isolamento por worktree. Para operar diretamente no repositório, selecione explicitamente o modo direto ou desative a governança (/ungoverned).${ansi.reset}`);
     return;
   }
+  await mcpManager.loadFromProject(projectRoot);
 
   // 5. Workspace Context Discovery
   const workspaceSummary = await inspectWorkspace(projectRoot);
@@ -224,7 +236,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       ontologySummary,
       projectFolder,
       gitBranch,
-      governed: validator !== null,
+      governed: !explicitlyUngoverned,
       alignmentStatus,
       alignmentWarning,
       tokensTotal,
@@ -364,7 +376,8 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
     while (true) {
       updateView();
-      let prompt = (await getNextPrompt()).trim();
+      let originalPrompt = await getNextPrompt();
+      let prompt = originalPrompt.trim();
       if (!prompt) continue;
 
       if (prompt === '/editor') {
@@ -391,6 +404,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         }
         if (edited) {
           prompt = edited;
+          originalPrompt = edited;
         } else {
           updateView();
           continue;
@@ -459,11 +473,18 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       }
 
       if (prompt === '/domain') {
+        availableDomains = await getAvailableDomains(projectRoot);
         activeDomainId = await selectDomainModal(availableDomains, activeDomainId, view);
         if (activeDomainId) {
-          validator = await loadDomainValidator(projectRoot, activeDomainId);
-          await saveEnvConfig({ BSH_DEFAULT_DOMAIN: activeDomainId }, projectRoot);
-          await runAffinityCheck(activeDomainId);
+          explicitlyUngoverned = false;
+          try {
+            validator = await loadDomainValidator(projectRoot, activeDomainId);
+            await saveEnvConfig({ BSH_DEFAULT_DOMAIN: activeDomainId }, projectRoot);
+            await runAffinityCheck(activeDomainId);
+          } catch (error) {
+            validator = null;
+            chatEntries.push({ type: 'alert', content: `Domain unavailable: ${error instanceof Error ? error.message : String(error)}. Governed requests remain disabled until the contract is repaired.` });
+          }
         } else {
           validator = null;
           alignmentStatus = 'INSUFFICIENT_DATA';
@@ -473,17 +494,20 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       }
 
       if (prompt === '/ungoverned' || prompt === '/bypass') {
+        explicitlyUngoverned = true;
         validator = null;
         alignmentStatus = 'INSUFFICIENT_DATA';
         chatEntries.push({
           type: 'agent',
-          content: 'Harness ontológico desabilitado pelo usuário. Sessão operando em modo UNGOVERNED sem restrições de SHACL.',
+          content: 'Ontology governance explicitly disabled by the user. Session is UNGOVERNED.',
         });
         updateView();
         continue;
       }
 
       if (prompt === '/governed') {
+        explicitlyUngoverned = false;
+        validator = null;
         if (activeDomainId) {
           try {
             validator = await loadDomainValidator(projectRoot, activeDomainId);
@@ -661,7 +685,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           if (toolDefs.length === 0) {
             chatEntries.push({
               type: 'agent',
-              content: 'Nenhum servidor MCP configurado no momento.\n↳ Use: /mcp add <nome> <comando> [args...]\n↳ Exemplo: /mcp add context7 node test/support/mock-context7-server.mjs\n↳ Ou peça no chat: "Conecte-se ao servidor MCP <nome> em <comando>"',
+              content: 'No MCP server is configured.\nUse: /mcp add <name> <command> [args...]\nOnly project-configured servers are connected. Governed tool execution requires host authorization.',
             });
           } else {
             const list = toolDefs.map((t) => `  • ${t.function.name}: ${t.function.description}`).join('\n');
@@ -868,6 +892,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       }
 
       // Dynamic Skill Invocation
+      skillRegistry.clearCache();
       const allDiscoveredSkillsForPrompt = await skillRegistry.discover();
       const skillInvocation = detectSkillInvocation(prompt, allDiscoveredSkillsForPrompt);
       if (skillInvocation.isSlashCommand && skillInvocation.matchedSkill) {
@@ -890,90 +915,64 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         }
       }
 
-      // Pre-flight Semantic Guard
-      const promptViolation = detectPromptViolation(prompt, activeDomainId);
-
-      if (promptViolation.isViolating && validator) {
-        chatEntries.push({ type: 'user', content: prompt, isViolating: true });
-        chatEntries.push({
-          type: 'prompt_violation',
-          violationOperation: promptViolation.operation,
-          violationShape: promptViolation.shape,
-          violationRule: promptViolation.rule,
-          violationBusinessRationale: promptViolation.businessRationale,
-          violationRemediation: promptViolation.remediation,
-          content: `${promptViolation.message}\n` +
-            (promptViolation.matchedKeywords ? `Termos identificados: ${promptViolation.matchedKeywords.join(', ')}` : ''),
-          waitingConfirmation: confirmPromptViolations,
-        });
-
-        if (confirmPromptViolations) {
-          updateView();
-          const answer = (await waitForConfirmation()).trim();
-          if (answer === '/cancel' || answer === 'cancel' || answer === '/abort' || answer === 'q' || answer === 'escape' || answer === 'esc') {
-            chatEntries.push({
-              type: 'agent',
-              content: 'Execução do prompt cancelada pelo usuário após alerta de violação ontológica.',
-            });
-            updateView();
-            continue;
-          }
-          chatEntries.push({
-            type: 'agent',
-            content: 'Usuário confirmou prosseguimento da execução do prompt sob governança do harness.',
-          });
-        }
-      } else {
-        chatEntries.push({ type: 'user', content: prompt });
-      }
-
-      if (validator) {
-        chatEntries.push({
-          type: 'agent',
-          content: `Checking domain rules for '${activeDomainId || 'project'}' and inspecting repository...`,
-        });
-      }
-      updateView();
-
-      // Auto-connect MCP if requested
-      const lower = prompt.toLowerCase();
-      if ((lower.includes('context7') || lower.includes('conecte') || lower.includes('conectar') || lower.includes('servidor mcp')) && mcpManager.getToolDefinitions().length === 0) {
-        const bshDir = join(projectRoot, '.bsh');
-        await mkdir(bshDir, { recursive: true });
-        const mcpConfigPath = join(bshDir, 'mcp.json');
-        const defaultMock = join(process.cwd(), 'test/support/mock-context7-server.mjs');
-        const config = {
-          mcpServers: {
-            context7: {
-              command: process.execPath,
-              args: [defaultMock],
-              readOnly: true,
-            },
-          },
-        };
-        await writeFile(mcpConfigPath, JSON.stringify(config, null, 2), 'utf8');
-        await mcpManager.loadFromProject(projectRoot);
-        chatEntries.push({
-          type: 'agent',
-          content: 'Conectando ao servidor MCP Context7 via transporte stdio...',
-        });
-        chatEntries.push({
-          type: 'agent',
-          content: '✔ Servidor MCP "context7" conectado. Ferramenta registrada: context7_search_docs.',
-        });
-        updateView();
-      }
-
-      let _agentResponseAccum = '';
-      messages.push({ role: 'user', content: prompt });
-
+      // BSH-PREP-001..009: retrieve the actual contract before dispatching each request.
       const allDiscoveredSkills = await skillRegistry.discover();
       const skillsContext = skillRegistry.formatSkillsForPrompt(allDiscoveredSkills, activeSkillNames);
+      const activeSkillsContext = skillRegistry.formatSkillsForPrompt(
+        allDiscoveredSkills.filter(skill => activeSkillNames.includes(skill.name)), activeSkillNames);
+      let prepared = await prepareGovernedRequest({
+        projectRoot, domainId: activeDomainId, ungoverned: explicitlyUngoverned,
+        originalPrompt, effectivePrompt: prompt, skillsContext: activeSkillsContext,
+        skillSources: allDiscoveredSkills.filter(skill => activeSkillNames.includes(skill.name))
+          .map(skill => ({ path: skill.filePath, sha256: skill.sourceHash })),
+      });
+      chatEntries.push({ type: 'user', content: originalPrompt, isViolating: prepared.status === 'BLOCK' });
+      chatEntries.push({ type: 'agent', content: `Request governance: ${prepared.status}. ${prepared.reason}\nReferences: ${prepared.references.join(', ') || '(none)'}\nIdentity: ${prepared.identity}` });
+      if (prepared.status === 'HUMAN_REVIEW') {
+        chatEntries.push({ type: 'prompt_violation', requestDecision: 'HUMAN_REVIEW', violationRule: prepared.references.join(', '),
+          violationBusinessRationale: prepared.reason,
+          violationRemediation: ['Confirm request dispatch only, or cancel.', 'Tool execution and candidate promotion require independent authorization.'],
+          content: 'Project contract requires human review before model dispatch.', waitingConfirmation: true });
+        updateView();
+        const answer = (await waitForConfirmation()).trim().toLowerCase();
+        const pending = chatEntries.at(-1);
+        if (pending) pending.waitingConfirmation = false;
+        if (!['', 'yes', 'y', 'confirm', 'approve'].includes(answer) || exitRequested) {
+          chatEntries.push({ type: 'agent', content: 'Request cancelled. No request was sent to the model.' });
+          updateView();
+          if (exitRequested) break;
+          continue;
+        }
+        prepared = approvePreparedRequest(prepared, { actor: 'interactive-user', reason: 'Explicit confirmation in the governed TUI.' });
+      }
+      if (prepared.status !== 'ALLOW') {
+        chatEntries.push({ type: 'alert', content: `Request not sent [${prepared.diagnosticCode ?? prepared.status}]: ${prepared.reason}` });
+        updateView();
+        continue;
+      }
+      try {
+        await assertPreparedRequestCurrent(projectRoot, prepared);
+        validator = explicitlyUngoverned ? null : await loadDomainValidator(projectRoot, activeDomainId ?? '');
+      } catch (error) {
+        chatEntries.push({ type: 'alert', content: `Request not sent: ${error instanceof Error ? error.message : String(error)}` });
+        updateView();
+        continue;
+      }
+      updateView();
+      let _agentResponseAccum = '';
+      const broker = explicitlyUngoverned ? undefined : new ApprovalBroker(projectRoot, async question => {
+        const answer = await view.question({ title: 'Tool authorization',
+          message: `Tool: ${question.action.tool}\nArguments: ${JSON.stringify(question.action.arguments)}\n${question.evaluation.reasons.join('\n')}\nType allow-once to authorize this action; any other answer denies it.`,
+          signal: activeAbortController?.signal });
+        return { choice: answer?.trim().toLowerCase() === 'allow-once' ? 'allow-once' : 'deny',
+          actor: 'interactive-user', reason: 'Explicit host tool authorization in the TUI.' };
+      }, 30_000, apiKey ? [apiKey] : []);
+      broker?.setRequestGuard(() => assertPreparedRequestCurrent(projectRoot, prepared));
 
       const systemPrompt = buildCodingAgentSystemPrompt({
         workspaceSummary,
         domainId: activeDomainId,
-        governed: validator !== null,
+        governed: !explicitlyUngoverned,
         skillsContext,
       });
 
@@ -990,8 +989,11 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           model: activeModel,
           workspaceRoot,
           projectRoot,
-          messages,
+          messages: [prepared.contextMessage, ...messages, { role: 'user', content: originalPrompt }],
           systemPrompt,
+          broker,
+          domain: activeDomainId,
+          beforeModelRequest: () => assertPreparedRequestCurrent(projectRoot, prepared),
           signal: activeAbortController.signal,
           mcpManager,
           onReasoningDelta: (text) => {

@@ -24,7 +24,7 @@ export async function main(argv: string[]): Promise<number> {
     return 0;
   }
   if (argv.length === 1 && argv[0] === '--help') {
-    process.stdout.write('bsh: [tui] [--model <nome>] [--domain <nome>] [--api-key <key>] | init | domain add <nome> | ontology validate | ontology show <dominio> | sessions list|clean <id> | mcp [--governed] | auth [login|status|logout] | skill [list|show|add]\n');
+    process.stdout.write('bsh: [tui] [--model <name>] [--domain <name>] [--api-key <key>] [--ungoverned] [--direct] | --prompt <text> [--auto-promote] | init | domain add <name> | ontology validate | ontology show <domain> | sessions list|clean <id> | mcp [--governed] | auth [login|status|logout] | skill [list|show|add]\n');
     return 0;
   }
 
@@ -97,6 +97,10 @@ export async function main(argv: string[]): Promise<number> {
 
   const promptIndexes = [promptFlag, promptFileFlag].filter((index) => index >= 0).flatMap((index) => [index, index + 1]);
   command = command.filter((_, index) => !promptIndexes.includes(index));
+  const ungoverned = command.includes('--ungoverned');
+  const allowDirectExecution = command.includes('--direct');
+  const autoPromote = command.includes('--auto-promote');
+  command = command.filter(argument => !['--ungoverned', '--direct', '--auto-promote'].includes(argument));
 
   try {
     if (promptText) {
@@ -106,12 +110,17 @@ export async function main(argv: string[]): Promise<number> {
         prompt: promptText,
         model,
         domain,
+        ungoverned,
+        allowDirectExecution,
+        autoPromote,
       });
     }
 
     if (command.length === 0 || (command.length === 1 && command[0] === 'tui')) {
       const { launchTui } = await import('./tui/runtime.js');
-      await launchTui({ projectRoot, model, domain });
+      await launchTui({ projectRoot, model, domain,
+        ...(ungoverned ? { ungoverned: true } : {}),
+        ...(allowDirectExecution ? { allowDirectExecution: true } : {}) });
       return Number(process.exitCode ?? 0);
     }
     if (command.length >= 1 && command[0] === 'mcp') {
