@@ -16,6 +16,11 @@ jobs:
           node-version: '26.4.0'
           cache: npm
       - run: npm ci
+      - name: Install the sandbox runtime required by confinement tests
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bubblewrap
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
       - run: npm run quality
       - run: npm test
       - name: Semantic integration and E2E pipeline
