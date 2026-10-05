@@ -157,6 +157,23 @@ test("Given BSH-PREP-015 a sufficient selected-model window When headless prepar
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
+test("Given BSH-PREP-020/022 an unrecognized execution in a governed domain When headless prepares Then it emits the deterministic remediation without any provider call", async () => {
+  const { root, directory } = await fixture();
+  try {
+    const ontology = JSON.parse(await readFile(join(directory, "ontology.jsonld"), "utf8"));
+    ontology["@graph"].push(
+      { "@id": "ex:Archive", "@type": "rdfs:Class", "rdfs:label": "Archive" },
+      { "@id": "ex:archive-policy", "@type": "bsh:Policy", "bsh:governs": { "@id": "ex:Archive" }, "bsh:requiresHumanReview": true },
+    );
+    await writeFile(join(directory, "ontology.jsonld"), JSON.stringify(ontology));
+    const result = await capture(root, "Implement unrelated behavior");
+    assert.equal(result.code, 4, result.diagnostic);
+    assert.equal(result.calls.length, 0);
+    assert.match(result.diagnostic, /No governed operation was recognized/);
+    assert.match(result.diagnostic, /\/domain/);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
 test("Given a governed native mutation without a host approval When headless dispatches Then the broker denies before effects and records the decision", async () => {
   const { root } = await fixture();
   try {

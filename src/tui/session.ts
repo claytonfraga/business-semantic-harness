@@ -945,7 +945,9 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         prepared = approvePreparedRequest(prepared, { actor: 'interactive-user', reason: 'Explicit confirmation in the governed TUI.' });
       }
       if (prepared.status !== 'ALLOW') {
-        chatEntries.push({ type: 'alert', content: `Request not sent [${prepared.diagnosticCode ?? prepared.status}]: ${prepared.reason}` });
+        const remediation = prepared.remediation ?? [];
+        const alertContent = [`Request not sent [${prepared.diagnosticCode ?? prepared.status}]: ${prepared.reason}`, ...remediation].join('\n');
+        chatEntries.push({ type: 'alert', content: alertContent });
         updateView();
         continue;
       }

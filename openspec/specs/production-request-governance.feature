@@ -139,3 +139,51 @@ Funcionalidade: Preparação ontológica de cada solicitação nas entradas de p
     E limite desconhecido deve ser reportado contra um piso conservador, sem truncar nem substituir o modelo
     E nenhuma regra ou dependência deve ser truncada silenciosamente nem o modelo substituído
     E o método de estimativa e suas limitações devem permanecer declarados
+
+  @BSH-PREP-016
+  Cenário: Orientar a solicitação não reconhecida sem chamar o modelo
+    Dado que a preparação resulta em INSUFFICIENT_INFORMATION
+    Quando a TUI ou o headless apresenta a decisão
+    Então deve exibir uma remediação determinística informando que nenhuma operação governada foi reconhecida
+    E deve listar os conceitos reconhecidos como apenas menções
+    E a remediação não deve acionar o provedor de modelo nem consumir tokens
+    E a remediação não deve afirmar conformidade do candidato
+
+  @BSH-PREP-017
+  Cenário: Sugerir a operação mais próxima do domínio
+    Dado que o domínio declara operações governadas e aliases
+    Quando nenhuma operação é reconhecida na solicitação
+    Então deve sugerir a operação lexicalmente mais próxima como pergunta, nunca como decisão
+    E deve manter disponíveis as demais operações governadas do domínio
+    E a sugestão não deve alterar a decisão nem autorizar implicitamente
+
+  @BSH-PREP-018
+  Cenário: Listar saídas acionáveis para decisões não autorizadas
+    Dado uma decisão diferente de ALLOW
+    Quando a remediação é apresentada
+    Então deve listar saídas acionáveis, incluindo reformular o pedido, trocar o domínio e operar sem o harness
+    E deve confirmar revisão quando a decisão exigir revisão humana
+    E deve reutilizar as regras aplicáveis já recuperadas do contrato
+
+  @BSH-PREP-019
+  Cenário: Distinguir domínio sem operações governadas
+    Dado um domínio ativo que não declara nenhuma operação governada
+    Quando uma solicitação de execução não é reconhecida
+    Então a remediação deve informar que o domínio não declara operações governadas
+    E deve sugerir verificar o domínio ativo
+
+  @BSH-PREP-020
+  Cenário: Preservar a preparação determinística e compartilhada
+    Dado TUI e headless usando a mesma preparação
+    Quando a remediação é produzida
+    Então a mesma orientação determinística deve estar disponível em ambos
+    E nenhuma chamada ao provedor deve ser feita para gerá-la
+    E a independência entre envio, ferramentas e promoção deve permanecer intacta
+
+  @BSH-PREP-021
+  Cenário: Remediação apenas orienta e não decide
+    Dado uma decisão de bloqueio, revisão ou incerteza
+    Quando a remediação é exibida
+    Então ela não deve substituir o gate nem promover o candidato
+    E não deve transformar ausência de alertas em permissão de escrita
+    E deve permanecer no idioma da interface

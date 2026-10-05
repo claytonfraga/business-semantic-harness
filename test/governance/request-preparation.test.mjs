@@ -245,3 +245,14 @@ test('Given BSH-PREP-014 a short acronym token When matching Then it is not drop
   assert.ok(specific.selectedConcepts.includes('urn:synthetic:WidgetIT'));
 });
 
+test('Given BSH-PREP-016/017 an unrecognized execution in a governed domain When prepared Then a deterministic remediation suggests the closest operation without a model call', async t => {
+  const { root } = await domainIndependentProject(t);
+  const result = await prepare(root, 'Move a widget');
+  assert.equal(result.status, 'INSUFFICIENT_INFORMATION', result.reason);
+  assert.ok(Array.isArray(result.remediation) && result.remediation.length > 0);
+  assert.ok(result.remediation.some(line => line.includes('No governed operation was recognized')));
+  assert.ok(result.remediation.some(line => line.includes('Did you mean Transfer widget?')));
+  assert.ok(result.remediation.some(line => line.includes('/domain')));
+  assert.ok(payloadOf(result).remediation.length > 0);
+});
+

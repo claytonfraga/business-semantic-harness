@@ -83,6 +83,7 @@ export async function runHeadlessCodingSession(options: HeadlessOptions): Promis
   for (const reference of prepared.references) process.stdout.write(`Contract reference: ${reference}\n`);
   if (prepared.status !== 'ALLOW') {
     process.stderr.write(`Request not sent [${prepared.diagnosticCode ?? prepared.status}]: ${prepared.reason}\n`);
+    for (const line of prepared.remediation ?? []) process.stderr.write(`${line}\n`);
     return prepared.status === 'HUMAN_REVIEW' ? 2 : prepared.status === 'BLOCK' ? 3
       : prepared.status === 'INSUFFICIENT_INFORMATION' ? 4 : 5;
   }
