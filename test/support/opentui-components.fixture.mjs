@@ -144,3 +144,18 @@ test('Given native input submits and global routing consumes a key Then subscrip
     remove(); unroute();
   } finally { view.destroy(); }
 });
+
+test('Given BSH-INPUT-019 When the prompt area renders Then it exposes at least four wrapping scrollable lines', async () => {
+  const fixture = await createTestRenderer({ width: 80, height: 24 });
+  const view = await createTuiView({ renderer: fixture.renderer });
+  try {
+    assert.ok(view.input.height >= 4, `expected at least four visible lines, got ${view.input.height}`);
+    assert.equal(view.input.wrapMode, 'word');
+    view.setPrompt('A long coding instruction that must wrap automatically across the prompt viewport. '.repeat(8));
+    view.input.gotoBufferEnd();
+    await fixture.renderOnce();
+    assert.equal(view.input.height, 4);
+    assert.equal(view.input.lineCount, 1, 'automatic wrapping keeps a single logical line');
+    assert.ok(view.input.scrollY > 0, `expected the wrapped content to scroll inside the prompt, got scrollY ${view.input.scrollY}`);
+  } finally { view.destroy(); }
+});
