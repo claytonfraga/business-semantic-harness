@@ -39,13 +39,13 @@ You can launch and run BSH in any repository immediately without prior global in
 
 ```bash
 # Launch interactive governed session in your current project:
-npx business-semantic-harness
+npx business-semantic-harness@beta
 
 # Pre-select domain and model directly:
-npx business-semantic-harness --domain assets --model deepseek/deepseek-v4.1-flash
+npx business-semantic-harness@beta --domain assets --model deepseek/deepseek-v4.1-flash
 
 # Run against any target project path:
-npx business-semantic-harness --project /path/to/my-project
+npx business-semantic-harness@beta --project /path/to/my-project
 ```
 
 ### 2. Global Installation via npm
@@ -53,7 +53,7 @@ npx business-semantic-harness --project /path/to/my-project
 If you prefer having the `bsh` command available globally in your PATH:
 
 ```bash
-npm install -g business-semantic-harness
+npm install -g business-semantic-harness@beta
 
 # Once installed, launch with:
 bsh
@@ -321,7 +321,7 @@ BSH can run as an **MCP Server (Model Context Protocol)** over standard I/O (`st
 
 ```bash
 # Run directly with npx (zero install):
-npx business-semantic-harness mcp --project /path/to/project
+npx business-semantic-harness@beta mcp --project /path/to/project
 
 # Or using globally installed bsh:
 bsh mcp --project /path/to/project
@@ -338,7 +338,7 @@ bsh mcp --project /path/to/project --governed
   "mcpServers": {
     "bsh": {
       "command": "npx",
-      "args": ["-y", "business-semantic-harness", "mcp", "--project", "/absolute/path/to/my-project"]
+      "args": ["-y", "business-semantic-harness@beta", "mcp", "--project", "/absolute/path/to/my-project"]
     }
   }
 }
@@ -350,7 +350,7 @@ bsh mcp --project /path/to/project --governed
   "mcpServers": {
     "bsh-governance": {
       "command": "npx",
-      "args": ["-y", "business-semantic-harness", "mcp", "--project", "/absolute/path/to/my-project"]
+      "args": ["-y", "business-semantic-harness@beta", "mcp", "--project", "/absolute/path/to/my-project"]
     }
   }
 }
@@ -397,7 +397,7 @@ Controlled experiment APIs separate candidate generation, context queries, seman
 
 `npm run install:local` validates, builds, packs and installs the local tarball globally without publishing it. To separate preparation from installation, use `npm run install:local -- --prepare-only`, then `npm run install:local -- --install-prepared`. The pipeline verifies the tarball SHA-256 and every installed distribution file and stores its receipt in `.bsh/local/packages/last-install.json`. It runs unit and module integration tests; it does not invoke E2E.
 
-The official Release workflow publishes a new, matching `v<package-version>` tag integrated into `master`. The GitHub Release tarball and `SHA256SUMS` identify the exact distribution; `dist/build-info.json` records its package version, source commit and whether tracked sources were modified at build time. CLI and MCP identities read the installed package version. The workflow publishes that same verified tarball to npm and fails explicitly if the repository `NPM_TOKEN` secret is unavailable. A local or global installation, or a GitHub artifact alone, does not establish npm publication. Do not reuse an existing package version for changed code.
+The official Release workflow publishes a new, matching `v<package-version>` tag integrated into `master`. The GitHub Release tarball and `SHA256SUMS` identify the exact distribution; `dist/build-info.json` records its package version, source commit and whether tracked sources were modified at build time. CLI and MCP identities read the installed package version. Beta releases use the explicit npm `beta` channel; select `@beta` or an exact version because the legacy `latest` channel can point to older code. The workflow publishes that same verified tarball to npm and fails explicitly if the repository `NPM_TOKEN` secret is unavailable. A local or global installation, or a GitHub artifact alone, does not establish npm publication. Do not reuse an existing package version for changed code.
 
 BSH maintains strict engineering standards:
 

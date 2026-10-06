@@ -7171,7 +7171,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "3cdff761b02eb772a663d988e926e06b46fb4fd5ed9b126f3e7d06c64c197f8a",
+      "sha256": "27fe16804325acd69604dd0d981ecd69746afa1ac27e724c8b53978432d22878",
       "capabilities": [
         "CLI",
         "DIST",
@@ -8615,7 +8615,7 @@
     },
     {
       "path": ".github/workflows/release.yml",
-      "sha256": "38df753badf6ecc47cefc60c0fba5f767b87f92c2c63c2fee8b0fdc53f08869c",
+      "sha256": "776ac05cbf7a73d2181683ce1a995b3dcb0e709ff6c040432613e4666f0b85a1",
       "capabilities": [
         "DIST"
       ]
@@ -9078,5 +9078,5 @@
     }
   ],
   "catalogBaselineCommit": "2afc270",
-  "updatedAt": "2026-10-06T14:56:02.002Z"
+  "updatedAt": "2026-10-06T15:11:56.607Z"
 }

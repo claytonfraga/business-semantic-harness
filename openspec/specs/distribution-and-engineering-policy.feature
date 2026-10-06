@@ -59,6 +59,7 @@ Funcionalidade: Distribuição e regras de engenharia
     E credencial ausente deve ser diagnosticada como publicação npm não concluída, sem sucesso silencioso
     E o pacote deve incluir identidade verificável do commit de origem e checksum SHA-256
     E a publicação deve usar versão inédita e tag que corresponda à versão do pacote integrado
+    E versões beta devem informar explicitamente o canal npm beta e a documentação deve selecionar esse canal ou uma versão exata
 
   @BSH-DIST-007
   Cenário: Manter versão consistente

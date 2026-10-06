@@ -66,6 +66,6 @@ jobs:
             echo "::error::NPM_TOKEN is missing; npm publication is not complete. Configure the repository secret and rerun this release."
             exit 1
           fi
-          npm publish release-assets/*.tgz --access public
+          npm publish release-assets/*.tgz --access public --tag beta
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
