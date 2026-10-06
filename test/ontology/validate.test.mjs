@@ -22,7 +22,7 @@ async function project(ids = ['ativos']) {
   return root;
 }
 
-test('Given two complete domains, when validated, then the project is ready', async () => {
+test('Given two complete domains When validated Then the project is ready', async () => {
   const root = await project(['ativos', 'contratos']);
   try {
     const second = join(root, '.bsh/domains/contratos/ontology.jsonld');
@@ -39,7 +39,7 @@ test('Given two complete domains, when validated, then the project is ready', as
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given a missing domain file, when validated, then its domain and path are reported', async () => {
+test('Given a missing domain file When validated Then its domain and path are reported', async () => {
   const root = await project();
   try {
     await rm(join(root, '.bsh/domains/ativos/shapes.ttl'));
@@ -50,7 +50,7 @@ test('Given a missing domain file, when validated, then its domain and path are 
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given a draft without concept or rule, when validated, then it is not ready', async () => {
+test('Given a draft without concept or rule When validated Then it is not ready', async () => {
   const root = await project();
   try {
     const file = join(root, '.bsh/domains/ativos/ontology.jsonld');
@@ -64,7 +64,7 @@ test('Given a draft without concept or rule, when validated, then it is not read
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given conflicting IRI definitions, when validated, then both origins are reported', async () => {
+test('Given conflicting IRI definitions When validated Then both origins are reported', async () => {
   const root = await project(['ativos', 'contratos']);
   try {
     const file = join(root, '.bsh/domains/contratos/ontology.jsonld');
@@ -75,7 +75,7 @@ test('Given conflicting IRI definitions, when validated, then both origins are r
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given a future ontology version, when validated, then it fails without rewriting the file', async () => {
+test('Given a future ontology version When validated Then it fails without rewriting the file', async () => {
   const root = await project();
   try {
     const file = join(root, '.bsh/domains/ativos/ontology.jsonld');
@@ -88,7 +88,7 @@ test('Given a future ontology version, when validated, then it fails without rew
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given conforming and violating actions, when SHACL runs, then only the violation is reported', async () => {
+test('Given conforming and violating actions When SHACL runs Then only the violation is reported', async () => {
   const shapes = parseShapes(await readFile(new URL('shapes.ttl', fixture), 'utf8'));
   const good = parseShapes(await readFile(new URL('valid-action.ttl', fixture), 'utf8'));
   const bad = parseShapes(await readFile(new URL('invalid-action.ttl', fixture), 'utf8'));

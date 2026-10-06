@@ -1,6 +1,6 @@
 # Relatório Oficial de Execução das Jornadas E2E — Business Semantic Harness (BSH) 2.0
 
-**Data da Execução**: 2026-10-03 18:22:49
+**Data da Execução**: 2026-10-05 10:12:03
 **Motor**: Business Semantic Harness (BSH) Nativo (Native Component TUI Architecture)
 **Binário**: `/home/clayton/.nvm/versions/node/v22.19.0/bin/bsh`
 **Projeto Piloto**: `/home/clayton/projetos/oracle/pilot/asset-management`
@@ -15,25 +15,25 @@
 ## Tabela de Artefatos e Integridade SHA-256
 | # | Jornada | Veredito | Tamanho MP4 | Hash SHA-256 (Local & WSL Downloads) |
 |---|---|:---:|:---:|---|
-| 01 | Jornada 1: Sessão Governada — Detecção de Violação e Bloqueio SHACL | `PASSOU` | 250.5 KB | `659194d20f3099ba83d9195b6dde6b5b955902296bec766b57a006e52dc19beb` |
-| 02 | Jornada 2: Sessão Desgovernada — Operação sem Harness Ontológico | `PASSOU` | 194.2 KB | `efd72687468793f34a888234a30dff752467b66cac2fe61ad792e7fa151438cd` |
-| 03 | Jornada 3: Sessão Governada Cooperativa — Alteração Conforme | `PASSOU` | 325.0 KB | `ea2f8678e4cf52a8919116259b560c7fed934f3b9e0f767fab73e4c7fbbcf9c4` |
-| 04 | Jornada 4: Detecção de Desalinhamento Ontológico (Domain Mismatch) | `PASSOU` | 266.6 KB | `98a5753e089a29088ef142dbdcb09c1d6fcb8bda1f27fc540b79f7a18075e8db` |
-| 05 | Jornada 5: Pesquisa de Modelos no OpenRouter e Cancelamento Seguro | `PASSOU` | 233.2 KB | `8c4f113626049b0472709a0dd91f1a6d1ea38f84be19d13737c75026c0b9c14c` |
-| 06 | Jornada 6: Servidor MCP de Governança para Agentes Externos | `PASSOU` | 198.4 KB | `f7578dba3781d68095ee74d74c6ac03e4074921f3e038704e6079990097384eb` |
-| 07 | Jornada 7: BSH como Cliente MCP Consumindo Ferramentas de Terceiros | `PASSOU` | 209.4 KB | `a12d0a0fb561d5db2633af7eed48f39f9de0a5a36c2e86b9c8d44727d2daaa22` |
-| 08 | Jornada 8: Barra de Rolagem, Histórico de Prompts e Execução no Workspace | `PASSOU` | 349.3 KB | `ed971d12ca4af5bb478a13da8cbdf87543b025481c4ddb17c77680f9b0513aa6` |
-| 09 | Jornada 9: Agente de Codificação Autônomo com Ferramentas Especializadas | `PASSOU` | 431.1 KB | `ed325d2b7a29c08e2ab0cd324c12dd7ddb8ef7888834eb9d44d2edf6427104ef` |
-| 10 | Jornada 10: Guarda Semântica com Negações e Navegação em Linha Única | `PASSOU` | 593.0 KB | `4aee1e1eb98e0c29510d601717751f0e438b5c85661f344fedbcd92fa8d8bf46` |
-| 11 | Jornada 11: Ergonomia TUI, Fila FIFO de Prompts e Atalhos Globais | `PASSOU` | 444.8 KB | `1b7a71e7207f72180012bac7b86b7545feb96bc665bfaef5adf6277255c250b3` |
-| 12 | Jornada 12: UX Avançada — Raciocínio CoT Retrátil, Diff e Modo Multilinha | `PASSOU` | 336.6 KB | `06c72532986662e79092257a68153953845b8e084d62744252e39c0a7a3c37da` |
-| 13 | Jornada 13: Mecanismo de Skills e Prototipação Rápida | `PASSOU` | 221.6 KB | `847882598c7aee9d52a5e49504a48ec633584fd4997db767ca5622778949149d` |
-| 14 | Jornada 14: Loop Interativo Multi-Turno com Inclusão de Skills | `PASSOU` | 204.4 KB | `01be9fef5ac12d1f52d5987c99347b26686a30c7339356358cc8fe1433ebe15e` |
-| 15 | Jornada 15: Paleta Flutuante de Comandos com Barra na TUI | `PASSOU` | 204.7 KB | `cbdbc6e6afd3364bca50f3642c913df44c1799860770a49e1c02120d6dc514b5` |
-| 16 | Jornada 16: Reconstrução da Arquitetura com Componentes Nativos da TUI | `PASSOU` | 482.5 KB | `e1d4c954592117b92434eaac372dd52e6ed8ba356794db1a3c3d6376b66ebc3e` |
-| 17 | Jornada 17: Fraude de Segregação de Funções e Lotação Incompatível | `PASSOU` | 635.5 KB | `dc048a7155b99d60044dff4ca60c31f232502a1f20969cdf300b27eecc6d6136` |
-| 18 | Jornada 18: Baixa Destrutiva de Alto Valor sem Alçada e Fraude Residual | `PASSOU` | 1130.2 KB | `01809804bbe3faeaa2c0951a16ee7e02fdcf79cc59609c95218985fd3f719548` |
-| 19 | Jornada 19: Logística Circular, Sinistro de Extravio e Alocação Ilegal | `PASSOU` | 992.7 KB | `916d07a73a4b5ce2254948016956d3c46a69b6947e8c04988f386edfeb90526b` |
+| 01 | Jornada 1: Sessão Governada — Detecção de Violação e Bloqueio SHACL | `PASSOU` | 253.0 KB | `4b977e8d23189706a1f77ff86c9911528ac971993d6f0d9cae0fb3342077523e` |
+| 02 | Jornada 2: Sessão Desgovernada — Operação sem Harness Ontológico | `PASSOU` | 266.0 KB | `ea4d7b3b7d9847dafc5166be6a82b5b80a3c1eb67d3f39db96f3d9ba4958cf8b` |
+| 03 | Jornada 3: Sessão Governada Cooperativa — Alteração Conforme | `PASSOU` | 336.6 KB | `1721aae9e7e750834310a13b9ff181722dabf44c83f883ab5c94e43c62ff52b9` |
+| 04 | Jornada 4: Detecção de Desalinhamento Ontológico (Domain Mismatch) | `PASSOU` | 245.7 KB | `ddb81db53927a219b22b8879aff6be2296c3461dc94b9e2093228dcfd9ed27da` |
+| 05 | Jornada 5: Pesquisa de Modelos no OpenRouter e Cancelamento Seguro | `PASSOU` | 233.3 KB | `491f7ceec1b784f0b0fcc04f69f9bb90a28a8243ba41ab9c2b1e7fdc1ac828da` |
+| 06 | Jornada 6: Servidor MCP de Governança para Agentes Externos | `PASSOU` | 198.8 KB | `feddd6c709d31bc1834011d8a40eb0f6fdd91cd00e05ee6138499471d99587d8` |
+| 07 | Jornada 7: BSH como Cliente MCP Consumindo Ferramentas de Terceiros | `PASSOU` | 222.1 KB | `ad58ea631e6a48acf093fd6dd6faad2ee15824122a77d948a20435cede0e93f1` |
+| 08 | Jornada 8: Barra de Rolagem, Histórico de Prompts e Execução no Workspace | `PASSOU` | 502.0 KB | `831b112dac3b79f40c412402e31cbeede3ba51ed1ff25c0f440d7507a34469a9` |
+| 09 | Jornada 9: Agente de Codificação Autônomo com Ferramentas Especializadas | `PASSOU` | 259.8 KB | `3caca63a1db218cc3577054f5c90e4a6855ee419f9c35f547b97de20c980e54b` |
+| 10 | Jornada 10: Guarda Semântica com Negações e Navegação em Linha Única | `PASSOU` | 619.1 KB | `9b38451473f93f04c63fadc8af2a00c90eb389eb39699cfec45e716e2dab66e8` |
+| 11 | Jornada 11: Ergonomia TUI, Fila FIFO de Prompts e Atalhos Globais | `PASSOU` | 472.6 KB | `6985103b9983968c325c5d22f67b0b19cfa6869f8cbcd4274fea4d324a6fbb96` |
+| 12 | Jornada 12: UX Avançada — Raciocínio CoT Retrátil, Diff e Modo Multilinha | `PASSOU` | 513.0 KB | `dc7d81f75e515a4d1b343fae1e2c3795fdb1140fcefa1e390e48dcfef238675a` |
+| 13 | Jornada 13: Mecanismo de Skills e Prototipação Rápida | `PASSOU` | 238.3 KB | `8717faf2eb7041e9ad92694d0b7ada3d635fb79d268851af09ec6d901b78565a` |
+| 14 | Jornada 14: Loop Interativo Multi-Turno com Inclusão de Skills | `PASSOU` | 200.1 KB | `5f9bd6ee5f48d3243307b9e6f6176565e7a372cacfedfab9a6293663cf16cd35` |
+| 15 | Jornada 15: Paleta Flutuante de Comandos com Barra na TUI | `PASSOU` | 203.0 KB | `7d12138763b7354a6896811d31524f744a971a00e184f1c0f8ecd97537d1fd38` |
+| 16 | Jornada 16: Reconstrução da Arquitetura com Componentes Nativos da TUI | `PASSOU` | 1651.6 KB | `27715b17eab097dfa5b5065c0b9afebde0ebe800d9ac6b21bd10fdc090e665b1` |
+| 17 | Jornada 17: Fraude de Segregação de Funções e Lotação Incompatível | `PASSOU` | 293.5 KB | `0f4d5a831b39c51964c40354de890ec29a7eb9998c8d77884c6f335c6742acb3` |
+| 18 | Jornada 18: Baixa Destrutiva de Alto Valor sem Alçada e Fraude Residual | `PASSOU` | 681.6 KB | `a867be622ace0a94673710a2da90d6773b86cb2d7e67fc0e1bfa3348af0ee0fa` |
+| 19 | Jornada 19: Logística Circular, Sinistro de Extravio e Alocação Ilegal | `PASSOU` | 1147.2 KB | `9cfa00c0e3af03dfb557b0e640f4443b3fe13b1654901d997456f40a3385a2cf` |
 
 ## Sincronização
 - Todos os 16 vídeos e 16 capturas de tela foram copiados para `/mnt/c/Users/clayt/Downloads/bsh` e validados com hashes estritamente idênticos.

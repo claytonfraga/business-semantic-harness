@@ -454,7 +454,10 @@
         "src/governance/domainRegistry.ts",
         "src/vocabulary/bsh.ts",
         "test/ontology",
-        "test/governance/domainRegistry.test.mjs"
+        "test/governance/domainRegistry.test.mjs",
+        "src/ontology/validate.ts",
+        "src/enforcement/validadorSemantico.ts",
+        "test/ontology/semantic-execution.test.mjs"
       ],
       "tags": [],
       "line": 11
@@ -467,7 +470,10 @@
         "src/governance/domainRegistry.ts",
         "src/vocabulary/bsh.ts",
         "test/ontology",
-        "test/governance/domainRegistry.test.mjs"
+        "test/governance/domainRegistry.test.mjs",
+        "src/ontology/validate.ts",
+        "src/enforcement/validadorSemantico.ts",
+        "test/ontology/semantic-execution.test.mjs"
       ],
       "tags": [],
       "line": 18
@@ -480,7 +486,10 @@
         "src/governance/domainRegistry.ts",
         "src/vocabulary/bsh.ts",
         "test/ontology",
-        "test/governance/domainRegistry.test.mjs"
+        "test/governance/domainRegistry.test.mjs",
+        "src/ontology/validate.ts",
+        "src/enforcement/validadorSemantico.ts",
+        "test/ontology/semantic-execution.test.mjs"
       ],
       "tags": [],
       "line": 25
@@ -493,7 +502,10 @@
         "src/governance/domainRegistry.ts",
         "src/vocabulary/bsh.ts",
         "test/ontology",
-        "test/governance/domainRegistry.test.mjs"
+        "test/governance/domainRegistry.test.mjs",
+        "src/ontology/validate.ts",
+        "src/enforcement/validadorSemantico.ts",
+        "test/ontology/semantic-execution.test.mjs"
       ],
       "tags": [],
       "line": 33
@@ -506,7 +518,10 @@
         "src/governance/domainRegistry.ts",
         "src/vocabulary/bsh.ts",
         "test/ontology",
-        "test/governance/domainRegistry.test.mjs"
+        "test/governance/domainRegistry.test.mjs",
+        "src/ontology/validate.ts",
+        "src/enforcement/validadorSemantico.ts",
+        "test/ontology/semantic-execution.test.mjs"
       ],
       "tags": [],
       "line": 41
@@ -519,7 +534,10 @@
         "src/governance/domainRegistry.ts",
         "src/vocabulary/bsh.ts",
         "test/ontology",
-        "test/governance/domainRegistry.test.mjs"
+        "test/governance/domainRegistry.test.mjs",
+        "src/ontology/validate.ts",
+        "src/enforcement/validadorSemantico.ts",
+        "test/ontology/semantic-execution.test.mjs"
       ],
       "tags": [],
       "line": 49
@@ -532,7 +550,10 @@
         "src/governance/domainRegistry.ts",
         "src/vocabulary/bsh.ts",
         "test/ontology",
-        "test/governance/domainRegistry.test.mjs"
+        "test/governance/domainRegistry.test.mjs",
+        "src/ontology/validate.ts",
+        "src/enforcement/validadorSemantico.ts",
+        "test/ontology/semantic-execution.test.mjs"
       ],
       "tags": [],
       "line": 57
@@ -545,7 +566,10 @@
         "src/governance/domainRegistry.ts",
         "src/vocabulary/bsh.ts",
         "test/ontology",
-        "test/governance/domainRegistry.test.mjs"
+        "test/governance/domainRegistry.test.mjs",
+        "src/ontology/validate.ts",
+        "src/enforcement/validadorSemantico.ts",
+        "test/ontology/semantic-execution.test.mjs"
       ],
       "tags": [],
       "line": 65
@@ -558,7 +582,10 @@
         "src/governance/domainRegistry.ts",
         "src/vocabulary/bsh.ts",
         "test/ontology",
-        "test/governance/domainRegistry.test.mjs"
+        "test/governance/domainRegistry.test.mjs",
+        "src/ontology/validate.ts",
+        "src/enforcement/validadorSemantico.ts",
+        "test/ontology/semantic-execution.test.mjs"
       ],
       "tags": [],
       "line": 73
@@ -571,7 +598,10 @@
         "src/governance/domainRegistry.ts",
         "src/vocabulary/bsh.ts",
         "test/ontology",
-        "test/governance/domainRegistry.test.mjs"
+        "test/governance/domainRegistry.test.mjs",
+        "src/ontology/validate.ts",
+        "src/enforcement/validadorSemantico.ts",
+        "test/ontology/semantic-execution.test.mjs"
       ],
       "tags": [],
       "line": 81
@@ -584,7 +614,10 @@
         "src/governance/domainRegistry.ts",
         "src/vocabulary/bsh.ts",
         "test/ontology",
-        "test/governance/domainRegistry.test.mjs"
+        "test/governance/domainRegistry.test.mjs",
+        "src/ontology/validate.ts",
+        "src/enforcement/validadorSemantico.ts",
+        "test/ontology/semantic-execution.test.mjs"
       ],
       "tags": [],
       "line": 89
@@ -701,7 +734,9 @@
         "test/enforcement/promptGuard.test.mjs",
         "test/features/journeys/jornada-01-governado-bloqueio.feature",
         "test/features/journeys/jornada-02-desgovernado-sem-harness.feature",
-        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature"
+        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature",
+        "src/tui/input.ts",
+        "test/tui/input.test.mjs"
       ],
       "tags": [],
       "line": 11
@@ -717,7 +752,9 @@
         "test/enforcement/promptGuard.test.mjs",
         "test/features/journeys/jornada-01-governado-bloqueio.feature",
         "test/features/journeys/jornada-02-desgovernado-sem-harness.feature",
-        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature"
+        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature",
+        "src/tui/input.ts",
+        "test/tui/input.test.mjs"
       ],
       "tags": [],
       "line": 18
@@ -733,7 +770,9 @@
         "test/enforcement/promptGuard.test.mjs",
         "test/features/journeys/jornada-01-governado-bloqueio.feature",
         "test/features/journeys/jornada-02-desgovernado-sem-harness.feature",
-        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature"
+        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature",
+        "src/tui/input.ts",
+        "test/tui/input.test.mjs"
       ],
       "tags": [],
       "line": 24
@@ -749,7 +788,9 @@
         "test/enforcement/promptGuard.test.mjs",
         "test/features/journeys/jornada-01-governado-bloqueio.feature",
         "test/features/journeys/jornada-02-desgovernado-sem-harness.feature",
-        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature"
+        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature",
+        "src/tui/input.ts",
+        "test/tui/input.test.mjs"
       ],
       "tags": [],
       "line": 31
@@ -765,7 +806,9 @@
         "test/enforcement/promptGuard.test.mjs",
         "test/features/journeys/jornada-01-governado-bloqueio.feature",
         "test/features/journeys/jornada-02-desgovernado-sem-harness.feature",
-        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature"
+        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature",
+        "src/tui/input.ts",
+        "test/tui/input.test.mjs"
       ],
       "tags": [],
       "line": 37
@@ -781,10 +824,12 @@
         "test/enforcement/promptGuard.test.mjs",
         "test/features/journeys/jornada-01-governado-bloqueio.feature",
         "test/features/journeys/jornada-02-desgovernado-sem-harness.feature",
-        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature"
+        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature",
+        "src/tui/input.ts",
+        "test/tui/input.test.mjs"
       ],
       "tags": [],
-      "line": 45
+      "line": 46
     },
     {
       "id": "BSH-GUARD-007",
@@ -797,10 +842,12 @@
         "test/enforcement/promptGuard.test.mjs",
         "test/features/journeys/jornada-01-governado-bloqueio.feature",
         "test/features/journeys/jornada-02-desgovernado-sem-harness.feature",
-        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature"
+        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature",
+        "src/tui/input.ts",
+        "test/tui/input.test.mjs"
       ],
       "tags": [],
-      "line": 52
+      "line": 53
     },
     {
       "id": "BSH-GUARD-008",
@@ -813,10 +860,12 @@
         "test/enforcement/promptGuard.test.mjs",
         "test/features/journeys/jornada-01-governado-bloqueio.feature",
         "test/features/journeys/jornada-02-desgovernado-sem-harness.feature",
-        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature"
+        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature",
+        "src/tui/input.ts",
+        "test/tui/input.test.mjs"
       ],
       "tags": [],
-      "line": 59
+      "line": 61
     },
     {
       "id": "BSH-GUARD-009",
@@ -829,10 +878,12 @@
         "test/enforcement/promptGuard.test.mjs",
         "test/features/journeys/jornada-01-governado-bloqueio.feature",
         "test/features/journeys/jornada-02-desgovernado-sem-harness.feature",
-        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature"
+        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature",
+        "src/tui/input.ts",
+        "test/tui/input.test.mjs"
       ],
       "tags": [],
-      "line": 67
+      "line": 69
     },
     {
       "id": "BSH-GUARD-010",
@@ -845,10 +896,12 @@
         "test/enforcement/promptGuard.test.mjs",
         "test/features/journeys/jornada-01-governado-bloqueio.feature",
         "test/features/journeys/jornada-02-desgovernado-sem-harness.feature",
-        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature"
+        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature",
+        "src/tui/input.ts",
+        "test/tui/input.test.mjs"
       ],
       "tags": [],
-      "line": 75
+      "line": 77
     },
     {
       "id": "BSH-GUARD-011",
@@ -861,13 +914,15 @@
         "test/enforcement/promptGuard.test.mjs",
         "test/features/journeys/jornada-01-governado-bloqueio.feature",
         "test/features/journeys/jornada-02-desgovernado-sem-harness.feature",
-        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature"
+        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature",
+        "src/tui/input.ts",
+        "test/tui/input.test.mjs"
       ],
       "tags": [
-        "@specified",
-        "@gap"
+        "specified",
+        "gap"
       ],
-      "line": 83
+      "line": 85
     },
     {
       "id": "BSH-DEC-001",
@@ -1315,7 +1370,10 @@
         "src/agent/tools.ts",
         "test/agent/agent.test.mjs",
         "test/agent/tools.test.mjs",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "src/agent/agentLoop.ts",
+        "test/agent/shell-and-process-confinement.test.mjs",
+        "test/agent/observed-outcomes.test.mjs"
       ],
       "tags": [],
       "line": 11
@@ -1327,7 +1385,10 @@
         "src/agent/tools.ts",
         "test/agent/agent.test.mjs",
         "test/agent/tools.test.mjs",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "src/agent/agentLoop.ts",
+        "test/agent/shell-and-process-confinement.test.mjs",
+        "test/agent/observed-outcomes.test.mjs"
       ],
       "tags": [],
       "line": 18
@@ -1339,7 +1400,10 @@
         "src/agent/tools.ts",
         "test/agent/agent.test.mjs",
         "test/agent/tools.test.mjs",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "src/agent/agentLoop.ts",
+        "test/agent/shell-and-process-confinement.test.mjs",
+        "test/agent/observed-outcomes.test.mjs"
       ],
       "tags": [],
       "line": 27
@@ -1351,7 +1415,10 @@
         "src/agent/tools.ts",
         "test/agent/agent.test.mjs",
         "test/agent/tools.test.mjs",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "src/agent/agentLoop.ts",
+        "test/agent/shell-and-process-confinement.test.mjs",
+        "test/agent/observed-outcomes.test.mjs"
       ],
       "tags": [],
       "line": 35
@@ -1363,11 +1430,14 @@
         "src/agent/tools.ts",
         "test/agent/agent.test.mjs",
         "test/agent/tools.test.mjs",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "src/agent/agentLoop.ts",
+        "test/agent/shell-and-process-confinement.test.mjs",
+        "test/agent/observed-outcomes.test.mjs"
       ],
       "tags": [
-        "@specified",
-        "@gap"
+        "specified",
+        "gap"
       ],
       "line": 43
     },
@@ -1378,7 +1448,10 @@
         "src/agent/tools.ts",
         "test/agent/agent.test.mjs",
         "test/agent/tools.test.mjs",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "src/agent/agentLoop.ts",
+        "test/agent/shell-and-process-confinement.test.mjs",
+        "test/agent/observed-outcomes.test.mjs"
       ],
       "tags": [],
       "line": 50
@@ -1390,7 +1463,10 @@
         "src/agent/tools.ts",
         "test/agent/agent.test.mjs",
         "test/agent/tools.test.mjs",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "src/agent/agentLoop.ts",
+        "test/agent/shell-and-process-confinement.test.mjs",
+        "test/agent/observed-outcomes.test.mjs"
       ],
       "tags": [],
       "line": 56
@@ -1402,7 +1478,10 @@
         "src/agent/tools.ts",
         "test/agent/agent.test.mjs",
         "test/agent/tools.test.mjs",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "src/agent/agentLoop.ts",
+        "test/agent/shell-and-process-confinement.test.mjs",
+        "test/agent/observed-outcomes.test.mjs"
       ],
       "tags": [],
       "line": 64
@@ -1414,11 +1493,14 @@
         "src/agent/tools.ts",
         "test/agent/agent.test.mjs",
         "test/agent/tools.test.mjs",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "src/agent/agentLoop.ts",
+        "test/agent/shell-and-process-confinement.test.mjs",
+        "test/agent/observed-outcomes.test.mjs"
       ],
       "tags": [
-        "@specified",
-        "@gap"
+        "R4",
+        "R5"
       ],
       "line": 71
     },
@@ -1429,7 +1511,10 @@
         "src/agent/tools.ts",
         "test/agent/agent.test.mjs",
         "test/agent/tools.test.mjs",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "src/agent/agentLoop.ts",
+        "test/agent/shell-and-process-confinement.test.mjs",
+        "test/agent/observed-outcomes.test.mjs"
       ],
       "tags": [],
       "line": 78
@@ -1441,7 +1526,10 @@
         "src/agent/tools.ts",
         "test/agent/agent.test.mjs",
         "test/agent/tools.test.mjs",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "src/agent/agentLoop.ts",
+        "test/agent/shell-and-process-confinement.test.mjs",
+        "test/agent/observed-outcomes.test.mjs"
       ],
       "tags": [],
       "line": 85
@@ -1453,7 +1541,10 @@
         "src/agent/tools.ts",
         "test/agent/agent.test.mjs",
         "test/agent/tools.test.mjs",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "src/agent/agentLoop.ts",
+        "test/agent/shell-and-process-confinement.test.mjs",
+        "test/agent/observed-outcomes.test.mjs"
       ],
       "tags": [],
       "line": 94
@@ -1469,7 +1560,9 @@
         "test/agent",
         "test/features/journeys/jornada-08-rolagem-historico-loop-agente.feature",
         "test/features/journeys/jornada-09-agente-codificacao-autonomo.feature",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "test/agent/observed-outcomes.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs"
       ],
       "tags": [],
       "line": 11
@@ -1485,7 +1578,9 @@
         "test/agent",
         "test/features/journeys/jornada-08-rolagem-historico-loop-agente.feature",
         "test/features/journeys/jornada-09-agente-codificacao-autonomo.feature",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "test/agent/observed-outcomes.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs"
       ],
       "tags": [],
       "line": 19
@@ -1501,7 +1596,9 @@
         "test/agent",
         "test/features/journeys/jornada-08-rolagem-historico-loop-agente.feature",
         "test/features/journeys/jornada-09-agente-codificacao-autonomo.feature",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "test/agent/observed-outcomes.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs"
       ],
       "tags": [],
       "line": 27
@@ -1517,7 +1614,9 @@
         "test/agent",
         "test/features/journeys/jornada-08-rolagem-historico-loop-agente.feature",
         "test/features/journeys/jornada-09-agente-codificacao-autonomo.feature",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "test/agent/observed-outcomes.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs"
       ],
       "tags": [],
       "line": 34
@@ -1533,10 +1632,12 @@
         "test/agent",
         "test/features/journeys/jornada-08-rolagem-historico-loop-agente.feature",
         "test/features/journeys/jornada-09-agente-codificacao-autonomo.feature",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "test/agent/observed-outcomes.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs"
       ],
       "tags": [],
-      "line": 41
+      "line": 43
     },
     {
       "id": "BSH-AGENT-006",
@@ -1549,10 +1650,12 @@
         "test/agent",
         "test/features/journeys/jornada-08-rolagem-historico-loop-agente.feature",
         "test/features/journeys/jornada-09-agente-codificacao-autonomo.feature",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "test/agent/observed-outcomes.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs"
       ],
       "tags": [],
-      "line": 48
+      "line": 50
     },
     {
       "id": "BSH-AGENT-007",
@@ -1565,10 +1668,12 @@
         "test/agent",
         "test/features/journeys/jornada-08-rolagem-historico-loop-agente.feature",
         "test/features/journeys/jornada-09-agente-codificacao-autonomo.feature",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "test/agent/observed-outcomes.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs"
       ],
       "tags": [],
-      "line": 55
+      "line": 57
     },
     {
       "id": "BSH-AGENT-008",
@@ -1581,10 +1686,12 @@
         "test/agent",
         "test/features/journeys/jornada-08-rolagem-historico-loop-agente.feature",
         "test/features/journeys/jornada-09-agente-codificacao-autonomo.feature",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "test/agent/observed-outcomes.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs"
       ],
       "tags": [],
-      "line": 62
+      "line": 64
     },
     {
       "id": "BSH-AGENT-009",
@@ -1597,10 +1704,12 @@
         "test/agent",
         "test/features/journeys/jornada-08-rolagem-historico-loop-agente.feature",
         "test/features/journeys/jornada-09-agente-codificacao-autonomo.feature",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "test/agent/observed-outcomes.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs"
       ],
       "tags": [],
-      "line": 69
+      "line": 71
     },
     {
       "id": "BSH-AGENT-010",
@@ -1613,10 +1722,12 @@
         "test/agent",
         "test/features/journeys/jornada-08-rolagem-historico-loop-agente.feature",
         "test/features/journeys/jornada-09-agente-codificacao-autonomo.feature",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "test/agent/observed-outcomes.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs"
       ],
       "tags": [],
-      "line": 77
+      "line": 79
     },
     {
       "id": "BSH-AGENT-011",
@@ -1629,10 +1740,12 @@
         "test/agent",
         "test/features/journeys/jornada-08-rolagem-historico-loop-agente.feature",
         "test/features/journeys/jornada-09-agente-codificacao-autonomo.feature",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "test/agent/observed-outcomes.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs"
       ],
       "tags": [],
-      "line": 85
+      "line": 89
     },
     {
       "id": "BSH-AGENT-012",
@@ -1645,10 +1758,12 @@
         "test/agent",
         "test/features/journeys/jornada-08-rolagem-historico-loop-agente.feature",
         "test/features/journeys/jornada-09-agente-codificacao-autonomo.feature",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "test/agent/observed-outcomes.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs"
       ],
       "tags": [],
-      "line": 92
+      "line": 96
     },
     {
       "id": "BSH-AGENT-013",
@@ -1661,13 +1776,15 @@
         "test/agent",
         "test/features/journeys/jornada-08-rolagem-historico-loop-agente.feature",
         "test/features/journeys/jornada-09-agente-codificacao-autonomo.feature",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "test/agent/observed-outcomes.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs"
       ],
       "tags": [
-        "@specified",
-        "@gap"
+        "specified",
+        "gap"
       ],
-      "line": 100
+      "line": 104
     },
     {
       "id": "BSH-AGENT-014",
@@ -1680,10 +1797,12 @@
         "test/agent",
         "test/features/journeys/jornada-08-rolagem-historico-loop-agente.feature",
         "test/features/journeys/jornada-09-agente-codificacao-autonomo.feature",
-        "openspec/changes/autonomous-coding-agent"
+        "openspec/changes/autonomous-coding-agent",
+        "test/agent/observed-outcomes.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs"
       ],
       "tags": [],
-      "line": 108
+      "line": 112
     },
     {
       "id": "BSH-GIT-001",
@@ -1932,11 +2051,13 @@
         "test/tui/session-advanced-ux.test.mjs",
         "openspec/changes/ergonomic-tui-queue-and-shortcuts",
         "openspec/changes/enhanced-ux-streaming-and-implementation-receipt",
-        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
+        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature",
+        "src/tui/entries.ts",
+        "test/support/opentui-components.fixture.mjs"
       ],
       "tags": [
-        "@specified",
-        "@gap"
+        "specified",
+        "gap"
       ],
       "line": 11
     },
@@ -1951,7 +2072,9 @@
         "test/tui/session-advanced-ux.test.mjs",
         "openspec/changes/ergonomic-tui-queue-and-shortcuts",
         "openspec/changes/enhanced-ux-streaming-and-implementation-receipt",
-        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
+        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature",
+        "src/tui/entries.ts",
+        "test/support/opentui-components.fixture.mjs"
       ],
       "tags": [],
       "line": 19
@@ -1967,7 +2090,9 @@
         "test/tui/session-advanced-ux.test.mjs",
         "openspec/changes/ergonomic-tui-queue-and-shortcuts",
         "openspec/changes/enhanced-ux-streaming-and-implementation-receipt",
-        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
+        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature",
+        "src/tui/entries.ts",
+        "test/support/opentui-components.fixture.mjs"
       ],
       "tags": [],
       "line": 27
@@ -1983,10 +2108,12 @@
         "test/tui/session-advanced-ux.test.mjs",
         "openspec/changes/ergonomic-tui-queue-and-shortcuts",
         "openspec/changes/enhanced-ux-streaming-and-implementation-receipt",
-        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
+        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature",
+        "src/tui/entries.ts",
+        "test/support/opentui-components.fixture.mjs"
       ],
       "tags": [],
-      "line": 36
+      "line": 37
     },
     {
       "id": "BSH-TUI-005",
@@ -1999,10 +2126,12 @@
         "test/tui/session-advanced-ux.test.mjs",
         "openspec/changes/ergonomic-tui-queue-and-shortcuts",
         "openspec/changes/enhanced-ux-streaming-and-implementation-receipt",
-        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
+        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature",
+        "src/tui/entries.ts",
+        "test/support/opentui-components.fixture.mjs"
       ],
       "tags": [],
-      "line": 44
+      "line": 45
     },
     {
       "id": "BSH-TUI-006",
@@ -2015,10 +2144,12 @@
         "test/tui/session-advanced-ux.test.mjs",
         "openspec/changes/ergonomic-tui-queue-and-shortcuts",
         "openspec/changes/enhanced-ux-streaming-and-implementation-receipt",
-        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
+        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature",
+        "src/tui/entries.ts",
+        "test/support/opentui-components.fixture.mjs"
       ],
       "tags": [],
-      "line": 52
+      "line": 54
     },
     {
       "id": "BSH-TUI-007",
@@ -2031,10 +2162,12 @@
         "test/tui/session-advanced-ux.test.mjs",
         "openspec/changes/ergonomic-tui-queue-and-shortcuts",
         "openspec/changes/enhanced-ux-streaming-and-implementation-receipt",
-        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
+        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature",
+        "src/tui/entries.ts",
+        "test/support/opentui-components.fixture.mjs"
       ],
       "tags": [],
-      "line": 60
+      "line": 65
     },
     {
       "id": "BSH-TUI-008",
@@ -2047,13 +2180,15 @@
         "test/tui/session-advanced-ux.test.mjs",
         "openspec/changes/ergonomic-tui-queue-and-shortcuts",
         "openspec/changes/enhanced-ux-streaming-and-implementation-receipt",
-        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
+        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature",
+        "src/tui/entries.ts",
+        "test/support/opentui-components.fixture.mjs"
       ],
       "tags": [
-        "@specified",
-        "@gap"
+        "specified",
+        "gap"
       ],
-      "line": 67
+      "line": 73
     },
     {
       "id": "BSH-TUI-009",
@@ -2066,10 +2201,12 @@
         "test/tui/session-advanced-ux.test.mjs",
         "openspec/changes/ergonomic-tui-queue-and-shortcuts",
         "openspec/changes/enhanced-ux-streaming-and-implementation-receipt",
-        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
+        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature",
+        "src/tui/entries.ts",
+        "test/support/opentui-components.fixture.mjs"
       ],
       "tags": [],
-      "line": 75
+      "line": 81
     },
     {
       "id": "BSH-TUI-010",
@@ -2082,13 +2219,12 @@
         "test/tui/session-advanced-ux.test.mjs",
         "openspec/changes/ergonomic-tui-queue-and-shortcuts",
         "openspec/changes/enhanced-ux-streaming-and-implementation-receipt",
-        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
+        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature",
+        "src/tui/entries.ts",
+        "test/support/opentui-components.fixture.mjs"
       ],
-      "tags": [
-        "@specified",
-        "@gap"
-      ],
-      "line": 83
+      "tags": [],
+      "line": 89
     },
     {
       "id": "BSH-TUI-011",
@@ -2101,10 +2237,12 @@
         "test/tui/session-advanced-ux.test.mjs",
         "openspec/changes/ergonomic-tui-queue-and-shortcuts",
         "openspec/changes/enhanced-ux-streaming-and-implementation-receipt",
-        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
+        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature",
+        "src/tui/entries.ts",
+        "test/support/opentui-components.fixture.mjs"
       ],
       "tags": [],
-      "line": 91
+      "line": 100
     },
     {
       "id": "BSH-TUI-012",
@@ -2117,13 +2255,15 @@
         "test/tui/session-advanced-ux.test.mjs",
         "openspec/changes/ergonomic-tui-queue-and-shortcuts",
         "openspec/changes/enhanced-ux-streaming-and-implementation-receipt",
-        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
+        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature",
+        "src/tui/entries.ts",
+        "test/support/opentui-components.fixture.mjs"
       ],
       "tags": [
-        "@specified",
-        "@gap"
+        "specified",
+        "gap"
       ],
-      "line": 98
+      "line": 107
     },
     {
       "id": "BSH-TUI-013",
@@ -2136,13 +2276,15 @@
         "test/tui/session-advanced-ux.test.mjs",
         "openspec/changes/ergonomic-tui-queue-and-shortcuts",
         "openspec/changes/enhanced-ux-streaming-and-implementation-receipt",
-        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
+        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature",
+        "src/tui/entries.ts",
+        "test/support/opentui-components.fixture.mjs"
       ],
       "tags": [
-        "@specified",
-        "@gap"
+        "specified",
+        "gap"
       ],
-      "line": 106
+      "line": 115
     },
     {
       "id": "BSH-INPUT-001",
@@ -2159,7 +2301,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 11
+      "line": 10
     },
     {
       "id": "BSH-INPUT-002",
@@ -2176,7 +2318,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 20
+      "line": 19
     },
     {
       "id": "BSH-INPUT-003",
@@ -2193,7 +2335,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 28
+      "line": 27
     },
     {
       "id": "BSH-INPUT-004",
@@ -2210,7 +2352,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 35
+      "line": 34
     },
     {
       "id": "BSH-INPUT-005",
@@ -2227,7 +2369,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 43
+      "line": 42
     },
     {
       "id": "BSH-INPUT-006",
@@ -2244,7 +2386,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 51
+      "line": 50
     },
     {
       "id": "BSH-INPUT-007",
@@ -2264,7 +2406,7 @@
         "@specified",
         "@gap"
       ],
-      "line": 59
+      "line": 58
     },
     {
       "id": "BSH-INPUT-008",
@@ -2281,7 +2423,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 66
+      "line": 65
     },
     {
       "id": "BSH-INPUT-009",
@@ -2298,7 +2440,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 73
+      "line": 72
     },
     {
       "id": "BSH-INPUT-010",
@@ -2315,7 +2457,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 79
+      "line": 78
     },
     {
       "id": "BSH-INPUT-011",
@@ -2332,7 +2474,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 88
+      "line": 87
     },
     {
       "id": "BSH-INPUT-012",
@@ -2349,7 +2491,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 96
+      "line": 95
     },
     {
       "id": "BSH-INPUT-013",
@@ -2366,7 +2508,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 104
+      "line": 103
     },
     {
       "id": "BSH-INPUT-014",
@@ -2383,7 +2525,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 111
+      "line": 110
     },
     {
       "id": "BSH-INPUT-015",
@@ -2403,7 +2545,7 @@
         "@specified",
         "@gap"
       ],
-      "line": 120
+      "line": 119
     },
     {
       "id": "BSH-INPUT-016",
@@ -2420,7 +2562,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 127
+      "line": 126
     },
     {
       "id": "BSH-INPUT-017",
@@ -2437,7 +2579,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 135
+      "line": 134
     },
     {
       "id": "BSH-INPUT-018",
@@ -2457,7 +2599,7 @@
         "@specified",
         "@gap"
       ],
-      "line": 143
+      "line": 142
     },
     {
       "id": "BSH-SELECT-001",
@@ -3475,7 +3617,12 @@
         "test/support/record_bsh_e2e_video.py",
         "test/support/tmux-screenshot.py",
         "pilot/asset-management/evaluation",
-        "pilot/asset-management/scripts/generate_semantic_reports.py"
+        "pilot/asset-management/scripts/generate_semantic_reports.py",
+        "scripts/run-production-e2e.py",
+        "scripts/run_all_e2e_journeys.py",
+        "scripts/verify-e2e-sync.mjs",
+        "test/evaluation/e2e-evidence-verifier.test.mjs",
+        "test/features/journeys/jornada-20-observabilidade-e-validacao-semantica.feature"
       ],
       "tags": [],
       "line": 40
@@ -3491,7 +3638,12 @@
         "test/support/record_bsh_e2e_video.py",
         "test/support/tmux-screenshot.py",
         "pilot/asset-management/evaluation",
-        "pilot/asset-management/scripts/generate_semantic_reports.py"
+        "pilot/asset-management/scripts/generate_semantic_reports.py",
+        "scripts/run-production-e2e.py",
+        "scripts/run_all_e2e_journeys.py",
+        "scripts/verify-e2e-sync.mjs",
+        "test/evaluation/e2e-evidence-verifier.test.mjs",
+        "test/features/journeys/jornada-20-observabilidade-e-validacao-semantica.feature"
       ],
       "tags": [],
       "line": 48
@@ -3507,7 +3659,12 @@
         "test/support/record_bsh_e2e_video.py",
         "test/support/tmux-screenshot.py",
         "pilot/asset-management/evaluation",
-        "pilot/asset-management/scripts/generate_semantic_reports.py"
+        "pilot/asset-management/scripts/generate_semantic_reports.py",
+        "scripts/run-production-e2e.py",
+        "scripts/run_all_e2e_journeys.py",
+        "scripts/verify-e2e-sync.mjs",
+        "test/evaluation/e2e-evidence-verifier.test.mjs",
+        "test/features/journeys/jornada-20-observabilidade-e-validacao-semantica.feature"
       ],
       "tags": [],
       "line": 55
@@ -3523,7 +3680,12 @@
         "test/support/record_bsh_e2e_video.py",
         "test/support/tmux-screenshot.py",
         "pilot/asset-management/evaluation",
-        "pilot/asset-management/scripts/generate_semantic_reports.py"
+        "pilot/asset-management/scripts/generate_semantic_reports.py",
+        "scripts/run-production-e2e.py",
+        "scripts/run_all_e2e_journeys.py",
+        "scripts/verify-e2e-sync.mjs",
+        "test/evaluation/e2e-evidence-verifier.test.mjs",
+        "test/features/journeys/jornada-20-observabilidade-e-validacao-semantica.feature"
       ],
       "tags": [],
       "line": 63
@@ -3539,7 +3701,12 @@
         "test/support/record_bsh_e2e_video.py",
         "test/support/tmux-screenshot.py",
         "pilot/asset-management/evaluation",
-        "pilot/asset-management/scripts/generate_semantic_reports.py"
+        "pilot/asset-management/scripts/generate_semantic_reports.py",
+        "scripts/run-production-e2e.py",
+        "scripts/run_all_e2e_journeys.py",
+        "scripts/verify-e2e-sync.mjs",
+        "test/evaluation/e2e-evidence-verifier.test.mjs",
+        "test/features/journeys/jornada-20-observabilidade-e-validacao-semantica.feature"
       ],
       "tags": [],
       "line": 72
@@ -3555,7 +3722,12 @@
         "test/support/record_bsh_e2e_video.py",
         "test/support/tmux-screenshot.py",
         "pilot/asset-management/evaluation",
-        "pilot/asset-management/scripts/generate_semantic_reports.py"
+        "pilot/asset-management/scripts/generate_semantic_reports.py",
+        "scripts/run-production-e2e.py",
+        "scripts/run_all_e2e_journeys.py",
+        "scripts/verify-e2e-sync.mjs",
+        "test/evaluation/e2e-evidence-verifier.test.mjs",
+        "test/features/journeys/jornada-20-observabilidade-e-validacao-semantica.feature"
       ],
       "tags": [],
       "line": 80
@@ -3603,7 +3775,12 @@
         "test/support/record_bsh_e2e_video.py",
         "test/support/tmux-screenshot.py",
         "pilot/asset-management/evaluation",
-        "pilot/asset-management/scripts/generate_semantic_reports.py"
+        "pilot/asset-management/scripts/generate_semantic_reports.py",
+        "scripts/run-production-e2e.py",
+        "scripts/run_all_e2e_journeys.py",
+        "scripts/verify-e2e-sync.mjs",
+        "test/evaluation/e2e-evidence-verifier.test.mjs",
+        "test/features/journeys/jornada-20-observabilidade-e-validacao-semantica.feature"
       ],
       "tags": [],
       "line": 105
@@ -4621,6 +4798,1632 @@
         "specified"
       ],
       "line": 148
+    },
+    {
+      "id": "BSH-SEM-QA-001",
+      "feature": "semantic-suite-operational-contract.feature",
+      "sources": [
+        "openspec/specs/semantic-enforcement-and-promotion-gate.feature",
+        "test/e2e-live/semantic-enforcement.semantic.mjs",
+        "scripts/run-e2e-pipeline.mjs",
+        ".github/workflows/ci.yml",
+        ".github/workflows/release.yml",
+        "src/git/promotion.ts",
+        "docs/semantic-suite-reconciliation.md"
+      ],
+      "tags": [],
+      "line": 10
+    },
+    {
+      "id": "BSH-SEM-QA-002",
+      "feature": "semantic-suite-operational-contract.feature",
+      "sources": [
+        "openspec/specs/semantic-enforcement-and-promotion-gate.feature",
+        "test/e2e-live/semantic-enforcement.semantic.mjs",
+        "scripts/run-e2e-pipeline.mjs",
+        ".github/workflows/ci.yml",
+        ".github/workflows/release.yml",
+        "src/git/promotion.ts",
+        "docs/semantic-suite-reconciliation.md"
+      ],
+      "tags": [],
+      "line": 18
+    },
+    {
+      "id": "BSH-SEM-QA-003",
+      "feature": "semantic-suite-operational-contract.feature",
+      "sources": [
+        "openspec/specs/semantic-enforcement-and-promotion-gate.feature",
+        "test/e2e-live/semantic-enforcement.semantic.mjs",
+        "scripts/run-e2e-pipeline.mjs",
+        ".github/workflows/ci.yml",
+        ".github/workflows/release.yml",
+        "src/git/promotion.ts",
+        "docs/semantic-suite-reconciliation.md"
+      ],
+      "tags": [],
+      "line": 27
+    },
+    {
+      "id": "BSH-SEM-QA-004",
+      "feature": "semantic-suite-operational-contract.feature",
+      "sources": [
+        "openspec/specs/semantic-enforcement-and-promotion-gate.feature",
+        "test/e2e-live/semantic-enforcement.semantic.mjs",
+        "scripts/run-e2e-pipeline.mjs",
+        ".github/workflows/ci.yml",
+        ".github/workflows/release.yml",
+        "src/git/promotion.ts",
+        "docs/semantic-suite-reconciliation.md"
+      ],
+      "tags": [],
+      "line": 35
+    },
+    {
+      "id": "BSH-SEM-QA-005",
+      "feature": "semantic-suite-operational-contract.feature",
+      "sources": [
+        "openspec/specs/semantic-enforcement-and-promotion-gate.feature",
+        "test/e2e-live/semantic-enforcement.semantic.mjs",
+        "scripts/run-e2e-pipeline.mjs",
+        ".github/workflows/ci.yml",
+        ".github/workflows/release.yml",
+        "src/git/promotion.ts",
+        "docs/semantic-suite-reconciliation.md"
+      ],
+      "tags": [],
+      "line": 43
+    },
+    {
+      "id": "BSH-ONT-012",
+      "feature": "ontology-validation-and-query.feature",
+      "sources": [
+        "src/ontology",
+        "src/governance/domainRegistry.ts",
+        "src/vocabulary/bsh.ts",
+        "test/ontology",
+        "test/governance/domainRegistry.test.mjs",
+        "src/ontology/validate.ts",
+        "src/enforcement/validadorSemantico.ts",
+        "test/ontology/semantic-execution.test.mjs"
+      ],
+      "tags": [
+        "petreo",
+        "regra-de-ouro"
+      ],
+      "line": 97
+    },
+    {
+      "id": "BSH-ONT-013",
+      "feature": "ontology-validation-and-query.feature",
+      "sources": [
+        "src/ontology",
+        "src/governance/domainRegistry.ts",
+        "src/vocabulary/bsh.ts",
+        "test/ontology",
+        "test/governance/domainRegistry.test.mjs",
+        "src/ontology/validate.ts",
+        "src/enforcement/validadorSemantico.ts",
+        "test/ontology/semantic-execution.test.mjs"
+      ],
+      "tags": [],
+      "line": 107
+    },
+    {
+      "id": "BSH-ONT-PROFILE-001",
+      "feature": "ontology-validation-and-query.feature",
+      "sources": [
+        "src/ontology",
+        "src/governance/domainRegistry.ts",
+        "src/vocabulary/bsh.ts",
+        "test/ontology",
+        "test/governance/domainRegistry.test.mjs",
+        "src/ontology/validate.ts",
+        "src/enforcement/validadorSemantico.ts",
+        "test/ontology/semantic-execution.test.mjs"
+      ],
+      "tags": [],
+      "line": 119
+    },
+    {
+      "id": "BSH-ONT-EXECUTION-001",
+      "feature": "ontology-validation-and-query.feature",
+      "sources": [
+        "src/ontology",
+        "src/governance/domainRegistry.ts",
+        "src/vocabulary/bsh.ts",
+        "test/ontology",
+        "test/governance/domainRegistry.test.mjs",
+        "src/ontology/validate.ts",
+        "src/enforcement/validadorSemantico.ts",
+        "test/ontology/semantic-execution.test.mjs"
+      ],
+      "tags": [],
+      "line": 132
+    },
+    {
+      "id": "BSH-TOOLS-013",
+      "feature": "workspace-tools.feature",
+      "sources": [
+        "src/agent/tools.ts",
+        "test/agent/agent.test.mjs",
+        "test/agent/tools.test.mjs",
+        "openspec/changes/autonomous-coding-agent",
+        "src/agent/agentLoop.ts",
+        "test/agent/shell-and-process-confinement.test.mjs",
+        "test/agent/observed-outcomes.test.mjs"
+      ],
+      "tags": [],
+      "line": 102
+    },
+    {
+      "id": "BSH-TOOLS-014",
+      "feature": "workspace-tools.feature",
+      "sources": [
+        "src/agent/tools.ts",
+        "test/agent/agent.test.mjs",
+        "test/agent/tools.test.mjs",
+        "openspec/changes/autonomous-coding-agent",
+        "src/agent/agentLoop.ts",
+        "test/agent/shell-and-process-confinement.test.mjs",
+        "test/agent/observed-outcomes.test.mjs"
+      ],
+      "tags": [
+        "REQ-AGENT-OBSERVED-CHANGES"
+      ],
+      "line": 110
+    },
+    {
+      "id": "REQ-AGENT-OBSERVED-CHANGES",
+      "feature": "workspace-tools.feature",
+      "sources": [
+        "src/agent/tools.ts",
+        "test/agent/agent.test.mjs",
+        "test/agent/tools.test.mjs",
+        "openspec/changes/autonomous-coding-agent",
+        "src/agent/agentLoop.ts",
+        "test/agent/shell-and-process-confinement.test.mjs",
+        "test/agent/observed-outcomes.test.mjs"
+      ],
+      "tags": [
+        "BSH-TOOLS-014"
+      ],
+      "line": 110
+    },
+    {
+      "id": "BSH-TOOLS-015",
+      "feature": "workspace-tools.feature",
+      "sources": [
+        "src/agent/tools.ts",
+        "test/agent/agent.test.mjs",
+        "test/agent/tools.test.mjs",
+        "openspec/changes/autonomous-coding-agent",
+        "src/agent/agentLoop.ts",
+        "test/agent/shell-and-process-confinement.test.mjs",
+        "test/agent/observed-outcomes.test.mjs"
+      ],
+      "tags": [
+        "REQ-AGENT-OBSERVED-OUTCOME"
+      ],
+      "line": 118
+    },
+    {
+      "id": "REQ-AGENT-OBSERVED-OUTCOME",
+      "feature": "workspace-tools.feature",
+      "sources": [
+        "src/agent/tools.ts",
+        "test/agent/agent.test.mjs",
+        "test/agent/tools.test.mjs",
+        "openspec/changes/autonomous-coding-agent",
+        "src/agent/agentLoop.ts",
+        "test/agent/shell-and-process-confinement.test.mjs",
+        "test/agent/observed-outcomes.test.mjs"
+      ],
+      "tags": [
+        "BSH-TOOLS-015"
+      ],
+      "line": 118
+    },
+    {
+      "id": "BSH-TUI-014",
+      "feature": "tui-layout-and-feedback.feature",
+      "sources": [
+        "src/tui/render.ts",
+        "src/tui/ansi.ts",
+        "src/tui/session.ts",
+        "test/tui/render.test.mjs",
+        "test/tui/session-advanced-ux.test.mjs",
+        "openspec/changes/ergonomic-tui-queue-and-shortcuts",
+        "openspec/changes/enhanced-ux-streaming-and-implementation-receipt",
+        "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature",
+        "src/tui/entries.ts",
+        "test/support/opentui-components.fixture.mjs"
+      ],
+      "tags": [],
+      "line": 124
+    },
+    {
+      "id": "BSH-GUARD-012",
+      "feature": "prompt-guard-and-governance-mode.feature",
+      "sources": [
+        "src/enforcement/promptGuard.ts",
+        "src/tui/session.ts",
+        "src/tui/modals.ts",
+        "test/enforcement/prompt-guard.test.mjs",
+        "test/enforcement/promptGuard.test.mjs",
+        "test/features/journeys/jornada-01-governado-bloqueio.feature",
+        "test/features/journeys/jornada-02-desgovernado-sem-harness.feature",
+        "test/features/journeys/jornada-10-guarda-semantica-negacoes-e-linha-unica.feature",
+        "src/tui/input.ts",
+        "test/tui/input.test.mjs"
+      ],
+      "tags": [],
+      "line": 92
+    },
+    {
+      "id": "BSH-EXP-001",
+      "feature": "experimental-evaluation.feature",
+      "sources": [
+        "openspec/specs/experimental-evaluation.feature",
+        "src/evaluation/analysis.ts",
+        "src/evaluation/experiment.ts",
+        "src/evaluation/generation.ts",
+        "src/evaluation/metrics.ts",
+        "src/evaluation/production.ts",
+        "src/evaluation/replay.ts",
+        "src/evaluation/types.ts",
+        "test/evaluation/controlled-experiment.test.mjs",
+        "test/evaluation/gate-exposure.integration.test.mjs",
+        "test/evaluation/operational-metrics.test.mjs",
+        "test/evaluation/production.test.mjs",
+        "test/evaluation/replay-analysis.test.mjs",
+        "src/ontology/sparql.ts",
+        "src/ontology/sparqlWorker.ts",
+        "test/ontology/general-sparql.test.mjs",
+        "src/agent/agentLoop.ts",
+        "src/ontology/validate.ts",
+        "scripts/gate-exposure.mjs",
+        "docs/controlled-evaluation.md",
+        "docs/evaluation-metrics.md",
+        "docs/sparql-library-selection.md",
+        "README.md"
+      ],
+      "tags": [],
+      "line": 10
+    },
+    {
+      "id": "BSH-EXP-002",
+      "feature": "experimental-evaluation.feature",
+      "sources": [
+        "openspec/specs/experimental-evaluation.feature",
+        "src/evaluation/analysis.ts",
+        "src/evaluation/experiment.ts",
+        "src/evaluation/generation.ts",
+        "src/evaluation/metrics.ts",
+        "src/evaluation/production.ts",
+        "src/evaluation/replay.ts",
+        "src/evaluation/types.ts",
+        "test/evaluation/controlled-experiment.test.mjs",
+        "test/evaluation/gate-exposure.integration.test.mjs",
+        "test/evaluation/operational-metrics.test.mjs",
+        "test/evaluation/production.test.mjs",
+        "test/evaluation/replay-analysis.test.mjs",
+        "src/ontology/sparql.ts",
+        "src/ontology/sparqlWorker.ts",
+        "test/ontology/general-sparql.test.mjs",
+        "src/agent/agentLoop.ts",
+        "src/ontology/validate.ts",
+        "scripts/gate-exposure.mjs",
+        "docs/controlled-evaluation.md",
+        "docs/evaluation-metrics.md",
+        "docs/sparql-library-selection.md",
+        "README.md"
+      ],
+      "tags": [],
+      "line": 18
+    },
+    {
+      "id": "BSH-EXP-003",
+      "feature": "experimental-evaluation.feature",
+      "sources": [
+        "openspec/specs/experimental-evaluation.feature",
+        "src/evaluation/analysis.ts",
+        "src/evaluation/experiment.ts",
+        "src/evaluation/generation.ts",
+        "src/evaluation/metrics.ts",
+        "src/evaluation/production.ts",
+        "src/evaluation/replay.ts",
+        "src/evaluation/types.ts",
+        "test/evaluation/controlled-experiment.test.mjs",
+        "test/evaluation/gate-exposure.integration.test.mjs",
+        "test/evaluation/operational-metrics.test.mjs",
+        "test/evaluation/production.test.mjs",
+        "test/evaluation/replay-analysis.test.mjs",
+        "src/ontology/sparql.ts",
+        "src/ontology/sparqlWorker.ts",
+        "test/ontology/general-sparql.test.mjs",
+        "src/agent/agentLoop.ts",
+        "src/ontology/validate.ts",
+        "scripts/gate-exposure.mjs",
+        "docs/controlled-evaluation.md",
+        "docs/evaluation-metrics.md",
+        "docs/sparql-library-selection.md",
+        "README.md"
+      ],
+      "tags": [],
+      "line": 27
+    },
+    {
+      "id": "BSH-EXP-004",
+      "feature": "experimental-evaluation.feature",
+      "sources": [
+        "openspec/specs/experimental-evaluation.feature",
+        "src/evaluation/analysis.ts",
+        "src/evaluation/experiment.ts",
+        "src/evaluation/generation.ts",
+        "src/evaluation/metrics.ts",
+        "src/evaluation/production.ts",
+        "src/evaluation/replay.ts",
+        "src/evaluation/types.ts",
+        "test/evaluation/controlled-experiment.test.mjs",
+        "test/evaluation/gate-exposure.integration.test.mjs",
+        "test/evaluation/operational-metrics.test.mjs",
+        "test/evaluation/production.test.mjs",
+        "test/evaluation/replay-analysis.test.mjs",
+        "src/ontology/sparql.ts",
+        "src/ontology/sparqlWorker.ts",
+        "test/ontology/general-sparql.test.mjs",
+        "src/agent/agentLoop.ts",
+        "src/ontology/validate.ts",
+        "scripts/gate-exposure.mjs",
+        "docs/controlled-evaluation.md",
+        "docs/evaluation-metrics.md",
+        "docs/sparql-library-selection.md",
+        "README.md"
+      ],
+      "tags": [],
+      "line": 36
+    },
+    {
+      "id": "BSH-EXP-005",
+      "feature": "experimental-evaluation.feature",
+      "sources": [
+        "openspec/specs/experimental-evaluation.feature",
+        "src/evaluation/analysis.ts",
+        "src/evaluation/experiment.ts",
+        "src/evaluation/generation.ts",
+        "src/evaluation/metrics.ts",
+        "src/evaluation/production.ts",
+        "src/evaluation/replay.ts",
+        "src/evaluation/types.ts",
+        "test/evaluation/controlled-experiment.test.mjs",
+        "test/evaluation/gate-exposure.integration.test.mjs",
+        "test/evaluation/operational-metrics.test.mjs",
+        "test/evaluation/production.test.mjs",
+        "test/evaluation/replay-analysis.test.mjs",
+        "src/ontology/sparql.ts",
+        "src/ontology/sparqlWorker.ts",
+        "test/ontology/general-sparql.test.mjs",
+        "src/agent/agentLoop.ts",
+        "src/ontology/validate.ts",
+        "scripts/gate-exposure.mjs",
+        "docs/controlled-evaluation.md",
+        "docs/evaluation-metrics.md",
+        "docs/sparql-library-selection.md",
+        "README.md"
+      ],
+      "tags": [],
+      "line": 45
+    },
+    {
+      "id": "BSH-EXP-006",
+      "feature": "experimental-evaluation.feature",
+      "sources": [
+        "openspec/specs/experimental-evaluation.feature",
+        "src/evaluation/analysis.ts",
+        "src/evaluation/experiment.ts",
+        "src/evaluation/generation.ts",
+        "src/evaluation/metrics.ts",
+        "src/evaluation/production.ts",
+        "src/evaluation/replay.ts",
+        "src/evaluation/types.ts",
+        "test/evaluation/controlled-experiment.test.mjs",
+        "test/evaluation/gate-exposure.integration.test.mjs",
+        "test/evaluation/operational-metrics.test.mjs",
+        "test/evaluation/production.test.mjs",
+        "test/evaluation/replay-analysis.test.mjs",
+        "src/ontology/sparql.ts",
+        "src/ontology/sparqlWorker.ts",
+        "test/ontology/general-sparql.test.mjs",
+        "src/agent/agentLoop.ts",
+        "src/ontology/validate.ts",
+        "scripts/gate-exposure.mjs",
+        "docs/controlled-evaluation.md",
+        "docs/evaluation-metrics.md",
+        "docs/sparql-library-selection.md",
+        "README.md"
+      ],
+      "tags": [],
+      "line": 53
+    },
+    {
+      "id": "BSH-EXP-007",
+      "feature": "experimental-evaluation.feature",
+      "sources": [
+        "openspec/specs/experimental-evaluation.feature",
+        "src/evaluation/analysis.ts",
+        "src/evaluation/experiment.ts",
+        "src/evaluation/generation.ts",
+        "src/evaluation/metrics.ts",
+        "src/evaluation/production.ts",
+        "src/evaluation/replay.ts",
+        "src/evaluation/types.ts",
+        "test/evaluation/controlled-experiment.test.mjs",
+        "test/evaluation/gate-exposure.integration.test.mjs",
+        "test/evaluation/operational-metrics.test.mjs",
+        "test/evaluation/production.test.mjs",
+        "test/evaluation/replay-analysis.test.mjs",
+        "src/ontology/sparql.ts",
+        "src/ontology/sparqlWorker.ts",
+        "test/ontology/general-sparql.test.mjs",
+        "src/agent/agentLoop.ts",
+        "src/ontology/validate.ts",
+        "scripts/gate-exposure.mjs",
+        "docs/controlled-evaluation.md",
+        "docs/evaluation-metrics.md",
+        "docs/sparql-library-selection.md",
+        "README.md"
+      ],
+      "tags": [],
+      "line": 63
+    },
+    {
+      "id": "BSH-EXP-008",
+      "feature": "experimental-evaluation.feature",
+      "sources": [
+        "openspec/specs/experimental-evaluation.feature",
+        "src/evaluation/analysis.ts",
+        "src/evaluation/experiment.ts",
+        "src/evaluation/generation.ts",
+        "src/evaluation/metrics.ts",
+        "src/evaluation/production.ts",
+        "src/evaluation/replay.ts",
+        "src/evaluation/types.ts",
+        "test/evaluation/controlled-experiment.test.mjs",
+        "test/evaluation/gate-exposure.integration.test.mjs",
+        "test/evaluation/operational-metrics.test.mjs",
+        "test/evaluation/production.test.mjs",
+        "test/evaluation/replay-analysis.test.mjs",
+        "src/ontology/sparql.ts",
+        "src/ontology/sparqlWorker.ts",
+        "test/ontology/general-sparql.test.mjs",
+        "src/agent/agentLoop.ts",
+        "src/ontology/validate.ts",
+        "scripts/gate-exposure.mjs",
+        "docs/controlled-evaluation.md",
+        "docs/evaluation-metrics.md",
+        "docs/sparql-library-selection.md",
+        "README.md"
+      ],
+      "tags": [],
+      "line": 72
+    },
+    {
+      "id": "BSH-EXP-009",
+      "feature": "experimental-evaluation.feature",
+      "sources": [
+        "openspec/specs/experimental-evaluation.feature",
+        "src/evaluation/analysis.ts",
+        "src/evaluation/experiment.ts",
+        "src/evaluation/generation.ts",
+        "src/evaluation/metrics.ts",
+        "src/evaluation/production.ts",
+        "src/evaluation/replay.ts",
+        "src/evaluation/types.ts",
+        "test/evaluation/controlled-experiment.test.mjs",
+        "test/evaluation/gate-exposure.integration.test.mjs",
+        "test/evaluation/operational-metrics.test.mjs",
+        "test/evaluation/production.test.mjs",
+        "test/evaluation/replay-analysis.test.mjs",
+        "src/ontology/sparql.ts",
+        "src/ontology/sparqlWorker.ts",
+        "test/ontology/general-sparql.test.mjs",
+        "src/agent/agentLoop.ts",
+        "src/ontology/validate.ts",
+        "scripts/gate-exposure.mjs",
+        "docs/controlled-evaluation.md",
+        "docs/evaluation-metrics.md",
+        "docs/sparql-library-selection.md",
+        "README.md"
+      ],
+      "tags": [],
+      "line": 81
+    },
+    {
+      "id": "BSH-EXP-010",
+      "feature": "experimental-evaluation.feature",
+      "sources": [
+        "openspec/specs/experimental-evaluation.feature",
+        "src/evaluation/analysis.ts",
+        "src/evaluation/experiment.ts",
+        "src/evaluation/generation.ts",
+        "src/evaluation/metrics.ts",
+        "src/evaluation/production.ts",
+        "src/evaluation/replay.ts",
+        "src/evaluation/types.ts",
+        "test/evaluation/controlled-experiment.test.mjs",
+        "test/evaluation/gate-exposure.integration.test.mjs",
+        "test/evaluation/operational-metrics.test.mjs",
+        "test/evaluation/production.test.mjs",
+        "test/evaluation/replay-analysis.test.mjs",
+        "src/ontology/sparql.ts",
+        "src/ontology/sparqlWorker.ts",
+        "test/ontology/general-sparql.test.mjs",
+        "src/agent/agentLoop.ts",
+        "src/ontology/validate.ts",
+        "scripts/gate-exposure.mjs",
+        "docs/controlled-evaluation.md",
+        "docs/evaluation-metrics.md",
+        "docs/sparql-library-selection.md",
+        "README.md"
+      ],
+      "tags": [],
+      "line": 91
+    },
+    {
+      "id": "BSH-EXP-011",
+      "feature": "experimental-evaluation.feature",
+      "sources": [
+        "openspec/specs/experimental-evaluation.feature",
+        "src/evaluation/analysis.ts",
+        "src/evaluation/experiment.ts",
+        "src/evaluation/generation.ts",
+        "src/evaluation/metrics.ts",
+        "src/evaluation/production.ts",
+        "src/evaluation/replay.ts",
+        "src/evaluation/types.ts",
+        "test/evaluation/controlled-experiment.test.mjs",
+        "test/evaluation/gate-exposure.integration.test.mjs",
+        "test/evaluation/operational-metrics.test.mjs",
+        "test/evaluation/production.test.mjs",
+        "test/evaluation/replay-analysis.test.mjs",
+        "src/ontology/sparql.ts",
+        "src/ontology/sparqlWorker.ts",
+        "test/ontology/general-sparql.test.mjs",
+        "src/agent/agentLoop.ts",
+        "src/ontology/validate.ts",
+        "scripts/gate-exposure.mjs",
+        "docs/controlled-evaluation.md",
+        "docs/evaluation-metrics.md",
+        "docs/sparql-library-selection.md",
+        "README.md"
+      ],
+      "tags": [],
+      "line": 100
+    },
+    {
+      "id": "BSH-EXP-012",
+      "feature": "experimental-evaluation.feature",
+      "sources": [
+        "openspec/specs/experimental-evaluation.feature",
+        "src/evaluation/analysis.ts",
+        "src/evaluation/experiment.ts",
+        "src/evaluation/generation.ts",
+        "src/evaluation/metrics.ts",
+        "src/evaluation/production.ts",
+        "src/evaluation/replay.ts",
+        "src/evaluation/types.ts",
+        "test/evaluation/controlled-experiment.test.mjs",
+        "test/evaluation/gate-exposure.integration.test.mjs",
+        "test/evaluation/operational-metrics.test.mjs",
+        "test/evaluation/production.test.mjs",
+        "test/evaluation/replay-analysis.test.mjs",
+        "src/ontology/sparql.ts",
+        "src/ontology/sparqlWorker.ts",
+        "test/ontology/general-sparql.test.mjs",
+        "src/agent/agentLoop.ts",
+        "src/ontology/validate.ts",
+        "scripts/gate-exposure.mjs",
+        "docs/controlled-evaluation.md",
+        "docs/evaluation-metrics.md",
+        "docs/sparql-library-selection.md",
+        "README.md"
+      ],
+      "tags": [],
+      "line": 110
+    },
+    {
+      "id": "BSH-EXP-SPARQL-001",
+      "feature": "experimental-evaluation.feature",
+      "sources": [
+        "openspec/specs/experimental-evaluation.feature",
+        "src/evaluation/analysis.ts",
+        "src/evaluation/experiment.ts",
+        "src/evaluation/generation.ts",
+        "src/evaluation/metrics.ts",
+        "src/evaluation/production.ts",
+        "src/evaluation/replay.ts",
+        "src/evaluation/types.ts",
+        "test/evaluation/controlled-experiment.test.mjs",
+        "test/evaluation/gate-exposure.integration.test.mjs",
+        "test/evaluation/operational-metrics.test.mjs",
+        "test/evaluation/production.test.mjs",
+        "test/evaluation/replay-analysis.test.mjs",
+        "src/ontology/sparql.ts",
+        "src/ontology/sparqlWorker.ts",
+        "test/ontology/general-sparql.test.mjs",
+        "src/agent/agentLoop.ts",
+        "src/ontology/validate.ts",
+        "scripts/gate-exposure.mjs",
+        "docs/controlled-evaluation.md",
+        "docs/evaluation-metrics.md",
+        "docs/sparql-library-selection.md",
+        "README.md"
+      ],
+      "tags": [],
+      "line": 119
+    },
+    {
+      "id": "BSH-PREP-001",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 9
+    },
+    {
+      "id": "BSH-PREP-002",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 22
+    },
+    {
+      "id": "BSH-PREP-003",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 31
+    },
+    {
+      "id": "BSH-PREP-004",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 41
+    },
+    {
+      "id": "BSH-PREP-005",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 50
+    },
+    {
+      "id": "BSH-PREP-006",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 59
+    },
+    {
+      "id": "BSH-PREP-007",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 66
+    },
+    {
+      "id": "BSH-PREP-008",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 74
+    },
+    {
+      "id": "BSH-PREP-009",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 83
+    },
+    {
+      "id": "BSH-PREP-010",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 92
+    },
+    {
+      "id": "BSH-PREP-011",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 99
+    },
+    {
+      "id": "BSH-PREP-012",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 108
+    },
+    {
+      "id": "BSH-PREP-013",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 120
+    },
+    {
+      "id": "BSH-PREP-014",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 129
+    },
+    {
+      "id": "BSH-PREP-015",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/contextBudget.ts",
+        "src/client/openrouter/client.ts",
+        "src/tui/view.ts",
+        "test/governance/context-budget.test.mjs",
+        "test/support/opentui-components.fixture.mjs",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 138
+    },
+    {
+      "id": "BSH-PREP-023",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/ontology/query.ts",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 151
+    },
+    {
+      "id": "BSH-PREP-024",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 162
+    },
+    {
+      "id": "BSH-PREP-016",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 174
+    },
+    {
+      "id": "BSH-PREP-017",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 183
+    },
+    {
+      "id": "BSH-PREP-018",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 191
+    },
+    {
+      "id": "BSH-PREP-019",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 203
+    },
+    {
+      "id": "BSH-PREP-020",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 210
+    },
+    {
+      "id": "BSH-PREP-021",
+      "feature": "production-request-governance.feature",
+      "sources": [
+        "openspec/specs/production-request-governance.feature",
+        "src/governance/requestPreparation.ts",
+        "src/agent/headless.ts",
+        "src/agent/agentLoop.ts",
+        "src/agent/tools.ts",
+        "src/tui/session.ts",
+        "src/decision/broker.ts",
+        "src/mcp/clientManager.ts",
+        "src/cli.ts",
+        "test/agent/headless-request-preparation.test.mjs",
+        "test/agent/headless-semantic-integration.test.mjs",
+        "test/agent/governed-isolation-requirement.test.mjs",
+        "test/governance/request-preparation.test.mjs",
+        "test/tui/production-request-preparation.test.mjs",
+        "README.md",
+        "src/skills/registry.ts",
+        "src/skills/types.ts",
+        "src/skills/activation.ts",
+        "test/decision/production-broker-guard.test.mjs",
+        "src/project/manifest.ts",
+        "src/tui/state.ts",
+        "src/tui/entries.ts",
+        "test/support/production-tui-preparation.fixture.mjs",
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "production_governance"
+      ],
+      "line": 218
+    },
+    {
+      "id": "BSH-INPUT-019",
+      "feature": "tui-input-history-and-navigation.feature",
+      "sources": [
+        "openspec/specs/tui-input-history-and-navigation.feature",
+        "src/tui/view.ts",
+        "test/support/opentui-components.fixture.mjs",
+        "test/tui/opentui-components.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "tui"
+      ],
+      "line": 149
     }
   ],
   "journeyCoverage": [
@@ -5302,12 +7105,44 @@
         "BSH-MENU-010",
         "BSH-MENU-011"
       ]
+    },
+    {
+      "source": "test/features/journeys/jornada-20-observabilidade-e-validacao-semantica.feature",
+      "scenarioLines": [
+        15,
+        23,
+        31
+      ],
+      "capabilities": [
+        "AGENT",
+        "SEM",
+        "EVAL"
+      ],
+      "requirementIds": [
+        "REQ-AGENT-OBSERVED-CHANGES",
+        "REQ-AGENT-OBSERVED-OUTCOME",
+        "BSH-AGENT-010",
+        "BSH-SEM-036",
+        "BSH-EVAL-001",
+        "BSH-EVAL-002",
+        "BSH-EVAL-003",
+        "BSH-EVAL-004",
+        "BSH-EVAL-005",
+        "BSH-EVAL-006",
+        "BSH-EVAL-007",
+        "BSH-EVAL-008",
+        "BSH-EVAL-009",
+        "BSH-EVAL-010",
+        "BSH-EVAL-011",
+        "BSH-EVAL-012",
+        "BSH-EVAL-013"
+      ]
     }
   ],
   "sourceInventory": [
     {
       "path": "AGENTS.md",
-      "sha256": "10650656249edd9c0df15497d4cb1ca665fceb617222babf9c7f642cd07b3168",
+      "sha256": "82bf9a1b1db6d92adde081d30a91e4d3c2ddd2e32ec580043ac3f01fc53be1fb",
       "capabilities": [
         "CLI",
         "DIST",
@@ -5317,12 +7152,14 @@
     },
     {
       "path": "README.md",
-      "sha256": "20f995e7bf057c996c0ea6ddeecdf7adeff8fda3bf0bd9ba9666e8f5e9c410d8",
+      "sha256": "049c0813d72102e1fcd8934e9de1b55b239e5935c6fbffc1a8ee0a6dee66bb82",
       "capabilities": [
         "CLI",
         "DIST",
         "EVAL",
-        "LEGACY"
+        "LEGACY",
+        "EXP",
+        "PREP"
       ]
     },
     {
@@ -5337,7 +7174,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "1a55f895ac14abc88b0b85e5db8a46d304b7bb47aff073b0b0d5246cd3c12eae",
+      "sha256": "cbd4d084ee143c4f79d56f331b728bf78e32207093b81e6b1b5d196562724eac",
       "capabilities": [
         "CLI",
         "DIST",
@@ -5367,26 +7204,30 @@
     },
     {
       "path": "src/agent/agentLoop.ts",
-      "sha256": "c43d50dc8d04d5f9438ebf6052a03412e01f808ae2358553794e15993044fe5a",
+      "sha256": "42d947d26293e5a239f5b1b2ea27a343be5821d37058d950f3b2ad814ae8599a",
       "capabilities": [
         "AGENT",
-        "TOOLS"
+        "TOOLS",
+        "EXP",
+        "PREP"
       ]
     },
     {
       "path": "src/agent/headless.ts",
-      "sha256": "aff5d74b53b251601c48dae44551fe14f73b56c1aa1efd65b65d3bfbb4b9cde0",
+      "sha256": "188af563bf7cf77497a4d3f762ba2040f03a20a8b9d4dd5e899522c44985143f",
       "capabilities": [
         "AGENT",
-        "TOOLS"
+        "TOOLS",
+        "PREP"
       ]
     },
     {
       "path": "src/agent/tools.ts",
-      "sha256": "323a86d0c03a07718ba22feaff5339bdda1f48dd7037bf9aa2f115209a68931e",
+      "sha256": "8614adabc5eba7c7c44bfc54ac09a74f58c43d89bfee1b90dcaecff566d0b03c",
       "capabilities": [
         "AGENT",
-        "TOOLS"
+        "TOOLS",
+        "PREP"
       ]
     },
     {
@@ -5399,24 +7240,25 @@
     },
     {
       "path": "src/cli/authCommand.ts",
-      "sha256": "0380dd355bd75f1d5a1577580ac13694a65e9d82a57f5ab462a039199e54af5f",
+      "sha256": "94b5e8169a9cd03cfe995c89b2412a48f43965f094913be1591b82195506d1ab",
       "capabilities": [
         "AUTH"
       ]
     },
     {
       "path": "src/cli.ts",
-      "sha256": "45c135f6e9dd869313ee3180df8c329dc66f2bd5e8e29781616e5f896d720419",
+      "sha256": "87a25bc18dd6db64f0d88a91c455b5f7faa8256b84f79220c7c282f592966122",
       "capabilities": [
         "CLI",
         "AGENT",
         "MCPS",
-        "DIST"
+        "DIST",
+        "PREP"
       ]
     },
     {
       "path": "src/client/openrouter/client.ts",
-      "sha256": "9411db02abb1ecbe837ff6cc8d6b47b5a6c59b503fcece1de9296e956ec85ae0",
+      "sha256": "992c16f200f76b89cd1e775cbe739388b53db6541dbe5035a23d47d72d0f4915",
       "capabilities": [
         "OR",
         "AUTH"
@@ -5424,7 +7266,7 @@
     },
     {
       "path": "src/client/openrouter/pkce.ts",
-      "sha256": "4072c899606701ef23cdfce7693f1f1ab400f31a6e4c2af64ec7b0b039fb5d38",
+      "sha256": "dbfd905efd55b092ddc0a112c89d64a6cd17d8f265b3ab1b45b0b69223fdd8ef",
       "capabilities": [
         "OR",
         "AUTH"
@@ -5432,7 +7274,7 @@
     },
     {
       "path": "src/client/openrouter/types.ts",
-      "sha256": "94f015fd9ed9d756dfbed63a6dbbbbff8d741dcbf2516d353588057feb461e13",
+      "sha256": "8620a98ef509a7d60e722cd70471cfb7c859deaf09f00f25d44061aa37d88149",
       "capabilities": [
         "OR",
         "AUTH"
@@ -5454,16 +7296,17 @@
     },
     {
       "path": "src/decision/audit.ts",
-      "sha256": "c85f0252aac57460f268b32188c800c7aa8b33daf45449674084f14ebfddfe1c",
+      "sha256": "c251037c3cba5d89b21f6d429deb111b218ff7e355aadb20daba78bbcf544d97",
       "capabilities": [
         "DEC"
       ]
     },
     {
       "path": "src/decision/broker.ts",
-      "sha256": "adc7718653ecaa4926412faf64e5b09b6663f97f531f5602ba93177b5af23226",
+      "sha256": "59f65ed4741fc9faa94095f6a0f2cf0be10b730a0e9097aa85f49f3f42d2545c",
       "capabilities": [
-        "DEC"
+        "DEC",
+        "PREP"
       ]
     },
     {
@@ -5483,7 +7326,7 @@
     },
     {
       "path": "src/enforcement/diffGate.ts",
-      "sha256": "2a3eedc71b7187f6007d415a7e8fe15d3473d179e30f18084eb378eac86dabee",
+      "sha256": "6b5fe2ea82bd950fba1ba17e5bcd788ea23b08d7dbe5b39eee5e711541598a16",
       "capabilities": [
         "SEM",
         "GUARD"
@@ -5491,7 +7334,7 @@
     },
     {
       "path": "src/enforcement/extratorOperacoes.ts",
-      "sha256": "ee1dc48919b1906bbba2e719447471ed5571ed93acde013610be79e03d5e65b8",
+      "sha256": "1640dce2fb3fa1a9eafe8d29ef17f02ebba0ad746abacc6501b1436c100f0621",
       "capabilities": [
         "SEM",
         "GUARD"
@@ -5499,7 +7342,7 @@
     },
     {
       "path": "src/enforcement/governanca.ts",
-      "sha256": "05204ec0612f0f79b8f0ed6b0efec51603db5562618e74eb0f4e9d907c2148ee",
+      "sha256": "a051f2362ee686ecad3fcaf70d7114f7402ccd0a8063dabe40f8caad369e3f35",
       "capabilities": [
         "SEM",
         "GUARD"
@@ -5507,7 +7350,7 @@
     },
     {
       "path": "src/enforcement/governanceDecision.ts",
-      "sha256": "8a607da67afa3afae3495667fdc8170ab1c2b5848fa244c08a3319edc71872a9",
+      "sha256": "04e37791a2bb8952578ede47622ae4ca8006850f96a66be9c4671e1bf7f4887f",
       "capabilities": [
         "SEM",
         "GUARD"
@@ -5523,7 +7366,7 @@
     },
     {
       "path": "src/enforcement/operacaoSemantica.ts",
-      "sha256": "4d5e036eab0b4b4857817ebfd29981de8c31ed6bd424faf9f4ff5529d2fa998d",
+      "sha256": "59ec6b71051ac6cd5be8a7213ab70b99161126a4f61c6cc65956a4ad662a9b49",
       "capabilities": [
         "SEM",
         "GUARD"
@@ -5531,7 +7374,7 @@
     },
     {
       "path": "src/enforcement/promptGuard.ts",
-      "sha256": "58aa4cebd202000ffcd54007641c86becc9dc4973312e2b530ca8168eeb85d08",
+      "sha256": "93d8f237cd6b488537632095f7f28b8a252f31e7dd8aefd95cfb4dc752464af5",
       "capabilities": [
         "SEM",
         "GUARD"
@@ -5539,7 +7382,7 @@
     },
     {
       "path": "src/enforcement/validadorSemantico.ts",
-      "sha256": "5ae75db976ea6363c897438bae472762de8854070c1023a786cb0c92971524dd",
+      "sha256": "ac70f54f5059a23faf998943ae5c67f85ebbbe55e70256377f58d961dcbb3e6c",
       "capabilities": [
         "SEM",
         "GUARD"
@@ -5556,7 +7399,7 @@
     },
     {
       "path": "src/git/finalize.ts",
-      "sha256": "3b5a1fcfc5fa2c5d4cfb684b450c935aef14bd8f09f17452f5928b6b4be92b5a",
+      "sha256": "30ca8525c0559b50be39f9120b08620efd4cdc28c3dceaaec54ae41176f16dab",
       "capabilities": [
         "GIT",
         "SEM",
@@ -5565,7 +7408,7 @@
     },
     {
       "path": "src/git/promotion.ts",
-      "sha256": "ea8d1ace87b653c2e8bd36da38d1348324eb2d918bf22c181c7dd50180cea36b",
+      "sha256": "d8a02627d494cac8b2eb260b9c579706b31b8ebbf81f53b68a5773c7f3a7740b",
       "capabilities": [
         "GIT",
         "SEM",
@@ -5610,7 +7453,7 @@
     },
     {
       "path": "src/git/worktree.ts",
-      "sha256": "681302425297f03557e5f71ced4d93d94c7f538de0e816eeb05a91240baa0c95",
+      "sha256": "a9ac18b0b184ce051134030521d5f823b099f206e5789b0d703a883cecc93088",
       "capabilities": [
         "GIT",
         "SEM",
@@ -5619,7 +7462,7 @@
     },
     {
       "path": "src/governance/domainAffinity.ts",
-      "sha256": "a4c21c8cee0c458da3a5329c452621bb0e31be6c03265c02e59f86b20297bf13",
+      "sha256": "8355a2981d65d41d3b0461ff4c530126ae2b56d561fdc4d78c7c8a9a8e742a41",
       "capabilities": [
         "AFF"
       ]
@@ -5634,21 +7477,22 @@
     },
     {
       "path": "src/mcp/clientManager.ts",
-      "sha256": "1ae7c8ecd46d4a2701f6a94a9f01865bcb268deee560cfd350acd1cf527c6734",
+      "sha256": "53241f27a863c24e30be8571f3ae806eafbbe8b28dc841c81284dd25de824f7e",
       "capabilities": [
-        "MCPC"
+        "MCPC",
+        "PREP"
       ]
     },
     {
       "path": "src/mcp/server.ts",
-      "sha256": "aa087439ef1c8ed6687ec6a550918d4684e4637bc71f737f005ad5c0ba023b48",
+      "sha256": "314fc55e4e535ccda879042352ecfa5278b98c376fa129ed8e25a6b343c5e206",
       "capabilities": [
         "MCPS"
       ]
     },
     {
       "path": "src/ontology/query.ts",
-      "sha256": "38f39a5178fce7519861e38c536012656cf4096b8f3392c76c1b9acbf4892717",
+      "sha256": "673b4fc7475e23a96ab84389eec736f2658bd6c41db260d53dacd43ab7fc8523",
       "capabilities": [
         "ONT"
       ]
@@ -5662,14 +7506,15 @@
     },
     {
       "path": "src/ontology/validate.ts",
-      "sha256": "3f0bc0207107d2da3c7e283d27c47f30449c2a251f807c8cdeb7383e26756137",
+      "sha256": "1c88dc22a45b82f5664d07247aecbea989acb2c04c337f4e30e7836913214be1",
       "capabilities": [
-        "ONT"
+        "ONT",
+        "EXP"
       ]
     },
     {
       "path": "src/project/manifest.ts",
-      "sha256": "148c1f1fcb88f9958a8d4ebd682b2f8bd0aeb99d45af1063de97cf6e58e49ccc",
+      "sha256": "a835c89447ebb3b1eb8078cd02f68380fd8aecf818415454871c9f449c4e9f4f",
       "capabilities": [
         "CLI"
       ]
@@ -5690,7 +7535,7 @@
     },
     {
       "path": "src/proposals/store.ts",
-      "sha256": "016c80fca60a703c0161c795864eb1a1ccc06c35550f5968d6eecf179f421957",
+      "sha256": "a9c22cf50dfc5346be64e2f66369eb4577f9b8c51fde3132b0bc60f6f6a5e6ed",
       "capabilities": [
         "MCPS"
       ]
@@ -5699,7 +7544,8 @@
       "path": "src/skills/activation.ts",
       "sha256": "1f74c6f6d8d0fadfd3196dec4489c27e9314b4427e4678476e0c139fc099f744",
       "capabilities": [
-        "SKILL"
+        "SKILL",
+        "PREP"
       ]
     },
     {
@@ -5725,16 +7571,18 @@
     },
     {
       "path": "src/skills/registry.ts",
-      "sha256": "39b5cf068756c93d9148def5a3ad655b61e6a55e61e3b578d72be484cdd44c7c",
+      "sha256": "4e825ab1e40cf5306e93e1d16feab0ac0e75dd00eb732e40e84ac7eb2a728af0",
       "capabilities": [
-        "SKILL"
+        "SKILL",
+        "PREP"
       ]
     },
     {
       "path": "src/skills/types.ts",
-      "sha256": "2ad18f93a8104e781b5893828725a4024c711e08f03ab66c923095a9dc1427df",
+      "sha256": "44ff900ad5e20a6c35fc69fac400a73fb8b69cff589596e6e71580aeac81ef7d",
       "capabilities": [
-        "SKILL"
+        "SKILL",
+        "PREP"
       ]
     },
     {
@@ -5761,7 +7609,7 @@
     },
     {
       "path": "src/tui/fuzzySearch.ts",
-      "sha256": "74d5ba9e5ee23b28ef7e5f36dc13e526d4aa77203a4285a9b4c15518ebdc5f60",
+      "sha256": "3768b0866e9a0de44a57abd87ccca5de748ea1c646c8a2a6d9b02d9ddd4bc138",
       "capabilities": [
         "TUI",
         "INPUT",
@@ -5794,7 +7642,7 @@
     },
     {
       "path": "src/tui/modals.ts",
-      "sha256": "1616959630f5b6e728c5a31f7e050e61f95e9a35e5e8a2e6b672e1e402bea8b8",
+      "sha256": "206cea94ee6c263d1d4e605b77e1e91c55bbcc0b3f02ee34ed9d85b93ed718a6",
       "capabilities": [
         "TUI",
         "INPUT",
@@ -5805,7 +7653,7 @@
     },
     {
       "path": "src/tui/render.ts",
-      "sha256": "f6791b761c0ff4ba4f20f46f9c69e8d104c314a942c631c9afbd55960fdb6a8d",
+      "sha256": "b2de6176be335ea4c2c3965629d1dfb27de7cda20ba650295f340cda3089a6c0",
       "capabilities": [
         "TUI",
         "INPUT",
@@ -5816,18 +7664,19 @@
     },
     {
       "path": "src/tui/session.ts",
-      "sha256": "bfa2e239688425d91a95ef55420e4fced30ee0e610b33f5a9c4ab5b8304f710c",
+      "sha256": "37f2e53bf714e9c0f589263a624a3e92051e7b6827799f7ea7685eee1c08300e",
       "capabilities": [
         "TUI",
         "INPUT",
         "SELECT",
         "MENU",
-        "SKILL"
+        "SKILL",
+        "PREP"
       ]
     },
     {
       "path": "src/tui/slashCommands.ts",
-      "sha256": "08baab0f75e72c1533fd032aff7ba6f1cf18f7fc9304ee94bc2fa6ad8b0eb2ef",
+      "sha256": "4cb9862b1dfa70a9d08932ffb9ced7c4038c4299586c7a27f1c6996b3232e168",
       "capabilities": [
         "TUI",
         "INPUT",
@@ -5838,7 +7687,7 @@
     },
     {
       "path": "src/types/shacl-engine.d.ts",
-      "sha256": "e302cfad5a9ac436f05487d769548edbd3b4c81b14c17c233b6371f0bec52735",
+      "sha256": "ada40f5776882903c22455fcf48444329e95e02b5fd40562b4897b088477d722",
       "capabilities": [
         "ONT"
       ]
@@ -5852,15 +7701,16 @@
     },
     {
       "path": "scripts/gate-exposure.mjs",
-      "sha256": "d8e494cbc19cf35d74e32cc962b21415b04d1a64979e1082d149506f61175035",
+      "sha256": "d62480e613a8dedf673f911dcf83749a832b727a811f069a66a26938c730a7e4",
       "capabilities": [
         "DIST",
-        "EVAL"
+        "EVAL",
+        "EXP"
       ]
     },
     {
       "path": "scripts/generate_jornada_14_video.py",
-      "sha256": "fa926530310c99ed47ac7e79f7f39526eb5fb7b8e2938e0635f8831f62408b52",
+      "sha256": "ce676868de3b79a174fe8ca23712aa6c3a5ca9ba00915ba4154891b4be14466d",
       "capabilities": [
         "DIST",
         "EVAL"
@@ -5868,7 +7718,7 @@
     },
     {
       "path": "scripts/generate_jornada_15_video.py",
-      "sha256": "1b5efe557f0062430aaf4ef3285ff399614605ef06bd0a531b30473b174ffdf7",
+      "sha256": "3e97c6991762cc96998d39ae400c58f6b09135e8719e61619de182580dda3111",
       "capabilities": [
         "DIST",
         "EVAL"
@@ -5876,7 +7726,7 @@
     },
     {
       "path": "scripts/prepare-bin.mjs",
-      "sha256": "66ca400a1b31e01d9fe59fc8de1ec6dfb7daec1c54c0b6e19d7a8172a00df822",
+      "sha256": "770329d05ede24cfc572cd77e3b4f6195785ab17d13747b0ac9184dba9f329b8",
       "capabilities": [
         "DIST",
         "EVAL"
@@ -5892,47 +7742,47 @@
     },
     {
       "path": "test/agent/agent.test.mjs",
-      "sha256": "e813b60b902df90ff9c23cd6a2bcacc98522cce2793690d9b92b8536584f80ea",
+      "sha256": "181561672408332b635b3f3c967edb80c79dbee44756ab6de3108b208ea6bac2",
       "capabilities": []
     },
     {
       "path": "test/agent/tools.test.mjs",
-      "sha256": "ff37e48bd12253e2db583e6f234fe7fa779547610e3e290b848328f61c19659b",
+      "sha256": "64018477cb0cc42cf59536e2bf74f6adbe7131f801acd540bfd3a427a28bcc92",
       "capabilities": []
     },
     {
       "path": "test/agent/workspace-context.test.mjs",
-      "sha256": "6fc5fba802974df5b87f0247e6bf9dffa9e284625ded622236c9ee7f1d36335b",
+      "sha256": "1be0b0dc1d3c46ddd2be2bda969b72a06c70a39cbf69fc5ebad41f83ef24e52b",
       "capabilities": []
     },
     {
       "path": "test/cli/auth-cli.test.mjs",
-      "sha256": "de6e9c3d4d967321f141686c0a56217ffcea11ec6e1585ed37651bab00e21d0d",
+      "sha256": "d5195fafd0cfaad8ee11c42d931abb6b639771be41b7c99316fe81e5fafb55ce",
       "capabilities": []
     },
     {
       "path": "test/cli/headless.test.mjs",
-      "sha256": "a5b2920849d546510070e95eb23b699bb762bbc0c39a982a945142a13a189b94",
+      "sha256": "93e327978b099c8d0889cfcefa1a566854ffed3bd0d52aa6871806223c5036da",
       "capabilities": []
     },
     {
       "path": "test/cli.test.mjs",
-      "sha256": "febc696c0e7c405a4c5be1444f7b2d58dd9f7a46c7f2a739d7b603d4604d5c33",
+      "sha256": "0dd09b717ad84e57085fb2ba2d3ac40d4dfb33c019233b8723ba60b0aa587377",
       "capabilities": []
     },
     {
       "path": "test/client/openrouter.test.mjs",
-      "sha256": "c91b64dad8c7d1777d7b2799b8f0da6651b66b7fb5c575eeadfa375a4cb7f570",
+      "sha256": "3f0264a9e541215aaf94cfda4286daaea99419d00fb3856d08e5aa1c7a87675a",
       "capabilities": []
     },
     {
       "path": "test/client/pkce.test.mjs",
-      "sha256": "ba106901cef0092d66ad0437890a4316375e2084bee92b86b49752ad72590475",
+      "sha256": "281684f5dd4f20bc65c9620e8482ea60cd705d687b4eacd414d72389677c7197",
       "capabilities": []
     },
     {
       "path": "test/config/env.test.mjs",
-      "sha256": "883868da6caaaf77d5352b7a24a1af58cf73aed9476d41fb6d2c20ea0a16da31",
+      "sha256": "acf2e3e5efd5148f37e5a2d17bcda0370488b659826330a7c9e201581e32b794",
       "capabilities": []
     },
     {
@@ -5942,17 +7792,17 @@
     },
     {
       "path": "test/decision/decision-contract.test.mjs",
-      "sha256": "21a9f1ec1075a4ddf4c83105c3b97845d07389cde65222eccb4d97520018faf0",
+      "sha256": "62f7ef32a2b9da25ea368f1b573a7559c7ba9372bedb619a3097f894f2dde79d",
       "capabilities": []
     },
     {
       "path": "test/e2e-live/autonomous-coding-agent.e2e.mjs",
-      "sha256": "0400c6399e7b361ca86c1dcfb95611fa0db665e600f2b0f5ffc6afc41a76bfdc",
+      "sha256": "a313c3406a399ea260bb8aa309d46155f83ac1e3a86907254625829914c3e3e8",
       "capabilities": []
     },
     {
       "path": "test/e2e-live/mcp-client-third-party.e2e.mjs",
-      "sha256": "1252e998c6b7928849ce1ab307c7552333d984f017d3bcfb61d5038e7b77b525",
+      "sha256": "ac0d19f761133932443d39729ffb0fd08ca226cdda676aa7ed22c8242d2a272d",
       "capabilities": []
     },
     {
@@ -5962,22 +7812,22 @@
     },
     {
       "path": "test/e2e-live/prompt-violation-confirmation.e2e.mjs",
-      "sha256": "355e23297ee54d7930b68174fb1775458e233293bf17904935eba9618261e416",
+      "sha256": "eae49fefae6527fbeb13cb4560c5c76037c5f5472ff0873f401d9e365f152af6",
       "capabilities": []
     },
     {
       "path": "test/e2e-live/semantic-enforcement.semantic.mjs",
-      "sha256": "99c2ffddfba4e372e9869f138137579732e8681abfa6be77c065c485bf328eeb",
+      "sha256": "731ef65e8c38b7a3c61fbbf80708ba63971e6bfb0f07f35237dd4404afc6cb21",
       "capabilities": []
     },
     {
       "path": "test/e2e-live/tui-scrollbar-and-history.e2e.mjs",
-      "sha256": "7881587031b68a1f134feb5e605ef682c7162ce4aec8a2f9381fcdba57f45c94",
+      "sha256": "abdb9dfabbc20d39bc4e94df69c1170c07011b961d4fd7330a9af3643f27cbd9",
       "capabilities": []
     },
     {
       "path": "test/e2e-live/ux-ergonomics-adversarial.e2e.mjs",
-      "sha256": "5ac22d1ca45eea08a5750b8bb38412df417c7cf9aea4a14023c9183c6ee9faba",
+      "sha256": "59bed0b38701f174d7afb74cf414b5f1133702a7f69386875cb80d06de93f190",
       "capabilities": []
     },
     {
@@ -5997,12 +7847,12 @@
     },
     {
       "path": "test/enforcement/diff-gate.test.mjs",
-      "sha256": "961824a6cb8d569bc55f90cff38ab992e25ecc24d18eb6afad4753fdad39ea15",
+      "sha256": "297ba6d8b019ea725dcf862fcc883583df959331248b8bab3c9f48dccb13a9fa",
       "capabilities": []
     },
     {
       "path": "test/enforcement/enforcement.test.mjs",
-      "sha256": "165ee3cff119e2d0243dad04482f06315d3419987c958d7aa525cafad2c356e9",
+      "sha256": "01c45e215ea4778481ef54772a11e2eb39a4adae3dd5c5b02ac4e0dd0a724700",
       "capabilities": []
     },
     {
@@ -6012,12 +7862,12 @@
     },
     {
       "path": "test/enforcement/prompt-guard.test.mjs",
-      "sha256": "d28b8e0f48307314fc0b2b7ff2d81519dc5983b79e6ad41973bba2478696ac0e",
+      "sha256": "9da73ae681961b10958dcc8db539eb70f75d8e19501765309930b10a587045f1",
       "capabilities": []
     },
     {
       "path": "test/enforcement/promptGuard.test.mjs",
-      "sha256": "19631b6e9813a279f9a41e1731bdfdfcd4f72938acdb22a2b1139933504d82ce",
+      "sha256": "c7838b19f789a4e0ab9a25c880328d0ff896e785346b6d9c571727af5bfe6088",
       "capabilities": []
     },
     {
@@ -6077,12 +7927,12 @@
     },
     {
       "path": "test/features/journeys/jornada-11-ergonomia-tui-fila-e-atalhos.feature",
-      "sha256": "985b41d684d898fcf4bf172c58e9243d0d5d004097d6b5c02fdb3f75c048962b",
+      "sha256": "821463e7b7ea65a531c85d021882096e4d2ddeb1c9b36fa313c2241471da735c",
       "capabilities": []
     },
     {
       "path": "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature",
-      "sha256": "0341a61a8d5b27377199d2ff60653cf90ef24f09fd25a10095a488d696c7f7ab",
+      "sha256": "dbe926a06cb2e053641825fe51fd7650723aa4169899a4040e27430cc00b82c7",
       "capabilities": []
     },
     {
@@ -6097,7 +7947,7 @@
     },
     {
       "path": "test/features/journeys/jornada-15-menu-de-comandos-barra.feature",
-      "sha256": "cfa7cafec38279b0b1c33f4b40f6b8533037b777b0a100aca3116d3d86ace0b8",
+      "sha256": "def89144eecc3750d08b81a341c7a4ccd5c9588884b027d4b1b8c2d50d32e0d4",
       "capabilities": []
     },
     {
@@ -6152,17 +8002,17 @@
     },
     {
       "path": "test/git/sessions.test.mjs",
-      "sha256": "71c8f0191a13edbb020acf288828ab22ef0fb836c42f3b42f53e8eb4ded7f6b9",
+      "sha256": "7b4b755d9020c6fd12da4630a0a186f6c43c5e6746adf5d9fb10a6e445ec9a31",
       "capabilities": []
     },
     {
       "path": "test/git/snapshot.test.mjs",
-      "sha256": "3ac034babfcebf936f620ea86d90bb6784f417d2aeef2d3a873939f6ed59277f",
+      "sha256": "1eeb7ce91668f1a4b42c66c6763aaa4ca63c870883c5aa5fc78a2670a9636931",
       "capabilities": []
     },
     {
       "path": "test/git/worktree.test.mjs",
-      "sha256": "189eb12f45a86c9cf999c8128c3db6f1c46a8d17c403555b2259f8c0787825f7",
+      "sha256": "c532279906263bd1a4fa5a710aa90b0172efc5e0b8c204f1f236f33885328e56",
       "capabilities": []
     },
     {
@@ -6172,52 +8022,52 @@
     },
     {
       "path": "test/governance/domainRegistry.test.mjs",
-      "sha256": "e7614b7a806de0e1212452a12611cbd222f9853e9c25dc97e004f1c013a4757f",
+      "sha256": "0b7604f16bb6ac357c3d7580304dab217b9a6edac8aba569d3f4b5bff9742d5f",
       "capabilities": []
     },
     {
       "path": "test/mcp/server.test.mjs",
-      "sha256": "4a0ef5be6def27b20f68e2e8f343d12676fc3d4835db4d7f07aa029619498596",
+      "sha256": "7d0cc2e4295c702a81a14ccc2a5dbbd7af44ebab5a2ecb179d96aebdaf39739d",
       "capabilities": []
     },
     {
       "path": "test/ontology/rdf.test.mjs",
-      "sha256": "b3d934cd3585783b9f9931078f2c3df7bad134b0fee080793e319e056feaeaa4",
+      "sha256": "50ab0a1aa0d7128ce396335954039c8c2eb94ff4c5ff22bf5231e2cc5ba910fa",
       "capabilities": []
     },
     {
       "path": "test/ontology/spec-contract.test.mjs",
-      "sha256": "3b64bb247ce0f2686058208497e15accbe40ee93798dd116e1a6e1ee5b8efa9e",
+      "sha256": "ebe3bdd3db122f8103f6cdccc871179adfa93896e54a3b96b4a036f16e6c0c86",
       "capabilities": []
     },
     {
       "path": "test/ontology/validate.test.mjs",
-      "sha256": "456afc5aaab29788796a207b264c8eb8264747a6e7bda621493e40e770c1c220",
+      "sha256": "67874536552813211fc3a959fe29d230421918643aed1e5015dcf88b44319d13",
       "capabilities": []
     },
     {
       "path": "test/package/global-bin.test.mjs",
-      "sha256": "864d2f3ffb3e3656333c0bdd5093118372221209032e8c8bfe2d02a4a2c2cb0c",
+      "sha256": "07f5bfd074060b5a83b22a437a43b6afd271f30f28c3c461b0e73901ca3ba704",
       "capabilities": []
     },
     {
       "path": "test/pilot/ontology.test.mjs",
-      "sha256": "1ea0ed539487d589a19c402942e5310420a3fcef08519207b23b693d512b3602",
+      "sha256": "3acb08b737a69ff390fce18085d1186c9f215afebc1aa4fc2caf502c9bcff958",
       "capabilities": []
     },
     {
       "path": "test/project/manifest.test.mjs",
-      "sha256": "28744220d24bd5cf1316411cb92da28c313f7071098183c70c1c62e05d009a81",
+      "sha256": "4b23ccb65bbe0cf2c784c41670cdbd7fe8141e5f5131653c62c23d4eb6f9939f",
       "capabilities": []
     },
     {
       "path": "test/project/paths.test.mjs",
-      "sha256": "afc1546847735971d24a751061b6719bf62522d559307bb97820d109283f4e61",
+      "sha256": "ee6ed96a60b5bf25c3d977147acc5181ef78573cb14288992adb55b1963a6dd7",
       "capabilities": []
     },
     {
       "path": "test/project/scaffold.test.mjs",
-      "sha256": "f2739ecc9bebebcbc1d74113d855b0508641eab513b862e85a20dfed2459bcb6",
+      "sha256": "ef2b53d62b3d4d103a20d6ec04a6982c76ec6dbc1c014b822641b90f257d6d3d",
       "capabilities": []
     },
     {
@@ -6240,7 +8090,7 @@
     },
     {
       "path": "test/support/record_bsh_e2e_video.py",
-      "sha256": "92dc5a7426860608eb5040f225339cff20560b4d64f2b0ca7e86bbf593de89f8",
+      "sha256": "011101ccf19968ca3bc5bd8f102865102a96236b5cc694dec41932ed79927d4b",
       "capabilities": [
         "EVAL",
         "MCPC"
@@ -6266,7 +8116,7 @@
     },
     {
       "path": "test/tui/modals.test.mjs",
-      "sha256": "bdc561a47b976ccb04ec0f580369137be6d651e32a2f1ff9bd9220fe9c215459",
+      "sha256": "a711dced6c3172490f7b2c3603384d9c24a6c26afde77519d4754e87757a1663",
       "capabilities": []
     },
     {
@@ -6281,7 +8131,7 @@
     },
     {
       "path": "test/tui/render.test.mjs",
-      "sha256": "598672f7dadd4e0a53da7d3e7a054bf123f788de26d4f28d0b380953f6cede73",
+      "sha256": "06ffccd7cc68ea33caedbdd6d75b01a1f176d33d62d482c7cb27999769bd3b0b",
       "capabilities": []
     },
     {
@@ -6296,7 +8146,7 @@
     },
     {
       "path": "test/tui/slash-menu.test.mjs",
-      "sha256": "7af456bdd7bb1b7ee99a92eb5cefe75f4d0707109e0236c87140934e12a5dbd3",
+      "sha256": "b33a4d73cc361fb2fd1b2f0bcb41572e3fc61bb1a529a6249fb43e177ecdd012",
       "capabilities": []
     },
     {
@@ -6739,19 +8589,454 @@
     },
     {
       "path": ".github/workflows/ci.yml",
-      "sha256": "8f253fd9d8512ee00eda76790580a9bfd0e7600218fffdeee4ee6382414b1670",
+      "sha256": "2c8b6fc7fb8f886eab4ad60e26e7181db2c7c60c0954a3cebb43874fc83e1780",
       "capabilities": [
         "DIST"
       ]
     },
     {
       "path": ".github/workflows/release.yml",
-      "sha256": "de93101ead2097294b23efcce31a1e4f22cf0545f8892361aff183fc0aa655a1",
+      "sha256": "25847abbb00f2210271d3db31641d9d2f63d0282afa93d9fae73687b2cd07a39",
       "capabilities": [
         "DIST"
+      ]
+    },
+    {
+      "path": "openspec/specs/semantic-suite-operational-contract.feature",
+      "sha256": "f9f1c46dd010c42ece858e0231999df9b264cf71ce275d067908eb03c92de1a2",
+      "capabilities": [
+        "SEM"
+      ]
+    },
+    {
+      "path": "openspec/specs/ontology-validation-and-query.feature",
+      "sha256": "324860c151b6b8763a8930223d90302449e08d50cbefdac86791214098ba2060",
+      "capabilities": [
+        "SEM"
+      ]
+    },
+    {
+      "path": "openspec/specs/workspace-tools.feature",
+      "sha256": "8d73a9e071230a4aa09d877bcaac167ed4a5cb27a061fb107646739d53aee310",
+      "capabilities": [
+        "SEM"
+      ]
+    },
+    {
+      "path": "openspec/specs/autonomous-agent-and-headless.feature",
+      "sha256": "6557066723cdf9ab2bdf809ab836352377c61b420b7470660c3e6bcbbed8088e",
+      "capabilities": [
+        "SEM"
+      ]
+    },
+    {
+      "path": "test/features/journeys/jornada-20-observabilidade-e-validacao-semantica.feature",
+      "sha256": "7d7465df8c006b5117836bc11f698bf6bf1c61927adb930c8b67669a1cc08fa4",
+      "capabilities": [
+        "SEM"
+      ]
+    },
+    {
+      "path": "scripts/run-e2e-pipeline.mjs",
+      "sha256": "c95ab3c71cbd32d19a5b6339214bc4ac6531e25c40bff77b409bf84e7c74a274",
+      "capabilities": [
+        "SEM"
+      ]
+    },
+    {
+      "path": "docs/semantic-suite-reconciliation.md",
+      "sha256": "3379cd4523f09019237b8dfdbad8e6f10cccec23e8357b20efd556ea51a6748a",
+      "capabilities": [
+        "SEM"
+      ]
+    },
+    {
+      "path": "test/ontology/semantic-execution.test.mjs",
+      "sha256": "8922168d1a153568ed3b650a29bf9a859d86965d9dea2a02d88c9cf8103a090b",
+      "capabilities": [
+        "SEM"
+      ]
+    },
+    {
+      "path": "test/agent/shell-and-process-confinement.test.mjs",
+      "sha256": "5054ea6cf756b7374ba65bb7f621517dfad071403273e45c079ba8472d8ff58e",
+      "capabilities": [
+        "SEM"
+      ]
+    },
+    {
+      "path": "test/agent/observed-outcomes.test.mjs",
+      "sha256": "b8f3848c15d5c263fe5b703aff7c6042cc9f3f00301e626db4bcd282acd42618",
+      "capabilities": [
+        "SEM"
+      ]
+    },
+    {
+      "path": "test/agent/headless-semantic-integration.test.mjs",
+      "sha256": "e8db0ff84f89515ed4337e3a4aac6f669c598d51372abc9e7c6e77fa54813046",
+      "capabilities": [
+        "SEM",
+        "PREP"
+      ]
+    },
+    {
+      "path": "openspec/specs/tui-layout-and-feedback.feature",
+      "sha256": "3fbe4261defde1578d2d2691cff647e87e5818bfe2dcd5653687f4741ad37d76",
+      "capabilities": [
+        "SEM"
+      ]
+    },
+    {
+      "path": "openspec/specs/prompt-guard-and-governance-mode.feature",
+      "sha256": "1331ccbb401acf0b9355e344528cbed6151447f9ab5d43e53359e764e1037b29",
+      "capabilities": [
+        "SEM"
+      ]
+    },
+    {
+      "path": "src/tui/entries.ts",
+      "sha256": "1d28d38f908cebb990426ce462df0719d1d608f87f59c96aaa1d260d7df66237",
+      "capabilities": [
+        "SEM"
+      ]
+    },
+    {
+      "path": "test/support/opentui-components.fixture.mjs",
+      "sha256": "6e2b55ec6bf82fa859ba554375bb2457b88527390e65cbfed2f74b359be6a5c8",
+      "capabilities": [
+        "SEM"
+      ]
+    },
+    {
+      "path": "src/tui/input.ts",
+      "sha256": "82618dcfc88baf0f6da10af9c488af9bb0a9523eac9bb0aed7b8f171dee2671f",
+      "capabilities": [
+        "SEM"
+      ]
+    },
+    {
+      "path": "test/tui/input.test.mjs",
+      "sha256": "9c5a6182608cd582dec6ae6fe8383ff179ae39429d9e82e5844d77728126593c",
+      "capabilities": [
+        "SEM"
+      ]
+    },
+    {
+      "path": "openspec/specs/experimental-evaluation.feature",
+      "sha256": "4bcb0f201027cebb0bda407223feb068222dc5fb874bbe85abd69624da7b0330",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "src/evaluation/analysis.ts",
+      "sha256": "7b101e95e38d0c3790cffd224713cda530313dd6da176a8ac79afac5563f6779",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "src/evaluation/experiment.ts",
+      "sha256": "4ccc4710cf5499cf928ffc37312e4c22f6fca9763cf5b5689b6d1c369a284d44",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "src/evaluation/generation.ts",
+      "sha256": "773ea52c306abb0126eff792f554063f46902edc7eac35ca8df2a4ae53496ca0",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "src/evaluation/metrics.ts",
+      "sha256": "a92cde966d84ad0de0d5b09b46d2fa8e3602cdd0d3f021f64926a69c7b72919d",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "src/evaluation/production.ts",
+      "sha256": "e868e289bf956824f9268a726b89fe6e535719e0c6104e2e5c5225bc75c0350a",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "src/evaluation/replay.ts",
+      "sha256": "087d125395cedd975e5f946abd3ed9f9b8b97d27bec701b5fe9d1233a4cac402",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "src/evaluation/types.ts",
+      "sha256": "145f21e7157aa9b59752b146943d58c1de740d8755b2e75bd26702fbca46124a",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "test/evaluation/controlled-experiment.test.mjs",
+      "sha256": "86e678e51b3086de144f0e1942dbcfee52a5ac3f30c331d8d67df7af30aaa44c",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "test/evaluation/gate-exposure.integration.test.mjs",
+      "sha256": "74409eabad035113e27eb641d33799157dc709979ced15910a0364961ea66370",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "test/evaluation/operational-metrics.test.mjs",
+      "sha256": "0efaae2544502becfdbfdbec2c23a3604632e8c8c764d41a4cdafa67f317f816",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "test/evaluation/production.test.mjs",
+      "sha256": "12e4f7339c8d82d73842f8291bbbc95f8cfe4d82218a4ca9fabfc18c99b6f117",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "test/evaluation/replay-analysis.test.mjs",
+      "sha256": "5b11fdbf218aeb4fcd0289d2f049c46af7876b1a421a053b577c780430d10f72",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "src/ontology/sparql.ts",
+      "sha256": "5c90e1585f99017cdb91f1512e26c85166b0fd909fcb619255f0510d24caf83d",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "src/ontology/sparqlWorker.ts",
+      "sha256": "98a06101beeca0f2866befd1a6759b143b8cded8a37925384ed1fee85a158429",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "test/ontology/general-sparql.test.mjs",
+      "sha256": "cab120348a9b128f453d5f792709dc0a7446334e753c8407a142bc3c06de299c",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "docs/controlled-evaluation.md",
+      "sha256": "025db459201edab6d28d6dcf4ef5a627f74b2b00e055aa22b66318386869adb6",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "docs/evaluation-metrics.md",
+      "sha256": "9b5222e9ee528c77d42d3a2d36cffd505a7a2cb563b09f94d244c48b96bf21c4",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "docs/sparql-library-selection.md",
+      "sha256": "8bfe6bf5a33e32f4c56520bc56efd8deebf93b3e2a0efb7f80c8a8d4e51b84ce",
+      "capabilities": [
+        "EXP"
+      ]
+    },
+    {
+      "path": "openspec/specs/production-request-governance.feature",
+      "capabilities": [
+        "PREP"
+      ],
+      "sha256": "b211054705687c7ae5ebb50c8a6dc569fcd81dfca3ead31020dcd1dd6f0bb03f"
+    },
+    {
+      "path": "src/governance/requestPreparation.ts",
+      "capabilities": [
+        "PREP"
+      ],
+      "sha256": "8f765d845f698788f103578c6fcbe404c373ba2b1d16d0d1f18cc28fcad47d6d"
+    },
+    {
+      "path": "test/agent/headless-request-preparation.test.mjs",
+      "capabilities": [
+        "PREP"
+      ],
+      "sha256": "d3ff5de9885e5ddd908ce8d41da2ebfcce0dfb2c53aee68d8386c79d618e68d3"
+    },
+    {
+      "path": "test/agent/governed-isolation-requirement.test.mjs",
+      "capabilities": [
+        "PREP"
+      ],
+      "sha256": "5b17ddb15e7eff909a87d52af48deb6b536e311366028635d6ee0d90d813534e"
+    },
+    {
+      "path": "test/governance/request-preparation.test.mjs",
+      "capabilities": [
+        "PREP"
+      ],
+      "sha256": "9ad3c6a8676fdbb7774280a4f092e2aa575d64ec9166078d757914f277397b25"
+    },
+    {
+      "path": "test/tui/production-request-preparation.test.mjs",
+      "capabilities": [
+        "PREP"
+      ],
+      "sha256": "fd218c64ee5e0d25141e236b3c857fdf426d0329339addafa48fb34abc03e9f9"
+    },
+    {
+      "path": "test/decision/production-broker-guard.test.mjs",
+      "sha256": "179c7cbb1bc0aca3b6370e4cb48f30f396077d88695634a89e35e79cc251483a",
+      "capabilities": [
+        "PREP"
+      ]
+    },
+    {
+      "path": "src/tui/state.ts",
+      "sha256": "63642f4ae2b2fb83eef5a32127c9dfc01f7e3e43b246f8445629802279b540d7",
+      "capabilities": [
+        "PREP"
+      ]
+    },
+    {
+      "path": "test/support/production-tui-preparation.fixture.mjs",
+      "sha256": "ef00057f0779de7de31b789b9ed4c0bd1b570df037b6f3469f9713e4256c4eb5",
+      "capabilities": [
+        "PREP"
+      ]
+    },
+    {
+      "path": "openspec/changes/prepare-production-requests/implementation.md",
+      "sha256": "83ac6adcfce1c07246cd2db1387c91d25e55396f07809bb0325242470ac1b242",
+      "capabilities": [
+        "PREP"
+      ]
+    },
+    {
+      "path": "scripts/run-production-e2e.py",
+      "sha256": "27e2c909f6af57ce147c617f7a24a5544c6b0768b5310e0529b2f08f1e8c6ef6",
+      "capabilities": [
+        "EVAL"
+      ]
+    },
+    {
+      "path": "scripts/run_all_e2e_journeys.py",
+      "sha256": "25a432f9affc8479b679805cd1c716d7a9aeadfc0706389b9faa37025cc66fd1",
+      "capabilities": [
+        "EVAL"
+      ]
+    },
+    {
+      "path": "scripts/verify-e2e-sync.mjs",
+      "sha256": "74576824b0925a71c9db3faab6e7a2027b6be707b0170628f5c48810f683d183",
+      "capabilities": [
+        "EVAL"
+      ]
+    },
+    {
+      "path": "test/evaluation/e2e-evidence-verifier.test.mjs",
+      "sha256": "5ed09ea87ecf2f0d10bbec1f006ef1428c17f2991bbeeb532c1e868cd78effc2",
+      "capabilities": [
+        "EVAL"
+      ]
+    },
+    {
+      "path": "pilot/asset-management/test/server.test.mjs",
+      "sha256": "11fe289a037c4d6b085a1a631e01d79915702d26a0ce4c229d2f2d0d2d5d9ed6",
+      "capabilities": [
+        "ASSET"
+      ]
+    },
+    {
+      "path": "openspec/changes/rebuild-tui-with-opentui/design.md",
+      "sha256": "a88e376de5fa93fbf6cb990337b6516f8d032041fa450a5cc27e5024821a4700",
+      "capabilities": [
+        "OPENTUI"
+      ]
+    },
+    {
+      "path": "openspec/specs/semantic-enforcement-and-promotion-gate.feature",
+      "sha256": "de56f1aef67618941cef6c19dda76c5c2f927dad0438f5327a30d6e52adc5583",
+      "capabilities": [
+        "SEM"
+      ]
+    },
+    {
+      "path": "src/governance/contextBudget.ts",
+      "sha256": "93df4d27e625f428a866529864e0cf81e8455f33c269ce5209ff9831bd43f968",
+      "capabilities": [
+        "PREP"
+      ]
+    },
+    {
+      "path": "src/tui/view.ts",
+      "sha256": "d345994a4ea47e02095f65a79dc6bae8c5abdc35012dc7143c6ca977c1f5c37d",
+      "capabilities": [
+        "PREP"
+      ]
+    },
+    {
+      "path": "test/agent/telemetry-consumption.test.mjs",
+      "sha256": "cffb6eb29cb6237bc21669a87af453f130d7c36efd664263cd3b9526a60744af",
+      "capabilities": [
+        "PREP"
+      ]
+    },
+    {
+      "path": "test/decision/tool-authorization-broker.test.mjs",
+      "sha256": "e628c2f49ba78f4cf0a2d206e4cae5f186211579673ca6d01edb8eca3f4c2227",
+      "capabilities": [
+        "PREP"
+      ]
+    },
+    {
+      "path": "test/governance/context-budget.test.mjs",
+      "sha256": "30b63527f12f1798518acdca9032d214fcf38877a7528f95d4209990c85dba45",
+      "capabilities": [
+        "PREP"
+      ]
+    },
+    {
+      "path": "src/governance/requestPurpose.ts",
+      "sha256": "39ce72382358ab5157346f31ea1f3dfb917defa24a5e8ab56d808322fb6b9f95",
+      "capabilities": [
+        "PREP"
+      ]
+    },
+    {
+      "path": "src/governance/requestRemediation.ts",
+      "sha256": "ec8f91d6644895ffc96d284ab568abc800a81c333f2372ac141f71b79db490a3",
+      "capabilities": [
+        "PREP"
+      ]
+    },
+    {
+      "path": "test/governance/request-remediation.test.mjs",
+      "sha256": "67e67c764d23520d881a087d1be7822ceacb8702523de9a5d657607ff1aa373d",
+      "capabilities": [
+        "PREP"
+      ]
+    },
+    {
+      "path": "src/governance/contextSelection.ts",
+      "sha256": "8032d73628e7f5bb8f09101dfe0ceada2ffdcd5bc1f2de0cf2b33168c88fe475",
+      "capabilities": [
+        "PREP"
       ]
     }
   ],
   "catalogBaselineCommit": "2afc270",
-  "updatedAt": "2026-10-03"
+  "updatedAt": "2026-10-06T02:02:02.610Z"
 }

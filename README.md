@@ -8,6 +8,8 @@
 
 The **Business Semantic Harness (BSH)** is an autonomous, ontology-governed AI software engineering client with direct **OpenRouter integration**. 
 
+The [semantic validation contract](openspec/semantic-validation-profile.md) specifies the supported selection, completeness, inference and SHACL execution profile. The [semantic suite reconciliation](docs/semantic-suite-reconciliation.md) records the operational regression contract and its evidence limits.
+
 BSH guarantees that AI coding models modify codebases **without violating business rules and domain invariants**. Instead of relying on prompt instructions or model self-discipline, BSH enforces domain rules deterministically using formal W3C RDF/OWL ontologies and SHACL constraint shapes stored directly inside your repository.
 
 ---
@@ -18,9 +20,9 @@ Modern AI coding agents excel at syntactic tasks (writing boilerplate, refactori
 
 BSH implements a **multi-layer semantic defense** that governs agent execution from prompt ingestion to final branch promotion:
 
-1. **Pre-flight Prompt Guard**: Detects and highlights violating intents at prompt capture time, prompting the user with an explicit confirmation gate before any LLM tokens are consumed.
+1. **Ontology preparation before model dispatch**: Every governed request loads and queries the project's current contract, resolves applicable concepts and policies, preserves constraint dependencies, and makes an explicit send decision. Retrieved rules, source documents, version and hashes accompany the unchanged user instruction in a separate context message. Natural-language relevance and purpose matching remain identified as heuristics; they are not SHACL conformity evidence.
 2. **Ephemeral Worktree Sandboxing**: Every session executes inside an isolated Git worktree (`bsh/session/<id>`). The developer's primary working directory and main Git branch remain 100% clean and untouched.
-3. **Autonomous Scoped Tooling**: The model inspects and edits code through sandboxed workspace tools (`read_file`, `write_file`, `replace_file_content`, `list_directory`, `run_bash_command`) with strict path guards.
+3. **Host-authorized Scoped Tooling**: Native and MCP tools pass through the host ApprovalBroker before execution, retaining sandbox path and argument controls. Permission to send a request does not authorize a tool or promote a candidate.
 4. **Independent Semantic Gate**: Validates proposed code diffs against domain RDF facts and SHACL constraint shapes (`shapes.ttl`) using a local validation engine before promotion.
 5. **Deterministic Promotion**: Conforming changes are cleanly promoted to the primary Git branch; non-conforming changes are strictly blocked with auditable violation reports.
 6. **Universal MCP Server**: Runs as a standard Model Context Protocol (MCP) server over `stdio`, empowering external agents and IDEs (Cursor, Claude Desktop, Antigravity, Windsurf) with native semantic governance.
@@ -126,7 +128,8 @@ This creates the canonical governance directory inside your repository:
     └── domains/
         └── assets/
             ├── ontology.jsonld           # OWL/RDF domain vocabulary (classes, properties, states)
-            └── shapes.ttl                # Verifiable business rules (SHACL Core & SPARQL)
+            ├── shapes.ttl                # Verifiable business rules (SHACL Core & SPARQL)
+            └── enforcement.json          # Governance rules mapping code changes to semantic operations
 ```
 
 ### 1. Defining Business Concepts (`ontology.jsonld`)
@@ -177,7 +180,44 @@ ex:TransferShape a sh:NodeShape ;
   ] .
 ```
 
-### 3. Validating Ontologies & Rules
+### 3. Defining Semantic Operations & Rules (`enforcement.json`)
+
+To recognize candidate code modifications and map them to semantic operations evaluated during gate promotion, declare governance rules in `enforcement.json` (or reference a custom path via `enforcement` in `.bsh/project.json`):
+
+```json
+{
+  "schemaVersion": 1,
+  "regras": [
+    {
+      "id": "regra-transferencia-ativo",
+      "operacao": "AssetTransfer",
+      "quando": {
+        "caminho": "src/services/assetService.ts",
+        "adicionou": "transferAsset"
+      },
+      "fatos": [
+        {
+          "propriedade": "currentState",
+          "valor": "Retired",
+          "determinacao": "observado",
+          "origem": "code"
+        }
+      ],
+      "evidenciasRequeridas": [
+        {
+          "tipo": "estrutural",
+          "propriedade": "currentState",
+          "obrigatoria": true
+        }
+      ]
+    }
+  ]
+}
+```
+
+The governance loader validates `enforcement.json` on the project root, distinguishing between missing configurations, invalid JSON/schema definitions, and file read errors.
+
+### 4. Validating Ontologies & Rules
 
 Before opening an interactive session, validate your domain files for syntactical and logical integrity:
 
@@ -185,6 +225,62 @@ Before opening an interactive session, validate your domain files for syntactica
 bsh ontology validate
 bsh ontology show assets
 ```
+
+### 5. Request authorization before the model
+
+TUI and headless use the same production preparation module. Each request reloads its active domain, declared dependency closure, ontology, shapes, policies and enforcement correspondences through the structured ontology query. The model receives the reachable RDF closure of relevant constraints, including complete lists, nested blank nodes, logical alternatives, compound paths and referenced shapes without targets. Cycles terminate and shared nodes are emitted once per source graph. RDF term kinds, literal datatypes and language tags are retained with document origins and SHA-256 hashes. In relevant-closure mode unrelated ontology content is excluded; rules are never silently truncated. SPARQL is available separately and is not required by this preparation.
+
+Partial selection is operationally sufficient only with established correspondence roots, direct class targets, and resolved structural references and complete RDF list cells across declared dependencies. No correspondence roots, non-class/custom targets, SHACL-SPARQL, or hierarchy/import-dependent selection switches recovery to `INTEGRAL_DOCUMENTS`: the complete ontology and shapes documents of the active domain and every declared dependency are included once with their original contents, paths and hashes. The payload records the recovery mode, criteria and reasons. In this mode unrelated source content is intentionally retained because safe filtering is unproven; duplicate RDF graph representations are omitted. Unavailable required shape references or incomplete RDF lists stop preparation with repair guidance. Integral recovery is subject to the same full context budget; oversized or unknown windows stop before dispatch without truncation. This is a conservative retrieval policy, not RDF/OWL inference or a claim of semantic completeness for arbitrary extensions.
+
+The model receives separate coding instructions, a structured project-governance context, and the original user message. Active skill directives and any transformed request are checked and retained in that context. The selected model remains unchanged. Contract identity is rechecked immediately before every model dispatch and tool authorization; changed contracts require new preparation rather than reuse of stale context.
+
+The send decision is `ALLOW`, `BLOCK`, `HUMAN_REVIEW`, `INSUFFICIENT_INFORMATION`, or `CONFIGURATION_ERROR`. Project policies apply independently of matching shapes. Explanation, inspection and tests of a prohibition are evaluated separately from requests to execute that prohibition. No absence of a heuristic warning or query match proves candidate conformity. Default execution without an established correspondence is insufficient information; a project may explicitly define its permitted handling through domain `requestGovernance` rules and `unmatchedMutation` policy. Aliases declared in the manifest provide project-owned vocabulary correspondences.
+
+Purpose matching considers each instruction's action and object. Mentioning tests as something omitted does not turn implementation into testing. File extensions and explanatory comma complements do not create execution instructions. Explicit execution combined with explanation or blocking tests still receives execution policy checks. Action negation is distinguished from negating tests or guards. These boundaries and purpose decisions remain language heuristics, not general natural-language understanding or candidate conformity evidence; unclassified instructions are treated conservatively as execution.
+
+Connective segmentation does not require a recognized execution verb: an unknown directive after `and`, `e` or another separator is independently evaluated. Nominal/explanatory continuations retain their prior purpose. Unknown directive purposes are recorded as potential execution; unless an applicable prohibition already blocks or review is required, dispatch stops as insufficient information (or contract-authorized human review), even when an operation is mentioned. Rephrase uncertain instructions rather than treating them as implicitly informational.
+
+Before every model call, the complete messages (including system, contract, skills and history), tool schemas and response reserve are checked against the selected model window. An unknown window, failed metadata lookup or missing model metadata stops dispatch with a diagnostic; headless returns code `6`. A programmatic host may explicitly supply a positive finite `contextLength`, bound to the selected model. No guessed floor grants permission. Size is estimated using JavaScript UTF-16 code units divided by four, with 4096 response tokens reserved by default; provider tokenizers and framing differ, so this is an estimate rather than an exact token guarantee. The model is never substituted and context is never truncated to fit.
+
+In the TUI, mandatory human review presents reasons and references and requires a request/snapshot-bound confirmation. Cancellation sends nothing. Settings cannot override a prohibition or required review. Tool mutations require independent host approval; candidate extraction, SHACL validation, technical gates and promotion still apply afterward.
+
+Headless never treats warnings or `--direct` as approval. Without a valid host approval, pending request review exits with code `2`, a blocked request with `3`, insufficient information with `4`, and configuration failure with `5`; none sends the request. Tool mutations are denied without a programmatic host tool approver. Authentication, execution or candidate-gate failure uses code `1`. A missing explicitly selected domain, invalid configuration, read error or missing dependency interrupts governed execution instead of silently disabling governance.
+
+Non-authorized decisions receive deterministic local guidance without model calls. Configuration errors include their cause and specific repair actions for missing domains, invalid configuration, read failures or unavailable dependencies. Human review presents reasons and references, request/snapshot-bound approval, cancellation, rephrasing and domain selection. Headless explains that it has no interactive request approver and points to an authorized host or TUI review mechanism; `askToolApproval` never authorizes request dispatch. TUI guidance uses `/domain` and `/ungoverned`; headless uses `--domain` and `--ungoverned`. Explicit ungoverned selection changes execution mode rather than satisfying the failed governed decision.
+
+```bash
+# Governed, noninteractive request:
+bsh --project /path/to/project --domain assets --model your/model --prompt "Explain AssetTransfer rules"
+
+# Explicitly choose execution without semantic governance:
+bsh --project /path/to/project --ungoverned --prompt "Inspect the repository"
+
+# Explicit direct checkout mode retains all governance decisions:
+bsh --project /path/to/project --domain assets --direct --prompt "Explain AssetTransfer rules"
+```
+
+The production contract and payload-level regressions are tracked in [Production request governance](openspec/specs/production-request-governance.feature). Preparation supplies knowledge and authorization for dispatch; it does not assert that a future candidate satisfies the ontology.
+
+`npm run test:e2e` preserves the semantic, tool, MCP and Git integration suites. Locally it also records the installed global `bsh` in a persistent tmux session against the sovereign pilot and its configured model. Journey 20 checks an exact comment-only candidate, independent host tool approval, cancellation of a conflicting request, and unchanged origin bytes. Batch manifests determine success from observed assertions; screenshots, continuous video and the dated report are synchronized to WSL Downloads with matching hashes. Token attribution remains explicitly unavailable when no comparable measurement exists. CI runs the automated suites; live provider recordings and WSL synchronization require the local environment. Successful pull request CI additionally preserves an installable tarball and SHA-256 checksum, without publishing a release or npm version.
+
+A domain may declare request correspondences in its `.bsh/project.json` entry, for example:
+
+```json
+{
+  "requestGovernance": {
+    "unmatchedMutation": "INSUFFICIENT_INFORMATION",
+    "rules": [{
+      "id": "restricted-publication",
+      "pattern": "publish without review",
+      "effect": "BLOCK",
+      "reference": "urn:project:publication-policy",
+      "purposes": ["EXECUTION"]
+    }]
+  }
+}
+```
+
+Rules accept `ALLOW`, `BLOCK`, or `HUMAN_REVIEW`; blocking takes precedence over review and allowance. `unmatchedMutation` accepts `ALLOW`, `HUMAN_REVIEW`, or `INSUFFICIENT_INFORMATION`. Patterns are project-declared lexical correspondences, not proof of facts or natural-language understanding. RDF policies governing recognized concepts use `bsh:requiresHumanReview` or the request-policy extension `bsh:effect` (`DENY`, `BLOCK`, `PROHIBIT`). Dispatch includes the relevant contract closure across declared dependencies, source hashes, policy references, effective skill directives and their source identities. This context strategy preserves nested restrictions but can increase prompt size; it does not implement RDF/OWL inference or validate prose with SHACL. Contracts or skill sources changed after preparation stop dispatch and require a new request preparation.
 
 ---
 
@@ -296,6 +392,10 @@ When an interactive session starts, BSH automatically connects to declared serve
 ---
 
 ## Code Quality & CI Verification
+
+Controlled experiment APIs separate candidate generation, context queries, semantic enforcement and actual promotion. They preserve replayable inputs, clustered paired analyses and operational cost measurements. See [Controlled evaluation](docs/controlled-evaluation.md), [Operational metrics](docs/evaluation-metrics.md) and [Local SPARQL library selection](docs/sparql-library-selection.md).
+
+`npm run install:local` validates, builds, packs and installs the local tarball globally without publishing it. To separate preparation from installation, use `npm run install:local -- --prepare-only`, then `npm run install:local -- --install-prepared`. The pipeline verifies the tarball SHA-256 and every installed distribution file and stores its receipt in `.bsh/local/packages/last-install.json`. It runs unit and module integration tests; it does not invoke E2E.
 
 BSH maintains strict engineering standards:
 

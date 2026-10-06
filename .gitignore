@@ -17,6 +17,7 @@ openspec/*
 !openspec/specs/
 !openspec/specs/**
 !openspec/config.yaml
+!openspec/semantic-validation-profile.md
 !openspec/changes/
 openspec/changes/*
 !openspec/changes/rebuild-tui-with-opentui/

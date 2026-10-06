@@ -23,7 +23,7 @@ const action = (factsTurtle = '@prefix ex: <urn:pilot:ativos:> . ex:transferenci
   consequences: ['altera transferência'],
 });
 
-test('Given a conforming represented action without human policy, when evaluated, then it is allowed with a matched rule', async () => {
+test('Given a conforming represented action without human policy When evaluated Then it is allowed with a matched rule', async () => {
   const root = await project();
   try {
     const file = join(root, '.bsh/domains/ativos/ontology.jsonld');
@@ -37,7 +37,7 @@ test('Given a conforming represented action without human policy, when evaluated
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given a SHACL violation, when evaluated, then the action needs human review before effects', async () => {
+test('Given a SHACL violation When evaluated Then the action needs human review before effects', async () => {
   const root = await project();
   try {
     const snapshot = await createOntologySnapshot(root);
@@ -49,7 +49,7 @@ test('Given a SHACL violation, when evaluated, then the action needs human revie
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given a textual policy, when SHACL conforms, then human review is still required', async () => {
+test('Given a textual policy When SHACL conforms Then human review is still required', async () => {
   const root = await project();
   try {
     const evaluation = await evaluateAction(root, action(), await createOntologySnapshot(root));
@@ -59,7 +59,7 @@ test('Given a textual policy, when SHACL conforms, then human review is still re
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given missing RDF facts, when a mutable action is evaluated, then it needs human review', async () => {
+test('Given missing RDF facts When a mutable action is evaluated Then it needs human review', async () => {
   const root = await project();
   try {
     const proposed = { ...action(), factsTurtle: undefined };
@@ -68,7 +68,7 @@ test('Given missing RDF facts, when a mutable action is evaluated, then it needs
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given only partial confidence in represented facts, when evaluated, then SHACL conformity cannot auto-allow', async () => {
+test('Given only partial confidence in represented facts When evaluated Then SHACL conformity cannot auto-allow', async () => {
   const root = await project();
   try {
     const result = await evaluateAction(root, { ...action(), representation: 'partial' }, await createOntologySnapshot(root));
@@ -77,7 +77,7 @@ test('Given only partial confidence in represented facts, when evaluated, then S
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given a mutable tool without trustworthy interception, when evaluated, then it fails closed', async () => {
+test('Given a mutable tool without trustworthy interception When evaluated Then it fails closed', async () => {
   const root = await project();
   try {
     const result = await evaluateAction(root, { ...action(), intercepted: false }, await createOntologySnapshot(root));
@@ -85,7 +85,7 @@ test('Given a mutable tool without trustworthy interception, when evaluated, the
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given a reviewed action, when allowed once, then the grant is bound and consumed only once', async () => {
+test('Given a reviewed action When allowed once Then the grant is bound and consumed only once', async () => {
   const root = await project();
   try {
     const snapshot = await createOntologySnapshot(root);
@@ -107,7 +107,7 @@ test('Given a reviewed action, when allowed once, then the grant is bound and co
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given altered arguments after evaluation, when authorization is requested, then it is denied', async () => {
+test('Given altered arguments after evaluation When authorization is requested Then it is denied', async () => {
   const root = await project();
   try {
     const snapshot = await createOntologySnapshot(root);
@@ -119,7 +119,7 @@ test('Given altered arguments after evaluation, when authorization is requested,
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given a changed ontology after authorization, when consuming the one-time grant, then execution is denied', async () => {
+test('Given a changed ontology after authorization When consuming the one-time grant Then execution is denied', async () => {
   const root = await project();
   try {
     const snapshot = await createOntologySnapshot(root);
@@ -134,7 +134,7 @@ test('Given a changed ontology after authorization, when consuming the one-time 
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given no human answer, when the deadline expires, then the action is denied and audited', async () => {
+test('Given no human answer When the deadline expires Then the action is denied and audited', async () => {
   const root = await project();
   try {
     const snapshot = await createOntologySnapshot(root);
@@ -148,7 +148,7 @@ test('Given no human answer, when the deadline expires, then the action is denie
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given an unavailable audit path, when approval is granted, then no execution grant is released', async () => {
+test('Given an unavailable audit path When approval is granted Then no execution grant is released', async () => {
   const root = await project();
   try {
     const snapshot = await createOntologySnapshot(root);
@@ -163,7 +163,7 @@ test('Given an unavailable audit path, when approval is granted, then no executi
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given a known secret in a review reason, when audited, then the secret is redacted', async () => {
+test('Given a known secret in a review reason When audited Then the secret is redacted', async () => {
   const root = await project();
   try {
     const snapshot = await createOntologySnapshot(root);

@@ -133,9 +133,22 @@ Funcionalidade: Isolamento Git, integração e recuperação de sessões
     E a restauração deve recuperar arquivos anteriores e remover arquivos novos
     E diretórios derivados e registros locais devem ser excluídos da comparação
 
-  @BSH-GIT-018 @gap
-  Cenário: Diagnosticar ausência de isolamento
-    Dado que Git não está disponível ou o projeto não é um repositório
-    Quando o caminho nativo inicia uma sessão
-    Então o fallback atual pode operar no diretório selecionado
-    E a garantia especificada de isolamento estrito deve ser registrada como não satisfeita nesse caminho
+  @BSH-GIT-018
+  Cenário: Exigir isolamento estrito no modo governado
+    Dado um projeto em execução no modo governado
+    Quando a criação da worktree de isolamento falhar ou o Git estiver indisponível
+    Então o modo governado não deve iniciar ferramentas mutantes sem a worktree exigida
+    E deve produzir um diagnóstico claro e interromper a sessão imediatamente
+    E a execução direta deve depender de seleção explícita do modo pelo usuário
+    E TUI e headless devem aplicar o mesmo comportamento de interrupção
+    E o checkout principal deve permanecer inalterado
+
+  @BSH-GIT-019
+  Cenário: Preservar candidatos bloqueados para revisão
+    Dado uma sessão com candidato que resultou em bloqueio, conflito ou falha de validação
+    Quando a limpeza padrão da sessão é executada
+    Então o candidato bloqueado deve conservar o commit, a referência Git da branch da sessão, o diff e o relatório
+    E os artefatos devem permanecer recuperáveis para inspeção e correção posterior
+    E a limpeza não deve eliminar a única referência do candidato pendente
+    E o descarte definitivo da branch e artefatos deve ocorrer exclusivamente mediante ação específica de descarte
+

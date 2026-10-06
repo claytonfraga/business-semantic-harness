@@ -14,6 +14,7 @@ export interface Skill {
   description: string;
   scope: SkillScope;
   filePath: string;
+  sourceHash: string;
   directoryPath: string;
   body: string;
   metadata: SkillMetadata;

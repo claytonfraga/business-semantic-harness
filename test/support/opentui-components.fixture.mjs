@@ -11,7 +11,7 @@ test('Given BSH-TUI-002 When telemetry renders at ordinary width Then duration T
   const fixture = await createTestRenderer({ width: 80, height: 24 });
   const view = await createTuiView({ renderer: fixture.renderer });
   try {
-    view.update({ ...state, generationDurationMs: 2000, generationTps: 50, queueLength: 2 }, []);
+    view.update({ ...state, contextLength: 131072, generationDurationMs: 2000, generationTps: 50, queueLength: 2 }, []);
     await fixture.renderOnce();
     const frame = fixture.captureCharFrame();
     for (const metric of ['Queue:2', '2.0s', '50.0 TPS', 'Model: test-model', '100/128k ctx', '(0.1%)', '$0.0000', 'Ctrl+D']) assert.ok(frame.includes(metric), metric + '\n' + frame);
@@ -58,6 +58,28 @@ test('Given BSH-TUI-005 When all entry payloads render Then English labels and s
     const spans = fixture.captureSpans().lines.flatMap(line => line.spans);
     assert.ok(spans.some(span => span.text.includes('VIOLATION') && span.fg.equals(RGBA.fromHex(theme.error))));
     assert.ok(spans.some(span => span.text.includes('+2') && span.fg.equals(RGBA.fromHex(theme.success))));
+  } finally { view.destroy(); }
+});
+
+test('Given an indeterminate gate and partial failed task When native cards render Then no semantic approval or task completion is claimed', async () => {
+  const fixture = await createTestRenderer({ width: 140, height: 30 });
+  const view = await createTuiView({ renderer: fixture.renderer });
+  try {
+    view.update(state, [
+      { type: 'gate', gateStatus: 'INDETERMINATE', gateChecks: [{ ok: false, text: 'No constraint execution evidence' }] },
+      { type: 'implementation_receipt', receiptHasChanges: true, receiptOutcome: 'tool_error',
+        receiptFiles: [{ path: 'partial.js', linesAdded: 1, linesRemoved: 0 }],
+        receiptDiagnostics: ['replace_file_content: target absent'] },
+    ]);
+    await fixture.renderOnce();
+    const frame = fixture.captureCharFrame();
+    for (const label of ['INDETERMINATE', 'Promotion blocked', 'WORKSPACE CHANGES OBSERVED', 'partial.js', 'tool_error', 'target absent']) {
+      assert.ok(frame.includes(label), label + '\n' + frame);
+    }
+    assert.ok(!frame.includes('CONFORMING'));
+    assert.ok(!frame.includes('Ready to promote'));
+    assert.ok(!frame.includes('IMPLEMENTATION COMPLETED'));
+    assert.ok(!frame.includes('TransferShape'));
   } finally { view.destroy(); }
 });
 
@@ -120,5 +142,20 @@ test('Given native input submits and global routing consumes a key Then subscrip
     assert.ok(selected.fg.equals(RGBA.fromHex(theme.emphasis)));
     assert.ok(selected.bg.equals(RGBA.fromHex(theme.selection)));
     remove(); unroute();
+  } finally { view.destroy(); }
+});
+
+test('Given BSH-INPUT-019 When the prompt area renders Then it exposes at least four wrapping scrollable lines', async () => {
+  const fixture = await createTestRenderer({ width: 80, height: 24 });
+  const view = await createTuiView({ renderer: fixture.renderer });
+  try {
+    assert.ok(view.input.height >= 4, `expected at least four visible lines, got ${view.input.height}`);
+    assert.equal(view.input.wrapMode, 'word');
+    view.setPrompt('A long coding instruction that must wrap automatically across the prompt viewport. '.repeat(8));
+    view.input.gotoBufferEnd();
+    await fixture.renderOnce();
+    assert.equal(view.input.height, 4);
+    assert.equal(view.input.lineCount, 1, 'automatic wrapping keeps a single logical line');
+    assert.ok(view.input.scrollY > 0, `expected the wrapped content to scroll inside the prompt, got scrollY ${view.input.scrollY}`);
   } finally { view.destroy(); }
 });

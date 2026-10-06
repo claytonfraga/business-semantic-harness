@@ -114,10 +114,14 @@ function rowsFor(entry: ChatEntry): EntryRow[] {
     }
     case 'gate': {
       const violation = entry.gateStatus === 'VIOLATION';
+      const status = entry.gateStatus ?? 'INDETERMINATE';
+      const conforming = status === 'CONFORMING';
+      const color = violation || status === 'VALIDATION_ERROR' ? theme.error : conforming ? theme.success : theme.warning;
       const rows: EntryRow[] = [
-        row(`Semantic Gate [SHACL: ${entry.gateShape || 'TransferShape'}] ${violation ? '[X] VIOLATION' : '[OK] CONFORMING'}`, violation ? theme.error : theme.success),
+        row(`Semantic Gate [SHACL: ${entry.gateShape || '(no selected shape)'}] ${conforming ? '[OK]' : '[!]'} ${status}`, color),
         ...(entry.gateChecks || []).map(check => row(`${check.ok ? '[+]' : '[X]'} ${check.text}`, check.ok ? theme.success : theme.error)),
-        row(violation ? 'Status: VIOLATION (Promotion blocked)' : 'Status: CONFORMING (Ready to promote)', violation ? theme.error : theme.success),
+        row(`Status: ${status} (${conforming ? 'Preliminary inspection only; promotion requires final authorization' : status === 'NO_CHANGES' ? 'No candidate changes' : 'Promotion blocked'})`, color),
+        ...(entry.gateDisclaimer ? [row(entry.gateDisclaimer, theme.muted)] : []),
       ];
       if (violation) {
         if (entry.violationBusinessRationale) {
@@ -146,25 +150,25 @@ function rowsFor(entry: ChatEntry): EntryRow[] {
     }
     case 'prompt_violation': {
       const rows: EntryRow[] = [
-        row('[!] PROMPT VIOLATION DETECTED [Pre-flight Semantic Guard]', theme.error),
+        row(entry.requestDecision === 'HUMAN_REVIEW' ? '[!] REQUEST REVIEW REQUIRED [Project contract]' : '[!] PROMPT VIOLATION DETECTED [Pre-flight Semantic Guard]', theme.warning),
       ];
       if (entry.violationOperation) {
-        rows.push(row(`Operação Identificada: ${entry.violationOperation}`, theme.accent));
+        rows.push(row(`Identified operation: ${entry.violationOperation}`, theme.accent));
       }
       if (entry.violationShape) {
         rows.push(row(`Violated shape: ${entry.violationShape}`, theme.warning));
       }
       if (entry.violationRule) {
-        rows.push(row(`SHACL rule: ${entry.violationRule}`, theme.warning));
+        rows.push(row(`${entry.requestDecision ? 'Contract references' : 'SHACL rule'}: ${entry.violationRule}`, theme.warning));
       }
       if (entry.violationBusinessRationale) {
-        rows.push(row(`Motivo Negocial: ${entry.violationBusinessRationale}`, theme.text));
+        rows.push(row(`Business rationale: ${entry.violationBusinessRationale}`, theme.text));
       }
       if (entry.content) {
         rows.push(row(entry.content, theme.error));
       }
       if (entry.violationRemediation && entry.violationRemediation.length > 0) {
-        rows.push(row('Como Prosseguir:', theme.accent));
+        rows.push(row('How to proceed:', theme.accent));
         entry.violationRemediation.forEach((rem, idx) => {
           rows.push(row(`  ${idx + 1}. ${rem}`, theme.muted));
         });
@@ -174,9 +178,15 @@ function rowsFor(entry: ChatEntry): EntryRow[] {
       }
       return rows;
     }
-    case 'implementation_receipt': return entry.receiptHasChanges
-      ? [row(`[IMPLEMENTATION COMPLETED] [Modified files: ${entry.receiptFiles?.length || 0}]`, theme.success), ...files(entry.receiptFiles || []), row(`Changes saved to workspace (+${entry.receiptTotalAdded || 0} / -${entry.receiptTotalRemoved || 0} lines); promotion is separate.`, theme.success)]
-      : [row('[READ / DIAGNOSTIC]', theme.accent), row('No file changes were saved in this response.', theme.muted)];
+    case 'implementation_receipt': {
+      const completed = !entry.receiptOutcome || entry.receiptOutcome === 'completed';
+      const rows = entry.receiptHasChanges
+        ? [row(`[${completed ? 'IMPLEMENTATION COMPLETED' : 'WORKSPACE CHANGES OBSERVED'}] [Modified files: ${entry.receiptFiles?.length || 0}]`, completed ? theme.success : theme.warning), ...files(entry.receiptFiles || []), row(`Current candidate diff (+${entry.receiptTotalAdded || 0} / -${entry.receiptTotalRemoved || 0} lines); promotion is separate.`, theme.muted)]
+        : [row('[READ / DIAGNOSTIC]', theme.accent), row('No file changes were saved in this response.', theme.muted)];
+      if (entry.receiptOutcome) rows.push(row(`Observed task outcome: ${entry.receiptOutcome}`, completed ? theme.success : theme.warning));
+      rows.push(...(entry.receiptDiagnostics || []).map(diagnostic => row(diagnostic, theme.error)));
+      return rows;
+    }
     case 'reasoning': {
       const collapsed = entry.reasoningCollapsed ?? true;
       const duration = entry.reasoningDurationMs ? ` · ${(entry.reasoningDurationMs / 1000).toFixed(1)}s` : '';

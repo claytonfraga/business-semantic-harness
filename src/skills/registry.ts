@@ -1,6 +1,7 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { homedir } from 'node:os';
+import { createHash } from 'node:crypto';
 import type { Skill, SkillRegistryOptions, SkillScope } from './types.js';
 import { parseSkillFrontmatter } from './frontmatter.js';
 
@@ -130,6 +131,7 @@ export class SkillRegistry {
         description: metadata.description || 'No description provided.',
         scope,
         filePath,
+        sourceHash: createHash('sha256').update(raw).digest('hex'),
         directoryPath,
         body,
         metadata,

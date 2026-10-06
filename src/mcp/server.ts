@@ -10,7 +10,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import * as z from 'zod/v4';
 import { queryOntology } from '../ontology/query.js';
 import { validateProject } from '../ontology/validate.js';
-import { createProposal } from '../proposals/store.js';
+import { createProposal, createPatchProposal } from '../proposals/store.js';
 import { detectPromptViolation } from '../enforcement/promptGuard.js';
 import { getAvailableDomains, loadDomainValidator } from '../governance/domainRegistry.js';
 import { checkDomainAffinity } from '../governance/domainAffinity.js';
@@ -44,7 +44,7 @@ export function createBSHMcpServer(root: string, governed = false): McpServer {
   });
 
   server.registerTool('bsh_check_prompt_intent', {
-    description: 'Verifica em pré-voo se a intenção ou solicitação do usuário viola regras de negócio e restrições SHACL do domínio.',
+    description: 'Executa triagem heurística de intenção do prompt via expressões regulares. Não substitui consulta ontológica ou validação SHACL.',
     annotations: { readOnlyHint: true, destructiveHint: false },
     inputSchema: { prompt: z.string(), domain: z.string().optional() },
   }, async ({ prompt, domain }) => {
@@ -57,7 +57,7 @@ export function createBSHMcpServer(root: string, governed = false): McpServer {
   });
 
   server.registerTool('bsh_validate_shacl', {
-    description: 'Valida fatos em formato Turtle/RDF contra as regras e shapes SHACL do domínio indicado.',
+    description: 'Valida consultivamente fatos RDF/Turtle autodeclarados contra shapes SHACL. Não comprova correspondência com o código do projeto nem autoriza promoção.',
     annotations: { readOnlyHint: true, destructiveHint: false },
     inputSchema: { domain: z.string(), factsTurtle: z.string() },
   }, async ({ domain, factsTurtle }) => {
@@ -65,7 +65,18 @@ export function createBSHMcpServer(root: string, governed = false): McpServer {
       const validator = await loadDomainValidator(root, domain);
       const dataStore = parseShapes(factsTurtle);
       const report = await validator.validateChanges(dataStore);
-      return { content: [{ type: 'text', text: JSON.stringify(report) }] };
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            ...report,
+            role: 'CONSULTATIVE',
+            isSelfDeclaredPayload: true,
+            authorizesPromotion: false,
+            limitations: 'Validação consultiva de fatos autodeclarados pelo cliente. Não atesta correspondência com arquivos do projeto nem substitui a extração de evidências do host para promoção.',
+          }),
+        }],
+      };
     } catch (error) {
       return { isError: true, content: [{ type: 'text', text: error instanceof Error ? error.message : String(error) }] };
     }
@@ -98,15 +109,30 @@ export function createBSHMcpServer(root: string, governed = false): McpServer {
       return { content: [{ type: 'text', text: JSON.stringify({ status: 'submitted', digest, message: 'Conflito enviado ao BSH para pergunta humana.' }) }] };
     });
     server.registerTool('bsh_propose_patch', {
-      description: 'Propõe alterações de arquivos ao BSH. Esta ferramenta não escreve no projeto. Cada arquivo informa seu hash anterior ou null para criação.',
+      description: 'Propõe alterações de arquivos ao BSH e persiste a proposta em .bsh/local/proposals/. Esta ferramenta não escreve no projeto. Cada arquivo informa seu hash anterior ou null para criação.',
       annotations: { readOnlyHint: true, destructiveHint: false },
       inputSchema: {
         domain: z.string(), summary: z.string(), factsTurtle: z.string().optional(),
-        files: z.array(z.object({ path: z.string(), beforeSha256: z.string().nullable(), content: z.string() })).length(1),
+        files: z.array(z.object({ path: z.string(), beforeSha256: z.string().nullable(), content: z.string() })).min(1),
       },
     }, async ({ domain, summary, factsTurtle, files }) => {
-      const digest = createHash('sha256').update(JSON.stringify({ domain, summary, factsTurtle, files })).digest('hex');
-      return { content: [{ type: 'text', text: JSON.stringify({ status: 'submitted', digest, message: 'Proposta enviada ao BSH. Aguarde a revisão fora deste turno.' }) }] };
+      try {
+        const proposal = await createPatchProposal(root, { domain, summary, factsTurtle, files });
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({
+              status: 'submitted',
+              proposalId: proposal.id,
+              digest: proposal.digest,
+              proposalStatus: proposal.status,
+              message: 'Proposta persistida e enviada ao BSH. Aguarde a revisão fora deste turno.',
+            }),
+          }],
+        };
+      } catch (error) {
+        return { isError: true, content: [{ type: 'text', text: error instanceof Error ? error.message : String(error) }] };
+      }
     });
     return server;
   }

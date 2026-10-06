@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "installedAt": "2026-10-04T20:57:39.836Z",
+  "name": "business-semantic-harness",
+  "version": "0.2.12-beta",
+  "tarball": "/home/clayton/projetos/oracle/.bsh/local/packages/business-semantic-harness-0.2.12-beta.tgz",
+  "tarballSha256": "297bd48a96fa5b62e5abfcb75b68624f5985f0c62ee5fdb98d8f41773cbf996c",
+  "installedRoot": "/home/clayton/.nvm/versions/node/v22.19.0/lib/node_modules/business-semantic-harness",
+  "verifiedDistributionFiles": 99,
+  "checks": [
+    "quality",
+    "build",
+    "unit tests",
+    "module integration tests",
+    "installed distribution SHA-256"
+  ],
+  "source": "LOCAL_TARBALL",
+  "registryPublication": false,
+  "e2eExecuted": false
+}

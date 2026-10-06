@@ -111,7 +111,7 @@ test('Given runAgentTurn with configured McpClientManager, when the model invoke
   const toolDones = [];
 
   try {
-    const result = await runAgentTurn({
+    const result = await runAgentTurn({ contextLength: 131072,
       client: mockClient,
       model: 'deepseek/deepseek-v4.1-flash',
       workspaceRoot: root,

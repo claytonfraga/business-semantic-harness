@@ -238,26 +238,53 @@ export function renderChatEntry(entry: ChatEntry, width: number): string[] {
     }
 
     case 'gate': {
-      const isViolation = entry.gateStatus === 'VIOLATION';
-      const shape = entry.gateShape || 'TransferShape';
-      const barColor = isViolation ? ansi.brightRed : ansi.brightGreen;
-      const title = `${ansi.bold}${ansi.cyan}[#] Semantic Gate${ansi.reset} ${ansi.dim}[SHACL: ${ansi.reset}${ansi.bold}${shape}${ansi.reset}${ansi.dim}]${ansi.reset}`;
-      const badge = isViolation
-        ? `${ansi.bold}${ansi.brightRed}[X] VIOLATION${ansi.reset}`
-        : `${ansi.bold}${ansi.brightGreen}[OK] CONFORMING${ansi.reset}`;
+      const status = entry.gateStatus || 'CONFORMING';
+      const shape = entry.gateShape || 'WorkspaceSemanticShape';
+      let barColor = ansi.brightGreen;
+      let badge = `${ansi.bold}${ansi.brightGreen}[OK] CONFORMING (Preliminary)${ansi.reset}`;
+      let statusText = `${ansi.bold}${ansi.brightGreen}-> Status: CONFORMING (Preliminary inspection; subject to promotion gate)${ansi.reset}`;
+
+      if (status === 'VIOLATION') {
+        barColor = ansi.brightRed;
+        badge = `${ansi.bold}${ansi.brightRed}[X] VIOLATION${ansi.reset}`;
+        statusText = `${ansi.bold}${ansi.brightRed}-> Status: VIOLATION (Promotion blocked)${ansi.reset}`;
+      } else if (status === 'HUMAN_REVIEW_REQUIRED') {
+        barColor = ansi.brightYellow;
+        badge = `${ansi.bold}${ansi.brightYellow}[?] HUMAN REVIEW REQUIRED${ansi.reset}`;
+        statusText = `${ansi.bold}${ansi.brightYellow}-> Status: HUMAN REVIEW REQUIRED (Bound decision required)${ansi.reset}`;
+      } else if (status === 'INDETERMINATE') {
+        barColor = ansi.brightYellow;
+        badge = `${ansi.bold}${ansi.brightYellow}[?] INDETERMINATE${ansi.reset}`;
+        statusText = `${ansi.bold}${ansi.brightYellow}-> Status: INDETERMINATE (Semantic validity not demonstrated / missing evidence)${ansi.reset}`;
+      } else if (status === 'VALIDATION_ERROR') {
+        barColor = ansi.brightRed;
+        badge = `${ansi.bold}${ansi.brightRed}[!] VALIDATION ERROR${ansi.reset}`;
+        statusText = `${ansi.bold}${ansi.brightRed}-> Status: VALIDATION ERROR (Error during semantic evaluation)${ansi.reset}`;
+      } else if (status === 'NO_CHANGES') {
+        barColor = ansi.dim;
+        badge = `${ansi.bold}${ansi.dim}[-] NO CHANGES${ansi.reset}`;
+        statusText = `${ansi.bold}${ansi.dim}-> Status: NO CHANGES (No modifications in workspace)${ansi.reset}`;
+      }
+
+      const scopeHeader = entry.gateIsPreliminary
+        ? `${ansi.dim}[Preliminary Inspection - Not Definitive Promotion]${ansi.reset}`
+        : `${ansi.dim}[Definitive Gate]${ansi.reset}`;
+      const title = `${ansi.bold}${ansi.cyan}[#] Semantic Gate${ansi.reset} ${ansi.dim}[SHACL: ${ansi.reset}${ansi.bold}${shape}${ansi.reset}${ansi.dim}]${ansi.reset} ${scopeHeader}`;
 
       lines.push(tuiLine(`  ${barColor}▎${ansi.reset} ${title} ${badge}`, width));
 
       if (entry.gateChecks && entry.gateChecks.length > 0) {
         for (const check of entry.gateChecks) {
           const checkIcon = check.ok ? `${ansi.brightGreen}[+]${ansi.reset}` : `${ansi.brightRed}[X]${ansi.reset}`;
-          lines.push(tuiLine(`  ${barColor}▎${ansi.reset}   ${checkIcon} ${check.text}`, width));
+          const ref = check.reference ? ` ${ansi.dim}(ref: ${check.reference.slice(0, 10)})${ansi.reset}` : '';
+          lines.push(tuiLine(`  ${barColor}▎${ansi.reset}   ${checkIcon} ${check.text}${ref}`, width));
         }
       }
 
-      const statusText = isViolation
-        ? `${ansi.bold}${ansi.brightRed}-> Status: VIOLATION (Promotion blocked)${ansi.reset}`
-        : `${ansi.bold}${ansi.brightGreen}-> Status: CONFORMING (Ready to promote)${ansi.reset}`;
+      if (entry.gateDisclaimer) {
+        lines.push(tuiLine(`  ${barColor}▎${ansi.reset}   ${ansi.dim}Scope: ${entry.gateDisclaimer}${ansi.reset}`, width));
+      }
+
       lines.push(tuiLine(`  ${barColor}▎${ansi.reset}   ${statusText}`, width));
       lines.push(tuiLine('', width));
       break;
@@ -460,7 +487,12 @@ export function renderCompleteTui(
   const ctxTotal = state.contextLength || 131072;
   const ctxUsed = state.tokensTotal;
   const ctxPct = ((ctxUsed / ctxTotal) * 100).toFixed(1);
-  const ctxStr = `${(ctxUsed / 1000).toFixed(1)}k (${ctxPct}%)`;
+  const statusSuffix = state.telemetryStatus === 'UNAVAILABLE'
+    ? ' (unavail)'
+    : state.telemetryStatus === 'ESTIMATED'
+    ? ' (est)'
+    : '';
+  const ctxStr = `${(ctxUsed / 1000).toFixed(1)}k (${ctxPct}%)${statusSuffix}`;
   const costStr = state.sessionCost !== undefined ? `$${state.sessionCost.toFixed(2)}` : '$0.00';
   const scrollIndicator = scrollOffset > 0 ? `${ansi.yellow}[^ Scroll: +${scrollOffset}]${ansi.reset}` : '';
 

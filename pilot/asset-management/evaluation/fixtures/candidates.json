@@ -1,0 +1,5 @@
+[
+  { "expected": "VALID", "path": "evaluation/fixtures/transfer-valid.ttl", "id": "valid-transfer" },
+  { "expected": "INVALID", "path": "evaluation/fixtures/transfer-retired.ttl", "id": "invalid-retired" },
+  { "expected": "INVALID", "path": "evaluation/fixtures/transfer-no-responsible.ttl", "id": "invalid-no-responsible" }
+]

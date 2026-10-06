@@ -20,6 +20,7 @@ import {
   type SessaoWorktree,
 } from '../git/worktree.js';
 import { promoverSessao } from '../git/promotion.js';
+import { createProductionFactsExtractor } from '../enforcement/evidenceAdapters.js';
 import { ansi } from './ansi.js';
 import type { ChatEntry, RenderState } from './state.js';
 import { promptApiKeyModal, selectModelModal, selectDomainModal, diffReviewModal, settingsModal, selectSkillModal, selectSlashCommandModal } from './modals.js';
@@ -27,7 +28,8 @@ import { DEFAULT_SLASH_COMMANDS } from './slashCommands.js';
 import { SkillRegistry } from '../skills/registry.js';
 import { installSkillPackage } from '../skills/installer.js';
 import { detectSkillInvocation, detectSemanticSkillNeed } from '../skills/activation.js';
-import { detectPromptViolation } from '../enforcement/promptGuard.js';
+import { prepareGovernedRequest, approvePreparedRequest, assertPreparedRequestCurrent } from '../governance/requestPreparation.js';
+import { ApprovalBroker } from '../decision/broker.js';
 import { McpClientManager } from '../mcp/clientManager.js';
 import { loadPromptHistory, savePromptHistory } from './history.js';
 import { InputQueueManager } from './inputQueue.js';
@@ -40,6 +42,12 @@ export interface TuiSessionOptions {
   model?: string;
   domain?: string;
   view?: TuiView;
+  allowDirectExecution?: boolean;
+  ungoverned?: boolean;
+  /** Controlled model transport; the production preparation and dispatch remain unchanged. */
+  client?: OpenRouterClient;
+  /** Explicit host window, bound to the initially selected model. */
+  contextLength?: number;
 }
 
 export async function startTuiSession(options: TuiSessionOptions = {}): Promise<void> {
@@ -50,7 +58,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   let apiKey = env.openRouterApiKey;
   let confirmPromptViolations = env.confirmPromptViolations ?? true;
 
-  if (!apiKey) {
+  if (!apiKey && !options.client) {
     const auth = await promptApiKeyModal(options.view);
     if (!auth?.apiKey) {
       console.log(`${ansi.red}OpenRouter authentication is required to use BSH. Exiting.${ansi.reset}`);
@@ -59,7 +67,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     apiKey = auth.apiKey;
   }
 
-  const client = new OpenRouterClient({ apiKey });
+  const client = options.client ?? new OpenRouterClient({ apiKey: apiKey ?? '' });
   const authCheck = await client.verifyApiKey();
   if (!authCheck.valid) {
     console.log(`${ansi.red}Invalid OpenRouter API Key: ${authCheck.error || 'Authentication failed'}${ansi.reset}`);
@@ -68,31 +76,42 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
   // 2. Models Discovery
   let activeModel = options.model || env.defaultModel || 'deepseek/deepseek-v4.1-flash';
+  const hostContextModel = activeModel;
   const modelsList = await client.getModels().catch(() => []);
 
   // 3. Domain & Governance Discovery
-  const availableDomains = await getAvailableDomains(projectRoot);
+  let availableDomains = await getAvailableDomains(projectRoot);
   let activeDomainId = options.domain || env.defaultDomain || (availableDomains.length > 0 ? availableDomains[0].id : undefined);
+  let explicitlyUngoverned = options.ungoverned === true;
 
   let validator: DomainValidator | null = null;
-  if (activeDomainId) {
+  if (!explicitlyUngoverned) {
+    const readiness = await prepareGovernedRequest({ projectRoot, domainId: activeDomainId, originalPrompt: 'Inspect the project contract.', entryPoint: 'tui' });
+    if (readiness.status === 'CONFIGURATION_ERROR') {
+      console.error(`Governed session stopped: ${readiness.diagnosticCode}: ${readiness.reason}`);
+      for (const line of readiness.remediation ?? []) console.error(line);
+      return;
+    }
+  }
+  if (activeDomainId && !explicitlyUngoverned) {
     try {
       validator = await loadDomainValidator(projectRoot, activeDomainId);
     } catch (err: unknown) {
-      console.log(`${ansi.yellow}Warning: Could not load domain '${activeDomainId}': ${err instanceof Error ? err.message : String(err)}${ansi.reset}`);
-      activeDomainId = undefined;
+      console.error(`Governed session stopped: could not load '${activeDomainId}': ${err instanceof Error ? err.message : String(err)}`);
+      return;
     }
   }
 
   // MCP Client Manager (.bsh/mcp.json)
   const mcpManager = new McpClientManager();
-  await mcpManager.loadFromProject(projectRoot);
 
   // 4. Git Worktree Isolation
   let sessao: SessaoWorktree | null = null;
   let workspaceRoot = projectRoot;
   let activeGitBranch: string | undefined;
-  if (await gitDisponivel()) {
+  const gitAvailable = await gitDisponivel();
+
+  if (gitAvailable) {
     try {
       const repoRoot = await resolverRepositorio(projectRoot);
       activeGitBranch = await branchAtual(repoRoot);
@@ -104,16 +123,35 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         incluirEstadoLocal: true,
       });
       workspaceRoot = sessao.caminhoWorktree;
-    } catch {
-      // Non-git project fallback: work directly in projectRoot
+    } catch (err) {
+      if (!explicitlyUngoverned && !options.allowDirectExecution) {
+        console.log(`${ansi.red}Erro: Falha ao criar worktree de isolamento no modo governado: ${err instanceof Error ? err.message : String(err)}. Execução direta exige seleção explícita.${ansi.reset}`);
+        return;
+      }
+    }
+  } else {
+    if (!explicitlyUngoverned && !options.allowDirectExecution) {
+      console.log(`${ansi.red}Erro: Git indisponível para criar worktree de isolamento no modo governado. Execução direta exige seleção explícita.${ansi.reset}`);
+      return;
     }
   }
+
+  if (!explicitlyUngoverned && !sessao && !options.allowDirectExecution) {
+    console.log(`${ansi.red}Erro: O modo governado exige isolamento por worktree. Para operar diretamente no repositório, selecione explicitamente o modo direto ou desative a governança (/ungoverned).${ansi.reset}`);
+    return;
+  }
+  await mcpManager.loadFromProject(projectRoot);
 
   // 5. Workspace Context Discovery
   const workspaceSummary = await inspectWorkspace(projectRoot);
 
   // 6. View & Component State
-  let tokensTotal = 1420;
+  let tokensTotal = 0;
+  let tokensPrompt = 0;
+  let tokensCompletion = 0;
+  let tokensCached = 0;
+  let tokensReasoning = 0;
+  let telemetryStatus: 'MEASURED' | 'ESTIMATED' | 'UNAVAILABLE' = 'MEASURED';
   let lastGateConforming = true;
   let lastGateViolations: string[] = [];
   let alignmentStatus: 'ALIGNED' | 'MISMATCH' | 'INSUFFICIENT_DATA' = 'ALIGNED';
@@ -166,7 +204,8 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   const activeSkillNames: string[] = [];
 
   const getActiveContextLength = () => {
-    return modelsList.find((m) => m.id === activeModel)?.context_length || 131072;
+    return activeModel === hostContextModel && options.contextLength !== undefined
+      ? options.contextLength : modelsList.find((m) => m.id === activeModel)?.context_length;
   };
 
   const exitGuard = new ExitGuard({ windowMs: 1500 });
@@ -202,10 +241,15 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       ontologySummary,
       projectFolder,
       gitBranch,
-      governed: validator !== null,
+      governed: !explicitlyUngoverned,
       alignmentStatus,
       alignmentWarning,
       tokensTotal,
+      tokensPrompt,
+      tokensCompletion,
+      tokensCached,
+      tokensReasoning,
+      telemetryStatus,
       generationDurationMs: lastTurnDurationMs,
       generationTps: lastTurnTps,
       queueLength: inputQueue.length,
@@ -253,6 +297,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     exitGuard,
     history: initialHistory,
     isExecutingTurn: () => isExecutingTurn,
+    isAwaitingConfirmation: () => confirmationResolver !== null,
     onDispatch: (prompt) => dispatchPrompt(prompt),
     onAbortTurn: (reason) => {
       if (activeAbortController) {
@@ -336,7 +381,8 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
     while (true) {
       updateView();
-      let prompt = (await getNextPrompt()).trim();
+      let originalPrompt = await getNextPrompt();
+      let prompt = originalPrompt.trim();
       if (!prompt) continue;
 
       if (prompt === '/editor') {
@@ -363,6 +409,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         }
         if (edited) {
           prompt = edited;
+          originalPrompt = edited;
         } else {
           updateView();
           continue;
@@ -431,11 +478,18 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       }
 
       if (prompt === '/domain') {
+        availableDomains = await getAvailableDomains(projectRoot);
         activeDomainId = await selectDomainModal(availableDomains, activeDomainId, view);
         if (activeDomainId) {
-          validator = await loadDomainValidator(projectRoot, activeDomainId);
-          await saveEnvConfig({ BSH_DEFAULT_DOMAIN: activeDomainId }, projectRoot);
-          await runAffinityCheck(activeDomainId);
+          explicitlyUngoverned = false;
+          try {
+            validator = await loadDomainValidator(projectRoot, activeDomainId);
+            await saveEnvConfig({ BSH_DEFAULT_DOMAIN: activeDomainId }, projectRoot);
+            await runAffinityCheck(activeDomainId);
+          } catch (error) {
+            validator = null;
+            chatEntries.push({ type: 'alert', content: `Domain unavailable: ${error instanceof Error ? error.message : String(error)}. Governed requests remain disabled until the contract is repaired.` });
+          }
         } else {
           validator = null;
           alignmentStatus = 'INSUFFICIENT_DATA';
@@ -445,17 +499,20 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       }
 
       if (prompt === '/ungoverned' || prompt === '/bypass') {
+        explicitlyUngoverned = true;
         validator = null;
         alignmentStatus = 'INSUFFICIENT_DATA';
         chatEntries.push({
           type: 'agent',
-          content: 'Harness ontológico desabilitado pelo usuário. Sessão operando em modo UNGOVERNED sem restrições de SHACL.',
+          content: 'Ontology governance explicitly disabled by the user. Session is UNGOVERNED.',
         });
         updateView();
         continue;
       }
 
       if (prompt === '/governed') {
+        explicitlyUngoverned = false;
+        validator = null;
         if (activeDomainId) {
           try {
             validator = await loadDomainValidator(projectRoot, activeDomainId);
@@ -633,7 +690,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           if (toolDefs.length === 0) {
             chatEntries.push({
               type: 'agent',
-              content: 'Nenhum servidor MCP configurado no momento.\n↳ Use: /mcp add <nome> <comando> [args...]\n↳ Exemplo: /mcp add context7 node test/support/mock-context7-server.mjs\n↳ Ou peça no chat: "Conecte-se ao servidor MCP <nome> em <comando>"',
+              content: 'No MCP server is configured.\nUse: /mcp add <name> <command> [args...]\nOnly project-configured servers are connected. Governed tool execution requires host authorization.',
             });
           } else {
             const list = toolDefs.map((t) => `  • ${t.function.name}: ${t.function.description}`).join('\n');
@@ -724,10 +781,46 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         const diffText = sessao ? await git(sessao.caminhoWorktree, ['diff', sessao.commitBase]).catch(() => '') : '';
         const shouldPromote = await diffReviewModal(diffText, lastGateConforming, lastGateViolations, view);
         if (shouldPromote && sessao) {
-          await promoverSessao(sessao);
+          const promotion = await promoverSessao(sessao, {
+            extractCandidateFacts: createProductionFactsExtractor(sessao.caminhoWorktree),
+          });
+          if (promotion.status === 'promovido') {
+            chatEntries.push({
+              type: 'agent',
+              content: `✔ Mudanças promovidas com sucesso para ${sessao.branchOrigem}! (commit: ${promotion.commitIntegrado?.slice(0, 8) || 'OK'})`,
+            });
+          } else if (promotion.status === 'bloqueado') {
+            chatEntries.push({
+              type: 'agent',
+              content: `✖ Promoção bloqueada na etapa [${promotion.etapaBloqueio || 'GOVERNANCE'}]: ${promotion.motivoBloqueio || promotion.detalhes}`,
+            });
+          } else if (promotion.status === 'falha-validacao') {
+            chatEntries.push({
+              type: 'agent',
+              content: `✖ Falha de validação técnica na worktree: ${promotion.detalhes}`,
+            });
+          } else if (promotion.status === 'conflitado') {
+            chatEntries.push({
+              type: 'agent',
+              content: `✖ Conflito na reconciliação Git com a branch de origem: ${promotion.detalhes}`,
+            });
+          }
+        }
+        updateView();
+        continue;
+      }
+
+      if (prompt === '/discard') {
+        if (!sessao) {
           chatEntries.push({
             type: 'agent',
-            content: `✔ Mudanças promovidas com sucesso para ${sessao.branchOrigem}!`,
+            content: 'Nenhuma sessão em worktree ativa para descartar.',
+          });
+        } else {
+          await removerSessaoWorktree(sessao, true);
+          chatEntries.push({
+            type: 'agent',
+            content: `✔ Candidato e branch da sessão '${sessao.branchSessao}' foram descartados permanentemente.`,
           });
         }
         updateView();
@@ -804,6 +897,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       }
 
       // Dynamic Skill Invocation
+      skillRegistry.clearCache();
       const allDiscoveredSkillsForPrompt = await skillRegistry.discover();
       const skillInvocation = detectSkillInvocation(prompt, allDiscoveredSkillsForPrompt);
       if (skillInvocation.isSlashCommand && skillInvocation.matchedSkill) {
@@ -826,91 +920,68 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
         }
       }
 
-      // Pre-flight Semantic Guard
-      const promptViolation = detectPromptViolation(prompt, activeDomainId);
-
-      if (promptViolation.isViolating && validator) {
-        chatEntries.push({ type: 'user', content: prompt, isViolating: true });
-        chatEntries.push({
-          type: 'prompt_violation',
-          violationOperation: promptViolation.operation,
-          violationShape: promptViolation.shape,
-          violationRule: promptViolation.rule,
-          violationBusinessRationale: promptViolation.businessRationale,
-          violationRemediation: promptViolation.remediation,
-          content: `${promptViolation.message}\n` +
-            (promptViolation.matchedKeywords ? `Termos identificados: ${promptViolation.matchedKeywords.join(', ')}` : ''),
-          waitingConfirmation: confirmPromptViolations,
-        });
-
-        if (confirmPromptViolations) {
+      // BSH-PREP-001..009: retrieve the actual contract before dispatching each request.
+      const allDiscoveredSkills = await skillRegistry.discover();
+      const activeSkillsContext = skillRegistry.formatSkillsForPrompt(
+        allDiscoveredSkills.filter(skill => activeSkillNames.includes(skill.name)), activeSkillNames);
+      let prepared = await prepareGovernedRequest({
+        entryPoint: 'tui',
+        projectRoot, domainId: activeDomainId, ungoverned: explicitlyUngoverned,
+        originalPrompt, effectivePrompt: prompt, skillsContext: activeSkillsContext,
+        skillSources: allDiscoveredSkills.filter(skill => activeSkillNames.includes(skill.name))
+          .map(skill => ({ path: skill.filePath, sha256: skill.sourceHash })),
+      });
+      chatEntries.push({ type: 'user', content: originalPrompt, isViolating: prepared.status === 'BLOCK' });
+      chatEntries.push({ type: 'agent', content: `Request governance: ${prepared.status}. ${prepared.reason}\nReferences: ${prepared.references.join(', ') || '(none)'}\nIdentity: ${prepared.identity}` });
+      if (prepared.status === 'HUMAN_REVIEW') {
+        chatEntries.push({ type: 'agent', content: (prepared.remediation ?? []).join('\n') });
+        chatEntries.push({ type: 'prompt_violation', requestDecision: 'HUMAN_REVIEW', violationRule: prepared.references.join(', '),
+          violationBusinessRationale: prepared.reason,
+          violationRemediation: ['Confirm request dispatch only, or cancel.', 'Tool execution and candidate promotion require independent authorization.'],
+          content: 'Project contract requires human review before model dispatch.', waitingConfirmation: true });
+        updateView();
+        const answer = (await waitForConfirmation()).trim().toLowerCase();
+        const pending = chatEntries.at(-1);
+        if (pending) pending.waitingConfirmation = false;
+        if (!['', 'yes', 'y', 'confirm', 'approve'].includes(answer) || exitRequested) {
+          chatEntries.push({ type: 'agent', content: 'Request cancelled. No request was sent to the model.' });
           updateView();
-          const answer = (await waitForConfirmation()).trim();
-          if (answer === '/cancel' || answer === 'cancel' || answer === '/abort' || answer === 'q' || answer === 'escape' || answer === 'esc') {
-            chatEntries.push({
-              type: 'agent',
-              content: 'Execução do prompt cancelada pelo usuário após alerta de violação ontológica.',
-            });
-            updateView();
-            continue;
-          }
-          chatEntries.push({
-            type: 'agent',
-            content: 'Usuário confirmou prosseguimento da execução do prompt sob governança do harness.',
-          });
+          if (exitRequested) break;
+          continue;
         }
-      } else {
-        chatEntries.push({ type: 'user', content: prompt });
+        prepared = approvePreparedRequest(prepared, { actor: 'interactive-user', reason: 'Explicit confirmation in the governed TUI.' });
       }
-
-      if (validator) {
-        chatEntries.push({
-          type: 'agent',
-          content: `Checking domain rules for '${activeDomainId || 'project'}' and inspecting repository...`,
-        });
+      if (prepared.status !== 'ALLOW') {
+        const remediation = prepared.remediation ?? [];
+        const alertContent = [`Request not sent [${prepared.diagnosticCode ?? prepared.status}]: ${prepared.reason}`, ...remediation].join('\n');
+        chatEntries.push({ type: 'alert', content: alertContent });
+        updateView();
+        continue;
+      }
+      try {
+        await assertPreparedRequestCurrent(projectRoot, prepared);
+        validator = explicitlyUngoverned ? null : await loadDomainValidator(projectRoot, activeDomainId ?? '');
+      } catch (error) {
+        chatEntries.push({ type: 'alert', content: `Request not sent: ${error instanceof Error ? error.message : String(error)}` });
+        updateView();
+        continue;
       }
       updateView();
-
-      // Auto-connect MCP if requested
-      const lower = prompt.toLowerCase();
-      if ((lower.includes('context7') || lower.includes('conecte') || lower.includes('conectar') || lower.includes('servidor mcp')) && mcpManager.getToolDefinitions().length === 0) {
-        const bshDir = join(projectRoot, '.bsh');
-        await mkdir(bshDir, { recursive: true });
-        const mcpConfigPath = join(bshDir, 'mcp.json');
-        const defaultMock = join(process.cwd(), 'test/support/mock-context7-server.mjs');
-        const config = {
-          mcpServers: {
-            context7: {
-              command: process.execPath,
-              args: [defaultMock],
-              readOnly: true,
-            },
-          },
-        };
-        await writeFile(mcpConfigPath, JSON.stringify(config, null, 2), 'utf8');
-        await mcpManager.loadFromProject(projectRoot);
-        chatEntries.push({
-          type: 'agent',
-          content: 'Conectando ao servidor MCP Context7 via transporte stdio...',
-        });
-        chatEntries.push({
-          type: 'agent',
-          content: '✔ Servidor MCP "context7" conectado. Ferramenta registrada: context7_search_docs.',
-        });
-        updateView();
-      }
-
       let _agentResponseAccum = '';
-      messages.push({ role: 'user', content: prompt });
-
-      const allDiscoveredSkills = await skillRegistry.discover();
-      const skillsContext = skillRegistry.formatSkillsForPrompt(allDiscoveredSkills, activeSkillNames);
+      const broker = explicitlyUngoverned ? undefined : new ApprovalBroker(projectRoot, async question => {
+        const answer = await view.question({ title: 'Tool authorization',
+          message: `Tool: ${question.action.tool}\nArguments: ${JSON.stringify(question.action.arguments)}\n${question.evaluation.reasons.join('\n')}\nType allow-once to authorize this action; any other answer denies it.`,
+          signal: activeAbortController?.signal });
+        return { choice: answer?.trim().toLowerCase() === 'allow-once' ? 'allow-once' : 'deny',
+          actor: 'interactive-user', reason: 'Explicit host tool authorization in the TUI.' };
+      }, 30_000, apiKey ? [apiKey] : []);
+      broker?.setRequestGuard(() => assertPreparedRequestCurrent(projectRoot, prepared));
 
       const systemPrompt = buildCodingAgentSystemPrompt({
         workspaceSummary,
         domainId: activeDomainId,
-        governed: validator !== null,
-        skillsContext,
+        governed: !explicitlyUngoverned,
+        skillsContext: activeSkillsContext,
       });
 
       isExecutingTurn = true;
@@ -926,8 +997,12 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
           model: activeModel,
           workspaceRoot,
           projectRoot,
-          messages,
+          messages: [prepared.contextMessage, ...messages, { role: 'user', content: originalPrompt }],
           systemPrompt,
+          broker,
+          domain: activeDomainId,
+          contextLength: getActiveContextLength(),
+          beforeModelRequest: () => assertPreparedRequestCurrent(projectRoot, prepared),
           signal: activeAbortController.signal,
           mcpManager,
           onReasoningDelta: (text) => {
@@ -1082,36 +1157,36 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
             projectRoot,
           });
 
-          chatEntries.push({
-            type: 'implementation_receipt',
-            receiptHasChanges: diffGateResult.hasChanges,
-            receiptFiles: diffGateResult.fileStats || [],
-            receiptTotalAdded: diffGateResult.linesAdded,
-            receiptTotalRemoved: diffGateResult.linesRemoved,
-          });
         }
 
+        const receiptFiles = turnResult.modifiedFiles.map(path =>
+          diffGateResult?.fileStats?.find(file => file.path === path)
+          ?? { path, linesAdded: 0, linesRemoved: 0 });
+        chatEntries.push({
+          type: 'implementation_receipt',
+          receiptHasChanges: receiptFiles.length > 0,
+          receiptFiles,
+          receiptTotalAdded: receiptFiles.reduce((total, file) => total + file.linesAdded, 0),
+          receiptTotalRemoved: receiptFiles.reduce((total, file) => total + file.linesRemoved, 0),
+          receiptOutcome: turnResult.outcome,
+          receiptDiagnostics: turnResult.toolFailures.map(failure => `${failure.tool}: ${failure.reason}`),
+        });
+
         if (validator && sessao && diffGateResult) {
-          const isViolation = !diffGateResult.conforming || promptViolation.isViolating;
+          // Prompt triage is shown separately; it is not executed SHACL evidence.
+          const isViolation = diffGateResult.gateStatus === 'VIOLATION';
 
           if (isViolation) {
             lastGateConforming = false;
             const violationsList = diffGateResult.violations.length > 0
               ? diffGateResult.violations
-              : promptViolation.isViolating && promptViolation.rule
-                ? [promptViolation.rule]
-                : [
-                  'State transition invalid: Retired asset cannot be transferred',
-                  'Required fields missing: adequateJustification, approver',
-                ];
+              : ['Semantic validation reported a violation'];
             lastGateViolations = violationsList;
 
             let checks = diffGateResult.checks;
             const hasFailingCheck = checks.some((c) => !c.ok);
             if (!hasFailingCheck) {
-              const failureText = promptViolation.isViolating && promptViolation.rule
-                ? `${promptViolation.shape || 'DomainShape'}: ${promptViolation.rule}`
-                : violationsList[0] || 'Violação ontológica detectada no Gate Semântico';
+              const failureText = violationsList[0] || 'Semantic validation reported a violation';
               checks = [
                 ...checks,
                 { ok: false, text: failureText },
@@ -1120,35 +1195,57 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
             chatEntries.push({
               type: 'gate',
-              gateShape: promptViolation.isViolating
-                ? (promptViolation.shape || diffGateResult.shapeName || 'TransferShape')
-                : (diffGateResult.shapeName || 'TransferShape'),
+              gateShape: diffGateResult.shapeName,
               gateChecks: checks,
               gateStatus: 'VIOLATION',
+              gateScope: diffGateResult.scope,
+              gateIsPreliminary: diffGateResult.isPreliminary,
+              gateDisclaimer: diffGateResult.disclaimer,
+              gateOperations: diffGateResult.operations,
+              gateRestrictions: diffGateResult.restrictions,
+              gateEvidences: diffGateResult.evidences,
+              gateReasons: diffGateResult.reasons,
+              gateReferences: diffGateResult.references,
             });
           } else {
-            lastGateConforming = true;
+            lastGateConforming = diffGateResult.conforming;
             lastGateViolations = [];
-            const checks: { ok: boolean; text: string }[] = diffGateResult.checks.length > 0
-              ? diffGateResult.checks
-              : [
-                { ok: true, text: 'State transition valid (InOperation -> Transferred)' },
-                { ok: true, text: 'Required fields present (newOwner, newLocation)' },
-              ];
-
             chatEntries.push({
               type: 'gate',
-              gateShape: diffGateResult.shapeName || 'TransferShape',
-              gateChecks: checks,
-              gateStatus: 'CONFORMING',
+              gateShape: diffGateResult.shapeName,
+              gateChecks: diffGateResult.checks,
+              gateStatus: diffGateResult.gateStatus,
+              gateScope: diffGateResult.scope,
+              gateIsPreliminary: diffGateResult.isPreliminary,
+              gateDisclaimer: diffGateResult.disclaimer,
+              gateOperations: diffGateResult.operations,
+              gateRestrictions: diffGateResult.restrictions,
+              gateEvidences: diffGateResult.evidences,
+              gateReasons: diffGateResult.reasons,
+              gateReferences: diffGateResult.references,
             });
+          }
+        }
+
+        if (turnResult.telemetry) {
+          telemetryStatus = turnResult.telemetry.status;
+          if (turnResult.telemetry.status === 'MEASURED') {
+            tokensTotal += turnResult.telemetry.totalTokens;
+            tokensPrompt += turnResult.telemetry.promptTokens;
+            tokensCompletion += turnResult.telemetry.completionTokens;
+            if (turnResult.telemetry.cachedTokens) tokensCached += turnResult.telemetry.cachedTokens;
+            if (turnResult.telemetry.reasoningTokens) tokensReasoning += turnResult.telemetry.reasoningTokens;
+          } else if (turnResult.telemetry.status === 'ESTIMATED') {
+            tokensTotal += turnResult.telemetry.totalTokens;
+            tokensPrompt += turnResult.telemetry.promptTokens;
+            tokensCompletion += turnResult.telemetry.completionTokens;
           }
         }
 
         const elapsed = performance.now() - turnStartTime;
         lastTurnDurationMs = elapsed;
-        lastTurnTps = elapsed > 0 ? (turnTokensCount / (elapsed / 1000)) : 0;
-        tokensTotal += 350;
+        const turnTokens = turnResult.telemetry?.totalTokens ?? turnTokensCount;
+        lastTurnTps = elapsed > 0 ? (turnTokens / (elapsed / 1000)) : 0;
         updateView();
       } catch (err: unknown) {
         if (activeAbortController?.signal.aborted) {
@@ -1171,7 +1268,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
     await mcpManager.close().catch(() => undefined);
     if (sessao) {
       try {
-        await removerSessaoWorktree(sessao);
+        await removerSessaoWorktree(sessao, false);
       } catch {
         // Best-effort cleanup
       }

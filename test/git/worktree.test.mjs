@@ -45,7 +45,7 @@ const gatesFalha = async () => ({ ok: false, saida: 'testes falharam' });
 
 after(() => rmSync(raiz, { recursive: true, force: true }));
 
-test('Given a repository on main, when a session starts, then a dedicated branch and worktree are created from HEAD', async () => {
+test('Given a repository on main When a session starts Then a dedicated branch and worktree are created from HEAD', async () => {
   const repo = novoRepositorio('criacao');
   const base = await commitAtual(repo);
   const sessao = await novaSessao(repo);
@@ -56,7 +56,7 @@ test('Given a repository on main, when a session starts, then a dedicated branch
   assert.ok(worktreesListadas.some((item) => item.branch === sessao.branchSessao));
 });
 
-test('Given a session worktree, when the agent edits a file, then only the worktree changes', async () => {
+test('Given a session worktree When the agent edits a file Then only the worktree changes', async () => {
   const repo = novoRepositorio('isolamento');
   const sessao = await novaSessao(repo);
   writeFileSync(join(sessao.caminhoWorktree, 'arquivo.txt'), 'alterado\n');
@@ -64,7 +64,7 @@ test('Given a session worktree, when the agent edits a file, then only the workt
   assert.equal(readFileSync(join(repo, 'arquivo.txt'), 'utf8'), 'base\n');
 });
 
-test('Given a session worktree, when the agent creates a file, then it does not exist in the main checkout before promotion', async () => {
+test('Given a session worktree When the agent creates a file Then it does not exist in the main checkout before promotion', async () => {
   const repo = novoRepositorio('arquivo-novo');
   const sessao = await novaSessao(repo);
   writeFileSync(join(sessao.caminhoWorktree, 'novo.txt'), 'novo\n');
@@ -72,7 +72,7 @@ test('Given a session worktree, when the agent creates a file, then it does not 
   assert.equal(existsSync(join(repo, 'novo.txt')), false);
 });
 
-test('Given a session worktree, when the agent removes a file, then the removal happens only in the worktree until promotion', async () => {
+test('Given a session worktree When the agent removes a file Then the removal happens only in the worktree until promotion', async () => {
   const repo = novoRepositorio('remocao');
   const sessao = await novaSessao(repo);
   rmSync(join(sessao.caminhoWorktree, 'arquivo.txt'));
@@ -80,7 +80,7 @@ test('Given a session worktree, when the agent removes a file, then the removal 
   assert.ok(existsSync(join(repo, 'arquivo.txt')));
 });
 
-test('Given the origin branch did not move, when the session is promoted, then changes reach the origin branch by Git', async () => {
+test('Given the origin branch did not move When the session is promoted Then changes reach the origin branch by Git', async () => {
   const repo = novoRepositorio('promocao-ff');
   const sessao = await novaSessao(repo);
   writeFileSync(join(sessao.caminhoWorktree, 'arquivo.txt'), 'promovido\n');
@@ -90,7 +90,7 @@ test('Given the origin branch did not move, when the session is promoted, then c
   assert.equal(await estaLimpo(repo), true);
 });
 
-test('Given the origin branch advanced, when promoting, then the session is rebased without losing the origin commits', async () => {
+test('Given the origin branch advanced When promoting Then the session is rebased without losing the origin commits', async () => {
   const repo = novoRepositorio('rebase');
   const sessao = await novaSessao(repo);
   writeFileSync(join(sessao.caminhoWorktree, 'sessao.txt'), 'X\n');
@@ -103,7 +103,7 @@ test('Given the origin branch advanced, when promoting, then the session is reba
   assert.ok(existsSync(join(repo, 'sessao.txt')));
 });
 
-test('Given a rebase conflict, when promoting, then the main branch stays unchanged and the conflict stays in the worktree', async () => {
+test('Given a rebase conflict When promoting Then the main branch stays unchanged and the conflict stays in the worktree', async () => {
   const repo = novoRepositorio('conflito');
   const sessao = await novaSessao(repo);
   writeFileSync(join(sessao.caminhoWorktree, 'arquivo.txt'), 'sessao\n');
@@ -120,7 +120,7 @@ test('Given a rebase conflict, when promoting, then the main branch stays unchan
   await removerSessaoWorktree(sessao);
 });
 
-test('Given the gates fail, when promoting, then nothing is promoted and the origin branch is intact', async () => {
+test('Given the gates fail When promoting Then nothing is promoted and the origin branch is intact', async () => {
   const repo = novoRepositorio('gates');
   const referenciaAntes = git(repo, ['rev-parse', 'HEAD']).trim();
   const sessao = await novaSessao(repo);
@@ -131,7 +131,7 @@ test('Given the gates fail, when promoting, then nothing is promoted and the ori
   assert.equal(readFileSync(join(repo, 'arquivo.txt'), 'utf8'), 'base\n');
 });
 
-test('Given a cancelled session, when the worktree is discarded, then the main checkout is unchanged', async () => {
+test('Given a cancelled session When the worktree is discarded Then the main checkout is unchanged', async () => {
   const repo = novoRepositorio('cancelamento');
   const sessao = await novaSessao(repo);
   writeFileSync(join(sessao.caminhoWorktree, 'arquivo.txt'), 'descartar\n');
@@ -140,7 +140,7 @@ test('Given a cancelled session, when the worktree is discarded, then the main c
   assert.equal(readFileSync(join(repo, 'arquivo.txt'), 'utf8'), 'base\n');
 });
 
-test('Given two simultaneous sessions, when both start, then each has its own branch and worktree', async () => {
+test('Given two simultaneous sessions When both start Then each has its own branch and worktree', async () => {
   const repo = novoRepositorio('paralelo');
   const primeira = await novaSessao(repo);
   const segunda = await novaSessao(repo);
@@ -150,7 +150,7 @@ test('Given two simultaneous sessions, when both start, then each has its own br
   assert.equal(existsSync(join(segunda.caminhoWorktree, 'a.txt')), false);
 });
 
-test('Given uncommitted local changes, when a session starts, then no stash/reset/restore/clean touches them', async () => {
+test('Given uncommitted local changes When a session starts Then no stash/reset/restore/clean touches them', async () => {
   const repo = novoRepositorio('local-ignorado');
   writeFileSync(join(repo, 'arquivo.txt'), 'local\n');
   const sessao = await novaSessao(repo, false);
@@ -158,7 +158,7 @@ test('Given uncommitted local changes, when a session starts, then no stash/rese
   assert.equal(readFileSync(join(sessao.caminhoWorktree, 'arquivo.txt'), 'utf8'), 'base\n');
 });
 
-test('Given uncommitted local changes, when a session includes the local state, then it is copied non-destructively', async () => {
+test('Given uncommitted local changes When a session includes the local state Then it is copied non-destructively', async () => {
   const repo = novoRepositorio('local-incluido');
   writeFileSync(join(repo, 'arquivo.txt'), 'local\n');
   writeFileSync(join(repo, 'novo-local.txt'), 'novo\n');
@@ -168,7 +168,7 @@ test('Given uncommitted local changes, when a session includes the local state, 
   assert.equal(readFileSync(join(repo, 'arquivo.txt'), 'utf8'), 'local\n');
 });
 
-test('Given the main checkout is dirty, when promotion is attempted, then it is blocked and the main checkout is not overwritten', async () => {
+test('Given the main checkout is dirty When promotion is attempted Then it is blocked and the main checkout is not overwritten', async () => {
   const repo = novoRepositorio('principal-sujo');
   const sessao = await novaSessao(repo);
   writeFileSync(join(sessao.caminhoWorktree, 'arquivo.txt'), 'sessao\n');
@@ -179,7 +179,7 @@ test('Given the main checkout is dirty, when promotion is attempted, then it is 
   assert.equal(readFileSync(join(repo, 'arquivo.txt'), 'utf8'), 'base\n');
 });
 
-test('Given a successful promotion, when the session is cleaned up, then the worktree is removed without losing promoted commits', async () => {
+test('Given a successful promotion When the session is cleaned up Then the worktree is removed without losing promoted commits', async () => {
   const repo = novoRepositorio('limpeza');
   const sessao = await novaSessao(repo);
   writeFileSync(join(sessao.caminhoWorktree, 'arquivo.txt'), 'promovido\n');
@@ -192,7 +192,7 @@ test('Given a successful promotion, when the session is cleaned up, then the wor
   assert.equal(status, '');
 });
 
-test('Given a worktree with changes, when listed, then its changes are reported', async () => {
+test('Given a worktree with changes When listed Then its changes are reported', async () => {
   const repo = novoRepositorio('alteracoes');
   const sessao = await novaSessao(repo);
   writeFileSync(join(sessao.caminhoWorktree, 'arquivo.txt'), 'editado\n');
