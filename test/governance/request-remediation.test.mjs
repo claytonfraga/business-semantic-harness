@@ -7,6 +7,30 @@ const operations = [
   { iri: 'urn:synthetic:RetireWidget', name: 'Retire widget', terms: ['retire', 'widget'] },
 ];
 
+test('Given BSH-PREP-018 configuration diagnostic categories When local remediation is built Then specific repairs and interface exits are deterministic without changing the decision', () => {
+  for (const [diagnosticCode, repair] of [['DOMAIN_NOT_FOUND', 'Select a domain declared'], ['INVALID_CONFIGURATION', 'Repair the reported'], ['READ_ERROR', 'Restore the contract file'], ['DEPENDENCY_UNAVAILABLE', 'Restore or declare the dependency']]) {
+    for (const entryPoint of ['tui', 'headless']) {
+      const input = { status: 'CONFIGURATION_ERROR', diagnosticCode, entryPoint, reason: 'Controlled cause', domainId: 'synthetic', requestText: 'Explain Publish', selectedConcepts: [], governedOperations: [], policyReferences: [] };
+      const before = structuredClone(input);
+      const result = buildRequestRemediation(input);
+      assert.deepEqual(result, buildRequestRemediation(input));
+      assert.deepEqual(input, before);
+      assert.ok(result.join('\n').includes(repair));
+      assert.ok(result.join('\n').includes('Controlled cause'));
+      assert.ok(result.join('\n').includes(entryPoint === 'tui' ? '/domain' : '--domain'));
+    }
+  }
+});
+
+test('Given BSH-PREP-018 human review When guidance is built Then authorized approval cancellation rephrasing and domain selection remain distinct from tool approval', () => {
+  for (const entryPoint of ['tui', 'headless']) {
+    const text = buildRequestRemediation({ status: 'HUMAN_REVIEW', entryPoint, reason: 'Required review', requestText: 'Implement Publish', selectedConcepts: [], governedOperations: [], policyReferences: ['urn:review'] }).join('\n');
+    for (const expected of ['urn:review', 'Required review', 'Cancel', 'rephrase', 'snapshot', 'promotion remain independent']) assert.ok(text.includes(expected), expected);
+    assert.ok(text.includes(entryPoint === 'tui' ? '/domain' : '--domain'));
+    if (entryPoint === 'headless') assert.match(text, /no interactive request approver/);
+  }
+});
+
 test('Given BSH-PREP-016 an unrecognized request When remediation is built Then it explains the mentions and never asserts conformity', () => {
   const lines = buildRequestRemediation({
     status: 'INSUFFICIENT_INFORMATION', domainId: 'synthetic', requestText: 'Move a widget',

@@ -76,6 +76,7 @@ export async function runHeadlessCodingSession(options: HeadlessOptions): Promis
   const activeSkillsContext = skillRegistry.formatSkillsForPrompt(
     discoveredSkills.filter(skill => activeSkillNames.includes(skill.name)), activeSkillNames);
   const prepared = await prepareGovernedRequest({ projectRoot, domainId: activeDomainId,
+    entryPoint: 'headless',
     ungoverned: options.ungoverned, originalPrompt: prompt, effectivePrompt, skillsContext: activeSkillsContext,
     skillSources: discoveredSkills.filter(skill => activeSkillNames.includes(skill.name))
       .map(skill => ({ path: skill.filePath, sha256: skill.sourceHash })) });

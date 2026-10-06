@@ -86,9 +86,10 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
   let validator: DomainValidator | null = null;
   if (!explicitlyUngoverned) {
-    const readiness = await prepareGovernedRequest({ projectRoot, domainId: activeDomainId, originalPrompt: 'Inspect the project contract.' });
+    const readiness = await prepareGovernedRequest({ projectRoot, domainId: activeDomainId, originalPrompt: 'Inspect the project contract.', entryPoint: 'tui' });
     if (readiness.status === 'CONFIGURATION_ERROR') {
       console.error(`Governed session stopped: ${readiness.diagnosticCode}: ${readiness.reason}`);
+      for (const line of readiness.remediation ?? []) console.error(line);
       return;
     }
   }
@@ -924,6 +925,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       const activeSkillsContext = skillRegistry.formatSkillsForPrompt(
         allDiscoveredSkills.filter(skill => activeSkillNames.includes(skill.name)), activeSkillNames);
       let prepared = await prepareGovernedRequest({
+        entryPoint: 'tui',
         projectRoot, domainId: activeDomainId, ungoverned: explicitlyUngoverned,
         originalPrompt, effectivePrompt: prompt, skillsContext: activeSkillsContext,
         skillSources: allDiscoveredSkills.filter(skill => activeSkillNames.includes(skill.name))
@@ -932,6 +934,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
       chatEntries.push({ type: 'user', content: originalPrompt, isViolating: prepared.status === 'BLOCK' });
       chatEntries.push({ type: 'agent', content: `Request governance: ${prepared.status}. ${prepared.reason}\nReferences: ${prepared.references.join(', ') || '(none)'}\nIdentity: ${prepared.identity}` });
       if (prepared.status === 'HUMAN_REVIEW') {
+        chatEntries.push({ type: 'agent', content: (prepared.remediation ?? []).join('\n') });
         chatEntries.push({ type: 'prompt_violation', requestDecision: 'HUMAN_REVIEW', violationRule: prepared.references.join(', '),
           violationBusinessRationale: prepared.reason,
           violationRemediation: ['Confirm request dispatch only, or cancel.', 'Tool execution and candidate promotion require independent authorization.'],

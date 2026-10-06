@@ -13,6 +13,10 @@ Funcionalidade: Preparação ontológica de cada solicitação nas entradas de p
     Então deve carregar e validar manifesto, ontologia, shapes e configurações declaradas
     E consultar conceitos, operações, políticas e correspondências com origem, versão e hash
     E preservar dependências e restrições aninhadas recuperando os documentos necessários integralmente quando seleção parcial for insegura
+    E a seleção só deve ser suficiente com correspondências estabelecidas, alvos de classe explícitos e referências estruturais resolvidas no fechamento declarado
+    E ausência de raízes pertinentes, alvos não selecionáveis, consultas SHACL-SPARQL ou dependências de hierarquia devem acionar recuperação integral da ontologia e shapes de todo o fechamento declarado
+    E referências estruturais ausentes ou listas RDF incompletas devem interromper com diagnóstico antes do transporte
+    E recuperação integral deve manter origem e hashes e passar pelo orçamento completo sem truncamento
     E nenhum envio contendo a solicitação deve ocorrer antes da preparação concluída
 
   @BSH-PREP-002
@@ -107,6 +111,9 @@ Funcionalidade: Preparação ontológica de cada solicitação nas entradas de p
     Quando solicitação efetiva ou diretivas de skills combinam explicação, inspeção ou testes com execução
     Então a finalidade informativa não deve isentar a execução presente em outra instrução
     E separadores, listas e conjunções em português ou inglês devem receber tratamento consistente
+    E conectivos não devem depender exclusivamente de uma lista fechada de verbos para separar instruções potencialmente executáveis
+    E Explain Publish and develop Publish e Explique Publish e desenvolva Publish devem receber as mesmas verificações que instruções separadas por ponto
+    E desenvolver, construir e refatorar combinados com consultas ou testes devem ser avaliados separadamente
     E interpretação incerta deve aplicar a política de incerteza ou revisão sem autorização implícita
     Mas explicar a regra ou escrever exclusivamente testes de bloqueio deve continuar permitido
 
@@ -188,6 +195,10 @@ Funcionalidade: Preparação ontológica de cada solicitação nas entradas de p
     Então deve listar saídas acionáveis, incluindo reformular o pedido, trocar o domínio e operar sem o harness
     E deve confirmar revisão quando a decisão exigir revisão humana
     E deve reutilizar as regras aplicáveis já recuperadas do contrato
+    E CONFIGURATION_ERROR deve informar a causa e ações específicas para domínio inexistente, configuração inválida, erro de leitura e dependência indisponível
+    E HUMAN_REVIEW deve oferecer aprovação pelo mecanismo autorizado, cancelamento, reformulação e troca de domínio
+    E headless sem aprovador deve explicar a interrupção e opções por argumentos CLI sem alterar o código de saída
+    E a orientação deve ser determinística e local, sem mudar a decisão nem afirmar conformidade
 
   @BSH-PREP-019
   Cenário: Distinguir domínio sem operações governadas
