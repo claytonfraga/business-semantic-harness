@@ -101,7 +101,7 @@ ex:Nested a sh:NodeShape ; sh:property [ sh:path ex:nested ; sh:hasValue "NESTED
 });
 
 test('Given BSH-PREP-024 native prohibited implementation without tests When submitted Then no model call occurs', async () => {
-  for (const prompt of ['Implemente Publish sem testes', 'Implement Publish without tests', 'Explain Publish. Implement Publish']) {
+  for (const prompt of ['Implemente Publish sem testes', 'Implement Publish without tests', 'Explain Publish. Implement Publish', 'Explain Publish and develop Publish', 'Explique Publish e desenvolva Publish', 'Inspect Publish and refactor Publish', 'Write tests that block Publish and construct Publish']) {
     const ui = await setup();
     try {
       await ui.submit(prompt);
@@ -109,6 +109,34 @@ test('Given BSH-PREP-024 native prohibited implementation without tests When sub
       assert.equal(ui.calls.length, 0, prompt);
     } finally { await ui.close(); }
   }
+});
+
+test('Given BSH-PREP-001 native non-class targets When selection is unsafe Then integral contract content reaches the unchanged selected model', async () => {
+  const ui = await setup();
+  try {
+    const shapes = '@prefix ex: <urn:example:> . @prefix sh: <http://www.w3.org/ns/shacl#> . ex:Global a sh:NodeShape; sh:targetNode ex:item; sh:property [sh:path ex:status; sh:in ("APPROVED")] .';
+    await writeFile(join(ui.root, '.bsh/domains/example/shapes.ttl'), shapes);
+    await ui.submit('Explain Publish and its constraints');
+    await wait(() => ui.calls.length === 1, 'native integral context dispatch');
+    const context = ui.calls[0].messages.find(m => m.content?.includes('PROJECT_GOVERNANCE_CONTEXT')).content;
+    const payload = JSON.parse(context.slice(context.indexOf('\n') + 1));
+    assert.equal(payload.recovery.mode, 'INTEGRAL_DOCUMENTS');
+    assert.equal(payload.integralDocuments.find(d => d.path.endsWith('shapes.ttl')).content, shapes);
+    assert.equal(ui.calls[0].model, 'controlled/selected');
+    assert.equal(ui.calls[0].messages.at(-1).content, 'Explain Publish and its constraints');
+  } finally { await ui.close(); }
+});
+
+test('Given BSH-PREP-018 native contract becomes unreadable When preparation runs Then actionable local remediation precedes zero calls', async () => {
+  const ui = await setup();
+  try {
+    await rm(join(ui.root, '.bsh/domains/example/shapes.ttl'));
+    await ui.submit('Explain Publish');
+    await wait(() => ui.has('Restore the contract file'), 'native configuration remediation');
+    assert.ok(ui.has('READ_ERROR'));
+    assert.ok(ui.has('/domain'));
+    assert.equal(ui.calls.length, 0);
+  } finally { await ui.close(); }
 });
 
 test('Given BSH-PREP-015 native model metadata failure When an explanation is submitted Then a visible unknown-window diagnostic precedes zero calls', async () => {

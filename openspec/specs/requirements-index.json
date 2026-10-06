@@ -2301,7 +2301,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 11
+      "line": 10
     },
     {
       "id": "BSH-INPUT-002",
@@ -2318,7 +2318,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 20
+      "line": 19
     },
     {
       "id": "BSH-INPUT-003",
@@ -2335,7 +2335,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 28
+      "line": 27
     },
     {
       "id": "BSH-INPUT-004",
@@ -2352,7 +2352,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 35
+      "line": 34
     },
     {
       "id": "BSH-INPUT-005",
@@ -2369,7 +2369,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 43
+      "line": 42
     },
     {
       "id": "BSH-INPUT-006",
@@ -2386,7 +2386,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 51
+      "line": 50
     },
     {
       "id": "BSH-INPUT-007",
@@ -2406,7 +2406,7 @@
         "@specified",
         "@gap"
       ],
-      "line": 59
+      "line": 58
     },
     {
       "id": "BSH-INPUT-008",
@@ -2423,7 +2423,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 66
+      "line": 65
     },
     {
       "id": "BSH-INPUT-009",
@@ -2440,7 +2440,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 73
+      "line": 72
     },
     {
       "id": "BSH-INPUT-010",
@@ -2457,7 +2457,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 79
+      "line": 78
     },
     {
       "id": "BSH-INPUT-011",
@@ -2474,7 +2474,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 88
+      "line": 87
     },
     {
       "id": "BSH-INPUT-012",
@@ -2491,7 +2491,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 96
+      "line": 95
     },
     {
       "id": "BSH-INPUT-013",
@@ -2508,7 +2508,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 104
+      "line": 103
     },
     {
       "id": "BSH-INPUT-014",
@@ -2525,7 +2525,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 111
+      "line": 110
     },
     {
       "id": "BSH-INPUT-015",
@@ -2545,7 +2545,7 @@
         "@specified",
         "@gap"
       ],
-      "line": 120
+      "line": 119
     },
     {
       "id": "BSH-INPUT-016",
@@ -2562,7 +2562,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 127
+      "line": 126
     },
     {
       "id": "BSH-INPUT-017",
@@ -2579,7 +2579,7 @@
         "test/features/journeys/jornada-12-ux-avancada-raciocinio-diff-multilinha-fuzzy.feature"
       ],
       "tags": [],
-      "line": 135
+      "line": 134
     },
     {
       "id": "BSH-INPUT-018",
@@ -2599,7 +2599,7 @@
         "@specified",
         "@gap"
       ],
-      "line": 143
+      "line": 142
     },
     {
       "id": "BSH-SELECT-001",
@@ -5490,7 +5490,13 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
@@ -5525,13 +5531,19 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 18
+      "line": 22
     },
     {
       "id": "BSH-PREP-003",
@@ -5560,13 +5572,19 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 27
+      "line": 31
     },
     {
       "id": "BSH-PREP-004",
@@ -5595,13 +5613,19 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 37
+      "line": 41
     },
     {
       "id": "BSH-PREP-005",
@@ -5630,13 +5654,19 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 46
+      "line": 50
     },
     {
       "id": "BSH-PREP-006",
@@ -5665,13 +5695,19 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 55
+      "line": 59
     },
     {
       "id": "BSH-PREP-007",
@@ -5700,13 +5736,19 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 62
+      "line": 66
     },
     {
       "id": "BSH-PREP-008",
@@ -5735,13 +5777,19 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 70
+      "line": 74
     },
     {
       "id": "BSH-PREP-009",
@@ -5770,13 +5818,19 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 79
+      "line": 83
     },
     {
       "id": "BSH-PREP-010",
@@ -5805,13 +5859,19 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 88
+      "line": 92
     },
     {
       "id": "BSH-PREP-011",
@@ -5840,13 +5900,19 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 95
+      "line": 99
     },
     {
       "id": "BSH-PREP-012",
@@ -5875,13 +5941,19 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 104
+      "line": 108
     },
     {
       "id": "BSH-PREP-013",
@@ -5910,13 +5982,19 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 113
+      "line": 120
     },
     {
       "id": "BSH-PREP-014",
@@ -5945,13 +6023,19 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 122
+      "line": 129
     },
     {
       "id": "BSH-PREP-015",
@@ -5985,13 +6069,18 @@
         "src/client/openrouter/client.ts",
         "src/tui/view.ts",
         "test/governance/context-budget.test.mjs",
-        "test/support/opentui-components.fixture.mjs"
+        "test/support/opentui-components.fixture.mjs",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 131
+      "line": 138
     },
     {
       "id": "BSH-PREP-023",
@@ -6021,13 +6110,18 @@
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
         "openspec/changes/prepare-production-requests/implementation.md",
-        "src/ontology/query.ts"
+        "src/ontology/query.ts",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 144
+      "line": 151
     },
     {
       "id": "BSH-PREP-024",
@@ -6057,13 +6151,18 @@
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
         "openspec/changes/prepare-production-requests/implementation.md",
-        "src/governance/requestPurpose.ts"
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 155
+      "line": 162
     },
     {
       "id": "BSH-PREP-016",
@@ -6092,13 +6191,19 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 167
+      "line": 174
     },
     {
       "id": "BSH-PREP-017",
@@ -6127,13 +6232,19 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 176
+      "line": 183
     },
     {
       "id": "BSH-PREP-018",
@@ -6162,13 +6273,19 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 184
+      "line": 191
     },
     {
       "id": "BSH-PREP-019",
@@ -6197,13 +6314,19 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 192
+      "line": 203
     },
     {
       "id": "BSH-PREP-020",
@@ -6232,13 +6355,19 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 199
+      "line": 210
     },
     {
       "id": "BSH-PREP-021",
@@ -6267,13 +6396,34 @@
         "src/tui/state.ts",
         "src/tui/entries.ts",
         "test/support/production-tui-preparation.fixture.mjs",
-        "openspec/changes/prepare-production-requests/implementation.md"
+        "openspec/changes/prepare-production-requests/implementation.md",
+        "src/governance/requestPurpose.ts",
+        "src/governance/requestRemediation.ts",
+        "src/governance/contextSelection.ts",
+        "src/governance/contextBudget.ts",
+        "src/ontology/query.ts",
+        "test/governance/request-remediation.test.mjs"
       ],
       "tags": [
         "bsh",
         "production_governance"
       ],
-      "line": 207
+      "line": 218
+    },
+    {
+      "id": "BSH-INPUT-019",
+      "feature": "tui-input-history-and-navigation.feature",
+      "sources": [
+        "openspec/specs/tui-input-history-and-navigation.feature",
+        "src/tui/view.ts",
+        "test/support/opentui-components.fixture.mjs",
+        "test/tui/opentui-components.test.mjs"
+      ],
+      "tags": [
+        "bsh",
+        "tui"
+      ],
+      "line": 149
     }
   ],
   "journeyCoverage": [
@@ -7002,7 +7152,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "4487f140d41e4a40186ec78bc620d05472538eb7f91e78b6b29c782e26131e7d",
+      "sha256": "049c0813d72102e1fcd8934e9de1b55b239e5935c6fbffc1a8ee0a6dee66bb82",
       "capabilities": [
         "CLI",
         "DIST",
@@ -7064,7 +7214,7 @@
     },
     {
       "path": "src/agent/headless.ts",
-      "sha256": "8846dab43a50d1b5054f3e10ba10811bf84f29bc92c0bb1b1ffea4323629db30",
+      "sha256": "188af563bf7cf77497a4d3f762ba2040f03a20a8b9d4dd5e899522c44985143f",
       "capabilities": [
         "AGENT",
         "TOOLS",
@@ -7514,7 +7664,7 @@
     },
     {
       "path": "src/tui/session.ts",
-      "sha256": "9fd8f4866b90bc43e066f62007a58e320e783fdaef4c0758ba10008fd55de148",
+      "sha256": "37f2e53bf714e9c0f589263a624a3e92051e7b6827799f7ea7685eee1c08300e",
       "capabilities": [
         "TUI",
         "INPUT",
@@ -8709,21 +8859,21 @@
       "capabilities": [
         "PREP"
       ],
-      "sha256": "f4b9f2eecbcb5286df464cf440dc02b8993408ebeebb0abb1ed16333a499a032"
+      "sha256": "b211054705687c7ae5ebb50c8a6dc569fcd81dfca3ead31020dcd1dd6f0bb03f"
     },
     {
       "path": "src/governance/requestPreparation.ts",
       "capabilities": [
         "PREP"
       ],
-      "sha256": "e11936046085e6af97751d8a7899297827ad7e3c7ff4e13bed070e3113b83dff"
+      "sha256": "8f765d845f698788f103578c6fcbe404c373ba2b1d16d0d1f18cc28fcad47d6d"
     },
     {
       "path": "test/agent/headless-request-preparation.test.mjs",
       "capabilities": [
         "PREP"
       ],
-      "sha256": "5df5dda997c7bd8006a73fc817502244fc35e3b9088b43aa63c9863920b63485"
+      "sha256": "d3ff5de9885e5ddd908ce8d41da2ebfcce0dfb2c53aee68d8386c79d618e68d3"
     },
     {
       "path": "test/agent/governed-isolation-requirement.test.mjs",
@@ -8762,7 +8912,7 @@
     },
     {
       "path": "test/support/production-tui-preparation.fixture.mjs",
-      "sha256": "f72ed29915fd30662d9af87e47aed6793af7f1c326c6582e4d8ad32b6623dc3c",
+      "sha256": "ef00057f0779de7de31b789b9ed4c0bd1b570df037b6f3469f9713e4256c4eb5",
       "capabilities": [
         "PREP"
       ]
@@ -8860,12 +9010,33 @@
     },
     {
       "path": "src/governance/requestPurpose.ts",
-      "sha256": "100561215e23cbb1972717ffc70caec0a435fa141556ea6a991fe82b7e3e76ee",
+      "sha256": "39ce72382358ab5157346f31ea1f3dfb917defa24a5e8ab56d808322fb6b9f95",
+      "capabilities": [
+        "PREP"
+      ]
+    },
+    {
+      "path": "src/governance/requestRemediation.ts",
+      "sha256": "ec8f91d6644895ffc96d284ab568abc800a81c333f2372ac141f71b79db490a3",
+      "capabilities": [
+        "PREP"
+      ]
+    },
+    {
+      "path": "test/governance/request-remediation.test.mjs",
+      "sha256": "67e67c764d23520d881a087d1be7822ceacb8702523de9a5d657607ff1aa373d",
+      "capabilities": [
+        "PREP"
+      ]
+    },
+    {
+      "path": "src/governance/contextSelection.ts",
+      "sha256": "8032d73628e7f5bb8f09101dfe0ceada2ffdcd5bc1f2de0cf2b33168c88fe475",
       "capabilities": [
         "PREP"
       ]
     }
   ],
   "catalogBaselineCommit": "2afc270",
-  "updatedAt": "2026-10-06T01:32:50.648Z"
+  "updatedAt": "2026-10-06T02:02:02.610Z"
 }

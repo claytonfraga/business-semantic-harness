@@ -40,6 +40,81 @@ async function capture(root, prompt, extra = {}, mutateBeforeAuth, stream) {
   finally { process.stdout.write = stdout; process.stderr.write = stderr; }
 }
 
+test('Given BSH-PREP-018 configuration failures When production headless prepares Then each cause has local repair guidance and zero transport calls', async () => {
+  for (const diagnosticCode of ['DOMAIN_NOT_FOUND', 'INVALID_CONFIGURATION', 'READ_ERROR', 'DEPENDENCY_UNAVAILABLE']) {
+    const { root, directory } = await fixture();
+    try {
+      const extra = {};
+      if (diagnosticCode === 'DOMAIN_NOT_FOUND') extra.domain = 'missing';
+      if (diagnosticCode === 'INVALID_CONFIGURATION') await writeFile(join(directory, 'ontology.jsonld'), '{ invalid JSON');
+      if (diagnosticCode === 'READ_ERROR') await rm(join(directory, 'shapes.ttl'));
+      if (diagnosticCode === 'DEPENDENCY_UNAVAILABLE') {
+        const path = join(root, '.bsh/project.json');
+        const manifest = JSON.parse(await readFile(path, 'utf8'));
+        manifest.domains[0].dependencies = { missing: '^1.0.0' };
+        await writeFile(path, JSON.stringify(manifest));
+      }
+      const result = await capture(root, 'Explain Publish', extra);
+      assert.equal(result.code, 5, result.diagnostic);
+      assert.equal(result.calls.length, 0);
+      assert.ok(result.diagnostic.includes(`Configuration cause [${diagnosticCode}]`), result.diagnostic);
+      assert.match(result.diagnostic, /Next steps:.*--domain/);
+    } finally { await rm(root, { recursive: true, force: true }); }
+  }
+});
+
+test('Given BSH-PREP-001 non-class targets When partial selection is unproven Then headless recovers integral sources or denies oversized context before transport', async () => {
+  const { root, directory } = await fixture();
+  try {
+    const shapePath = join(directory, 'shapes.ttl');
+    const shapes = '@prefix ex: <urn:dispatch:> . @prefix sh: <http://www.w3.org/ns/shacl#> . ex:Global a sh:NodeShape; sh:targetNode ex:item; sh:property [sh:path ex:status; sh:in ("APPROVED")] .';
+    await writeFile(shapePath, shapes);
+    const allowed = await capture(root, 'Explain Publish');
+    assert.equal(allowed.calls.length, 1, allowed.diagnostic);
+    const context = allowed.calls[0].messages.find(m => m.content?.includes('PROJECT_GOVERNANCE_CONTEXT')).content;
+    const payload = JSON.parse(context.slice(context.indexOf('\n') + 1));
+    assert.equal(payload.recovery.mode, 'INTEGRAL_DOCUMENTS');
+    assert.equal(payload.integralDocuments.find(d => d.path.endsWith('shapes.ttl')).content, shapes);
+    assert.equal(payload.integralDocuments.find(d => d.path.endsWith('ontology.jsonld')).content, await readFile(join(directory, 'ontology.jsonld'), 'utf8'));
+    assert.ok(payload.integralDocuments.every(d => /^[a-f0-9]{64}$/.test(d.sha256)));
+    assert.equal(allowed.calls[0].model, 'selected/model');
+    assert.equal(allowed.calls[0].messages.at(-1).content, 'Explain Publish');
+    await writeFile(shapePath, shapes + '\n# ' + 'integral-contract-content '.repeat(5000));
+    const tooLarge = await capture(root, 'Explain Publish', { contextLength: 10000 });
+    assert.equal(tooLarge.code, 6, tooLarge.diagnostic);
+    assert.equal(tooLarge.calls.length, 0);
+    assert.match(tooLarge.diagnostic, /No rule or dependency was truncated/);
+    await writeFile(shapePath, '@prefix ex: <urn:dispatch:> . @prefix sh: <http://www.w3.org/ns/shacl#> . ex:S a sh:NodeShape; sh:targetClass ex:Publish; sh:node ex:Missing .');
+    const missing = await capture(root, 'Explain Publish');
+    assert.equal(missing.calls.length, 0);
+    assert.equal(missing.code, 5, missing.diagnostic);
+    assert.match(missing.diagnostic, /Required constraint reference is unavailable/);
+    assert.match(missing.diagnostic, /Repair/);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test('Given BSH-PREP-001 unestablished roots hierarchy or SHACL-SPARQL When headless prepares Then each unsafe selection uses integral documents with recorded reasons', async () => {
+  for (const cause of ['roots', 'hierarchy', 'sparql']) {
+    const { root, directory } = await fixture();
+    try {
+      if (cause === 'hierarchy') {
+        const path = join(directory, 'ontology.jsonld');
+        const ontology = JSON.parse(await readFile(path, 'utf8'));
+        ontology['@graph'].push({ '@id': 'ex:Sub', '@type': 'rdfs:Class', 'rdfs:subClassOf': { '@id': 'ex:Publish' } });
+        await writeFile(path, JSON.stringify(ontology));
+      }
+      if (cause === 'sparql') await writeFile(join(directory, 'shapes.ttl'), '@prefix ex: <urn:dispatch:> . @prefix sh: <http://www.w3.org/ns/shacl#> . ex:S a sh:NodeShape; sh:targetClass ex:Publish; sh:sparql [sh:select "SELECT $this WHERE { $this <urn:dispatch:status> ?status . FILTER (?status != \\\"APPROVED\\\") }"] .');
+      const result = await capture(root, cause === 'roots' ? 'Explain the project contract' : 'Explain Publish');
+      assert.equal(result.calls.length, 1, result.diagnostic);
+      const context = result.calls[0].messages.find(m => m.content?.includes('PROJECT_GOVERNANCE_CONTEXT')).content;
+      const payload = JSON.parse(context.slice(context.indexOf('\n') + 1));
+      assert.equal(payload.recovery.mode, 'INTEGRAL_DOCUMENTS');
+      assert.ok(payload.recovery.reasons.length > 0);
+      assert.equal(payload.integralDocuments.length, 2);
+    } finally { await rm(root, { recursive: true, force: true }); }
+  }
+});
+
 test("Given a pertinent contract When production headless sends the request Then its recovered rule and identity precede the unchanged selected-model payload", async () => {
   const { root, directory } = await fixture();
   try {
@@ -69,12 +144,12 @@ test("Given BSH-PREP-024 a RDF prohibition When implementation omits tests or qu
     const ontology = JSON.parse(await readFile(path, 'utf8'));
     ontology['@graph'].push({ '@id': 'ex:deny', '@type': 'bsh:Policy', 'bsh:governs': { '@id': 'ex:Publish' }, 'bsh:effect': 'DENY' });
     await writeFile(path, JSON.stringify(ontology));
-    for (const prompt of ['Implemente Publish sem testes', 'Implement Publish without tests', 'Explain Publish. Implement Publish', 'Explain Publish, implement Publish', 'Inspect Publish and execute Publish', 'Write tests that block Publish; implement Publish', 'Do not implement Publish but implement Publish']) {
+    for (const prompt of ['Explain Publish and develop Publish', 'Explain Publish. Develop Publish', 'Explique Publish e desenvolva Publish', 'Explique Publish. Desenvolva Publish', 'Inspect Publish and construct Publish', 'Explain Publish and refactor Publish', 'Explique Publish e construa Publish', 'Explique Publish e refatore Publish', 'Write tests that block Publish and develop Publish', 'Explain Publish and invent Publish', 'Implemente Publish sem testes', 'Implement Publish without tests', 'Explain Publish. Implement Publish', 'Explain Publish, implement Publish', 'Inspect Publish and execute Publish', 'Write tests that block Publish; implement Publish', 'Do not implement Publish but implement Publish']) {
       const result = await capture(root, prompt);
       assert.equal(result.code, 3, `${prompt}: ${result.diagnostic}`);
       assert.equal(result.calls.length, 0, prompt);
     }
-    for (const prompt of ['Inspect Publish in src/service.js', 'Explain Publish, including its constraints', 'Write tests that block Publish', 'Escreva testes que bloqueiam Publish', 'Explain Publish; do not implement Publish', 'Explique Publish; nao implemente Publish']) {
+    for (const prompt of ['Explain Publish and its constraints', 'Explain Publish and Archive', 'Inspect Publish in src/service.js and its constraints', 'Explain Publish and do not develop Publish', 'Inspect Publish in src/service.js', 'Explain Publish, including its constraints', 'Write tests that block Publish', 'Escreva testes que bloqueiam Publish', 'Explain Publish; do not implement Publish', 'Explique Publish; nao implemente Publish']) {
       const result = await capture(root, prompt);
       assert.equal(result.calls.length, 1, `${prompt}: ${result.diagnostic}`);
       assert.equal(result.calls[0].model, 'selected/model');
@@ -84,6 +159,12 @@ test("Given BSH-PREP-024 a RDF prohibition When implementation omits tests or qu
     await writeFile(join(directory, 'enforcement.json'), JSON.stringify({ schemaVersion: 1, regras: [{ id: 'archive-operation', operacao: 'Archive', quando: { caminho: 'src/archive.js' }, fatos: [] }] }));
     const mixed = await capture(root, 'Explain Publish; implement Archive');
     assert.equal(mixed.calls.length, 1, mixed.diagnostic);
+    const distinct = await capture(root, 'Explain Publish and develop Archive');
+    assert.equal(distinct.calls.length, 1, distinct.diagnostic);
+    const uncertain = await capture(root, 'Explain Publish and maybe Archive');
+    assert.equal(uncertain.calls.length, 0);
+    assert.equal(uncertain.code, 4, uncertain.diagnostic);
+    assert.match(uncertain.diagnostic, /Operation correspondences were recognized/);
     // Mentioning a prohibited operation only in explanation does not make Archive prohibited.
     assert.match(mixed.calls[0].messages.find(message => message.content?.includes('PROJECT_GOVERNANCE_CONTEXT')).content, /urn:dispatch:Archive/);
   } finally { await rm(root, { recursive: true, force: true }); }
@@ -109,6 +190,12 @@ test("Given BSH-PREP-023 a targetless shape owned by a declared dependency When 
     assert.equal(recovered.shapesSource, 'domains/dependency/shapes.ttl');
     assert.match(recovered.shapesHash, /^[a-f0-9]{64}$/);
     assert.ok(recovered.shapeGraph.some(triple => triple.object.value === 'DEPENDENCY_RESTRICTION'));
+    await writeFile(join(directory, 'shapes.ttl'), '@prefix ex: <urn:dispatch:> . @prefix sh: <http://www.w3.org/ns/shacl#> . ex:S a sh:NodeShape ; sh:targetNode ex:item ; sh:node <urn:dependency:Shared> .');
+    const integral = await capture(root, 'Explain Publish');
+    assert.equal(integral.calls.length, 1, integral.diagnostic);
+    const recoveredPayload = JSON.parse(integral.calls[0].messages.find(m => m.content?.includes('PROJECT_GOVERNANCE_CONTEXT')).content.split('\n').slice(1).join('\n'));
+    assert.equal(recoveredPayload.integralDocuments.length, 4);
+    assert.ok(recoveredPayload.integralDocuments.find(d => d.path === '.bsh/domains/dependency/shapes.ttl').content.includes('DEPENDENCY_RESTRICTION'));
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
@@ -272,7 +359,7 @@ test("Given BSH-PREP-015 a sufficient selected-model window When headless prepar
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test("Given BSH-PREP-020/022 an unrecognized execution in a governed domain When headless prepares Then it emits the deterministic remediation without any provider call", async () => {
+test("Given BSH-PREP-020 an unrecognized execution in a governed domain When headless prepares Then it emits the deterministic remediation without any provider call", async () => {
   const { root, directory } = await fixture();
   try {
     const ontology = JSON.parse(await readFile(join(directory, "ontology.jsonld"), "utf8"));
@@ -285,7 +372,7 @@ test("Given BSH-PREP-020/022 an unrecognized execution in a governed domain When
     assert.equal(result.code, 4, result.diagnostic);
     assert.equal(result.calls.length, 0);
     assert.match(result.diagnostic, /No governed operation was recognized/);
-    assert.match(result.diagnostic, /\/domain/);
+    assert.match(result.diagnostic, /--domain/);
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
