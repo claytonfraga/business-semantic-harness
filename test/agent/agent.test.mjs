@@ -85,7 +85,7 @@ test('Given runAgentTurn When model emits a tool call Then tool is executed and 
     };
 
     const toolEvents = [];
-    const result = await runAgentTurn({
+    const result = await runAgentTurn({ contextLength: 131072,
       client: mockClient,
       model: 'deepseek/deepseek-chat',
       workspaceRoot: tempDir,
@@ -129,7 +129,7 @@ test('Given an action refused by a business rule When the model ends without too
         yield { delta: { content: 'The business rule forbids this operation. No files were changed.' } };
       },
     };
-    const result = await runAgentTurn({ client: mockClient, model: 'fixture', workspaceRoot: tempDir,
+    const result = await runAgentTurn({ contextLength: 131072, client: mockClient, model: 'fixture', workspaceRoot: tempDir,
       messages: [{ role: 'user', content: 'Implement the forbidden operation' }] });
     assert.equal(calls, 1);
     assert.deepEqual(result.modifiedFiles, []);
@@ -172,7 +172,7 @@ test('Given runAgentTurn When model generates explanation before tool call Then 
     };
 
     const intermediateMessages = [];
-    const result = await runAgentTurn({
+    const result = await runAgentTurn({ contextLength: 131072,
       client: mockClient,
       model: 'deepseek/deepseek-chat',
       workspaceRoot: tempDir,

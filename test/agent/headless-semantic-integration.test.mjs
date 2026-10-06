@@ -77,7 +77,7 @@ test('Given a candidate When loaded Then publication state exists', async () => 
     } else yield { delta: { content: 'Provider fixture finished.' } };
   };
   try {
-    const exitCode = await runHeadlessCodingSession({ projectRoot: repo, model: 'provider-fixture', domain: 'synthetic',
+    const exitCode = await runHeadlessCodingSession({ contextLength: 131072, projectRoot: repo, model: 'provider-fixture', domain: 'synthetic',
       askToolApproval: async () => ({ choice: 'allow-once', actor: 'identified-fixture-reviewer', reason: 'Authorize this exact synthetic native tool call' }),
       prompt: 'Implement publication according to the active rule', autoPromote: true });
     await fn({ exitCode, output, repo, before, calls });

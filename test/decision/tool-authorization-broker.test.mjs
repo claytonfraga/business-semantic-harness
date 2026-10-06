@@ -169,6 +169,7 @@ test('Given runAgentTurn with ApprovalBroker When model proposes a mutating tool
     };
 
     const result = await runAgentTurn({
+      contextLength: 131072,
       client: mockClient,
       model: 'test-model',
       workspaceRoot: root,

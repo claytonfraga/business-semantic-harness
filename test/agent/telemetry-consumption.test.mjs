@@ -23,7 +23,7 @@ test('Given full provider usage telemetry in stream chunks, When runAgentTurn ex
       },
     };
 
-    const result = await runAgentTurn({
+    const result = await runAgentTurn({ contextLength: 131072,
       client: mockClient,
       model: 'deepseek/deepseek-chat',
       workspaceRoot: tempDir,
@@ -62,7 +62,7 @@ test('Given partial provider usage telemetry lacking total_tokens, When runAgent
       },
     };
 
-    const result = await runAgentTurn({
+    const result = await runAgentTurn({ contextLength: 131072,
       client: mockClient,
       model: 'deepseek/deepseek-chat',
       workspaceRoot: tempDir,
@@ -92,7 +92,7 @@ test('Given absent provider usage telemetry, When runAgentTurn executes, Then st
       },
     };
 
-    const result = await runAgentTurn({
+    const result = await runAgentTurn({ contextLength: 131072,
       client: mockClient,
       model: 'deepseek/deepseek-chat',
       workspaceRoot: tempDir,
@@ -152,7 +152,7 @@ test('Given a multi-turn tool interaction, When runAgentTurn completes multiple 
       },
     };
 
-    const result = await runAgentTurn({
+    const result = await runAgentTurn({ contextLength: 131072,
       client: mockClient,
       model: 'deepseek/deepseek-chat',
       workspaceRoot: tempDir,

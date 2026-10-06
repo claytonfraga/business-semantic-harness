@@ -5,6 +5,7 @@ import { DataFactory } from 'n3';
 import { aplicarRegras, lerDiff, paraRegex } from './extratorOperacoes.js';
 import { carregarRegrasGovernanca } from './governanca.js';
 import { validarOperacao } from './validadorSemantico.js';
+import { resolverIdentidadeOperacao } from './identidadeOperacao.js';
 import type { OperacaoSemantica, ResultadoEnforcement } from './operacaoSemantica.js';
 import { createOntologySnapshot } from '../ontology/query.js';
 import { validateProject } from '../ontology/validate.js';
@@ -220,8 +221,7 @@ async function selectedShapes(root: string, operation: OperacaoSemantica): Promi
   const manifest = await loadManifest(root);
   const domain = manifest.domains.find((item) => item.id === operation.dominio);
   if (!domain) throw new Error(`Domínio reconhecido não declarado: ${operation.dominio}`);
-  const target = operation.operacao.startsWith('urn:') || operation.operacao.startsWith('http:') ||
-    operation.operacao.startsWith('https:') ? operation.operacao : `${domain.baseIri}${operation.operacao}`;
+  const target = resolverIdentidadeOperacao(operation.operacao, domain.baseIri);
   const shapes = parseShapes(await readFile(await resolveProjectFile(root, `.bsh/${domain.shapes}`), 'utf8'));
   if (Array.isArray(operation.dependenciasDominio)) {
     for (const depId of operation.dependenciasDominio) {

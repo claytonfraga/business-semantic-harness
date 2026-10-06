@@ -10,6 +10,7 @@ import type { ExperimentStages } from './experiment.js';
 /** Native agent adapter. Each condition requires a fresh isolated session from the same base. */
 export function createNativeGeneration(session: SessaoWorktree, options: {
   client: OpenRouterClient; agentVersion: string; systemPrompt: string; broker?: ApprovalBroker;
+  contextLength?: number;
 }): NonNullable<ExperimentStages['generate']> {
   return async ({ controls, context, signal }) => {
     const packageManifest = JSON.parse(await readFile(new URL('../../package.json', import.meta.url), 'utf8')) as { version: string };
@@ -34,6 +35,7 @@ export function createNativeGeneration(session: SessaoWorktree, options: {
       sha256: contentHash(prompts), source: 'native-generation:prompts' }];
     try {
       const result = await runAgentTurn({ client: options.client, workspaceRoot: session.caminhoWorktree,
+        contextLength: options.contextLength,
         projectRoot: session.repositorioOrigem, model: controls.model, systemPrompt,
         messages: [{ role: 'user', content: controls.taskPrompt }], maxTurns: controls.budget.maxTurns,
         maxTokens: controls.budget.maxTokens, signal, broker: options.broker });
