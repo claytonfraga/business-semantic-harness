@@ -5,7 +5,7 @@ import { DataFactory } from 'n3';
 import { aplicarRegras, lerDiff, paraRegex } from './extratorOperacoes.js';
 import { carregarRegrasGovernanca } from './governanca.js';
 import { validarOperacao } from './validadorSemantico.js';
-import { resolverIdentidadeOperacao } from './identidadeOperacao.js';
+import { resolveOperationDomain } from './identidadeOperacao.js';
 import type { OperacaoSemantica, ResultadoEnforcement } from './operacaoSemantica.js';
 import { createOntologySnapshot } from '../ontology/query.js';
 import { validateProject } from '../ontology/validate.js';
@@ -218,18 +218,14 @@ async function bounded<T>(stage: string, pending: Promise<T>): Promise<T> {
 }
 
 async function selectedShapes(root: string, operation: OperacaoSemantica): Promise<string[]> {
-  const manifest = await loadManifest(root);
-  const domain = manifest.domains.find((item) => item.id === operation.dominio);
-  if (!domain) throw new Error(`Domínio reconhecido não declarado: ${operation.dominio}`);
-  const target = resolverIdentidadeOperacao(operation.operacao, domain.baseIri);
+  const identity = await resolveOperationDomain(root, operation);
+  const domain = identity.domain;
+  const target = identity.iri;
   const shapes = parseShapes(await readFile(await resolveProjectFile(root, `.bsh/${domain.shapes}`), 'utf8'));
-  if (Array.isArray(operation.dependenciasDominio)) {
-    for (const depId of operation.dependenciasDominio) {
-      const depDomain = manifest.domains.find((d) => d.id === depId);
-      if (depDomain) {
-        const depShapes = parseShapes(await readFile(await resolveProjectFile(root, `.bsh/${depDomain.shapes}`), 'utf8'));
-        shapes.addQuads(depShapes.getQuads(null, null, null, null));
-      }
+  for (const depDomain of identity.domains) {
+    if (depDomain.id !== domain.id) {
+      const depShapes = parseShapes(await readFile(await resolveProjectFile(root, `.bsh/${depDomain.shapes}`), 'utf8'));
+      shapes.addQuads(depShapes.getQuads(null, null, null, null));
     }
   }
   return unique(shapes.getQuads(null, SH_TARGET_CLASS, DataFactory.namedNode(target), null)
@@ -505,7 +501,7 @@ export async function evaluateGovernance(session: SessaoWorktree,
             evidence: evidenceId,
             evidenceType: evType,
             origin: `candidate_workspace:${path}`,
-            method: isBehavioral ? 'CAUSAL_EXECUTION_TRACE' : 'AST_STATIC_ANALYSIS',
+            method: isBehavioral ? 'CAUSAL_EXECUTION_TRACE' : 'STRUCTURAL_EXTRACTION',
             scope: path,
             symbol: operation.operacao,
             scenario: opRule?.quando?.caminho ?? path,
@@ -549,6 +545,10 @@ export async function evaluateGovernance(session: SessaoWorktree,
         });
 
         graphHashes.push(sha(facts.graphTurtle));
+        if (!opSufficient) {
+          decision.missingFacts.push(...missingReqs);
+          continue;
+        }
         stage = 'VALIDATION_EXECUTION';
         const result = await bounded('SHACL', validarOperacao(root, snapshot, { ...operation, fatos: [],
           candidateGraphTurtle: facts.graphTurtle }, { requireCandidateEvidence: true }));

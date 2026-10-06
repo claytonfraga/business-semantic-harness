@@ -1,5 +1,22 @@
 # Semantic validation contract
 
+The promotion guarantee is conditional on the applicable project contracts,
+recognized operations, independent extractor coverage and evidence, executed
+SHACL/policy checks and technical gates. It is not a universal guarantee that
+generated code satisfies unrepresented real-world invariants. Dispatch, tools
+and promotion use independent authorization decisions.
+
+Extraction resolves the operation's explicit domain and its declared dependency
+closure using sovereign base IRIs, independent of manifest order. Local names
+bind to their declaring owner; full IRIs remain intact. Missing or ambiguous
+identities stop evaluation without conformance. The built-in JavaScript/TypeScript
+adapter uses bounded lexical literal/invocation heuristics, not a full AST or
+runtime data-flow verifier. Rule facts identify properties to extract; configured
+values are not candidate evidence. A unique source literal is required; absent
+or ambiguous values are indeterminate. Lexical findings remain structural
+evidence and do not replace behavioral traces. Only exercised adapters and
+actually covered paths are recorded.
+
 Requirements: `BSH-ONT-008`, `BSH-ONT-PROFILE-001`, `BSH-ONT-EXECUTION-001` in
 `specs/ontology-validation-and-query.feature`. The feature remains authoritative.
 

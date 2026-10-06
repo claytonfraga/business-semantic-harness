@@ -56,8 +56,11 @@ Funcionalidade: Distribuição e regras de engenharia
     Então deve validar testes e gerar o tarball instalável
     E deve produzir checksums SHA-256 e anexá-los à release
     E publicação npm deve depender da credencial configurada
+    E credencial ausente deve ser diagnosticada como publicação npm não concluída, sem sucesso silencioso
+    E o pacote deve incluir identidade verificável do commit de origem e checksum SHA-256
+    E a publicação deve usar versão inédita e tag que corresponda à versão do pacote integrado
 
-  @BSH-DIST-007 @specified @gap
+  @BSH-DIST-007
   Cenário: Manter versão consistente
     Dado uma nova versão distribuída
     Quando seus metadados são apresentados

@@ -72,7 +72,7 @@ test('Given a candidate When loaded Then publication state exists', async () => 
       const name = status === 'RULE_BLOCKED' ? 'report_task_outcome' : status === 'TOOL_ERROR' ? 'replace_file_content' : 'write_file';
       const args = status === 'RULE_BLOCKED' ? { outcome: 'rule_blocked', ruleId: 'PublishShape', reason: 'Rejected by business rule' }
         : status === 'TOOL_ERROR' ? { path: 'src/publication.js', target_content: 'absent', replacement_content: 'invalid' }
-        : { path: 'src/publication.js', content: `export const publish = "${status}";\n` };
+        : { path: 'src/publication.js', content: `export const status = "${status}";\nexport const publish = status;\n` };
       yield { delta: { tool_calls: [{ index: 0, id: 'qa-call', function: { name, arguments: JSON.stringify(args) } }] } };
     } else yield { delta: { content: 'Provider fixture finished.' } };
   };
@@ -98,7 +98,7 @@ test('Given conforming candidate facts When production headless executes and pro
     assert.match(output, /Observed task outcome: completed/);
     assert.match(output, /Observed changed files: src\/publication.js/);
     assert.notEqual(git(repo, 'rev-parse', 'HEAD'), before);
-    assert.equal(await readFile(join(repo, 'src/publication.js'), 'utf8'), 'export const publish = "APPROVED";\n');
+    assert.equal(await readFile(join(repo, 'src/publication.js'), 'utf8'), 'export const status = "APPROVED";\nexport const publish = status;\n');
     assert.match(output, /commit:/);
   });
 });

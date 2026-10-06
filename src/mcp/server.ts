@@ -25,7 +25,7 @@ function recordSessionEvent(fileName: string, entry: Record<string, unknown>): v
 
 export function createBSHMcpServer(root: string, governed = false): McpServer {
   const server = new McpServer(
-    { name: 'bsh', version: '0.2.7-beta' },
+    { name: 'bsh', version: getPackageVersion() },
     { instructions: 'Consulte a ontologia do domínio e valide propostas com regras SHACL antes de alterar o código do projeto.' },
   );
 
@@ -165,3 +165,4 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === realpathSync(process.a
     process.exitCode = 1;
   });
 }
+import { getPackageVersion } from '../version.js';

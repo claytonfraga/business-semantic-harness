@@ -3429,7 +3429,9 @@
         "README.md",
         "openspec/config.yaml",
         "openspec/changes/npm-distribution-and-npx-instructions",
-        "openspec/changes/repository-sanitization-and-journey-separation"
+        "openspec/changes/repository-sanitization-and-journey-separation",
+        "src/version.ts",
+        "test/cli/distribution-identity.test.mjs"
       ],
       "tags": [],
       "line": 48
@@ -3446,7 +3448,9 @@
         "README.md",
         "openspec/config.yaml",
         "openspec/changes/npm-distribution-and-npx-instructions",
-        "openspec/changes/repository-sanitization-and-journey-separation"
+        "openspec/changes/repository-sanitization-and-journey-separation",
+        "src/version.ts",
+        "test/cli/distribution-identity.test.mjs"
       ],
       "tags": [
         "@specified",
@@ -6424,6 +6428,21 @@
         "tui"
       ],
       "line": 149
+    },
+    {
+      "id": "BSH-EXTRACT-DOMAIN-001",
+      "feature": "semantic-enforcement-and-promotion-gate.feature",
+      "sources": [
+        "src/enforcement/identidadeOperacao.ts",
+        "src/enforcement/evidenceAdapters.ts",
+        "src/enforcement/governanceDecision.ts",
+        "src/enforcement/validadorSemantico.ts",
+        "test/enforcement/operation-domain-production.test.mjs",
+        "openspec/semantic-validation-profile.md",
+        "README.md"
+      ],
+      "tags": [],
+      "line": 350
     }
   ],
   "journeyCoverage": [
@@ -7152,7 +7171,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "049c0813d72102e1fcd8934e9de1b55b239e5935c6fbffc1a8ee0a6dee66bb82",
+      "sha256": "3cdff761b02eb772a663d988e926e06b46fb4fd5ed9b126f3e7d06c64c197f8a",
       "capabilities": [
         "CLI",
         "DIST",
@@ -7174,7 +7193,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "cbd4d084ee143c4f79d56f331b728bf78e32207093b81e6b1b5d196562724eac",
+      "sha256": "83ec43c15c975e09347070bd6c11fb0ab16cdf143c0109bd4631d7a118293b5f",
       "capabilities": [
         "CLI",
         "DIST",
@@ -7247,7 +7266,7 @@
     },
     {
       "path": "src/cli.ts",
-      "sha256": "87a25bc18dd6db64f0d88a91c455b5f7faa8256b84f79220c7c282f592966122",
+      "sha256": "3d4ae5bcfb1ad09b1337b1d60275e570ddfc47eb07fb73dfbcbae2d65187a91a",
       "capabilities": [
         "CLI",
         "AGENT",
@@ -7350,7 +7369,7 @@
     },
     {
       "path": "src/enforcement/governanceDecision.ts",
-      "sha256": "04e37791a2bb8952578ede47622ae4ca8006850f96a66be9c4671e1bf7f4887f",
+      "sha256": "835d01e848e4403982b849a86b402bab35cc94f6bf6334846593dd30574d52a8",
       "capabilities": [
         "SEM",
         "GUARD"
@@ -7382,7 +7401,7 @@
     },
     {
       "path": "src/enforcement/validadorSemantico.ts",
-      "sha256": "ac70f54f5059a23faf998943ae5c67f85ebbbe55e70256377f58d961dcbb3e6c",
+      "sha256": "7554439587474e4d27ca635c3200d107a51121d25272a62ce213a04ed66a4148",
       "capabilities": [
         "SEM",
         "GUARD"
@@ -7477,7 +7496,7 @@
     },
     {
       "path": "src/mcp/clientManager.ts",
-      "sha256": "53241f27a863c24e30be8571f3ae806eafbbe8b28dc841c81284dd25de824f7e",
+      "sha256": "15e845e32747f7fc1a2f2109263e83c30c7d2d1754f287cb3ff550899d7118d4",
       "capabilities": [
         "MCPC",
         "PREP"
@@ -7485,7 +7504,7 @@
     },
     {
       "path": "src/mcp/server.ts",
-      "sha256": "314fc55e4e535ccda879042352ecfa5278b98c376fa129ed8e25a6b343c5e206",
+      "sha256": "9d02f616e603ecb060c4310536d2e8efa412f107cc3fe130768936a91a62870a",
       "capabilities": [
         "MCPS"
       ]
@@ -7726,7 +7745,7 @@
     },
     {
       "path": "scripts/prepare-bin.mjs",
-      "sha256": "770329d05ede24cfc572cd77e3b4f6195785ab17d13747b0ac9184dba9f329b8",
+      "sha256": "79d0951eaf6b987fa0b93e5ffa4a1e54526e3f23734433afb10f0e1bca7039d1",
       "capabilities": [
         "DIST",
         "EVAL"
@@ -7817,7 +7836,7 @@
     },
     {
       "path": "test/e2e-live/semantic-enforcement.semantic.mjs",
-      "sha256": "731ef65e8c38b7a3c61fbbf80708ba63971e6bfb0f07f35237dd4404afc6cb21",
+      "sha256": "cf520d7967f8f68c7971aec0ac93488348b0bb9a948bd98bc7eee8a40a26463c",
       "capabilities": []
     },
     {
@@ -7852,7 +7871,7 @@
     },
     {
       "path": "test/enforcement/enforcement.test.mjs",
-      "sha256": "01c45e215ea4778481ef54772a11e2eb39a4adae3dd5c5b02ac4e0dd0a724700",
+      "sha256": "11d5b6a978ad563096929382359bbad102d479923e45ca38cf5243856b61d854",
       "capabilities": []
     },
     {
@@ -8596,7 +8615,7 @@
     },
     {
       "path": ".github/workflows/release.yml",
-      "sha256": "25847abbb00f2210271d3db31641d9d2f63d0282afa93d9fae73687b2cd07a39",
+      "sha256": "38df753badf6ecc47cefc60c0fba5f767b87f92c2c63c2fee8b0fdc53f08869c",
       "capabilities": [
         "DIST"
       ]
@@ -8673,7 +8692,7 @@
     },
     {
       "path": "test/agent/headless-semantic-integration.test.mjs",
-      "sha256": "e8db0ff84f89515ed4337e3a4aac6f669c598d51372abc9e7c6e77fa54813046",
+      "sha256": "7c130ba1cc858ad62c105080368fc45b77ce04d49f1ddd44b3570a2f45019b2d",
       "capabilities": [
         "SEM",
         "PREP"
@@ -8800,7 +8819,7 @@
     },
     {
       "path": "test/evaluation/production.test.mjs",
-      "sha256": "12e4f7339c8d82d73842f8291bbbc95f8cfe4d82218a4ca9fabfc18c99b6f117",
+      "sha256": "0cfbb3ff7d862d415145dbe2ff2814b8d5b0a2937b34d0a328efd771965f2d78",
       "capabilities": [
         "EXP"
       ]
@@ -8887,7 +8906,7 @@
       "capabilities": [
         "PREP"
       ],
-      "sha256": "9ad3c6a8676fdbb7774280a4f092e2aa575d64ec9166078d757914f277397b25"
+      "sha256": "dd859cf4ee2f7ff532d3def4375938ff4d1144ed60778220aa917af35be0e4b7"
     },
     {
       "path": "test/tui/production-request-preparation.test.mjs",
@@ -8968,7 +8987,7 @@
     },
     {
       "path": "openspec/specs/semantic-enforcement-and-promotion-gate.feature",
-      "sha256": "de56f1aef67618941cef6c19dda76c5c2f927dad0438f5327a30d6e52adc5583",
+      "sha256": "14c87f37e7b9f1edefd0b9fe2a47098d0c85018487c81bb849579af5cb79b37c",
       "capabilities": [
         "SEM"
       ]
@@ -9035,8 +9054,29 @@
       "capabilities": [
         "PREP"
       ]
+    },
+    {
+      "path": "src/version.ts",
+      "sha256": "0ff8ea61e767b599f2a3dedc07db9739fd7416652a37d632d44c9060624b2a87",
+      "capabilities": [
+        "DIST"
+      ]
+    },
+    {
+      "path": "test/enforcement/operation-domain-production.test.mjs",
+      "sha256": "39c6fd11ade5779506fde941181d6d78bf49c3246ad14f000d8f18f2b8c29d26",
+      "capabilities": [
+        "SEM"
+      ]
+    },
+    {
+      "path": "test/cli/distribution-identity.test.mjs",
+      "sha256": "6c76515fb75d6d5477411a1ad1b9b33bed77d1cc09cdb3f180549402f6d18ce7",
+      "capabilities": [
+        "DIST"
+      ]
     }
   ],
   "catalogBaselineCommit": "2afc270",
-  "updatedAt": "2026-10-06T02:02:02.610Z"
+  "updatedAt": "2026-10-06T14:56:02.002Z"
 }

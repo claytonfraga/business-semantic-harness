@@ -1,4 +1,5 @@
 # language: pt
+
 # Fontes: src/enforcement; src/git/promotion.ts; src/git/finalize.ts; test/enforcement; test/e2e-live/semantic-enforcement.semantic.mjs; test/features/journeys/jornada-03-governado-conforme.feature; test/features/journeys/jornada-09-agente-codificacao-autonomo.feature
 @bsh @sem
 Funcionalidade: Enforcement independente e gate de promoção
@@ -345,3 +346,16 @@ Funcionalidade: Enforcement independente e gate de promoção
     E a interface deve informar a etapa e o motivo de bloqueio
     E a integração deve ser confirmada comparando o commit integrado com o candidato autorizado
     E promoção negada ou bloqueada deve produzir código de saída diferente de zero no headless
+
+  @BSH-EXTRACT-DOMAIN-001
+  Cenário: Resolver a operação sem depender da ordem do manifesto
+    Dado domínios pedidos e financeiro com a operação AutorizarEstorno declarada em financeiro
+    Quando adaptadores extraem evidências da operação financeira com qualquer ordem dos domínios
+    Então o grafo deve usar urn:delivery:financeiro: e as shapes e políticas do domínio financeiro
+    E nomes locais e IRIs completos devem preservar a identidade soberana
+    E dependências declaradas devem permitir resolver operações no domínio proprietário
+    E domínios homônimos devem permanecer distintos
+    E identidade ausente, inexistente ou ambígua deve gerar diagnóstico e impedir conformidade ou promoção
+    E candidatos conformes e violadores devem percorrer extração, validação e decisão de promoção independentes
+    E fatos configurados nas regras não devem substituir valores observados no código candidato
+    E propriedades sem literal único extraível devem produzir indeterminação com limitações explícitas

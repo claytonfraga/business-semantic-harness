@@ -38,7 +38,7 @@ async function fixture(t, candidate = 'valid') {
   const session = await criarSessaoWorktree({ repositorioOrigem: repo, branchOrigem: 'main', commitBase: baseCommit, diretorioBase: join(root, 'worktrees') });
   t.after(async () => { await removerSessaoWorktree(session, true); await rm(root, { recursive: true, force: true }); });
   if (candidate === null) return { session, repo };
-  await writeFile(join(session.caminhoWorktree, 'src/change.js'), `export const observed = "${candidate === 'valid' ? 'READY' : 'BLOCKED'}";\nexport function change_${candidate}(){ return observed; }\n`);
+  await writeFile(join(session.caminhoWorktree, 'src/change.js'), `export const status = "${candidate === 'valid' ? 'READY' : 'BLOCKED'}";\nexport const observed = status;\nexport function change_${candidate}(){ return observed; }\n`);
   await exec('git', ['-C', session.caminhoWorktree, 'add', '.']);
   await exec('git', ['-C', session.caminhoWorktree, 'commit', '-m', 'Synthetic candidate']);
   return { session, repo };
@@ -77,7 +77,7 @@ test('Given controlled native generation with an explicitly mocked model transpo
   const requests = [];
   const transport = { async *streamChat(request) {
     requests.push(request);
-    if (requests.length === 1) yield { delta: { tool_calls: [{ index: 0, id: 'fixture-write', function: { name: 'write_file', arguments: JSON.stringify({ path: 'src/change.js', content: 'export const observed = "READY";\nexport function change_valid(){return observed;}\n' }) } }] } };
+    if (requests.length === 1) yield { delta: { tool_calls: [{ index: 0, id: 'fixture-write', function: { name: 'write_file', arguments: JSON.stringify({ path: 'src/change.js', content: 'export const status = "READY";\nexport const observed = status;\nexport function change_valid(){return observed;}\n' }) } }] } };
     else yield { delta: { content: 'Fixture transport completion; assertions rely on files and records.' } };
   } };
   const seed = {

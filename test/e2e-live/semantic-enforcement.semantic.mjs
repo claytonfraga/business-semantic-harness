@@ -16,8 +16,8 @@ import { createProductionFactsExtractor } from '../../dist/enforcement/evidenceA
 const root = mkdtempSync(join(tmpdir(), 'bsh-semantic-integration-'));
 after(() => rmSync(root, { recursive: true, force: true }));
 const iri = 'urn:semantic-regression:';
-const approved = 'export const publish = "APPROVED";\n';
-const rejected = 'export const publish = "REJECTED";\n';
+const approved = 'export const status = "APPROVED";\nexport const publish = status;\n';
+const rejected = 'export const status = "REJECTED";\nexport const publish = status;\n';
 
 function git(cwd, args) {
   return execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8' });

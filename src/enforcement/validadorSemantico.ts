@@ -1,13 +1,12 @@
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { DataFactory } from 'n3';
-import { loadManifest } from '../project/manifest.js';
 import { resolveProjectFile } from '../project/paths.js';
 import { parseOntology, parseShapes } from '../ontology/rdf.js';
 import { assertOntologySnapshot, type OntologySnapshot } from '../ontology/query.js';
 import { validateData } from '../ontology/validate.js';
 import { BSH_TERMS } from '../vocabulary/bsh.js';
-import { ehIri, resolverIdentidadeOperacao } from './identidadeOperacao.js';
+import { ehIri, resolveOperationDomain } from './identidadeOperacao.js';
 import type { OperacaoSemantica, ResultadoEnforcement } from './operacaoSemantica.js';
 
 const { namedNode } = DataFactory;
@@ -41,25 +40,24 @@ export async function validarOperacao(
     resultado.evidencia.push(error instanceof Error ? error.message : String(error));
     return resultado;
   }
-  const manifest = await loadManifest(root);
-  const dominio = manifest.domains.find((item) => item.id === operacao.dominio);
-  if (!dominio) {
-    resultado.evidencia.push(`Dominio nao declarado: ${operacao.dominio}`);
+  let identity: Awaited<ReturnType<typeof resolveOperationDomain>>;
+  try { identity = await resolveOperationDomain(root, operacao); }
+  catch (error) {
+    resultado.evidencia.push(error instanceof Error ? error.message : String(error));
     return resultado;
   }
+  const dominio = identity.domain;
+  resultado.dominio = dominio.id;
   const base = dominio.baseIri;
-  const classe = resolverIdentidadeOperacao(operacao.operacao, base);
+  const classe = identity.iri;
   const ontology = await parseOntology(await readFile(await resolveProjectFile(root, `.bsh/${dominio.ontology}`), 'utf8'));
   const shapes = parseShapes(await readFile(await resolveProjectFile(root, `.bsh/${dominio.shapes}`), 'utf8'));
-  if (Array.isArray(operacao.dependenciasDominio) && operacao.dependenciasDominio.length > 0) {
-    for (const depId of operacao.dependenciasDominio) {
-      const depDomain = manifest.domains.find((d) => d.id === depId);
-      if (depDomain) {
-        const depOnto = await parseOntology(await readFile(await resolveProjectFile(root, `.bsh/${depDomain.ontology}`), 'utf8'));
-        ontology.addQuads(depOnto.getQuads(null, null, null, null));
-        const depShapes = parseShapes(await readFile(await resolveProjectFile(root, `.bsh/${depDomain.shapes}`), 'utf8'));
-        shapes.addQuads(depShapes.getQuads(null, null, null, null));
-      }
+  for (const depDomain of identity.domains) {
+    if (depDomain.id !== dominio.id) {
+      const depOnto = await parseOntology(await readFile(await resolveProjectFile(root, `.bsh/${depDomain.ontology}`), 'utf8'));
+      ontology.addQuads(depOnto.getQuads(null, null, null, null));
+      const depShapes = parseShapes(await readFile(await resolveProjectFile(root, `.bsh/${depDomain.shapes}`), 'utf8'));
+      shapes.addQuads(depShapes.getQuads(null, null, null, null));
     }
   }
 

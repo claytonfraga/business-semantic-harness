@@ -29,6 +29,7 @@ async function createFixture({
   ];
 
   if (crossDomain) {
+    domains[0].dependencies = { extension: '1.0.0' };
     await mkdir(join(repo, '.bsh/domains/extension'), { recursive: true });
     domains.push({
       id: 'extension',

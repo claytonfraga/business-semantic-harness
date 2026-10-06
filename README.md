@@ -10,7 +10,7 @@ The **Business Semantic Harness (BSH)** is an autonomous, ontology-governed AI s
 
 The [semantic validation contract](openspec/semantic-validation-profile.md) specifies the supported selection, completeness, inference and SHACL execution profile. The [semantic suite reconciliation](docs/semantic-suite-reconciliation.md) records the operational regression contract and its evidence limits.
 
-BSH guarantees that AI coding models modify codebases **without violating business rules and domain invariants**. Instead of relying on prompt instructions or model self-discipline, BSH enforces domain rules deterministically using formal W3C RDF/OWL ontologies and SHACL constraint shapes stored directly inside your repository.
+BSH is a governed coding agent that prepares each request against the project's applicable ontology and policies before sending it to the selected model. Tool authorization and candidate promotion remain independent. Promotion requires represented candidate evidence, applicable SHACL and policy checks, technical gates and authorization; violations or insufficient evidence block integration. This guarantee is bounded by the declared contract, operation recognition, extractor coverage and checks actually executed. It does not prove unrepresented business facts or arbitrary runtime behavior.
 
 ---
 
@@ -396,6 +396,8 @@ When an interactive session starts, BSH automatically connects to declared serve
 Controlled experiment APIs separate candidate generation, context queries, semantic enforcement and actual promotion. They preserve replayable inputs, clustered paired analyses and operational cost measurements. See [Controlled evaluation](docs/controlled-evaluation.md), [Operational metrics](docs/evaluation-metrics.md) and [Local SPARQL library selection](docs/sparql-library-selection.md).
 
 `npm run install:local` validates, builds, packs and installs the local tarball globally without publishing it. To separate preparation from installation, use `npm run install:local -- --prepare-only`, then `npm run install:local -- --install-prepared`. The pipeline verifies the tarball SHA-256 and every installed distribution file and stores its receipt in `.bsh/local/packages/last-install.json`. It runs unit and module integration tests; it does not invoke E2E.
+
+The official Release workflow publishes a new, matching `v<package-version>` tag integrated into `master`. The GitHub Release tarball and `SHA256SUMS` identify the exact distribution; `dist/build-info.json` records its package version, source commit and whether tracked sources were modified at build time. CLI and MCP identities read the installed package version. The workflow publishes that same verified tarball to npm and fails explicitly if the repository `NPM_TOKEN` secret is unavailable. A local or global installation, or a GitHub artifact alone, does not establish npm publication. Do not reuse an existing package version for changed code.
 
 BSH maintains strict engineering standards:
 

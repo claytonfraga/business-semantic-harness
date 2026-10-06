@@ -58,11 +58,11 @@ test('Given BSH-SEM-002 a governed operation with an undetermined required fact 
   assert.equal(resultado.status, 'indeterminado');
 });
 
-test('Given BSH-SEM-001 an operation with no governed knowledge When validating OperacaoNaoGovernada Then status is conforme and governado is false', async () => {
+test('Given BSH-EXTRACT-DOMAIN-001 an operation identity absent from its contract When validating Then indetermination prevents an unsupported conformity claim', async () => {
   const snapshot = await createOntologySnapshot(raiz);
   const resultado = await validarOperacao(raiz, snapshot, operacao('OperacaoNaoGovernada', []));
-  assert.equal(resultado.status, 'conforme');
-  assert.equal(resultado.governado, false);
+  assert.equal(resultado.status, 'indeterminado');
+  assert.match(resultado.evidencia.join(' '), /OPERATION_IDENTITY_MISSING/);
 });
 
 test('Given BSH-SEM-004 a governed violation with no conflict report When avaliarOperacoes evaluates batch Then status is violacao and bloquear is true', async () => {

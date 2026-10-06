@@ -20,6 +20,7 @@ const PREFIX = '@prefix ex: <urn:prov:> .\n@prefix sh: <http://www.w3.org/ns/sha
 async function initRepoFixture({
   rules = [],
   shapesContent = '',
+  externalDependency = false,
 } = {}) {
   const root = await mkdtemp(join(tmpdir(), 'bsh-provenance-test-'));
   const repo = join(root, 'repository');
@@ -39,7 +40,9 @@ async function initRepoFixture({
           ontology: 'domains/prov/ontology.jsonld',
           shapes: 'domains/prov/shapes.ttl',
           enforcement: 'domains/prov/enforcement.json',
+          ...(externalDependency ? { dependencies: { 'external-domain-pkg': '1.0.0' } } : {}),
         },
+        ...(externalDependency ? [{ id: 'external-domain-pkg', version: '1.0.0', baseIri: 'urn:external:', ontology: 'domains/external-domain-pkg/ontology.jsonld', shapes: 'domains/external-domain-pkg/shapes.ttl' }] : []),
       ],
     })
   );
@@ -80,6 +83,11 @@ ex:TransferShape a sh:NodeShape ; sh:targetClass ex:TransferAsset ;
     })
   );
 
+  if (externalDependency) {
+    await mkdir(join(repo, '.bsh/domains/external-domain-pkg'), { recursive: true });
+    await writeFile(join(repo, '.bsh/domains/external-domain-pkg/ontology.jsonld'), JSON.stringify({ '@context': { bsh: 'urn:bsh:ns:v1:', rdfs: 'http://www.w3.org/2000/01/rdf-schema#' }, '@graph': [{ '@id': 'urn:external:domain', '@type': 'bsh:Domain', 'bsh:version': '1.0.0' }, { '@id': 'urn:external:Dependency', '@type': 'rdfs:Class' }] }));
+    await writeFile(join(repo, '.bsh/domains/external-domain-pkg/shapes.ttl'), '@prefix sh: <http://www.w3.org/ns/shacl#> . <urn:external:Shape> a sh:NodeShape; sh:targetClass <urn:external:Dependency>; sh:property [sh:path <urn:external:value>; sh:minCount 1] .');
+  }
   await run('git', ['init', '-b', 'main'], { cwd: repo });
   await run('git', ['config', 'user.name', 'Tester'], { cwd: repo });
   await run('git', ['config', 'user.email', 'test@test.local'], { cwd: repo });
@@ -312,7 +320,7 @@ test('Given external domain dependencies or mutable data sources When tracked Th
     },
   ];
 
-  const { root, session } = await initRepoFixture({ rules });
+  const { root, session } = await initRepoFixture({ rules, externalDependency: true });
   try {
     const code = `
 function authorize(userId: string) { return true; }
@@ -329,7 +337,7 @@ export function transfer(assetId: string) {
     const decision = await evaluateGovernance(session, extractor);
 
     // 6. Mutable external data sources have verifiable version and consistency policy
-    assert.ok(decision.externalDataSources.length > 0, 'Must track external domain dependencies');
+    assert.ok(decision.externalDataSources.length > 0, `Must track external domain dependencies: ${decision.reason}`);
     const ext = decision.externalDataSources.find((s) => s.source === 'domain_dependency:external-domain-pkg');
     assert.ok(ext, 'External domain dependency must be tracked');
     assert.equal(ext.consistencyPolicy, 'SNAPSHOT_PINNED');

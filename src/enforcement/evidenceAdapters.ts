@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { OperacaoSemantica } from './operacaoSemantica.js';
 import type { CandidateFacts, CandidateFactsExtractor } from './governanceDecision.js';
+import { ehIri, resolveOperationDomain, resolverIdentidadeOperacao } from './identidadeOperacao.js';
 
 export interface EvidenceAdapterMetadata {
   id: string;
@@ -24,32 +25,19 @@ export interface EvidenceAdapter {
   }): Promise<Partial<CandidateFacts>>;
 }
 
-async function resolveDomainBaseIri(workspace: string): Promise<string> {
-  try {
-    const raw = await readFile(join(workspace, '.bsh', 'project.json'), 'utf8');
-    const parsed = JSON.parse(raw);
-    const domain = parsed.domains?.[0];
-    if (domain?.baseIri) {
-      return domain.baseIri;
-    }
-  } catch {
-    // fallback
-  }
-  return 'urn:generic:';
-}
-
 /**
- * Adapter 1: TypeScript & JavaScript Structural AST & Flow Evidence Adapter
+ * Adapter 1: TypeScript & JavaScript bounded lexical evidence extraction
  */
 export class TypeScriptStructuralAdapter implements EvidenceAdapter {
   public readonly metadata: EvidenceAdapterMetadata = {
     id: 'typescript-structural-adapter',
-    name: 'TypeScript & JavaScript Structural AST & Flow Evidence Adapter',
+    name: 'TypeScript & JavaScript lexical evidence adapter',
     language: 'TypeScript / JavaScript',
-    technology: 'Static Analysis, AST Parser & Git Snapshot Inspection',
+    technology: 'Bounded source literal and invocation heuristics with Git snapshot provenance',
     supportedOperations: ['*'],
     limitations: [
       'Requires syntactically valid TypeScript or JavaScript source files',
+      'Only unique direct string literals assigned to required property names are extracted; this is not full AST, data-flow or runtime verification',
       'Locating an authorization function does not prove its execution before persistence in runtime control flow',
       'Textual symbol presence without verifiable invocation is classified as heuristic, not structural proof',
     ],
@@ -71,13 +59,15 @@ export class TypeScriptStructuralAdapter implements EvidenceAdapter {
     const missingRequirements: string[] = [];
     const turtleStatements: string[] = [];
     const structuralEvidence: string[] = [];
+    const candidateSources: string[] = [];
 
-    const baseIri = await resolveDomainBaseIri(workspace);
+    const identity = await resolveOperationDomain(workspace, operation);
+    const baseIri = identity.domain.baseIri;
     const prefix = `@prefix ex: <${baseIri}> .\n@prefix bsh: <urn:bsh:ns:v1:> .\n@prefix sh: <http://www.w3.org/ns/shacl#> .\n`;
     turtleStatements.push(prefix);
 
     const candidateId = `ex:candidate_${sourceCommit.slice(0, 8)}`;
-    turtleStatements.push(`${candidateId} a ex:${operation.operacao} ;\n  bsh:sourceCommit "${sourceCommit}" .\n`);
+    turtleStatements.push(`${candidateId} a <${identity.iri}> ;\n  bsh:sourceCommit "${sourceCommit}" .\n`);
 
     for (const relPath of relevantPaths) {
       if (!relPath.endsWith('.ts') && !relPath.endsWith('.js')) continue;
@@ -95,6 +85,7 @@ export class TypeScriptStructuralAdapter implements EvidenceAdapter {
 
       // Strip comments so comments, dead explanations or documentation cannot fake execution
       const codeOnly = content.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, (match) => ' '.repeat(match.length));
+      candidateSources.push(codeOnly);
 
       // Analyze control flow: Authorization before Persistence verification
       // Criterion: "Localizar uma função de autorização não equivale a demonstrar sua execução antes da persistência."
@@ -162,13 +153,19 @@ export class TypeScriptStructuralAdapter implements EvidenceAdapter {
       }
     }
 
-    // Extract facts into RDF once per candidate
+    // Configured facts identify required properties, never their candidate values.
+    // This bounded literal extractor is heuristic, not runtime/data-flow proof.
     for (const fato of operation.fatos) {
-      if (fato.valor !== null) {
+      const name = fato.propriedade.split(/[#/:]/).at(-1) ?? fato.propriedade;
+      const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const pattern = new RegExp(String.raw`(?:\b${escaped}\b|["']${escaped}["'])\s*[:=]\s*(?:"([^"\n]*)"|'([^'\n]*)')`, 'g');
+      const values = new Set(candidateSources.flatMap(source => [...source.matchAll(pattern)].map(match => match[1] ?? match[2])));
+      if (values.size === 1) {
+        const value = [...values][0];
         turtleStatements.push(
-          `${candidateId} ex:${fato.propriedade} "${fato.valor}" .\n`
+          `${candidateId} <${resolverIdentidadeOperacao(fato.propriedade, baseIri)}> ${ehIri(value) ? `<${value}>` : JSON.stringify(value)} .\n`
         );
-      }
+      } else missingRequirements.push(`Candidate literal for '${fato.propriedade}' is ${values.size ? 'ambiguous' : 'unavailable'}; configured facts do not establish candidate values.`);
     }
 
     return {
@@ -357,11 +354,13 @@ export function createProductionFactsExtractor(
 
   return async (input) => {
     const { sourceCommit, operation, relevantPaths } = input;
+    const identity = await resolveOperationDomain(workspace, operation);
     const coveredPathsSet = new Set<string>();
     const structuralEvidenceSet = new Set<string>();
     const behavioralEvidenceSet = new Set<string>();
     const missingRequirementsSet = new Set<string>();
     const turtleParts: string[] = [];
+    const adaptersUsed: CandidateFacts['adaptersUsed'] = [];
 
     for (const adapter of adapters) {
       if (!adapter.canHandle(operation, relevantPaths)) continue;
@@ -373,6 +372,7 @@ export function createProductionFactsExtractor(
         operation,
         relevantPaths,
       });
+      adaptersUsed.push({ id: adapter.metadata.id, name: adapter.metadata.name, version: '1.0.0', technology: adapter.metadata.technology, supportedOperations: [...adapter.metadata.supportedOperations] });
 
       if (partial.graphTurtle) turtleParts.push(partial.graphTurtle);
       for (const p of partial.coveredPaths ?? []) coveredPathsSet.add(p);
@@ -388,9 +388,9 @@ export function createProductionFactsExtractor(
 
     let graphTurtle = turtleParts.join('\n').trim();
     if (!graphTurtle) {
-      const baseIri = await resolveDomainBaseIri(workspace);
+      const baseIri = identity.domain.baseIri;
       // Fallback empty graph
-      graphTurtle = `@prefix ex: <${baseIri}> .\n@prefix bsh: <urn:bsh:ns:v1:> .\nex:candidate a ex:${operation.operacao} .\n`;
+      graphTurtle = `@prefix ex: <${baseIri}> .\n@prefix bsh: <urn:bsh:ns:v1:> .\nex:candidate a <${identity.iri}> .\n`;
     }
 
     const coveredPaths = Array.from(coveredPathsSet);
@@ -398,17 +398,9 @@ export function createProductionFactsExtractor(
     const behavioralEvidence = Array.from(behavioralEvidenceSet);
     const missingRequirements = Array.from(missingRequirementsSet);
 
-    const adaptersUsed = adapters.map((a) => ({
-      id: a.metadata.id,
-      name: a.metadata.name,
-      version: '1.0.0',
-      technology: a.metadata.technology,
-      supportedOperations: [...a.metadata.supportedOperations],
-    }));
-
     return {
       graphTurtle,
-      coveredPaths: coveredPaths.length > 0 ? coveredPaths : Array.from(relevantPaths),
+      coveredPaths,
       sourceCommit,
       structuralEvidence,
       behavioralEvidence,
