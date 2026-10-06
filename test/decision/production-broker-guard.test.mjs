@@ -108,7 +108,7 @@ for (const dispatch of ['native', 'MCP']) {
         } }] } };
       } else yield { delta: { content: 'Finished' } };
     } };
-    await runAgentTurn({ client, model: 'controlled-selected-model', workspaceRoot: root,
+    await runAgentTurn({ client, contextLength: 131072, model: 'controlled-selected-model', workspaceRoot: root,
       broker, mcpManager: manager, domain: 'synthetic', maxTurns: 2,
       messages: [{ role: 'user', content: 'Create once.txt' }],
     });

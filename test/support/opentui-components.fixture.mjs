@@ -11,7 +11,7 @@ test('Given BSH-TUI-002 When telemetry renders at ordinary width Then duration T
   const fixture = await createTestRenderer({ width: 80, height: 24 });
   const view = await createTuiView({ renderer: fixture.renderer });
   try {
-    view.update({ ...state, generationDurationMs: 2000, generationTps: 50, queueLength: 2 }, []);
+    view.update({ ...state, contextLength: 131072, generationDurationMs: 2000, generationTps: 50, queueLength: 2 }, []);
     await fixture.renderOnce();
     const frame = fixture.captureCharFrame();
     for (const metric of ['Queue:2', '2.0s', '50.0 TPS', 'Model: test-model', '100/128k ctx', '(0.1%)', '$0.0000', 'Ctrl+D']) assert.ok(frame.includes(metric), metric + '\n' + frame);

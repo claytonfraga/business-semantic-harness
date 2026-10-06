@@ -22,6 +22,7 @@ async function fixture(policy = false) {
 async function capture(root, prompt, extra = {}, mutateBeforeAuth, stream) {
   const calls = [];
   const client = new OpenRouterClient({ apiKey: "controlled-model-transport" });
+  client.getModels = async () => { throw new Error('Controlled metadata lookup failure; no provider access'); };
   client.verifyApiKey = async () => { if (mutateBeforeAuth) await mutateBeforeAuth(); return { valid: true }; };
   client.streamChat = async function* (payload) {
     calls.push(structuredClone(payload));
@@ -33,7 +34,7 @@ async function capture(root, prompt, extra = {}, mutateBeforeAuth, stream) {
   const stderr = process.stderr.write;
   process.stdout.write = process.stderr.write = chunk => { diagnostic += String(chunk); return true; };
   try {
-    const code = await runHeadlessCodingSession({ projectRoot: root, prompt, model: "selected/model", domain: "synthetic", allowDirectExecution: true, client, ...extra });
+    const code = await runHeadlessCodingSession({ projectRoot: root, prompt, model: "selected/model", domain: "synthetic", allowDirectExecution: true, client, contextLength: 100000, ...extra });
     return { code, calls, diagnostic };
   } catch (error) { return { error, calls, diagnostic }; }
   finally { process.stdout.write = stdout; process.stderr.write = stderr; }
@@ -58,6 +59,120 @@ test("Given a pertinent contract When production headless sends the request Then
     const newer = second.calls[0].messages.filter(message => message.role === "system").map(message => message.content).join("\n");
     assert.match(newer, /REVIEWED status/);
     assert.notEqual(context, newer);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test("Given BSH-PREP-024 a RDF prohibition When implementation omits tests or queries contain punctuation Then headless applies the actual instruction purpose before dispatch", async () => {
+  const { root, directory } = await fixture();
+  try {
+    const path = join(directory, 'ontology.jsonld');
+    const ontology = JSON.parse(await readFile(path, 'utf8'));
+    ontology['@graph'].push({ '@id': 'ex:deny', '@type': 'bsh:Policy', 'bsh:governs': { '@id': 'ex:Publish' }, 'bsh:effect': 'DENY' });
+    await writeFile(path, JSON.stringify(ontology));
+    for (const prompt of ['Implemente Publish sem testes', 'Implement Publish without tests', 'Explain Publish. Implement Publish', 'Explain Publish, implement Publish', 'Inspect Publish and execute Publish', 'Write tests that block Publish; implement Publish', 'Do not implement Publish but implement Publish']) {
+      const result = await capture(root, prompt);
+      assert.equal(result.code, 3, `${prompt}: ${result.diagnostic}`);
+      assert.equal(result.calls.length, 0, prompt);
+    }
+    for (const prompt of ['Inspect Publish in src/service.js', 'Explain Publish, including its constraints', 'Write tests that block Publish', 'Escreva testes que bloqueiam Publish', 'Explain Publish; do not implement Publish', 'Explique Publish; nao implemente Publish']) {
+      const result = await capture(root, prompt);
+      assert.equal(result.calls.length, 1, `${prompt}: ${result.diagnostic}`);
+      assert.equal(result.calls[0].model, 'selected/model');
+    }
+    ontology['@graph'].push({ '@id': 'ex:Archive', '@type': 'rdfs:Class' });
+    await writeFile(path, JSON.stringify(ontology));
+    await writeFile(join(directory, 'enforcement.json'), JSON.stringify({ schemaVersion: 1, regras: [{ id: 'archive-operation', operacao: 'Archive', quando: { caminho: 'src/archive.js' }, fatos: [] }] }));
+    const mixed = await capture(root, 'Explain Publish; implement Archive');
+    assert.equal(mixed.calls.length, 1, mixed.diagnostic);
+    // Mentioning a prohibited operation only in explanation does not make Archive prohibited.
+    assert.match(mixed.calls[0].messages.find(message => message.content?.includes('PROJECT_GOVERNANCE_CONTEXT')).content, /urn:dispatch:Archive/);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test("Given BSH-PREP-023 a targetless shape owned by a declared dependency When headless prepares Then its closure retains the dependency origin and hash", async () => {
+  const { root, directory } = await fixture();
+  try {
+    const path = join(root, '.bsh/project.json');
+    const manifest = JSON.parse(await readFile(path, 'utf8'));
+    manifest.domains[0].dependencies = { dependency: '1.0.0' };
+    manifest.domains.push({ id: 'dependency', version: '1.0.0', baseIri: 'urn:dependency:', ontology: 'domains/dependency/ontology.jsonld', shapes: 'domains/dependency/shapes.ttl' });
+    await writeFile(path, JSON.stringify(manifest));
+    const dependency = join(root, '.bsh/domains/dependency');
+    await mkdir(dependency);
+    await writeFile(join(dependency, 'ontology.jsonld'), JSON.stringify({ '@context': { ex: 'urn:dependency:', bsh: 'urn:bsh:ns:v1:' }, '@graph': [{ '@id': 'ex:domain', '@type': 'bsh:Domain', 'bsh:version': '1.0.0' }] }));
+    await writeFile(join(dependency, 'shapes.ttl'), '@prefix ex: <urn:dependency:> . @prefix sh: <http://www.w3.org/ns/shacl#> . ex:Shared a sh:NodeShape ; sh:message "DEPENDENCY_RESTRICTION" .');
+    await writeFile(join(directory, 'shapes.ttl'), '@prefix ex: <urn:dispatch:> . @prefix sh: <http://www.w3.org/ns/shacl#> . [] a sh:NodeShape ; sh:targetClass ex:Publish ; sh:node <urn:dependency:Shared> .');
+    const result = await capture(root, 'Explain Publish');
+    assert.equal(result.calls.length, 1, result.diagnostic);
+    const payload = JSON.parse(result.calls[0].messages.find(message => message.content?.includes('PROJECT_GOVERNANCE_CONTEXT')).content.split('\n').slice(1).join('\n'));
+    const recovered = payload.queries.find(query => query.domain === 'dependency');
+    assert.equal(recovered.shapesSource, 'domains/dependency/shapes.ttl');
+    assert.match(recovered.shapesHash, /^[a-f0-9]{64}$/);
+    assert.ok(recovered.shapeGraph.some(triple => triple.object.value === 'DEPENDENCY_RESTRICTION'));
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test("Given BSH-PREP-023 nested SHACL lists paths shared references and cycles When headless sends Then the complete relevant RDF closure precedes independent candidate validation", async () => {
+  const { root, directory } = await fixture();
+  try {
+    const ontologyPath = join(directory, 'ontology.jsonld');
+    const ontology = JSON.parse(await readFile(ontologyPath, 'utf8'));
+    delete ontology['@graph'][1]['rdfs:comment'];
+    ontology['@graph'].push({ '@id': 'ex:Unrelated', '@type': 'rdfs:Class', 'rdfs:comment': 'UNRELATED_ONTOLOGY_SENTINEL' });
+    await writeFile(ontologyPath, JSON.stringify(ontology));
+    const prefixes = '@prefix ex: <urn:dispatch:> .\n@prefix sh: <http://www.w3.org/ns/shacl#> .\n';
+    const shapes = prefixes + `
+ex:PublishShape a sh:NodeShape ; sh:targetClass ex:Publish ;
+ sh:property [ sh:path ex:status ; sh:in ("APPROVED") ] ;
+ sh:property [ sh:path [ sh:alternativePath (ex:status ex:secondary) ] ;
+   sh:or ([ sh:hasValue "OR_A" ] [ sh:node ex:Nested ]) ] ;
+ sh:node ex:Shared ; sh:not ex:Cycle .
+ex:Nested a sh:NodeShape ; sh:property [ sh:path ex:nested ; sh:hasValue "NESTED" ] ; sh:node ex:Shared .
+ex:Shared a sh:NodeShape ; sh:message "SHARED"@en .
+ex:Cycle a sh:NodeShape ; sh:node ex:PublishShape .
+ex:UnrelatedShape a sh:NodeShape ; sh:targetClass ex:Unrelated ; sh:message "UNRELATED_SHAPE_SENTINEL" .
+`;
+    await writeFile(join(directory, 'shapes.ttl'), shapes);
+    const result = await capture(root, 'Explain Publish');
+    assert.equal(result.calls.length, 1, result.diagnostic);
+    const context = result.calls[0].messages.find(message => message.content?.includes('PROJECT_GOVERNANCE_CONTEXT')).content;
+    const payload = JSON.parse(context.split('\n').slice(1).join('\n'));
+    const query = payload.queries[0];
+    for (const value of ['APPROVED', 'OR_A', 'NESTED', 'urn:dispatch:secondary']) assert.ok(query.shapeGraph.some(triple => triple.object.value === value), value);
+    assert.equal(query.shapeGraph.filter(triple => triple.subject.value === 'urn:dispatch:Shared' && triple.predicate.endsWith('#message')).length, 1);
+    const shared = query.shapeGraph.find(triple => triple.object.value === 'SHARED');
+    assert.equal(shared.object.language, 'en');
+    assert.ok(shared.object.datatype);
+    assert.equal(new Set(query.shapeGraph.map(triple => JSON.stringify(triple))).size, query.shapeGraph.length);
+    assert.equal(context.includes('UNRELATED_ONTOLOGY_SENTINEL'), false);
+    assert.equal(context.includes('UNRELATED_SHAPE_SENTINEL'), false);
+    assert.match(query.shapesHash, /^[a-f0-9]{64}$/);
+    assert.equal(payload.contractReferences.find(file => file.path.endsWith('shapes.ttl')).sha256, query.shapesHash);
+    const { queryOntology } = await import('../../dist/ontology/query.js');
+    const directReference = await queryOntology(root, 'synthetic', 'urn:dispatch:Nested');
+    assert.ok(directReference.shapeGraph.some(triple => triple.object.value === 'NESTED'));
+    // Promotion's validator reads the complete sovereign graph independently of model context.
+    await writeFile(join(directory, 'shapes.ttl'), prefixes + 'ex:PublishShape a sh:NodeShape ; sh:targetClass ex:Publish ; sh:property [ sh:path ex:status ; sh:minCount 1 ; sh:in ("APPROVED") ] .');
+    const { loadDomainValidator } = await import('../../dist/governance/domainRegistry.js');
+    const { parseShapes } = await import('../../dist/ontology/rdf.js');
+    const validator = await loadDomainValidator(root, 'synthetic');
+    for (const [value, expected] of [['APPROVED', true], ['REJECTED', false]]) {
+      const validation = await validator.validateChanges(parseShapes(prefixes + `ex:candidate a ex:Publish ; ex:status "${value}" .`));
+      assert.equal(validation.conforms, expected);
+    }
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test("Given BSH-PREP-015 unavailable metadata When headless lacks a host window Then it diagnoses and sends zero calls while an explicit sufficient window allows dispatch", async () => {
+  const { root } = await fixture();
+  try {
+    const unknown = await capture(root, 'Explain Publish', { contextLength: undefined });
+    assert.equal(unknown.code, 6, unknown.diagnostic);
+    assert.equal(unknown.calls.length, 0);
+    assert.match(unknown.diagnostic, /CONTEXT_BUDGET.*unknown/);
+    const allowed = await capture(root, 'Explain Publish', { contextLength: 100000 });
+    assert.equal(allowed.calls.length, 1);
+    assert.equal(allowed.calls[0].model, 'selected/model');
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 

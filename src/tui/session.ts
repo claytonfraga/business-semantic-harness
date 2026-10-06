@@ -46,6 +46,8 @@ export interface TuiSessionOptions {
   ungoverned?: boolean;
   /** Controlled model transport; the production preparation and dispatch remain unchanged. */
   client?: OpenRouterClient;
+  /** Explicit host window, bound to the initially selected model. */
+  contextLength?: number;
 }
 
 export async function startTuiSession(options: TuiSessionOptions = {}): Promise<void> {
@@ -74,6 +76,7 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
 
   // 2. Models Discovery
   let activeModel = options.model || env.defaultModel || 'deepseek/deepseek-v4.1-flash';
+  const hostContextModel = activeModel;
   const modelsList = await client.getModels().catch(() => []);
 
   // 3. Domain & Governance Discovery
@@ -200,7 +203,8 @@ export async function startTuiSession(options: TuiSessionOptions = {}): Promise<
   const activeSkillNames: string[] = [];
 
   const getActiveContextLength = () => {
-    return modelsList.find((m) => m.id === activeModel)?.context_length || 131072;
+    return activeModel === hostContextModel && options.contextLength !== undefined
+      ? options.contextLength : modelsList.find((m) => m.id === activeModel)?.context_length;
   };
 
   const exitGuard = new ExitGuard({ windowMs: 1500 });

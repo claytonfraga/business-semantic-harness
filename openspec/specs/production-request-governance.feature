@@ -136,9 +136,33 @@ Funcionalidade: Preparação ontológica de cada solicitação nas entradas de p
     E contratos e representações equivalentes não devem ser repetidos sem necessidade
     E proveniência, referências e dependências devem permanecer recuperáveis
     E contexto que excede a janela conhecida deve interromper antes da chamada ao provedor com diagnóstico
-    E limite desconhecido deve ser reportado contra um piso conservador, sem truncar nem substituir o modelo
+    E limite desconhecido ou falha de metadados deve interromper por padrão antes do envio com diagnóstico
+    E um limite positivo explicitamente informado pelo host pode estabelecer o orçamento sem substituir o modelo
     E nenhuma regra ou dependência deve ser truncada silenciosamente nem o modelo substituído
     E o método de estimativa e suas limitações devem permanecer declarados
+
+  @BSH-PREP-023
+  Cenário: Recuperar fechamento das restrições relevantes sem perda de conteúdo
+    Dado uma shape pertinente com sh:in contendo APPROVED e dependências aninhadas
+    Quando a preparação recupera o contexto para o modelo
+    Então deve incluir listas RDF completas, nós anônimos, combinações lógicas e caminhos compostos
+    E deve recuperar shapes referenciadas mesmo sem alvo próprio
+    E ciclos devem terminar e referências compartilhadas devem aparecer uma vez por grafo recuperado
+    E termos devem preservar identidade, tipo, datatype e idioma com origem e hash do documento
+    E somente o fechamento necessário deve ser enviado sem repetir toda a ontologia nem truncar regras
+    E a validação posterior deve continuar distinguindo APPROVED de REJECTED
+
+  @BSH-PREP-024
+  Cenário: Interpretar ação, objeto, negação e complementos informativos
+    Dado uma política que proíbe executar Publish
+    Quando a solicitação pede Implemente Publish sem testes ou Implement Publish without tests
+    Então deve identificar execução e bloquear antes de qualquer chamada ao modelo
+    Mas quando pede Inspect Publish in src/service.js ou Explain Publish, including its constraints
+    Então deve preservar inspeção ou explicação e permitir consulta dentro do orçamento estabelecido
+    E pontos em caminhos e vírgulas em complementos não devem criar instruções de execução
+    E explicação ou testes combinados com execução proibida devem continuar bloqueados
+    E negação explícita de execução não deve ser confundida com pedido para executá-la
+    E ambiguidade de finalidade deve permanecer identificada e receber tratamento conservador
 
   @BSH-PREP-016
   Cenário: Orientar a solicitação não reconhecida sem chamar o modelo

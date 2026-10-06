@@ -226,7 +226,7 @@ export async function runAgentTurn(options: AgentLoopOptions): Promise<AgentTurn
     });
     for await (const chunk of options.client.streamChat({
       model: options.model,
-      maxTokens: options.maxTokens,
+      maxTokens: options.maxTokens ?? 4096,
       messages: conversation,
       tools,
       signal: options.signal,

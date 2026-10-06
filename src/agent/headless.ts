@@ -95,10 +95,10 @@ export async function runHeadlessCodingSession(options: HeadlessOptions): Promis
     return 1;
   }
 
-  // Resolve the selected model window for host-created clients; an injected
-  // transport keeps its own contract and may pass contextLength explicitly.
+  // An explicit host limit takes precedence; otherwise metadata must establish
+  // the selected model window even for a controlled transport.
   let contextLength = options.contextLength;
-  if (contextLength === undefined && !options.client) {
+  if (contextLength === undefined) {
     try {
       const models = await client.getModels();
       contextLength = models.find(model => model.id === activeModel)?.context_length;

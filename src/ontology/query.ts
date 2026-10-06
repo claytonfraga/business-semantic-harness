@@ -21,20 +21,74 @@ export interface QueryEntry {
   governedBy: Array<{ iri: string; description: string; requiresHumanReview: boolean }>;
 }
 
+export interface QueryTerm {
+  type: string;
+  value: string;
+  datatype?: string;
+  language?: string;
+}
+export interface QueryTriple {
+  subject: QueryTerm;
+  predicate: string;
+  object: QueryTerm;
+}
+
+/** Follow subject references once, retaining RDF list and literal identities. */
+export function constraintClosure(graph: QueryTriple[], roots: string[]): QueryTriple[] {
+  const bySubject = new Map<string, QueryTriple[]>();
+  for (const triple of graph) {
+    const key = `${triple.subject.type}:${triple.subject.value}`;
+    const statements = bySubject.get(key) ?? [];
+    statements.push(triple);
+    bySubject.set(key, statements);
+  }
+  const pending = [...bySubject.keys()].filter(key => roots.includes(key.slice(key.indexOf(':') + 1)));
+  const visited = new Set<string>();
+  const result: QueryTriple[] = [];
+  while (pending.length > 0) {
+    const key = pending.pop();
+    if (key === undefined) continue;
+    if (visited.has(key)) continue;
+    visited.add(key);
+    for (const triple of bySubject.get(key) ?? []) {
+      result.push(triple);
+      if (triple.object.type === 'NamedNode' || triple.object.type === 'BlankNode') {
+        const next = `${triple.object.type}:${triple.object.value}`;
+        if (bySubject.has(next) && !visited.has(next)) pending.push(next);
+      }
+    }
+  }
+  return result;
+}
+
 export interface QueryResult {
   domain: string;
   version: string;
   source: string;
   entries: QueryEntry[];
   shapes: Array<{ iri: string; source: string; target: string; statements: QueryStatement[] }>;
+  ontologyGraph?: QueryTriple[];
+  shapeGraph?: QueryTriple[];
+  sourceHash?: string;
+  shapesHash?: string;
+  shapesSource?: string;
 }
 
 export async function queryOntology(root: string, domainId: string, iri?: string): Promise<QueryResult> {
   const manifest = await loadManifest(root);
   const domain = manifest.domains.find((candidate) => candidate.id === domainId);
   if (!domain) throw new Error(`Domínio não declarado: ${domainId}`);
-  const store = await parseOntology(await readFile(await resolveProjectFile(root, `.bsh/${domain.ontology}`), 'utf8'));
-  const shapeStore = parseShapes(await readFile(await resolveProjectFile(root, `.bsh/${domain.shapes}`), 'utf8'));
+  const ontologyText = await readFile(await resolveProjectFile(root, `.bsh/${domain.ontology}`), 'utf8');
+  const shapesText = await readFile(await resolveProjectFile(root, `.bsh/${domain.shapes}`), 'utf8');
+  const store = await parseOntology(ontologyText);
+  const shapeStore = parseShapes(shapesText);
+  const term = (value: { termType: string; value: string; datatype?: { value: string }; language?: string }, scope: string): QueryTerm => ({
+    type: value.termType, value: value.termType === 'BlankNode' ? `${domainId}:${scope}:${value.value}` : value.value,
+    ...(value.termType === 'Literal' ? { datatype: value.datatype?.value, language: value.language ?? '' } : {}),
+  });
+  const graph = (quads: ReturnType<typeof store.getQuads>, scope: string): QueryTriple[] => quads.map(quad => ({
+    subject: term(quad.subject, scope), predicate: quad.predicate.value, object: term(quad.object, scope),
+  }));
   const subjects = iri
     ? [iri]
     : [...new Set(store.getQuads(null, null, null, null).filter((q) => q.subject.termType === 'NamedNode').map((q) => q.subject.value))].sort();
@@ -52,7 +106,7 @@ export async function queryOntology(root: string, domainId: string, iri?: string
   const shapes = shapeStore.getQuads(null, targetPredicate, null, null)
     .filter((q) => !iri || q.object.value === iri || q.subject.value === iri)
     .map((q) => ({
-      iri: q.subject.value,
+      iri: term(q.subject, 'shapes').value,
       source: domain.shapes,
       target: q.object.value,
       statements: shapeStore.getQuads(q.subject, null, null, null).flatMap((statement) => {
@@ -64,10 +118,17 @@ export async function queryOntology(root: string, domainId: string, iri?: string
         }))];
       }),
     }));
-  if (iri && entries.length === 0 && shapes.length === 0) {
+  if (iri && entries.length === 0 && shapes.length === 0 && shapeStore.countQuads(namedNode(iri), null, null, null) === 0) {
     throw new Error(`IRI não encontrado no domínio ${domainId}: ${iri}`);
   }
-  return { domain: domainId, version: domain.version, source: domain.ontology, entries, shapes };
+  return { domain: domainId, version: domain.version, source: domain.ontology, entries, shapes,
+    ontologyGraph: constraintClosure(graph(store.getQuads(null, null, null, null), 'ontology'), entries.map(entry => entry.iri)),
+    shapeGraph: iri ? constraintClosure(graph(shapeStore.getQuads(null, null, null, null), 'shapes'), [...shapes.map(shape => shape.iri), iri])
+      : graph(shapeStore.getQuads(null, null, null, null), 'shapes'),
+    sourceHash: createHash('sha256').update(ontologyText).digest('hex'),
+    shapesHash: createHash('sha256').update(shapesText).digest('hex'),
+    shapesSource: domain.shapes,
+  };
 }
 
 export interface OntologySnapshot {

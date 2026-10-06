@@ -19,11 +19,14 @@ test('Given BSH-PREP-015 a payload beyond the known window When checked before d
   assert.throws(() => assertContextBudget(input), ContextBudgetError);
 });
 
-test('Given BSH-PREP-015 an unknown model window When checked Then it is reported against a conservative floor without blocking or truncating', () => {
+test('Given BSH-PREP-015 an unknown model window When checked Then dispatch is denied with a diagnostic without truncation', () => {
   const result = evaluateContextBudget({ messages: [{ role: 'user', content: 'hi' }] });
-  assert.equal(result.ok, true);
+  assert.equal(result.ok, false);
   assert.equal(result.limit, undefined);
   assert.ok(result.limitations.some(item => item.includes('unknown')));
+  assert.match(result.diagnostic, /unknown/);
+  assert.equal(result.availableTokens, undefined);
+  assert.throws(() => assertContextBudget({ messages: [{ role: 'user', content: 'x'.repeat(200000) }] }), ContextBudgetError);
 });
 
 test('Given BSH-PREP-015 system instructions tools and reserved response When estimated Then all are counted', () => {

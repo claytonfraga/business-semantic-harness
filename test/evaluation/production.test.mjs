@@ -91,7 +91,7 @@ test('Given controlled native generation with an explicitly mocked model transpo
     expectedRuleIds: [], evaluatedRuleIds: [], expectedEvidenceIds: [], evaluatedEvidenceIds: [], decisionRecords: [],
     explanation: null, humanReview: null, costs: [], transfer: null, limitations: ['Only model transport is mocked; all production mechanisms are real']
   };
-  const generate = createNativeGeneration(session, { client: transport, agentVersion: seed.controls.agentVersion, systemPrompt: 'Use native file tools to implement the requested change.' });
+  const generate = createNativeGeneration(session, { client: transport, contextLength: 131072, agentVersion: seed.controls.agentVersion, systemPrompt: 'Use native file tools to implement the requested change.' });
   await assert.rejects(generate({ controls: { ...seed.controls, systemPromptHash: hash('different instructions') }, context: '', signal: new AbortController().signal }), /controlled prompt identity/);
   await assert.rejects(generate({ controls: { ...seed.controls, agentVersion: 'invented-version' }, context: '', signal: new AbortController().signal }), /native agent version/);
   assert.equal(requests.length, 0);

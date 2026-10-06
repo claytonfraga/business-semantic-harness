@@ -64,7 +64,7 @@ export async function createTuiView(options: { renderer?: CliRenderer } = {}): P
       brand.fg = status === 'GOVERNED' ? theme.success : theme.warning;
       const ontology = state.ontologySummary || state.domain;
       context.content = `Project: ${state.projectFolder || 'project'} · Branch: ${state.gitBranch || 'non-git'} · Ontology: ${ontology ? `${ontology} (${state.governed ? 'SHACL active' : 'inactive'})` : 'none (inactive)'}${state.activeSkill ? ` · Skill: ${state.activeSkill} [ACTIVE]` : ''}${state.alignmentWarning ? ` · ${state.alignmentWarning}` : ''}`;
-      const total = state.contextLength || 131072;
+      const total = state.contextLength;
       const activeMetrics = [
         ...(state.queueLength ? [`Queue:${state.queueLength}`] : []),
         ...(state.generationDurationMs !== undefined ? [`${(state.generationDurationMs / 1000).toFixed(1)}s`] : []),
@@ -72,7 +72,10 @@ export async function createTuiView(options: { renderer?: CliRenderer } = {}): P
       ];
       execution.visible = activeMetrics.length > 0;
       execution.content = `${activeMetrics.join(' · ')} · `;
-      usage.content = `Model: ${state.model} · ${state.tokensTotal}/${Math.round(total / 1024)}k ctx (${(state.tokensTotal / total * 100).toFixed(1)}%) · $${(state.sessionCost || 0).toFixed(4)}`;
+      const contextUsage = total && Number.isFinite(total)
+        ? `${state.tokensTotal}/${Math.round(total / 1024)}k ctx (${(state.tokensTotal / total * 100).toFixed(1)}%)`
+        : `${state.tokensTotal} tokens · context window unknown`;
+      usage.content = `Model: ${state.model} · ${contextUsage} · $${(state.sessionCost || 0).toFixed(4)}`;
       alert.content = state.ctrlCExitAlert ? 'Press Ctrl+C again to exit' : '';
       while (cards.length > entries.length) {
         const card = cards.pop(); snapshots.pop();

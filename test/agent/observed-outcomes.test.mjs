@@ -23,7 +23,7 @@ async function fixture(fn) {
   try { await fn(root); } finally { await rm(root, { recursive: true, force: true }); }
 }
 function run(root, calls, extra = {}) {
-  return runAgentTurn({ client: scriptedClient(calls), model: 'fixture', workspaceRoot: root,
+  return runAgentTurn({ contextLength: 131072, client: scriptedClient(calls), model: 'fixture', workspaceRoot: root,
     messages: [{ role: 'user', content: 'Implement the requested change' }], ...extra });
 }
 

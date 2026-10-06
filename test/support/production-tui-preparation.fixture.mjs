@@ -17,7 +17,7 @@ const wait = async (predicate, description) => {
     await new Promise(resolve => setTimeout(resolve, 10));
   }
 };
-async function setup(effect = 'DENY', selectedDomain = 'example', withMcp = false) {
+async function setup(effect = 'DENY', selectedDomain = 'example', withMcp = false, modelWindow = 10000) {
   const root = await mkdtemp(join(tmpdir(), 'bsh-native-production-'));
   const domain = id => ({ id, version: '1.0.0', baseIri: `urn:${id}:`, ontology: `domains/${id}/ontology.jsonld`, shapes: `domains/${id}/shapes.ttl` });
   const manifest = { schemaVersion: 1, projectId: 'synthetic-native', domains: [domain('example'), domain('second')] };
@@ -39,7 +39,10 @@ async function setup(effect = 'DENY', selectedDomain = 'example', withMcp = fals
   const update = view.update.bind(view);
   view.update = (state, entries) => { observations.push({ state: structuredClone(state), entries: structuredClone(entries) }); timeline.push({ kind: 'view', entries: structuredClone(entries) }); update(state, entries); };
   const client = new OpenRouterClient({ apiKey: 'sk-or-v1-mock-production-native' });
-  client.getModels = async () => [{ id: 'controlled/selected', name: 'Controlled transport', context_length: 10000 }];
+  client.getModels = async () => {
+    if (modelWindow === null) throw new Error('Controlled model metadata failure');
+    return [{ id: 'controlled/selected', name: 'Controlled transport', context_length: modelWindow }];
+  };
   client.streamChat = async function* (payload) { timeline.push({ kind: 'model' }); calls.push(structuredClone({ model: payload.model, messages: payload.messages })); yield { delta: { content: 'The requested contract information is available.' }, finish_reason: 'stop' }; };
   let finished = false;
   const session = startTuiSession({ projectRoot: root, domain: selectedDomain, model: 'controlled/selected', allowDirectExecution: true, client, view }).finally(() => { finished = true; });
@@ -79,6 +82,42 @@ test('Given BSH-PREP-003 native prohibited execution When submitted Then zero mo
   const ui = await setup();
   try { await ui.submit('Execute Publish'); await wait(() => ui.has('Request not sent [BLOCK]'), 'blocked diagnostic'); assert.equal(ui.calls.length, 0); }
   finally { await ui.close(); }
+});
+
+test('Given BSH-PREP-023 native preparation When a relevant shape uses RDF lists and targetless references Then their values reach the selected model payload', async () => {
+  const ui = await setup();
+  try {
+    await writeFile(join(ui.root, '.bsh/domains/example/shapes.ttl'), `@prefix ex: <urn:example:> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+ex:PublishShape a sh:NodeShape ; sh:targetClass ex:Publish ;
+ sh:property [ sh:path [ sh:alternativePath (ex:status ex:secondary) ] ; sh:in ("APPROVED") ; sh:or ([ sh:hasValue "OR_A" ] [ sh:node ex:Nested ]) ] .
+ex:Nested a sh:NodeShape ; sh:property [ sh:path ex:nested ; sh:hasValue "NESTED" ] .`);
+    await ui.submit('Explain Publish, including its constraints');
+    await wait(() => ui.calls.length === 1, 'complete native RDF context');
+    const context = ui.calls[0].messages.find(message => message.content?.includes('PROJECT_GOVERNANCE_CONTEXT')).content;
+    for (const value of ['APPROVED', 'OR_A', 'NESTED', 'urn:example:secondary']) assert.ok(context.includes(value), value);
+    assert.equal(ui.calls[0].model, 'controlled/selected');
+  } finally { await ui.close(); }
+});
+
+test('Given BSH-PREP-024 native prohibited implementation without tests When submitted Then no model call occurs', async () => {
+  for (const prompt of ['Implemente Publish sem testes', 'Implement Publish without tests', 'Explain Publish. Implement Publish']) {
+    const ui = await setup();
+    try {
+      await ui.submit(prompt);
+      await wait(() => ui.has('Request not sent [BLOCK]'), 'actual execution prohibition');
+      assert.equal(ui.calls.length, 0, prompt);
+    } finally { await ui.close(); }
+  }
+});
+
+test('Given BSH-PREP-015 native model metadata failure When an explanation is submitted Then a visible unknown-window diagnostic precedes zero calls', async () => {
+  const ui = await setup('DENY', 'example', false, null);
+  try {
+    await ui.submit('Explain Publish');
+    await wait(() => ui.has('context window is unknown'), 'native unknown-window diagnostic');
+    assert.equal(ui.calls.length, 0);
+  } finally { await ui.close(); }
 });
 
 test('Given BSH-PREP-005 native pending review When cancelled Then model dispatch is prevented', async () => {
