@@ -1,6 +1,6 @@
 {
   "name": "business-semantic-harness",
-  "version": "0.2.12-beta",
+  "version": "0.2.14-beta",
   "type": "module",
   "license": "Apache-2.0",
   "files": [
@@ -22,6 +22,7 @@
     "test:e2e": "npm run build && node scripts/run-e2e-pipeline.mjs",
     "test:e2e:semantic": "npm run build && node --test --experimental-test-isolation=none test/e2e-live/*.semantic.mjs",
     "capture": "python3 test/support/tmux-screenshot.py",
+    "install:local": "node scripts/install-local.mjs",
     "prepack": "npm run build"
   },
   "engines": {
@@ -35,8 +36,10 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
+    "@comunica/query-sparql-rdfjs-lite": "5.4.1",
     "@modelcontextprotocol/sdk": "^1.30.1",
     "@opentui/core": "0.5.14",
+    "@traqula/parser-sparql-1-2": "1.3.1",
     "bun": "1.4.2",
     "jsonld": "^9.0.0",
     "n3": "^2.7.12",

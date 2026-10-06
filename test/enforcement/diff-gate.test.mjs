@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { evaluateWorkspaceDiffGate } from '../../dist/enforcement/diffGate.js';
 
-test('evaluateWorkspaceDiffGate reports NO_CHANGES when no files modified', async () => {
+test('Given BSH-SEM-017 a workspace without modifications When evaluateWorkspaceDiffGate is executed Then it returns NO_CHANGES with hasChanges false', async () => {
   const tempDir = await mkdtemp(join(tmpdir(), 'bsh-gate-test-'));
   try {
     spawnSync('git', ['init'], { cwd: tempDir });
@@ -28,7 +28,7 @@ test('evaluateWorkspaceDiffGate reports NO_CHANGES when no files modified', asyn
   }
 });
 
-test('evaluateWorkspaceDiffGate detects modified files and conforming diff', async () => {
+test('Given BSH-SEM-013 a workspace with valid modifications When evaluateWorkspaceDiffGate is executed Then it returns CONFORMING with conforming true and lists changed files', async () => {
   const tempDir = await mkdtemp(join(tmpdir(), 'bsh-gate-diff-'));
   try {
     spawnSync('git', ['init'], { cwd: tempDir });

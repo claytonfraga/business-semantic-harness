@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { inspectWorkspace } from '../../dist/agent/workspaceContext.js';
 
-test('inspectWorkspace extracts technology and structure summary from project folder', async () => {
+test('Given BSH-AGENT-001 a project workspace When inspectWorkspace is executed Then it extracts technology, manifests, and formatted structure summary', async () => {
   const tempDir = await mkdtemp(join(tmpdir(), 'bsh-workspace-test-'));
   try {
     await mkdir(join(tempDir, 'src'), { recursive: true });

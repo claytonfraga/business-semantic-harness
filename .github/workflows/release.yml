@@ -4,6 +4,11 @@ on:
   push:
     tags: [ 'v*' ]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag on integrated master
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -15,13 +20,30 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '26.4.0'
           registry-url: 'https://registry.npmjs.org'
           cache: npm
       - run: npm ci
+      - name: Verify release version and integrated source
+        env:
+          VERSION_TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          test "$VERSION_TAG" = "v$(node -p 'require("./package.json").version')"
+          git merge-base --is-ancestor HEAD origin/master
+      - name: Install the sandbox runtime required by confinement tests
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bubblewrap
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+      - run: npm run quality
       - run: npm test
+      - name: Semantic integration and E2E pipeline
+        run: npm run test:e2e
       - name: Pack the installable tarball
         run: |
           mkdir -p release-assets
@@ -37,8 +59,13 @@ jobs:
             release-assets/*.tgz
             release-assets/SHA256SUMS
           generate_release_notes: true
-      - name: Publish to npm (only when NPM_TOKEN is set)
-        if: env.NPM_TOKEN != ''
-        run: npm publish --access public
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+      - name: Publish the verified tarball to npm
+        run: |
+          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
+            echo "::error::NPM_TOKEN is missing; npm publication is not complete. Configure the repository secret and rerun this release."
+            exit 1
+          fi
+          npm publish release-assets/*.tgz --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

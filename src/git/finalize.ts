@@ -6,7 +6,7 @@ import { appendAudit } from '../decision/audit.js';
 import { hashConteudoCodigoBase } from '../enforcement/codigoBase.js';
 import { actionDigest, type ProposedAction } from '../decision/evaluate.js';
 import type { OntologySnapshot } from '../ontology/query.js';
-import { evaluateGovernance, type CandidateFactsExtractor, type GovernanceDecision } from '../enforcement/governanceDecision.js';
+import { evaluateGovernance, persistGovernanceDecision, type CandidateFactsExtractor, type GovernanceDecision } from '../enforcement/governanceDecision.js';
 import { writeAlerts, type ConflictAlert } from './alerts.js';
 import { alteracoesNaWorktree, git, removerSessaoWorktree, type SessaoWorktree } from './worktree.js';
 import { executarGates, integrar, reconciliar, type StatusPromocao, type ValidadorGates } from './promotion.js';
@@ -200,9 +200,7 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
   }
 
   const recordDecision = async (decision: GovernanceDecision): Promise<void> => {
-    const diretorio = join(root, '.bsh', 'local', 'enforcement');
-    await mkdir(diretorio, { recursive: true });
-    await writeFile(join(diretorio, `${sessao.id}.json`), JSON.stringify(decision, null, 2), { mode: 0o600 });
+    await persistGovernanceDecision(root, sessao.id, decision);
     await gravarRelatorioSessao(root, sessao, {
       recognizedOperation: decision.recognizedOperation, selectedShapes: decision.selectedShapes,
       executedShapes: decision.executedShapes, factsExtracted: decision.factsExtracted,
@@ -212,6 +210,7 @@ export async function finalizeSession(options: FinalizeOptions): Promise<Resulta
       policyDecision: decision.policyDecision, candidateFingerprint: decision.candidateFingerprint,
       promotionDecision: decision.promotionDecision, originChanged: decision.originChanged,
       failureStage: decision.failureStage,
+      contentIdentification: decision.contentIdentification,
     });
   };
   const governance = await evaluateGovernance(sessao, options.extractCandidateFacts);

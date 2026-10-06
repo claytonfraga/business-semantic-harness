@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { SessionInputController } from '../../dist/tui/input.js';
 import { InputQueueManager } from '../../dist/tui/inputQueue.js';
 import { ExitGuard } from '../../dist/tui/exitGuard.js';
@@ -202,4 +204,14 @@ test('Given SessionInputController When multiline input is submitted Then it acc
   assert.equal(dispatched.length, 1);
   assert.equal(dispatched[0], 'First line\nSecond line\nThird line');
   controller.destroy();
+});
+
+// BSH-GUARD-007: real OpenTUI renderer and Textarea input through supported Bun runtime.
+test('Given a pending prompt-guard confirmation When native Enter submits an empty field Then the decision proceeds while idle blanks stay ignored', () => {
+  const runtime = fileURLToPath(new URL('../../node_modules/bun/bin/bun.exe', import.meta.url));
+  const fixture = fileURLToPath(new URL('../support/opentui-confirmation-input.fixture.mjs', import.meta.url));
+  const env = { ...process.env };
+  delete env.NODE_TEST_CONTEXT;
+  const result = spawnSync(runtime, ['test', fixture], { encoding: 'utf8', timeout: 60000, env });
+  assert.equal(result.status, 0, `${result.error || ''}\n${result.stdout}\n${result.stderr}`);
 });

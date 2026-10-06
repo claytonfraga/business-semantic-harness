@@ -9,6 +9,7 @@ export interface SessionInputControllerOptions {
   exitGuard: ExitGuard;
   history: string[];
   isExecutingTurn: () => boolean;
+  isAwaitingConfirmation?: () => boolean;
   onDispatch: (prompt: string) => void;
   onAbortTurn: (reason: string) => void;
   onCancelConfirmation?: () => boolean;
@@ -27,6 +28,7 @@ export class SessionInputController {
   private historyIndex = -1;
   private draft = '';
   private isExecutingTurn: () => boolean;
+  private isAwaitingConfirmation?: () => boolean;
   private onDispatch: (prompt: string) => void;
   private onAbortTurn: (reason: string) => void;
   private onCancelConfirmation?: () => boolean;
@@ -44,6 +46,7 @@ export class SessionInputController {
     this.exitGuard = options.exitGuard;
     this.history = [...options.history];
     this.isExecutingTurn = options.isExecutingTurn;
+    this.isAwaitingConfirmation = options.isAwaitingConfirmation;
     this.onDispatch = options.onDispatch;
     this.onAbortTurn = options.onAbortTurn;
     this.onCancelConfirmation = options.onCancelConfirmation;
@@ -182,6 +185,13 @@ export class SessionInputController {
 
   public handleSubmit(rawText: string): void {
     const text = rawText.trim();
+    // A confirmation answer is input to the pending human decision, not a new
+    // task or a prompt-history entry. OpenTUI submits Enter even on empty input.
+    if (this.isAwaitingConfirmation?.()) {
+      this.onDispatch(text);
+      this.view.setPrompt('');
+      return;
+    }
     if (!text && !this.queue.isMultiline) return;
 
     // Multiline handling

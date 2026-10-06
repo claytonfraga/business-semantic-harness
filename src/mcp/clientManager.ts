@@ -1,8 +1,11 @@
 import { readFile } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import type { ToolDefinition } from '../client/openrouter/types.js';
+import { buildSafeEnv } from '../agent/tools.js';
+import { BrokerAuthorizationError, type ApprovalBroker } from '../decision/broker.js';
 
 export interface McpServerConfig {
   command: string;
@@ -10,6 +13,7 @@ export interface McpServerConfig {
   env?: Record<string, string>;
   readOnly?: boolean;
   disabled?: boolean;
+  allowNetwork?: boolean;
 }
 
 export interface McpConfigFile {
@@ -27,6 +31,11 @@ export interface ConnectedTool {
 export class McpClientManager {
   private clients: Map<string, { client: Client; transport: StdioClientTransport; config: McpServerConfig }> = new Map();
   private tools: Map<string, ConnectedTool> = new Map();
+  private broker?: ApprovalBroker;
+
+  setBroker(broker: ApprovalBroker | undefined): void {
+    this.broker = broker;
+  }
 
   async loadFromProject(projectRoot: string): Promise<void> {
     const configPath = join(projectRoot, '.bsh', 'mcp.json');
@@ -45,15 +54,7 @@ export class McpClientManager {
     for (const [serverName, config] of Object.entries(servers)) {
       if (config.disabled) continue;
       try {
-        const cleanEnv: Record<string, string> = {};
-        for (const [k, v] of Object.entries(process.env)) {
-          if (typeof v === 'string') cleanEnv[k] = v;
-        }
-        if (config.env) {
-          for (const [k, v] of Object.entries(config.env)) {
-            if (typeof v === 'string') cleanEnv[k] = v;
-          }
-        }
+        const cleanEnv = buildSafeEnv(config.env);
 
         const transport = new StdioClientTransport({
           command: config.command,
@@ -63,7 +64,7 @@ export class McpClientManager {
 
         const client = new Client({
           name: `bsh-client-${serverName}`,
-          version: '0.2.7-beta',
+          version: getPackageVersion(),
         });
 
         await client.connect(transport);
@@ -108,7 +109,7 @@ export class McpClientManager {
     return this.tools.get(name);
   }
 
-  async callTool(name: string, args: Record<string, unknown>): Promise<string> {
+  async callTool(name: string, args: Record<string, unknown>, overrideBroker?: ApprovalBroker, actionId: string = randomUUID(), domain?: string): Promise<string> {
     const tool = this.tools.get(name);
     if (!tool) {
       throw new Error(`Tool '${name}' not found in any connected MCP server.`);
@@ -117,6 +118,39 @@ export class McpClientManager {
     const entry = this.clients.get(tool.serverName);
     if (!entry) {
       throw new Error(`MCP server '${tool.serverName}' is not connected.`);
+    }
+
+    if (entry.config.readOnly || tool.readOnly) {
+      const lowerName = tool.originalName.toLowerCase();
+      const isMutating =
+        lowerName.includes('write') ||
+        lowerName.includes('create') ||
+        lowerName.includes('delete') ||
+        lowerName.includes('remove') ||
+        lowerName.includes('update') ||
+        lowerName.includes('patch') ||
+        lowerName.includes('modify') ||
+        lowerName.includes('edit') ||
+        lowerName.includes('execute') ||
+        lowerName.includes('run');
+      if (isMutating) {
+        throw new Error(`Tool '${name}' is blocked by read-only MCP governance policy.`);
+      }
+    }
+
+    const activeBroker = overrideBroker || this.broker;
+    if (activeBroker) {
+      const auth = await activeBroker.authorizeToolCall({
+        tool: name,
+        args,
+        readOnly: entry.config.readOnly || tool.readOnly,
+        domain: domain || entry.config.env?.BSH_DOMAIN || 'default',
+        actionId,
+        external: true,
+      });
+      if (!auth.allowed) {
+        throw new BrokerAuthorizationError(name, auth.reason);
+      }
     }
 
     const response = await entry.client.callTool({
@@ -134,6 +168,9 @@ export class McpClientManager {
     }
 
     const text = content.map((c) => c.type === 'text' ? (c.text ?? '') : JSON.stringify(c)).join('\n');
+    if (activeBroker) {
+      await activeBroker.recordToolResult(actionId, name, text, domain || entry.config.env?.BSH_DOMAIN || 'default').catch(() => undefined);
+    }
     return text;
   }
 
@@ -149,3 +186,4 @@ export class McpClientManager {
     this.tools.clear();
   }
 }
+import { getPackageVersion } from '../version.js';

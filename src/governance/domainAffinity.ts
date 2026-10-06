@@ -4,12 +4,20 @@ import { join, extname, basename } from 'node:path';
 export interface DomainAffinityResult {
   status: 'ALIGNED' | 'MISMATCH' | 'INSUFFICIENT_DATA';
   score: number;
+  indicatorType: 'SAMPLED_LEXICAL_OVERLAP';
+  sampledFilesCount: number;
+  totalTokensAnalyzed: number;
   ontologyTerms: string[];
   matchedTerms: string[];
   missingTerms: string[];
   summary: string;
   recommendation?: string;
+  limitations: string;
 }
+
+export const AFFINITY_LIMITATIONS =
+  'Indicador heurístico baseado exclusivamente em sobreposição lexical amostrada. Não comprova conformidade semântica nem substitui validação SHACL, extração estrutural de fatos ou autorização de promoção.';
+
 
 const RELEVANT_EXTENSIONS = new Set([
   '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs',
@@ -34,6 +42,13 @@ const CONCEPT_ALIASES: Record<string, string[]> = {
   aprovador: ['approver', 'aprovador', 'reviewer'],
   motivo: ['reason', 'motivo', 'justification'],
 };
+
+export const DOMAIN_PACKAGE_ALIASES: Map<string, Record<string, string[]>> = new Map();
+
+export function registerDomainConceptAliases(domainId: string, aliases: Record<string, string[]>): void {
+  const existing = DOMAIN_PACKAGE_ALIASES.get(domainId) || {};
+  DOMAIN_PACKAGE_ALIASES.set(domainId, { ...existing, ...aliases });
+}
 
 /**
  * Extracts key domain concepts from ontology.jsonld and shapes.ttl.
@@ -155,19 +170,30 @@ export async function checkDomainAffinity(
   projectRoot: string,
   ontologyPath: string,
   shapesPath: string,
-  domainId = 'default'
+  domainId = 'default',
+  customAliases?: Record<string, string[]>
 ): Promise<DomainAffinityResult> {
   const ontologyTerms = await extractOntologyConcepts(ontologyPath, shapesPath);
   const { tokens: projectTokens, fileCount } = await scanProjectTokens(projectRoot);
 
+  const domainAliases = {
+    ...CONCEPT_ALIASES,
+    ...(DOMAIN_PACKAGE_ALIASES.get(domainId) || {}),
+    ...(customAliases || {}),
+  };
+
   if (fileCount === 0 || ontologyTerms.length === 0) {
     return {
       status: 'INSUFFICIENT_DATA',
-      score: 1.0,
+      score: 0.0,
+      indicatorType: 'SAMPLED_LEXICAL_OVERLAP',
+      sampledFilesCount: fileCount,
+      totalTokensAnalyzed: projectTokens.size,
       ontologyTerms,
       matchedTerms: [],
       missingTerms: ontologyTerms,
-      summary: `Projeto sem arquivos de código suficientes para validação de afinidade semântica (${fileCount} arquivos analisados).`,
+      summary: `Projeto sem arquivos de código suficientes para validação de sobreposição lexical (${fileCount} arquivos analisados). Ausência de dados não constitui afinidade semântica.`,
+      limitations: AFFINITY_LIMITATIONS,
     };
   }
 
@@ -183,7 +209,7 @@ export async function checkDomainAffinity(
       found = true;
     } else {
       // Check aliases
-      for (const [key, aliases] of Object.entries(CONCEPT_ALIASES)) {
+      for (const [key, aliases] of Object.entries(domainAliases)) {
         if (termLower.includes(key)) {
           for (const alias of aliases) {
             if (projectTokens.has(alias)) {
@@ -220,10 +246,14 @@ export async function checkDomainAffinity(
     return {
       status: 'ALIGNED',
       score: Number(score.toFixed(2)),
+      indicatorType: 'SAMPLED_LEXICAL_OVERLAP',
+      sampledFilesCount: fileCount,
+      totalTokensAnalyzed: projectTokens.size,
       ontologyTerms,
       matchedTerms,
       missingTerms,
       summary: `Afinidade semântica confirmada (${matchedTerms.length}/${ontologyTerms.length} conceitos encontrados no projeto).`,
+      limitations: AFFINITY_LIMITATIONS,
     };
   }
 
@@ -231,10 +261,14 @@ export async function checkDomainAffinity(
   return {
     status: 'MISMATCH',
     score: Number(score.toFixed(2)),
+    indicatorType: 'SAMPLED_LEXICAL_OVERLAP',
+    sampledFilesCount: fileCount,
+    totalTokensAnalyzed: projectTokens.size,
     ontologyTerms,
     matchedTerms,
     missingTerms,
     summary: `Baixa afinidade semântica: conceitos do domínio '${domainId}' (${previewMissing}...) não foram encontrados no projeto.`,
     recommendation: `Pressione [Ctrl+D] para trocar a ontologia ativa ou [Ctrl+G] para desabilitar o harness ontológico.`,
+    limitations: AFFINITY_LIMITATIONS,
   };
 }

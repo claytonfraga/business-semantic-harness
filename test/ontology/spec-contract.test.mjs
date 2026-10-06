@@ -25,11 +25,11 @@ async function fixtureProject() {
   return root;
 }
 
-test('Given malformed JSON-LD, when parsed, then it fails with a format diagnosis', async () => {
+test('Given malformed JSON-LD When parsed Then it fails with a format diagnosis', async () => {
   await assert.rejects(parseOntology('{ broken'), /JSON-LD inválido/);
 });
 
-test('Given a local policy reference without a target, when validated, then readiness is denied', async () => {
+test('Given a local policy reference without a target When validated Then readiness is denied', async () => {
   const root = await fixtureProject();
   try {
     const file = join(root, '.bsh/domains/ativos/ontology.jsonld');
@@ -42,7 +42,7 @@ test('Given a local policy reference without a target, when validated, then read
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given a human review policy without SHACL restrictions, when validated, then the domain is ready', async () => {
+test('Given a human review policy without SHACL restrictions When validated Then the domain is ready', async () => {
   const root = await fixtureProject();
   try {
     await writeFile(join(root, '.bsh/domains/ativos/shapes.ttl'), '@prefix sh: <http://www.w3.org/ns/shacl#> .');
@@ -51,7 +51,7 @@ test('Given a human review policy without SHACL restrictions, when validated, th
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given a malformed shape graph, when validated, then the shape file is identified', async () => {
+test('Given a malformed shape graph When validated Then the shape file is identified', async () => {
   const root = await fixtureProject();
   try {
     await writeFile(join(root, '.bsh/domains/ativos/shapes.ttl'), 'this is not Turtle !!!');
@@ -61,7 +61,7 @@ test('Given a malformed shape graph, when validated, then the shape file is iden
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given a parseable shape without a path, when validated, then it is rejected as invalid', async () => {
+test('Given a parseable shape without a path When validated Then it is rejected as invalid', async () => {
   const root = await fixtureProject();
   try {
     await writeFile(join(root, '.bsh/domains/ativos/shapes.ttl'), '@prefix ex: <urn:pilot:ativos:> . @prefix sh: <http://www.w3.org/ns/shacl#> . ex:S a sh:NodeShape ; sh:targetClass ex:Ativo ; sh:property [ sh:minCount 1 ] .');
@@ -71,7 +71,7 @@ test('Given a parseable shape without a path, when validated, then it is rejecte
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given domains sharing a base IRI, when validated, then their namespace conflict is reported', async () => {
+test('Given domains sharing a base IRI When validated Then their namespace conflict is reported', async () => {
   const root = await fixtureProject();
   try {
     const manifestPath = join(root, '.bsh/project.json');
@@ -83,7 +83,7 @@ test('Given domains sharing a base IRI, when validated, then their namespace con
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given an external symlink at the BSH directory, when initializing, then no external manifest is written', async () => {
+test('Given an external symlink at the BSH directory When initializing Then no external manifest is written', async () => {
   const root = await mkdtemp(join(tmpdir(), 'bsh-boundary-'));
   const outside = await mkdtemp(join(tmpdir(), 'bsh-external-'));
   try {
@@ -98,7 +98,7 @@ test('Given an external symlink at the BSH directory, when initializing, then no
   }
 });
 
-test('Given a concept IRI, when queried, then its source, definition and governing policy are returned', async () => {
+test('Given a concept IRI When queried Then its source, definition and governing policy are returned', async () => {
   const root = await fixtureProject();
   try {
     const result = await queryOntology(root, 'ativos', 'urn:pilot:ativos:TransferenciaAtivo');
@@ -109,7 +109,7 @@ test('Given a concept IRI, when queried, then its source, definition and governi
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given an unknown IRI, when queried, then absence is explicit', async () => {
+test('Given an unknown IRI When queried Then absence is explicit', async () => {
   const root = await fixtureProject();
   try {
     await assert.rejects(queryOntology(root, 'ativos', 'urn:pilot:ativos:Inexistente'), /IRI não encontrado/);
@@ -117,7 +117,7 @@ test('Given an unknown IRI, when queried, then absence is explicit', async () =>
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given an ontology snapshot, when an approved file changes, then stale decisions are rejected', async () => {
+test('Given an ontology snapshot When an approved file changes Then stale decisions are rejected', async () => {
   const root = await fixtureProject();
   try {
     const snapshot = await createOntologySnapshot(root);
@@ -128,7 +128,7 @@ test('Given an ontology snapshot, when an approved file changes, then stale deci
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given a complete project, when CLI validates and shows an IRI, then commands exit successfully with provenance', async () => {
+test('Given a complete project When CLI validates and shows an IRI Then commands exit successfully with provenance', async () => {
   const root = await fixtureProject();
   try {
     const validate = spawnSync(process.execPath, [cli, 'ontology', 'validate', '--project', root], { encoding: 'utf8' });
@@ -140,7 +140,7 @@ test('Given a complete project, when CLI validates and shows an IRI, then comman
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('Given a draft project, when CLI validates it, then it exits with a nonzero code and a reason', async () => {
+test('Given a draft project When CLI validates it Then it exits with a nonzero code and a reason', async () => {
   const root = await mkdtemp(join(tmpdir(), 'bsh-spec-draft-'));
   try {
     assert.equal(spawnSync(process.execPath, [cli, 'init', '--project', root], { encoding: 'utf8' }).status, 0);

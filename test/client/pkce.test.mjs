@@ -7,7 +7,7 @@ import {
   generatePkceCodes,
 } from '../../dist/client/openrouter/pkce.js';
 
-test('Given generatePkceCodes, when called, then verifier and S256 challenge are generated', () => {
+test('Given generatePkceCodes When called Then verifier and S256 challenge are generated', () => {
   const { verifier, challenge } = generatePkceCodes();
   assert.ok(verifier.length >= 43);
   assert.ok(challenge.length >= 43);
@@ -17,7 +17,7 @@ test('Given generatePkceCodes, when called, then verifier and S256 challenge are
   assert.equal(challenge, expectedChallenge);
 });
 
-test('Given an authorization code and verifier, when exchangeCodeForApiKey is called, then POST is made and key returned', async () => {
+test('Given an authorization code and verifier When exchangeCodeForApiKey is called Then POST is made and key returned', async () => {
   const originalFetch = globalThis.fetch;
   try {
     globalThis.fetch = async (url, opts) => {
@@ -41,7 +41,7 @@ test('Given an authorization code and verifier, when exchangeCodeForApiKey is ca
   }
 });
 
-test('Given authenticateViaWebBrowser, when browser hits callback with code, then ephemeral key is returned in memory without disk writes', async () => {
+test('Given authenticateViaWebBrowser When browser hits callback with code Then ephemeral key is returned in memory without disk writes', async () => {
   const originalFetch = globalThis.fetch;
   try {
     globalThis.fetch = async (url, opts) => {

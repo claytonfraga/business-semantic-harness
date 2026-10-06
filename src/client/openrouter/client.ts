@@ -112,7 +112,7 @@ export class OpenRouterClient {
       id: m.id,
       name: m.name || m.id,
       description: m.description,
-      context_length: m.context_length || 8192,
+      context_length: m.context_length,
       pricing: m.pricing,
     }));
     this.cacheTimestamp = now;

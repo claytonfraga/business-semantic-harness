@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { DataFactory, type Store } from 'n3';
-import { Validator as ShaclEngineValidator } from 'shacl-engine';
+import { Validator as ShaclEngineValidator, type EngineResult } from 'shacl-engine';
 import { targetResolvers, validations } from 'shacl-engine/sparql.js';
 import { loadManifest } from '../project/manifest.js';
 import { resolveProjectFile } from '../project/paths.js';
@@ -33,10 +33,42 @@ export interface ValidationReport {
   issues: ValidationIssue[];
 }
 
+export const SEMANTIC_VALIDATION_PROFILE = Object.freeze({
+  selection: 'Exact operation IRI matching sh:targetClass; other target forms are engine capabilities, not operation selection',
+  completeness: 'Immediate property shapes with named-IRI sh:path and positive sh:minCount; every typed candidate focus must supply these facts',
+  engine: 'SHACL Core and SHACL-SPARQL; class/node/subjects-of/objects-of targets, paths, logical alternatives and nested constraints',
+  inference: 'No RDF/OWL entailment or ontology materialization; engine resolves rdfs:subClassOf declared in the shapes graph',
+  missingInformation: 'Missing or indeterminate required candidate facts prevent approval; SHACL conformity alone does not prove extractor completeness',
+  representation: 'Independent candidate RDF and extractor coverage/evidence gates are required for promotion; complex paths and nested/alternative completeness are delegated to SHACL, not inferred from flat facts',
+  generalSparqlQueries: 'Not supported by this validation interface; SHACL-SPARQL constraints are supported. Separate executeLocalSparql API supports local read-only SELECT/ASK with explicit outcomes, not authorization',
+});
+
+export interface ConstraintExecution {
+  shape: string;
+  owningShapes: string[];
+  targets: Array<{ shape: string; predicate: string; value: string }>;
+  focusNode: string;
+  constraintComponent: string;
+  sourceConstraints: string[];
+  outcome: 'passed' | 'violation';
+}
+
+export interface ValidationResult {
+  shape: string;
+  owningShapes: string[];
+  focusNode: string;
+  constraintComponent: string;
+  sourceConstraints: string[];
+  message: string;
+  severity: string;
+  mechanism: 'SHACL_CORE' | 'SHACL_SPARQL' | 'UNKNOWN';
+}
+
 export interface DataValidationResult {
   conforms: boolean;
-  results: Array<{ shape: string; focusNode: string; message: string; severity: string;
-    mechanism: 'SHACL_CORE' | 'SHACL_SPARQL' | 'UNKNOWN' }>;
+  executedShapes: string[];
+  executionEvidence: ConstraintExecution[];
+  results: ValidationResult[];
 }
 
 export async function validateData(shapes: Store, data: Store): Promise<DataValidationResult> {
@@ -44,20 +76,68 @@ export async function validateData(shapes: Store, data: Store): Promise<DataVali
     factory: DataFactory,
     targetResolvers,
     validations,
+    debug: true,
+    details: true,
+    trace: true,
   });
-  const report = await validator.validate({ dataset: data });
+  const identifier = (term?: { value: string; termType?: string }): string =>
+    term?.termType === 'BlankNode' ? `_:${term.value}` : term?.value ?? '';
+  // Bind child evidence to the root whose real target resolution reached it.
+  // Static reverse references would misattribute shared properties to roots without targets.
+  const rootTerms = [...new Map(shapes.getQuads(null, null, null, null).filter((quad) =>
+    quad.predicate.value.startsWith('http://www.w3.org/ns/shacl#target') ||
+    (quad.predicate.equals(RDF_TYPE) && ['NodeShape', 'PropertyShape'].some((type) =>
+      quad.object.value === `http://www.w3.org/ns/shacl#${type}`)))
+    .map((quad) => [identifier(quad.subject), quad.subject])).values()];
+  let activeRoot = '';
+  const convert = (item: EngineResult): ValidationResult => ({
+    shape: identifier(item.shape?.ptr?.term),
+    owningShapes: [...new Set([identifier(item.shape?.ptr?.term), activeRoot])],
+    focusNode: identifier(item.focusNode?.term) || item.focusNode?.values?.[0] || '',
+    constraintComponent: item.constraintComponent?.value ?? '',
+    sourceConstraints: (item.source ?? []).map(identifier),
+    message: item.message?.length ? item.message.map((term) => term.value).join('; ')
+      : `SHACL constraint: ${item.constraintComponent?.value ?? 'unknown'}`,
+    severity: item.severity?.value ?? '',
+    mechanism: item.constraintComponent?.value?.includes('SPARQLConstraintComponent') ? 'SHACL_SPARQL'
+      : item.constraintComponent?.value ? 'SHACL_CORE' : 'UNKNOWN',
+  });
+  const isViolation = (item: EngineResult): boolean => ['Violation', 'Warning', 'Info']
+    .some((severity) => item.severity?.value === `http://www.w3.org/ns/shacl#${severity}`);
+  const evidence: ConstraintExecution[] = [];
+  const collect = (items: EngineResult[]): void => {
+    for (const item of items) {
+      if (item.constraintComponent?.value && !item.constraintComponent.value.endsWith('TraversalConstraintComponent')) {
+        const result = convert(item);
+        evidence.push({ shape: result.shape, owningShapes: result.owningShapes,
+          targets: shapes.getQuads(null, null, null, null).filter((quad) =>
+            result.owningShapes.includes(identifier(quad.subject)) && quad.predicate.value.startsWith('http://www.w3.org/ns/shacl#target'))
+            .map((quad) => ({ shape: identifier(quad.subject), predicate: quad.predicate.value, value: identifier(quad.object) })),
+          focusNode: result.focusNode, constraintComponent: result.constraintComponent,
+          sourceConstraints: result.sourceConstraints, outcome: isViolation(item) ? 'violation' : 'passed' });
+      }
+      collect(item.results ?? []);
+    }
+  };
+  const results: ValidationResult[] = [];
+  let conforms = true;
+  for (const root of rootTerms) {
+    activeRoot = identifier(root);
+    const report = await validator.validate({ dataset: data }, [{ terms: [root] }]);
+    conforms = conforms && report.conforms;
+    collect(report.results);
+    results.push(...report.results.filter(isViolation).map(convert));
+  }
+  const executionEvidence = [...new Map(evidence.map((item) => [JSON.stringify(item), item])).values()];
   return {
-    conforms: report.conforms,
-    results: report.results.map((item) => ({
-      shape: item.shape?.ptr?.term?.value ?? '',
-      focusNode: item.focusNode?.term?.value ?? item.focusNode?.values?.[0] ?? '',
-      message: (item.message && item.message.length > 0)
-        ? item.message.map((term) => term.value).join('; ')
-        : (item.constraintComponent?.value ? `Violação de ${item.constraintComponent.value}` : 'Violação SHACL'),
-      severity: item.severity?.value ?? '',
-      mechanism: item.constraintComponent?.value?.includes('SPARQLConstraintComponent') ? 'SHACL_SPARQL'
-        : item.constraintComponent?.value ? 'SHACL_CORE' : 'UNKNOWN',
-    })),
+    conforms,
+    executionEvidence,
+    executedShapes: [...new Set(executionEvidence.flatMap((item) => item.owningShapes))].filter((id) =>
+      shapes.getQuads(null, null, null, null).some((quad) => identifier(quad.subject) === id &&
+        (quad.predicate.value.startsWith('http://www.w3.org/ns/shacl#target') ||
+          (quad.predicate.equals(RDF_TYPE) && ['NodeShape', 'PropertyShape'].some((type) =>
+            quad.object.value === `http://www.w3.org/ns/shacl#${type}`))))),
+    results,
   };
 }
 

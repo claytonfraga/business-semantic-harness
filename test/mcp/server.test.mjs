@@ -17,7 +17,7 @@ async function project() {
   return root;
 }
 
-test('Given a complete project, when the MCP server starts, then ontology can be queried with provenance', async () => {
+test('Given a complete project When the MCP server starts Then ontology can be queried with provenance', async () => {
   const root = await project();
   const transport = new StdioClientTransport({ command: process.execPath, args: [resolve('dist/mcp/server.js'), root] });
   const client = new Client({ name: 'bsh-quality', version: '0.1.0' });
@@ -34,7 +34,7 @@ test('Given a complete project, when the MCP server starts, then ontology can be
   }
 });
 
-test('Given verifiable evidence, when an MCP proposal is submitted, then only a pending local proposal is written', async () => {
+test('Given verifiable evidence When an MCP proposal is submitted Then only a pending local proposal is written', async () => {
   const root = await project();
   const transport = new StdioClientTransport({ command: process.execPath, args: [resolve('dist/mcp/server.js'), root] });
   const client = new Client({ name: 'bsh-quality', version: '0.1.0' });
@@ -54,7 +54,7 @@ test('Given verifiable evidence, when an MCP proposal is submitted, then only a 
   }
 });
 
-test('Given unverifiable evidence, when an MCP proposal is submitted, then it is rejected', async () => {
+test('Given unverifiable evidence When an MCP proposal is submitted Then it is rejected', async () => {
   const root = await project();
   const transport = new StdioClientTransport({ command: process.execPath, args: [resolve('dist/mcp/server.js'), root] });
   const client = new Client({ name: 'bsh-quality', version: '0.1.0' });
@@ -71,7 +71,7 @@ test('Given unverifiable evidence, when an MCP proposal is submitted, then it is
   }
 });
 
-test('Given a governed BSH session, when the agent queries and reports a conflict, then MCP records no project mutation', async () => {
+test('Given a governed BSH session When the agent queries and reports a conflict Then MCP records no project mutation', async () => {
   const root = await project();
   const transport = new StdioClientTransport({ command: process.execPath, args: [resolve('dist/mcp/server.js'), root, 'governed'] });
   const client = new Client({ name: 'bsh-quality', version: '0.1.0' });
@@ -105,7 +105,7 @@ test('Given a governed BSH session, when the agent queries and reports a conflic
   }
 });
 
-test('Given a prompt with violating intent, when bsh_check_prompt_intent is called via MCP, then violation is reported', async () => {
+test('Given a prompt with violating intent When bsh_check_prompt_intent is called via MCP Then violation is reported', async () => {
   const root = await project();
   const transport = new StdioClientTransport({ command: process.execPath, args: [resolve('dist/mcp/server.js'), root] });
   const client = new Client({ name: 'bsh-quality', version: '0.1.0' });
@@ -125,7 +125,7 @@ test('Given a prompt with violating intent, when bsh_check_prompt_intent is call
   }
 });
 
-test('Given candidate facts in Turtle, when bsh_validate_shacl is called via MCP, then validation report is returned', async () => {
+test('Given candidate facts in Turtle When bsh_validate_shacl is called via MCP Then validation report is returned', async () => {
   const root = await project();
   const transport = new StdioClientTransport({ command: process.execPath, args: [resolve('dist/mcp/server.js'), root] });
   const client = new Client({ name: 'bsh-quality', version: '0.1.0' });
@@ -154,7 +154,7 @@ ex:transfer-99 a ex:Transferencia ;
   }
 });
 
-test('Given bsh CLI with mcp subcommand, when invoked, then MCP server connects via stdio and responds to tool listing', async () => {
+test('Given bsh CLI with mcp subcommand When invoked Then MCP server connects via stdio and responds to tool listing', async () => {
   const root = await project();
   const transport = new StdioClientTransport({ command: process.execPath, args: [resolve('dist/cli.js'), 'mcp', '--project', root] });
   const client = new Client({ name: 'bsh-cli-quality', version: '0.1.0' });

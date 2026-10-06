@@ -46,6 +46,8 @@ Funcionalidade: Distribuição e regras de engenharia
     Quando o workflow CI executa
     Então deve instalar dependências de forma reproduzível com "npm ci"
     E deve executar testes e a suíte E2E no ambiente Node.js configurado
+    E após aprovação dos checks deve preservar o pacote instalável e seu checksum SHA-256 como artefatos do pull request
+    E essa geração de artefatos não deve publicar versão no npm nem criar release sem evento autorizado
 
   @BSH-DIST-006
   Cenário: Gerar release verificável
@@ -54,8 +56,11 @@ Funcionalidade: Distribuição e regras de engenharia
     Então deve validar testes e gerar o tarball instalável
     E deve produzir checksums SHA-256 e anexá-los à release
     E publicação npm deve depender da credencial configurada
+    E credencial ausente deve ser diagnosticada como publicação npm não concluída, sem sucesso silencioso
+    E o pacote deve incluir identidade verificável do commit de origem e checksum SHA-256
+    E a publicação deve usar versão inédita e tag que corresponda à versão do pacote integrado
 
-  @BSH-DIST-007 @specified @gap
+  @BSH-DIST-007
   Cenário: Manter versão consistente
     Dado uma nova versão distribuída
     Quando seus metadados são apresentados

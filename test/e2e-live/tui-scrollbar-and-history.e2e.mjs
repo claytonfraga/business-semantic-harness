@@ -111,7 +111,7 @@ test('Given a user request to perform a code modification, when processed in the
     // First turn: user prompt
     messages.push({ role: 'user', content: 'Inspecione a documentação e verifique as regras SHACL' });
 
-    const turn1 = await runAgentTurn({
+    const turn1 = await runAgentTurn({ contextLength: 131072,
       client,
       model: 'deepseek/deepseek-v4.1-flash',
       workspaceRoot: workspaceDir,
@@ -129,7 +129,7 @@ test('Given a user request to perform a code modification, when processed in the
     // Second turn: follow-up prompt
     messages.push({ role: 'user', content: 'Prossiga com a operação no código' });
 
-    const turn2 = await runAgentTurn({
+    const turn2 = await runAgentTurn({ contextLength: 131072,
       client,
       model: 'deepseek/deepseek-v4.1-flash',
       workspaceRoot: workspaceDir,

@@ -67,7 +67,7 @@ Funcionalidade: Ferramentas de exploração e edição do workspace
     Então deve rejeitar o acesso
     E a ferramenta não deve escrever no checkout principal por esse caminho
 
-  @BSH-TOOLS-009 @specified @gap
+  @BSH-TOOLS-009 @R4 @R5
   Cenário: Restringir execução ao isolamento especificado
     Dado um link simbólico ou comando de shell capaz de acessar fora do workspace
     Quando uma ferramenta tenta usá-lo
@@ -97,3 +97,33 @@ Funcionalidade: Ferramentas de exploração e edição do workspace
     Então deve receber nome, escopo, descrição, caminho, instruções completas e recursos associados
     E nome ausente deve gerar erro
     E skill desconhecida deve retornar aviso recuperável
+
+  @BSH-TOOLS-013
+  Cenário: Preparar ambiente não interativo para processos de ferramentas
+    Dado variáveis de ambiente do host, incluindo um pager interativo
+    Quando o ambiente de um processo de shell ou MCP é preparado
+    Então apenas variáveis permitidas e valores explicitamente configurados devem ser preservados
+    E "PAGER" deve usar "cat" por padrão para evitar espera por interação
+    E configuração explícita do processo deve prevalecer sobre esse padrão
+
+  @BSH-TOOLS-014 @REQ-AGENT-OBSERVED-CHANGES
+  Cenário: Relatar somente mudanças observadas ao terminar um turno
+    Dado o estado inicial do workspace e dos arquivos rastreados pelo Git
+    Quando o agente usa ferramentas de arquivo, shell ou MCP
+    Então os arquivos relatados devem corresponder às diferenças de conteúdo, tipo ou permissão no estado final
+    E criações, remoções e mudanças por shell ou MCP devem ser identificadas
+    E escritas malsucedidas, escritas idênticas e alterações preexistentes intocadas não devem ser relatadas como mudanças realizadas
+
+  @BSH-TOOLS-015 @REQ-AGENT-OBSERVED-OUTCOME
+  Cenário: Distinguir desfechos sem obrigar uma mutação
+    Dado uma solicitação de ação
+    Quando o agente termina sua resposta ou atinge o limite de turnos
+    Então o resultado deve distinguir conclusão, bloqueio por regra, erro de ferramenta e limite de turnos
+    E uma negativa registrada pelo broker deve impedir que o resultado declare conclusão
+    E o relato deve preservar os motivos e as ferramentas que falharam
+    E uma recusa declarada pelo agente via "report_task_outcome" deve informar identificador da regra e motivo
+    E essa declaração deve ser distinguida da evidência independente do broker
+    E arquivos gerados de auditoria e telemetria em ".bsh/local" não devem ser atribuídos ao agente
+    E arquivos dos domínios em ".bsh/domains" devem permanecer no inventário de mudanças
+    E terminar sem mudanças não deve inserir automaticamente uma nova solicitação de escrita
+    E uma recusa por regra de negócio não deve obrigar o agente a modificar arquivos

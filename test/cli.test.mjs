@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { test } from 'node:test';
 
-test('Given the help flag, when the CLI runs, then project, ontology, and mcp commands are shown', () => {
+test('Given the help flag When the CLI runs Then project, ontology, and mcp commands are shown', () => {
   const result = spawnSync(process.execPath, ['dist/cli.js', '--help'], { encoding: 'utf8' });
   assert.equal(result.status, 0);
   assert.match(result.stdout, /bsh/);
@@ -15,13 +15,13 @@ test('Given the help flag, when the CLI runs, then project, ontology, and mcp co
   assert.match(result.stdout, /mcp/);
 });
 
-test('Given an unknown command, when the CLI runs, then it exits with code 2', () => {
+test('Given an unknown command When the CLI runs Then it exits with code 2', () => {
   const result = spawnSync(process.execPath, ['dist/cli.js', 'unknown'], { encoding: 'utf8' });
   assert.equal(result.status, 2);
   assert.match(result.stderr, /Comando desconhecido/);
 });
 
-test('Given a selected project, when init and domain add run, then the domain is created', () => {
+test('Given a selected project When init and domain add run Then the domain is created', () => {
   const root = mkdtempSync(join(tmpdir(), 'bsh-cli-'));
   const executable = resolve('dist/cli.js');
   try {
@@ -36,7 +36,7 @@ test('Given a selected project, when init and domain add run, then the domain is
   }
 });
 
-test('Given a project without ontology, when ontology validate runs, then it returns exit code 1', () => {
+test('Given a project without ontology When ontology validate runs Then it returns exit code 1', () => {
   const root = mkdtempSync(join(tmpdir(), 'bsh-validate-'));
   const executable = resolve('dist/cli.js');
   try {
@@ -45,7 +45,7 @@ test('Given a project without ontology, when ontology validate runs, then it ret
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
-test('Given a project without ready ontology, when bsh mcp runs, then it exits with non-zero code and reports error on stderr', () => {
+test('Given a project without ready ontology When bsh mcp runs Then it exits with non-zero code and reports error on stderr', () => {
   const root = mkdtempSync(join(tmpdir(), 'bsh-mcp-unready-'));
   const executable = resolve('dist/cli.js');
   try {

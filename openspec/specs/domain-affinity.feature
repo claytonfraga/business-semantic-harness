@@ -59,3 +59,13 @@ Funcionalidade: Afinidade semântica entre domínio e código
     Quando o usuário executa "/affinity" ou "/alignment"
     Então deve receber pontuação, classificação e conceitos encontrados
     E sem domínio deve receber um diagnóstico em vez de um resultado inventado
+
+  @BSH-AFF-008
+  Cenário: Apresentar afinidade como sobreposição lexical amostrada sem falsa autorização
+    Dado a verificação de afinidade de domínio executada sobre um projeto
+    Quando o resultado é gerado
+    Então ausência de dados não deve aparecer como afinidade total nem receber pontuação máxima
+    E o resultado deve informar que se trata de sobreposição lexical amostrada, termos analisados e limitações
+    E o indicador de afinidade não deve substituir reconhecimento, extração ou validação semântica
+    E a avaliação deve distinguir vocabulário semelhante com comportamento incompatível de vocabulário distinto com comportamento compatível
+

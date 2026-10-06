@@ -107,7 +107,7 @@ test('Given a code modification task, when the agent loop executes tools, then f
       },
     };
 
-    const turnResult = await runAgentTurn({
+    const turnResult = await runAgentTurn({ contextLength: 131072,
       client: clientWithFinal,
       model: 'test-model',
       workspaceRoot: tempDir,

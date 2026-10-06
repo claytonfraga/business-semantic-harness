@@ -1,0 +1,31 @@
+# Semantic suite reconciliation
+
+Review date: 2026-10-04. Requirement authority: `openspec/specs/semantic-enforcement-and-promotion-gate.feature` and `semantic-suite-operational-contract.feature`.
+
+The original semantic suite passed one of eleven cases. Its fixtures did not establish the prerequisites required by the promotion contract. The reconciliation preserves conservative enforcement rather than bypassing policies or treating missing evidence as approval.
+
+| Original case | Observed result | Diagnosis and corrected verification |
+| --- | --- | --- |
+| Valid change | `bloqueado`, `POLICY` | Every transfer in the fixture required candidate-bound human review. Ordinary confirmation did not supply it. The conforming integration fixture has a synthetic operation without review policy, production extraction, actual SHACL, actual npm gates and immutable authorized commit verification. |
+| Violation without agent report | `bloqueado`, `POLICY` | The policy prevented reaching SHACL, and no independent extractor was supplied. A separate no-review-policy fixture now verifies actual violation evidence and unchanged origin. |
+| Human review refused | `bloqueado`, `POLICY` | `descartado` incorrectly implied the governance block had reached ordinary exception confirmation. The policy regression now verifies explicit denial and zero confirmation calls. |
+| Undetermined fact | `bloqueado`, `POLICY` | The review requirement masked missing facts. A dedicated fixture verifies `INDETERMINATE`, incomplete validation, and no integration. |
+| Outside governed knowledge | `bloqueado`, `POLICY` | A neutral comment is neither trustworthy irrelevance evidence nor complete coverage. The corrected case requires an indeterminate recognition block without inventing a violation. |
+| Violation with passing technical gates | `bloqueado`, `POLICY` | SHACL was never reached. The corrected case supplies independent extraction, observes a violation, separately runs real passing project tests, and verifies those tests cannot override semantic denial. |
+| Valid change with failing technical gate | `bloqueado`, `POLICY` | Missing extraction and policy prevented technical gates. A modified test file also lacked coverage. The new candidate changes only a covered source file; its existing project test rejects the candidate for a separate technical requirement. |
+| Origin advances | `bloqueado`, `POLICY` | Missing extraction and review prevented integration after reconciliation. The new case validates the reconciled candidate and verifies the origin commit and authorized candidate both survive. |
+| Git reconciliation conflict | `conflitado` (passed) | Retained: conflict stays in the worktree and the origin hash and source remain unchanged. |
+| Public promotion path inventory | Static assertion failed | The expected list omitted `agent/headless.ts`. The updated architecture check includes that entry and verifies both TUI and headless connect the production extractor. Static checks supplement behavior and do not prove runtime authorization. |
+| Agent-reported conflict | `bloqueado` | The fixture had no candidate mutation and did not demonstrate SHACL execution. The corrected case has an independently conforming candidate, an explicit agent alert and an actual user refusal; it verifies the exception is discarded without integration. |
+
+The reconciled suite also tests absence of an independent extractor explicitly at `FACT_EXTRACTION`. This distinguishes missing evidence from a violation and from a policy block.
+
+A genuine operational defect emerged after the fixture prerequisites were corrected: Node's `NODE_TEST_CONTEXT` leaked into npm child processes. Nested `node --test` reported recursive execution, skipped every project test and returned success. `executarGates` now removes that internal parent-runner variable from the child environment. The real failing project-test case verifies the gate reports `falha-validacao` and leaves the origin unchanged. No gate mock hides this failure.
+
+`npm run test:e2e:semantic` remains the targeted integration command. `npm run test:e2e` invokes the same suite once before the existing integration/live-interaction suites. Both CI and release workflows run quality, unit/integration tests and this E2E pipeline. Verification no longer deletes prior MP4 or PNG evidence batches.
+
+Validation on 2026-10-04: the reconciled semantic suite passed 12/12; the CI-mode E2E pipeline passed those 12 cases and all 49 existing interaction/worktree cases; `npm run quality` passed. The two existing renderer snapshot failures were traced to obsolete expectations: one promised `Ready to promote` from preliminary inspection, while the other required the full positive badge inside a deliberately truncated long header. Their assertions now require visible conformance status, the final-authorization disclosure and absence of contradictory failure or promotion claims. This changes snapshot expectations to the authoritative preliminary-gate contract without adding a parallel terminal renderer. CI-mode execution does not generate functional journey recordings or verify the WSL artifact copy.
+
+These tests call production modules and use real local RDF/SHACL, npm and Git. They use a synthetic project-owned ontology and configured recognition fixtures. They contain no mocked extractor, SHACL validator, technical gate or Git integration. They do not demonstrate arbitrary runtime semantics, nor replace packaged global `bsh` sessions in a persistent terminal. Functional headless/TUI evidence, including screenshots, recordings, ontology preflight and token overhead, must be reported separately. Any model transport simulation in that layer must be identified.
+
+The existing automated regression mapping is R1/R2: `test/enforcement/git-diff-inventory.test.mjs`; R3: `test/enforcement/reconciled-decision-contract.test.mjs`; R4: `test/agent/symlink-confinement.test.mjs`; R5: `test/agent/shell-and-process-confinement.test.mjs`; R7: `test/enforcement/policy-without-shapes.test.mjs`; R8: `test/agent/promotion-result-propagation.test.mjs`. No authoritative R6 definition was recoverable from the repository during this review. Full R1–R8 coverage must not be claimed until that definition is supplied and traced.

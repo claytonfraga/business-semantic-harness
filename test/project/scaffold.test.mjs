@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { initProject, addDomain } from '../../dist/project/scaffold.js';
 
-test('Given an empty project, when initialized and a domain is added, then distinct ontology and shape files exist', async () => {
+test('Given an empty project When initialized and a domain is added Then distinct ontology and shape files exist', async () => {
   const root = await mkdtemp(join(tmpdir(), 'bsh-scaffold-'));
   try {
     await initProject(root);
@@ -25,7 +25,7 @@ test('Given an empty project, when initialized and a domain is added, then disti
   }
 });
 
-test('Given an existing domain, when added again, then its files are preserved', async () => {
+test('Given an existing domain When added again Then its files are preserved', async () => {
   const root = await mkdtemp(join(tmpdir(), 'bsh-scaffold-'));
   try {
     await initProject(root);
@@ -39,7 +39,7 @@ test('Given an existing domain, when added again, then its files are preserved',
   }
 });
 
-test('Given an existing manifest, when initializing again, then its bytes are preserved', async () => {
+test('Given an existing manifest When initializing again Then its bytes are preserved', async () => {
   const root = await mkdtemp(join(tmpdir(), 'bsh-scaffold-'));
   try {
     await initProject(root);

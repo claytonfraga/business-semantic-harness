@@ -150,7 +150,7 @@ test('Given prompt history navigation and confirmation banners, when rendered, t
   assert.equal(promptLines.length, 1, 'Prompt input with prefix must appear on exactly 1 line');
 });
 
-test('Given a conforming prompt ("faça um endpoint pra remover um ativo nao baixado") and conforming code diff, when gate evaluates, then it emits [OK] CONFORMING with all [+] checks', async () => {
+test('Given a conforming preliminary inspection When its gate is rendered Then it discloses that final promotion authorization is still required', async () => {
   const prompt = 'faça um endpoint pra remover um ativo nao baixado';
   const domain = 'ativos';
 
@@ -187,7 +187,8 @@ test('Given a conforming prompt ("faça um endpoint pra remover um ativo nao bai
   );
 
   assert.ok(tui.includes('[OK] CONFORMING'), 'Gate must display [OK] CONFORMING');
-  assert.ok(tui.includes('Status: CONFORMING (Ready to promote)'), 'Gate must display Ready to promote');
+  assert.ok(tui.includes('Status: CONFORMING (Preliminary inspection; subject to promotion gate)'), 'Gate must disclose preliminary scope');
+  assert.ok(!tui.includes('Ready to promote'), 'Preliminary inspection cannot promise promotion');
   assert.ok(!tui.includes('[X] VIOLATION'), 'Gate must NOT display [X] VIOLATION');
   assert.ok(!tui.includes('Promotion blocked'), 'Gate must NOT display Promotion blocked');
 });
@@ -226,5 +227,4 @@ test('Given a session with violation status, when gate renders, then it strictly
   assert.ok(tui.includes('[X]'), 'Must display failing check [X] icon');
   assert.ok(tui.includes('TransferShape: Invariante de Ciclo de Vida'), 'Must display failing check explanation');
 });
-
 

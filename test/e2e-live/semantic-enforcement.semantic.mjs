@@ -1,182 +1,219 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative, resolve } from 'node:path';
 import { after, test } from 'node:test';
-import { criarSessaoWorktree, removerSessaoWorktree } from '../../dist/git/worktree.js';
+import { criarSessaoWorktree } from '../../dist/git/worktree.js';
 import { finalizeSession } from '../../dist/git/finalize.js';
 import { createOntologySnapshot } from '../../dist/ontology/query.js';
+import { createProductionFactsExtractor } from '../../dist/enforcement/evidenceAdapters.js';
 
-const FIXTURE = resolve('test/fixtures/enforcement-project');
-const raiz = mkdtempSync(join(tmpdir(), 'bsh-semantic-'));
-const worktrees = join(raiz, 'worktrees');
+// Production-module integration, not a functional TUI/headless E2E session.
+// No mocked extractor, SHACL engine, technical gate, or Git integration.
+// Synthetic recognition rules are fixtures; their configured facts are not proof
+// of arbitrary runtime behavior. Packaged CLI journeys supply functional evidence.
+const root = mkdtempSync(join(tmpdir(), 'bsh-semantic-integration-'));
+after(() => rmSync(root, { recursive: true, force: true }));
+const iri = 'urn:semantic-regression:';
+const approved = 'export const status = "APPROVED";\nexport const publish = status;\n';
+const rejected = 'export const status = "REJECTED";\nexport const publish = status;\n';
 
 function git(cwd, args) {
   return execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8' });
 }
 
-function prepararProjeto(nome) {
-  const repo = join(raiz, nome);
-  mkdirSync(repo, { recursive: true });
-  execFileSync('cp', ['-a', `${FIXTURE}/.`, repo]);
-  execFileSync('git', ['init', '-q', repo]);
-  git(repo, ['config', 'user.name', 'Teste']);
-  git(repo, ['config', 'user.email', 'teste@example.com']);
+async function fixture(name, { review = false, gateFailure = false } = {}) {
+  const repo = join(root, name);
+  const domain = join(repo, '.bsh/domains/synthetic');
+  mkdirSync(domain, { recursive: true });
+  mkdirSync(join(repo, 'src'));
+  mkdirSync(join(repo, 'test'));
+  writeFileSync(join(repo, '.gitignore'), '.bsh/local/\n');
+  writeFileSync(join(repo, '.bsh/project.json'), JSON.stringify({ schemaVersion: 1, projectId: name,
+    domains: [{ id: 'synthetic', version: '1.0.0', baseIri: iri,
+      ontology: 'domains/synthetic/ontology.jsonld', shapes: 'domains/synthetic/shapes.ttl',
+      enforcement: 'domains/synthetic/enforcement.json' }] }));
+  writeFileSync(join(domain, 'ontology.jsonld'), JSON.stringify({
+    '@context': { ex: iri, bsh: 'urn:bsh:ns:v1:', rdfs: 'http://www.w3.org/2000/01/rdf-schema#' },
+    '@graph': [{ '@id': 'ex:domain', '@type': 'bsh:Domain', 'bsh:version': '1.0.0' },
+      { '@id': 'ex:Publish', '@type': 'rdfs:Class' },
+      ...(review ? [{ '@id': 'ex:ReviewPolicy', '@type': 'bsh:Policy',
+        'bsh:governs': { '@id': 'ex:Publish' }, 'bsh:requiresHumanReview': true }] : [])] }));
+  writeFileSync(join(domain, 'shapes.ttl'), `@prefix ex: <${iri}> .\n@prefix sh: <http://www.w3.org/ns/shacl#> .
+ex:PublishShape a sh:NodeShape ; sh:targetClass ex:Publish ;
+  sh:property [ sh:path ex:status ; sh:minCount 1 ; sh:in ( "APPROVED" ) ] .\n`);
+  writeFileSync(join(domain, 'enforcement.json'), JSON.stringify({ regras: ['APPROVED', 'REJECTED', 'UNKNOWN'].map(status => ({
+    id: `publish-${status}`, operacao: 'Publish', quando: { caminho: 'src/**', adicionou: `"${status}"` },
+    fatos: [{ propriedade: 'status', valor: status === 'UNKNOWN' ? null : status,
+      determinacao: status === 'UNKNOWN' ? 'indeterminado' : 'observado', origem: 'synthetic-recognition-fixture' }],
+    evidenciasRequeridas: [{ tipo: 'estrutural' }],
+  })) }));
+  writeFileSync(join(repo, 'src/publication.js'), 'export const initial = true;\n');
+  writeFileSync(join(repo, 'package.json'), JSON.stringify({ type: 'module', scripts: {
+    quality: 'node --check src/publication.js', test: 'node --test test/publication.test.mjs' } }));
+  writeFileSync(join(repo, 'test/publication.test.mjs'), `import assert from 'node:assert/strict';
+import { test } from 'node:test';
+test('Given a publication module When loaded Then it exports a state', async () => {
+  const publication = await import('../src/publication.js');
+  assert.equal(${gateFailure ? "publication.publish, 'TECHNICALLY_APPROVED'" : "typeof publication.publish, 'string'"});
+});\n`);
+  git(repo, ['init', '-q', '-b', 'main']);
+  git(repo, ['config', 'user.name', 'Semantic QA']);
+  git(repo, ['config', 'user.email', 'semantic-qa@example.invalid']);
   git(repo, ['config', 'commit.gpgsign', 'false']);
   git(repo, ['add', '-A']);
-  git(repo, ['commit', '-q', '-m', 'base']);
-  return repo;
+  git(repo, ['commit', '-q', '-m', 'Synthetic base']);
+  const base = git(repo, ['rev-parse', 'HEAD']).trim();
+  const session = await criarSessaoWorktree({ repositorioOrigem: repo, branchOrigem: 'main', commitBase: base,
+    diretorioBase: join(root, 'worktrees') });
+  return { repo, base, session };
 }
 
-async function executar(nome, aplicar, responder) {
-  const repo = prepararProjeto(nome);
-  const commitBase = git(repo, ['rev-parse', 'HEAD']).trim();
-  const sessao = await criarSessaoWorktree({ repositorioOrigem: repo, branchOrigem: 'master', commitBase, diretorioBase: worktrees });
-  const antes = readFileSync(join(repo, 'src', 'asset.js'), 'utf8');
-  aplicar(sessao.caminhoWorktree);
-  const snapshot = await createOntologySnapshot(repo);
-  const resultado = await finalizeSession({
-    sessao, domain: 'ativos', snapshot, alerts: [], tokenTotals: undefined,
-    ontologyQueries: 0, harnessTokens: 0,
-    confirmar: async () => responder,
-  });
-  const depois = readFileSync(join(repo, 'src', 'asset.js'), 'utf8');
-  return { resultado, antes, depois, repo, sessao, statusOrigem: git(repo, ['status', '--porcelain']).trim() };
+async function execute(name, code, options = {}) {
+  const f = await fixture(name, options);
+  writeFileSync(join(f.session.caminhoWorktree, 'src/publication.js'), code);
+  if (options.advance) {
+    writeFileSync(join(f.repo, 'origin.txt'), 'Origin advance retained\n');
+    git(f.repo, ['add', 'origin.txt']); git(f.repo, ['commit', '-q', '-m', 'Origin advance']);
+  }
+  if (options.conflict) {
+    writeFileSync(join(f.repo, 'src/publication.js'), rejected);
+    git(f.repo, ['add', '-A']); git(f.repo, ['commit', '-q', '-m', 'Conflicting origin']);
+  }
+  const originBefore = git(f.repo, ['rev-parse', 'HEAD']).trim();
+  let confirmationCalls = 0;
+  const result = await finalizeSession({ sessao: f.session, domain: 'synthetic',
+    snapshot: await createOntologySnapshot(f.repo), alerts: options.alerts ?? [],
+    ontologyQueries: 0, harnessTokens: 0, confirmar: async () => { confirmationCalls++; return options.confirm ?? true; },
+    ...(!options.noExtractor ? { extractCandidateFacts: createProductionFactsExtractor(f.session.caminhoWorktree) } : {}) });
+  const evidencePath = join(f.repo, '.bsh/local/enforcement', `${f.session.id}.json`);
+  const decision = result.status === 'conflitado' ? null : JSON.parse(readFileSync(evidencePath, 'utf8'));
+  return { ...f, result, decision, originBefore, confirmationCalls,
+    originAfter: git(f.repo, ['rev-parse', 'HEAD']).trim(), content: readFileSync(join(f.repo, 'src/publication.js'), 'utf8') };
 }
 
-after(() => rmSync(raiz, { recursive: true, force: true }));
+function unchanged(r) {
+  assert.equal(r.originAfter, r.originBefore);
+  assert.equal(git(r.repo, ['status', '--porcelain']).trim(), '');
+}
 
-test('E2E semantico: Given a valid change, when finalized, then it is promoted and the main branch is updated', async () => {
-  const r = await executar('valido', (wt) => {
-    writeFileSync(join(wt, 'src', 'asset.js'), readFileSync(join(wt, 'src', 'asset.js'), 'utf8') + '\n// melhoria valida\n');
-  }, true);
-  assert.equal(r.resultado.status, 'promovido');
-  assert.match(r.depois, /melhoria valida/);
-  assert.equal(r.statusOrigem, '');
+test('Given independent conforming evidence When finalized with real technical gates Then only the authorized commit is integrated', async () => {
+  const r = await execute('conforming', approved);
+  assert.equal(r.result.status, 'promovido');
+  assert.equal(r.content, approved);
+  assert.equal(r.originAfter, r.decision.candidateCommit);
+  assert.equal(r.decision.originChanged, true);
+  assert.equal(r.decision.validationStatus, 'CONFORMING');
+  assert.equal(r.decision.validationExecuted, true);
+  assert.equal(r.decision.validationComplete, true);
+  assert.equal(r.decision.promotionDecision, 'ALLOW');
+  assert.deepEqual(r.decision.coveredPaths, ['src/publication.js']);
+  assert.ok(r.decision.adaptersUsed.some(a => a.id === 'typescript-structural-adapter'));
+  const report = JSON.parse(readFileSync(join(r.repo, '.bsh/local/sessions', `${r.session.id}.report.json`), 'utf8'));
+  assert.equal(report.gatesAprovados, true);
+  assert.equal(report.origemHeadDepois, r.decision.candidateCommit);
 });
 
-test('E2E semantico: Given a governed violation with zero bsh_report_conflict, when finalized, then promotion is blocked and the origin is untouched', async () => {
-  const r = await executar('violacao-sem-report', (wt) => {
-    const conteudo = readFileSync(join(wt, 'src', 'asset.js'), 'utf8')
-      .replace("  if (asset.status === 'Baixado') throw new Error('Ativo baixado nao pode ser transferido');\n", '');
-    writeFileSync(join(wt, 'src', 'asset.js'), conteudo);
-  }, false);
-  assert.equal(r.resultado.status, 'descartado');
-  assert.equal(r.depois, r.antes);
-  assert.equal(r.statusOrigem, '');
-  const evidencia = join(r.repo, '.bsh', 'local', 'enforcement', `${r.sessao.id}.json`);
-  assert.ok(existsSync(evidencia), 'registro de enforcement ausente');
-  const registro = JSON.parse(readFileSync(evidencia, 'utf8'));
-  assert.equal(registro.status, 'violacao');
-  assert.ok(registro.resultados.some((item) => item.status === 'violacao' && item.shape));
+test('Given a SHACL violation without an agent conflict report When finalized Then semantic enforcement denies it and preserves origin', async () => {
+  const r = await execute('violation', rejected);
+  assert.equal(r.result.status, 'bloqueado');
+  assert.equal(r.decision.validationStatus, 'VIOLATION');
+  assert.ok(r.decision.violations.length > 0);
+  unchanged(r);
 });
 
-test('E2E semantico: Given an operation under a human-review policy, when refused, then nothing is promoted', async () => {
-  const r = await executar('politica', (wt) => {
-    writeFileSync(join(wt, 'src', 'asset.js'), readFileSync(join(wt, 'src', 'asset.js'), 'utf8') + '\n// GOV-JUSTIFICATIVA\n');
-  }, false);
-  assert.equal(r.resultado.status, 'descartado');
-  assert.equal(r.depois, r.antes);
+test('Given real passing technical tests and a violating candidate When finalized Then technical success cannot override SHACL', async () => {
+  const r = await execute('violation-technical-pass', rejected);
+  const environment = { ...process.env };
+  delete environment.NODE_TEST_CONTEXT;
+  execFileSync('npm', ['test'], { cwd: r.session.caminhoWorktree, env: environment, stdio: 'pipe' });
+  assert.equal(r.decision.promotionDecision, 'DENY');
+  assert.equal(r.decision.validationStatus, 'VIOLATION');
+  unchanged(r);
 });
 
-test('E2E semantico: Given a governed operation with an undetermined fact, when finalized, then it is not treated as conforming', async () => {
-  const r = await executar('indeterminado', (wt) => {
-    writeFileSync(join(wt, 'src', 'asset.js'), readFileSync(join(wt, 'src', 'asset.js'), 'utf8') + '\n// GOV-PENDENTE\n');
-  }, false);
-  assert.equal(r.resultado.status, 'descartado');
-  assert.equal(r.depois, r.antes);
+test('Given a human-review policy When ordinary confirmation is available Then it cannot substitute a candidate-bound review', async () => {
+  const r = await execute('human-policy', approved, { review: true });
+  assert.equal(r.result.status, 'bloqueado');
+  assert.equal(r.decision.failureStage, 'POLICY');
+  assert.equal(r.decision.policyDecision, 'DENY');
+  assert.equal(r.confirmationCalls, 0);
+  unchanged(r);
 });
 
-test('E2E semantico: Given a change outside governed knowledge, when finalized, then there is no false block', async () => {
-  const r = await executar('fora-conhecimento', (wt) => {
-    writeFileSync(join(wt, 'src', 'asset.js'), readFileSync(join(wt, 'src', 'asset.js'), 'utf8') + '\n// mudanca neutra\n');
-  }, true);
-  assert.equal(r.resultado.status, 'promovido');
-  assert.match(r.depois, /mudanca neutra/);
+test('Given an undetermined required fact When finalized Then absence cannot become conformance', async () => {
+  const r = await execute('unknown-fact', 'export const publish = "UNKNOWN";\n');
+  assert.equal(r.result.status, 'bloqueado');
+  assert.equal(r.decision.validationStatus, 'INDETERMINATE');
+  assert.equal(r.decision.validationComplete, false);
+  unchanged(r);
 });
 
-test('E2E semantico: Given a violation that passes the technical gates, when finalized, then the semantic layer still blocks it', async () => {
-  const r = await executar('violacao-gates-ok', (wt) => {
-    const asset = readFileSync(join(wt, 'src', 'asset.js'), 'utf8')
-      .replace("  if (asset.status === 'Baixado') throw new Error('Ativo baixado nao pode ser transferido');\n", '');
-    writeFileSync(join(wt, 'src', 'asset.js'), asset);
-    const teste = readFileSync(join(wt, 'test', 'asset.test.mjs'), 'utf8')
-      .replace("test('Given a retired asset, when transferred, then it fails', () => {\n  assert.throws(() => transferir({ status: 'Baixado' }, 'Ana'));\n});", "test('retired allowed', () => { assert.equal(transferir({ status: 'Baixado' }, 'Ana').responsible, 'Ana'); });");
-    writeFileSync(join(wt, 'test', 'asset.test.mjs'), teste);
-  }, false);
-  assert.equal(r.resultado.status, 'descartado');
-  assert.equal(r.depois, r.antes);
+test('Given an unrecognized change When finalized Then missing coverage blocks without fabricating a violation', async () => {
+  const r = await execute('outside-knowledge', 'export const neutral = true;\n');
+  assert.equal(r.result.status, 'bloqueado');
+  assert.equal(r.decision.validationStatus, 'INDETERMINATE');
+  assert.equal(r.decision.validationExecuted, false);
+  unchanged(r);
 });
 
-test('E2E semantico: Given a semantically valid change that fails a technical gate, when finalized, then it is not promoted', async () => {
-  const r = await executar('valido-gate-falha', (wt) => {
-    writeFileSync(join(wt, 'src', 'asset.js'), readFileSync(join(wt, 'src', 'asset.js'), 'utf8') + '\n// mudanca neutra\n');
-    writeFileSync(join(wt, 'test', 'asset.test.mjs'), readFileSync(join(wt, 'test', 'asset.test.mjs'), 'utf8') + "\ntest('falha proposital', () => { assert.equal(1, 2); });\n");
-  }, true);
-  assert.equal(r.resultado.status, 'falha-validacao');
-  assert.equal(r.depois, r.antes);
-});
-test('E2E semantico 9: Given the origin branch advances during the session, when finalized, then enforcement is valid on the reconciled state and no origin commit is lost', async () => {
-  const repo = prepararProjeto('origem-avanca');
-  const commitBase = git(repo, ['rev-parse', 'HEAD']).trim();
-  const sessao = await criarSessaoWorktree({ repositorioOrigem: repo, branchOrigem: 'master', commitBase, diretorioBase: worktrees });
-  writeFileSync(join(sessao.caminhoWorktree, 'src', 'asset.js'), readFileSync(join(sessao.caminhoWorktree, 'src', 'asset.js'), 'utf8') + '\n// melhoria valida\n');
-  writeFileSync(join(repo, 'origem.txt'), 'B\n');
-  git(repo, ['add', 'origem.txt']); git(repo, ['commit', '-q', '-m', 'B']);
-  const snapshot = await createOntologySnapshot(repo);
-  const resultado = await finalizeSession({ sessao, domain: 'ativos', snapshot, alerts: [], tokenTotals: undefined, ontologyQueries: 0, harnessTokens: 0, confirmar: async () => true });
-  assert.equal(resultado.status, 'promovido');
-  assert.ok(existsSync(join(repo, 'origem.txt')), 'commit da origem perdido');
-  assert.match(readFileSync(join(repo, 'src', 'asset.js'), 'utf8'), /melhoria valida/);
-  assert.equal(git(repo, ['status', '--porcelain']).trim(), '');
+test('Given an applicable shape without an extractor When finalized Then evidence absence is explicit and cannot approve', async () => {
+  const r = await execute('missing-extractor', approved, { noExtractor: true });
+  assert.equal(r.result.status, 'bloqueado');
+  assert.equal(r.decision.failureStage, 'FACT_EXTRACTION');
+  assert.equal(r.decision.validationExecuted, false);
+  unchanged(r);
 });
 
-test('E2E semantico 10: Given a git conflict during reconciliation, then the origin stays intact and the conflict stays in the worktree', async () => {
-  const repo = prepararProjeto('conflito-semantico');
-  const commitBase = git(repo, ['rev-parse', 'HEAD']).trim();
-  const sessao = await criarSessaoWorktree({ repositorioOrigem: repo, branchOrigem: 'master', commitBase, diretorioBase: worktrees });
-  writeFileSync(join(sessao.caminhoWorktree, 'src', 'asset.js'), readFileSync(join(sessao.caminhoWorktree, 'src', 'asset.js'), 'utf8').replace('Baixado', 'BaixadoSessao'));
-  writeFileSync(join(repo, 'src', 'asset.js'), readFileSync(join(repo, 'src', 'asset.js'), 'utf8').replace('Baixado', 'BaixadoOrigem'));
-  git(repo, ['add', 'src/asset.js']); git(repo, ['commit', '-q', '-m', 'B']);
-  const referenciaAntes = git(repo, ['rev-parse', 'HEAD']).trim();
-  const snapshot = await createOntologySnapshot(repo);
-  const resultado = await finalizeSession({ sessao, domain: 'ativos', snapshot, alerts: [], tokenTotals: undefined, ontologyQueries: 0, harnessTokens: 0, confirmar: async () => true });
-  assert.equal(resultado.status, 'conflitado');
-  assert.equal(git(repo, ['rev-parse', 'HEAD']).trim(), referenciaAntes);
-  assert.match(readFileSync(join(repo, 'src', 'asset.js'), 'utf8'), /BaixadoOrigem/);
-  git(sessao.caminhoWorktree, ['rebase', '--abort']);
-  await removerSessaoWorktree(sessao);
+test('Given conforming semantic evidence and a real failing technical gate When finalized Then origin stays intact', async () => {
+  const r = await execute('technical-failure', approved, { gateFailure: true });
+  assert.equal(r.result.status, 'falha-validacao');
+  assert.equal(r.decision.validationStatus, 'CONFORMING');
+  unchanged(r);
 });
 
-test('E2E semantico: no public path promotes without going through the enforcement gate', () => {
+test('Given origin advances When conforming candidate is finalized Then reconciled evidence retains both commits', async () => {
+  const r = await execute('origin-advance', approved, { advance: true });
+  assert.equal(r.result.status, 'promovido');
+  assert.equal(r.content, approved);
+  assert.equal(readFileSync(join(r.repo, 'origin.txt'), 'utf8'), 'Origin advance retained\n');
+  assert.equal(r.originAfter, r.decision.candidateCommit);
+});
+
+test('Given a reconciliation conflict When finalized Then conflict is isolated and origin is preserved', async () => {
+  const r = await execute('origin-conflict', approved, { conflict: true });
+  assert.equal(r.result.status, 'conflitado');
+  assert.equal(r.content, rejected);
+  unchanged(r);
+  git(r.session.caminhoWorktree, ['rebase', '--abort']);
+});
+
+test('Given a conforming candidate with an agent alert When user refuses exception Then nothing is promoted', async () => {
+  const r = await execute('agent-alert', approved, { confirm: false, alerts: [{ domain: 'synthetic',
+    request: 'Publish', reason: 'Reported concern', conflictingRules: [`${iri}PublishShape`] }] });
+  assert.equal(r.result.status, 'descartado');
+  assert.equal(r.confirmationCalls, 1);
+  unchanged(r);
+});
+
+test('Given all public promotion call sites When the static architecture inventory is inspected Then headless and TUI both use the independent governance gate', () => {
+  // Architecture inventory supplements behavioral integration; it cannot prove
+  // runtime authorization by itself and intentionally includes the headless path.
   const src = resolve('src');
-  const arquivos = [];
-  const percorrer = (dir) => {
-    for (const nome of readdirSync(dir)) {
-      const caminho = join(dir, nome);
-      if (statSync(caminho).isDirectory()) percorrer(caminho);
-      else if (nome.endsWith('.ts')) arquivos.push(caminho);
+  const files = [];
+  function visit(directory) {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const path = join(directory, entry.name);
+      if (entry.isDirectory()) visit(path);
+      else if (entry.name.endsWith('.ts')) files.push(path);
     }
-  };
-  percorrer(src);
-  const comPromocao = arquivos
-    .filter((arquivo) => /promoverSessao\(|integrar\(|reconciliar\(/.test(readFileSync(arquivo, 'utf8')))
-    .map((arquivo) => relative(src, arquivo).split('\\').join('/'))
-    .sort();
-  assert.deepEqual(comPromocao, ['git/finalize.ts', 'git/promotion.ts', 'tui/session.ts']);
-});
-
-test('E2E semantico 2: Given the agent reports a conflict, when finalized, then human review is requested and nothing is promoted', async () => {
-  const repo = prepararProjeto('relato-agente');
-  const commitBase = git(repo, ['rev-parse', 'HEAD']).trim();
-  const sessao = await criarSessaoWorktree({ repositorioOrigem: repo, branchOrigem: 'master', commitBase, diretorioBase: worktrees });
-  const snapshot = await createOntologySnapshot(repo);
-  const alertas = [
-    { domain: 'ativos', request: 'permitir transferir ativo baixado', reason: 'ativo baixado nao pode ser transferido', conflictingRules: ['urn:enforcement:ativos:TransferenciaShape'] },
-  ];
-  const resultado = await finalizeSession({ sessao, domain: 'ativos', snapshot, alerts: alertas, tokenTotals: undefined, ontologyQueries: 0, harnessTokens: 0, confirmar: async () => false });
-  assert.equal(resultado.status, 'descartado');
-  assert.equal(git(repo, ['status', '--porcelain']).trim(), '');
-  await removerSessaoWorktree(sessao);
+  }
+  visit(src);
+  const callers = files.filter(path => /promoverSessao\(|integrar\(|reconciliar\(/.test(readFileSync(path, 'utf8')))
+    .map(path => relative(src, path).replaceAll('\\', '/')).sort();
+  assert.deepEqual(callers, ['agent/headless.ts', 'git/finalize.ts', 'git/promotion.ts', 'tui/session.ts']);
+  for (const caller of ['agent/headless.ts', 'tui/session.ts']) {
+    assert.match(readFileSync(join(src, caller), 'utf8'), /promoverSessao\(sessao,\s*\{\s*extractCandidateFacts:\s*createProductionFactsExtractor\(sessao\.caminhoWorktree\)/);
+  }
 });

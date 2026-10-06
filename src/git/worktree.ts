@@ -143,10 +143,14 @@ async function transferirEstadoLocal(sessao: SessaoWorktree): Promise<void> {
   }
 }
 
-export async function removerSessaoWorktree(sessao: SessaoWorktree, removerBranch = true): Promise<void> {
+export async function removerSessaoWorktree(sessao: SessaoWorktree, removerBranch = false): Promise<void> {
   await git(sessao.repositorioOrigem, ['worktree', 'remove', '--force', sessao.caminhoWorktree]).catch(() => undefined);
   await git(sessao.repositorioOrigem, ['worktree', 'prune']).catch(() => undefined);
   if (removerBranch) await git(sessao.repositorioOrigem, ['branch', '-D', sessao.branchSessao]).catch(() => undefined);
+}
+
+export async function descartarSessaoWorktree(sessao: SessaoWorktree): Promise<void> {
+  await removerSessaoWorktree(sessao, true);
 }
 
 export async function listarWorktrees(repositorio: string): Promise<{ caminho: string; branch: string }[]> {

@@ -1,131 +1,76 @@
 #!/usr/bin/env node
-import { existsSync, readFileSync, statSync } from 'node:fs';
-import { resolve, join } from 'node:path';
+// BSH-EVAL-005..013: verify the current batch's observed assertions and artifacts.
+import assert from 'node:assert/strict';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { basename, join, resolve, sep } from 'node:path';
 import { createHash } from 'node:crypto';
 
-const JOURNEYS = [
-  { id: 1, name: 'bsh-governed-scenario', title: 'Sessão Governada — Detecção de Violação e Bloqueio SHACL' },
-  { id: 2, name: 'bsh-ungoverned-scenario', title: 'Sessão Desgovernada — Operação sem Harness Ontológico' },
-  { id: 3, name: 'bsh-cooperative-scenario', title: 'Sessão Governada Cooperativa — Alteração Conforme' },
-  { id: 4, name: 'bsh-domain-mismatch-scenario', title: 'Detecção de Desalinhamento Ontológico' },
-  { id: 5, name: 'bsh-model-search-scenario', title: 'Pesquisa de Modelos no OpenRouter' },
-  { id: 6, name: 'bsh-mcp-server-scenario', title: 'Servidor MCP de Governança' },
-  { id: 7, name: 'bsh-mcp-client-scenario', title: 'BSH como Cliente MCP' },
-  { id: 8, name: 'bsh-scrollbar-history-loop-scenario', title: 'Barra de Rolagem e Histórico' },
-  { id: 9, name: 'bsh-autonomous-coding-agent-scenario', title: 'Agente de Codificação Autônomo' },
-  { id: 10, name: 'bsh-prompt-guard-negation-scenario', title: 'Guarda Semântica com Negações' },
-  { id: 11, name: 'bsh-tui-queue-shortcuts-scenario', title: 'Ergonomia TUI e Fila FIFO' },
-  { id: 12, name: 'bsh-advanced-ux-reasoning-diff-fuzzy-scenario', title: 'UX Avançada — CoT e Diff' },
-  { id: 13, name: 'bsh-skills-prototype-scenario', title: 'Mecanismo de Skills e Prototipação' },
-  { id: 14, name: 'bsh-skills-dynamic-inclusion', title: 'Loop Interativo com Inclusão de Skills' },
-  { id: 15, name: 'bsh-slash-commands-menu', title: 'Paleta Flutuante de Comandos com Barra' },
-  { id: 16, name: 'bsh-opentui-reconstruction-scenario', title: 'Reconstrução da TUI com Componentes Nativos' },
-  { id: 17, name: 'bsh-segregacao-funcoes-e-conflito-interesses', title: 'Fraude de Segregação de Funções' },
-  { id: 18, name: 'bsh-baixa-destrutiva-alto-valor-sem-alcada', title: 'Baixa Destrutiva de Alto Valor sem Alçada' },
-  { id: 19, name: 'bsh-logistica-circular-extravio-alocacao-ilegal', title: 'Logística Circular e Extravio Ilegal' },
+const root = resolve(import.meta.dirname, '..');
+const evaluation = join(root, 'evaluation');
+const downloads = '/mnt/c/Users/clayt/Downloads/bsh';
+const digest = path => createHash('sha256').update(readFileSync(path)).digest('hex');
+const requiredChecks = [
+  'Installed version matches local package',
+  'Sovereign ontology validates before first turn',
+  'Production creates exactly one isolated repository workspace',
+  'Actual request preparation decision is presented',
+  'Decision identifies actual project contract references',
+  'Candidate contains exactly the planned comment and unchanged implementation',
+  'Only the planned application file changed',
+  'Host broker authorizes and records real mutation execution',
+  'Conflicting cancelled request leaves candidate unchanged',
+  'Conflicting operation receives contract review or block',
+  'Conflicting cancelled request executes no audited tool',
+  'No candidate promotion modifies origin',
 ];
 
-function sha256(filePath) {
-  const content = readFileSync(filePath);
-  return createHash('sha256').update(content).digest('hex');
-}
-
-const rootDir = resolve(import.meta.dirname, '..');
-const localVideosDir = join(rootDir, 'evaluation', 'videos');
-const localScreenshotsDir = join(rootDir, 'evaluation', 'screenshots');
-const wslDownloadsDir = '/mnt/c/Users/clayt/Downloads/bsh';
-const isWslAvailable = existsSync('/mnt/c/Users/clayt/Downloads');
-
-console.log('='.repeat(80));
-console.log('VERIFICAÇÃO DE VÍDEOS E SINCRONIZAÇÃO E2E WSL (ARQUIVOS NOVOS)');
-console.log('='.repeat(80));
-console.log(`Diretório Local de Vídeos: ${localVideosDir}`);
-console.log(`Diretório WSL de Downloads: ${wslDownloadsDir} (disponível: ${isWslAvailable})`);
-console.log('');
-
-let totalErrors = 0;
-const now = Date.now();
-const MAX_AGE_MS = 60 * 60 * 1000; // Máximo 1 hora
-
-for (const j of JOURNEYS) {
-  const localVideo = join(localVideosDir, `${j.name}.mp4`);
-  const localScreenshot = join(localScreenshotsDir, `${j.name}.png`);
-
-  if (!existsSync(localVideo)) {
-    console.error(`[ERRO] Jornada ${String(j.id).padStart(2, '0')}: Vídeo local inexistente: ${localVideo}`);
-    totalErrors++;
-    continue;
+try {
+  const explicit = process.argv[2] ?? process.env.BSH_E2E_BATCH_ID;
+  const batches = readdirSync(evaluation, { withFileTypes: true })
+    .filter(entry => entry.isDirectory() && existsSync(join(evaluation, entry.name, 'manifest.json')))
+    .map(entry => ({ id: entry.name, path: join(evaluation, entry.name, 'manifest.json') }))
+    .sort((a, b) => statSync(b.path).mtimeMs - statSync(a.path).mtimeMs);
+  const selected = explicit ? batches.find(batch => batch.id === explicit) : batches[0];
+  assert.ok(selected, 'A production E2E batch manifest must exist');
+  assert.ok(Date.now() - statSync(selected.path).mtimeMs < 60 * 60 * 1000,
+    'The production batch must have completed in the last hour');
+  const manifest = JSON.parse(readFileSync(selected.path, 'utf8'));
+  assert.equal(manifest.batchId, selected.id);
+  assert.equal(manifest.passed, true, `Production assertions failed: ${manifest.diagnostic ?? 'inspect manifest checks'}`);
+  assert.ok(Array.isArray(manifest.checks) && manifest.checks.length > 0);
+  assert.ok(manifest.checks.every(check => check.passed === true), 'Every recorded behavioral assertion must pass');
+  for (const name of requiredChecks) {
+    assert.ok(manifest.checks.some(check => check.name === name && check.passed === true),
+      `Missing successful production assertion: ${name}`);
   }
-  if (!existsSync(localScreenshot)) {
-    console.error(`[ERRO] Jornada ${String(j.id).padStart(2, '0')}: Screenshot local inexistente: ${localScreenshot}`);
-    totalErrors++;
-    continue;
-  }
-
-  const vStat = statSync(localVideo);
-  const sStat = statSync(localScreenshot);
-
-  if (vStat.size < 10000) {
-    console.error(`[ERRO] Jornada ${String(j.id).padStart(2, '0')}: Vídeo corrompido ou vazio (${vStat.size} bytes)`);
-    totalErrors++;
-    continue;
-  }
-  if (sStat.size < 5000) {
-    console.error(`[ERRO] Jornada ${String(j.id).padStart(2, '0')}: Screenshot corrompida ou vazia (${sStat.size} bytes)`);
-    totalErrors++;
-    continue;
-  }
-
-  // Verifica se o arquivo é recente (gerado nesta sessão)
-  if (now - vStat.mtimeMs > MAX_AGE_MS) {
-    console.error(`[ERRO] Jornada ${String(j.id).padStart(2, '0')}: Vídeo é antigo (${new Date(vStat.mtimeMs).toISOString()}), não foi regerado!`);
-    totalErrors++;
-    continue;
-  }
-
-  const localVideoHash = sha256(localVideo);
-  const localShotHash = sha256(localScreenshot);
-
-  if (isWslAvailable) {
-    const wslVideo = join(wslDownloadsDir, `${j.name}.mp4`);
-    const wslScreenshot = join(wslDownloadsDir, `${j.name}.png`);
-
-    if (!existsSync(wslVideo)) {
-      console.error(`[ERRO] Jornada ${String(j.id).padStart(2, '0')}: Vídeo não sincronizado em WSL: ${wslVideo}`);
-      totalErrors++;
-      continue;
-    }
-    if (!existsSync(wslScreenshot)) {
-      console.error(`[ERRO] Jornada ${String(j.id).padStart(2, '0')}: Screenshot não sincronizada em WSL: ${wslScreenshot}`);
-      totalErrors++;
-      continue;
-    }
-
-    const wslVideoHash = sha256(wslVideo);
-    const wslShotHash = sha256(wslScreenshot);
-
-    if (localVideoHash !== wslVideoHash) {
-      console.error(`[ERRO] Jornada ${String(j.id).padStart(2, '0')}: Divergência de hash SHA-256 no vídeo!`);
-      console.error(`  Local: ${localVideoHash}`);
-      console.error(`  WSL:   ${wslVideoHash}`);
-      totalErrors++;
-      continue;
-    }
-    if (localShotHash !== wslShotHash) {
-      console.error(`[ERRO] Jornada ${String(j.id).padStart(2, '0')}: Divergência de hash SHA-256 na screenshot!`);
-      totalErrors++;
-      continue;
+  assert.equal(manifest.projectRoot, join(root, 'pilot/asset-management'));
+  assert.equal(manifest.metrics.status, 'UNAVAILABLE');
+  assert.equal(manifest.metrics.harnessTokensAbsolute, null);
+  assert.equal(manifest.metrics.harnessTokensPercent, null);
+  assert.equal(manifest.scenarios.length, 2);
+  assert.ok(manifest.artifacts.some(artifact => artifact.path.endsWith('.mp4')));
+  assert.ok(manifest.artifacts.filter(artifact => artifact.path.endsWith('.png')).length >= 4);
+  for (const artifact of manifest.artifacts) {
+    const path = resolve(root, artifact.path);
+    assert.ok(path.startsWith(`${join(evaluation, selected.id)}${sep}`), 'Artifacts must belong to the selected batch');
+    assert.ok(basename(path).includes(selected.id), 'Artifact names must include the batch identifier');
+    assert.ok(statSync(path).size > 0, `Empty artifact: ${artifact.path}`);
+    assert.equal(digest(path), artifact.sha256, `Local artifact hash differs: ${artifact.path}`);
+    if (existsSync('/mnt/c/Users/clayt/Downloads')) {
+      const copy = join(downloads, basename(path));
+      assert.ok(existsSync(copy), `Missing Downloads copy: ${copy}`);
+      assert.equal(digest(copy), artifact.sha256, `Downloads hash differs: ${copy}`);
     }
   }
-
-  console.log(`✔ Jornada ${String(j.id).padStart(2, '0')}: [OK NOVO] ${j.name}.mp4 (${(vStat.size / 1024).toFixed(1)} KB) | SHA-256: ${localVideoHash.slice(0, 16)}...`);
-}
-
-console.log('');
-if (totalErrors > 0) {
-  console.error(`Falha na verificação de integridade E2E: ${totalErrors} erro(s) encontrado(s).`);
-  process.exit(1);
-} else {
-  console.log(`✔ Todas as ${JOURNEYS.length} jornadas foram regeradas do zero, são recentes e estão 100% sincronizadas com SHA-256 idêntico!`);
-  process.exit(0);
+  const report = join(root, 'pilot/asset-management/evaluation', `production-governance-${selected.id}.md`);
+  assert.ok(existsSync(report), 'A dated production report must exist');
+  if (existsSync('/mnt/c/Users/clayt/Downloads')) {
+    assert.equal(digest(report), digest(join(downloads, basename(report))), 'Production report copy differs');
+    assert.equal(digest(selected.path), digest(join(downloads, `manifest-${selected.id}.json`)), 'Manifest copy differs');
+  }
+  console.log(`PASS: production batch ${selected.id}, ${manifest.checks.length} observed assertions, artifact hashes and synchronization verified.`);
+  console.log('Harness token overhead is explicitly unavailable in absolute and percentage values.');
+} catch (error) {
+  console.error(`FAIL: ${error.message}`);
+  process.exitCode = 1;
 }

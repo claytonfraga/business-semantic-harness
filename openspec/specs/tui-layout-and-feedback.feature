@@ -57,6 +57,9 @@ Funcionalidade: Layout responsivo e feedback da sessão
     Então o recibo deve listar arquivos com linhas adicionadas e removidas
     E deve apresentar totais consolidados
     E deve distinguir gravação no workspace de promoção para a origem
+    E os arquivos do recibo do turno devem corresponder às mudanças observadas nesse turno
+    E bloqueio por regra, erro de ferramenta e limite de turnos devem ser exibidos sem declarar conclusão da tarefa
+    E estatísticas do diff candidato devem ser identificadas separadamente do desfecho do turno
 
   @BSH-TUI-007
   Cenário: Apresentar diagnóstico sem gravação
@@ -64,6 +67,7 @@ Funcionalidade: Layout responsivo e feedback da sessão
     Quando o resultado é renderizado
     Então deve indicar leitura ou diagnóstico
     E não deve informar implementação realizada
+    E ausência de execução de validação ou conformidade indeterminada não deve aparecer como "CONFORMING" nem "Ready to promote"
 
   @BSH-TUI-008 @specified @gap
   Cenário: Atualizar preview incremental de diff
@@ -81,13 +85,16 @@ Funcionalidade: Layout responsivo e feedback da sessão
     E "Ctrl+O" deve alternar a visibilidade do bloco mais recente
     E a altura do quadro deve permanecer invariável
 
-  @BSH-TUI-010 @specified @gap
-  Cenário: Mostrar telemetria de geração
+  @BSH-TUI-010
+  Cenário: Mostrar telemetria de geração informada pelo provedor
     Dado um turno em execução ou concluído
-    Quando o rodapé é atualizado
-    Então deve apresentar duração e taxa de tokens por segundo
-    E estimativas devem ser distinguíveis de métricas reais retornadas pelo provedor
-    E tokens e custo não devem ser apresentados como medidos quando são valores fixos
+    Quando a telemetria da sessão é atualizada
+    Então tokens de entrada, saída, cache e raciocínio devem ser registrados quando informados pelo provedor
+    E a ausência de dados de consumo do provedor deve ser identificada explicitamente
+    E estimativas devem ser rotuladas e não apresentadas como consumo medido
+    E valores fixos e incrementos constantes não devem ser atribuídos como consumo real
+    E os registros de telemetria devem possuir identificador de execução e método de cálculo da taxa
+
 
   @BSH-TUI-011
   Cenário: Limpar feed

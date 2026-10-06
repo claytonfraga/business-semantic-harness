@@ -20,7 +20,7 @@ const domain = (id) => ({
   shapes: `domains/${id}/shapes.ttl`,
 });
 
-test('Given two declared domains, when loading the manifest, then both distinct paths are retained', async () => {
+test('Given two declared domains When loading the manifest Then both distinct paths are retained', async () => {
   const root = await projectWith({ schemaVersion: 1, projectId: 'inventory', domains: [domain('assets'), domain('contracts')] });
   try {
     const manifest = await loadManifest(root);
@@ -32,7 +32,7 @@ test('Given two declared domains, when loading the manifest, then both distinct 
   }
 });
 
-test('Given no manifest, when loading the project, then an explicit error is reported', async () => {
+test('Given no manifest When loading the project Then an explicit error is reported', async () => {
   const root = await mkdtemp(join(tmpdir(), 'bsh-manifest-'));
   try {
     await assert.rejects(loadManifest(root), /Manifesto.*ausente/);
@@ -41,7 +41,7 @@ test('Given no manifest, when loading the project, then an explicit error is rep
   }
 });
 
-test('Given duplicate domain IDs, when loading the manifest, then it is rejected', async () => {
+test('Given duplicate domain IDs When loading the manifest Then it is rejected', async () => {
   const root = await projectWith({ schemaVersion: 1, projectId: 'inventory', domains: [domain('assets'), domain('assets')] });
   try {
     await assert.rejects(loadManifest(root), /Domínio duplicado: assets/);
@@ -50,7 +50,7 @@ test('Given duplicate domain IDs, when loading the manifest, then it is rejected
   }
 });
 
-test('Given a future format version, when loading the manifest, then it is rejected', async () => {
+test('Given a future format version When loading the manifest Then it is rejected', async () => {
   const root = await projectWith({ schemaVersion: 99, projectId: 'inventory', domains: [domain('assets')] });
   try {
     await assert.rejects(loadManifest(root), /versão.*99/i);

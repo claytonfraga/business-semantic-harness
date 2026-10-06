@@ -207,17 +207,17 @@ def render_verdict_slide(
     is_pass = (verdict.upper() == "PASSOU" or verdict.upper() == "PASS")
     verdict_color = (46, 160, 67) if is_pass else (218, 54, 51)  # Verde esmeralda ou Carmesim
     verdict_bg = (18, 44, 25) if is_pass else (54, 20, 22)
-    verdict_text = "✔ JORNADA APROVADA • COMPORTAMENTO CONFORME" if is_pass else "✖ JORNADA REPROVADA • VIOLAÇÃO DE CRITÉRIO"
+    verdict_text = "PASS • OBSERVED ASSERTIONS SATISFIED" if is_pass else "FAIL • EXPECTED ASSERTIONS NOT SATISFIED"
 
     # Barra decorativa superior
     draw.rectangle([(80, 50), (width - 80, 53)], fill=verdict_color)
 
     # Header da Avaliação
     draw.rectangle([(80, 70), (450, 102)], fill=(22, 27, 34))
-    draw.text((95, 77), f"AVALIAÇÃO E2E • RELATÓRIO DE CONFORMIDADE", font=badge_font, fill=(56, 189, 248))
+    draw.text((95, 77), f"E2E • OBSERVED EXECUTION REPORT", font=badge_font, fill=(56, 189, 248))
 
     # Título da Jornada
-    draw.text((80, 115), f"Jornada {journey_num:02d}: {title}", font=title_font, fill=(255, 255, 255))
+    draw.text((80, 115), f"Journey {journey_num:02d}: {title}", font=title_font, fill=(255, 255, 255))
 
     # Badge de Veredito em destaque
     draw.rectangle([(80, 155), (width - 80, 200)], fill=verdict_bg, outline=verdict_color, width=2)
@@ -229,9 +229,9 @@ def render_verdict_slide(
     
     # Cabeçalho da Tabela
     draw.rectangle([(80, y), (width - 80, y + 36)], fill=(33, 38, 45))
-    draw.text((95, y + 8), "DIMENSÃO AUDITADA", font=label_font, fill=(139, 148, 158))
-    draw.text((360, y + 8), "COMPORTAMENTO ESPERADO (GHERKIN)", font=label_font, fill=(139, 148, 158))
-    draw.text((800, y + 8), "EVIDÊNCIA OBSERVADA (TMUX)", font=label_font, fill=(139, 148, 158))
+    draw.text((95, y + 8), "ASSERTION", font=label_font, fill=(139, 148, 158))
+    draw.text((360, y + 8), "EXPECTED (GHERKIN)", font=label_font, fill=(139, 148, 158))
+    draw.text((800, y + 8), "OBSERVED EVIDENCE", font=label_font, fill=(139, 148, 158))
 
     row_y = y + 45
     for dimension, expected, observed in criteria_results:
@@ -243,22 +243,22 @@ def render_verdict_slide(
 
     # Painel de Métricas Técnicas
     my = y + 265
-    draw.rectangle([(80, my), (width - 80, my + 65)], fill=(22, 27, 34), outline=(48, 54, 61), width=1)
+    draw.rectangle([(80, my), (width - 80, my + 100)], fill=(22, 27, 34), outline=(48, 54, 61), width=1)
     
-    m_txt1 = f"Harness Overhead: {metrics.get('harness_overhead', '0 tokens (validação local)')}"
-    m_txt2 = f"Tempo de Sessão: {metrics.get('session_time', 'N/A')}"
-    m_txt3 = f"Ontologia: {metrics.get('ontology', 'ativos v1.0.0 (40 classes, 23 shapes)')}"
-    m_txt4 = f"Console Leakage: 0 (Nenhum prompt vazado para o shell SO)"
+    m_txt1 = f"Harness Overhead: {metrics.get('harness_overhead', 'Unavailable')}"
+    m_txt2 = f"Session duration: {metrics.get('session_time', 'N/A')}"
+    m_txt3 = f"Ontology: {metrics.get('ontology', 'ativos v1.0.0 (40 classes, 23 shapes)')}"
+    m_txt4 = f"Console Leakage: {metrics.get('console_leakage', 'Unavailable')}"
     
     draw.text((95, my + 12), m_txt1, font=val_font, fill=(173, 186, 199))
-    draw.text((480, my + 12), m_txt2, font=val_font, fill=(173, 186, 199))
-    draw.text((95, my + 38), m_txt3, font=val_font, fill=(173, 186, 199))
-    draw.text((480, my + 38), m_txt4, font=label_font, fill=(56, 189, 248))
+    draw.text((95, my + 34), m_txt2, font=val_font, fill=(173, 186, 199))
+    draw.text((95, my + 56), m_txt3, font=val_font, fill=(173, 186, 199))
+    draw.text((95, my + 78), m_txt4, font=label_font, fill=(56, 189, 248))
 
     # Rodapé
     draw.text(
         (80, height - 42),
-        "Evidência formal de conformidade gerada pelo Business Semantic Harness (BSH) • Todos os direitos reservados",
+        "Business Semantic Harness • Recorded execution; candidate promotion remains independently governed",
         font=sub_font,
         fill=(100, 116, 139),
     )
@@ -836,7 +836,7 @@ def main():
                 "Dado a necessidade de inserir instruções complexas com quebras de linha",
                 "Quando o usuário digita o delimitador triple-quote (\"\"\") no prompt",
                 "Então o modo multilinha é ativado com indentação e quebra controlada",
-                "E o streaming de raciocínio é recolhido elegantemente per BSH-STREAM-004",
+                "E o streaming de raciocínio é recolhido elegantemente per BSH-TUI-009",
             ],
             "actions": [
                 ("type", "\"\"\"", 0.8),
@@ -1103,4 +1103,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # Legacy demonstrations have no behavioral oracle and must not publish a pass.
+    # Keep rendering helpers and historical configurations available, but use the
+    # production contract journey with observed file/audit assertions for the gate.
+    import runpy
+    runpy.run_path(str(Path(__file__).with_name("run-production-e2e.py")), run_name="__main__")

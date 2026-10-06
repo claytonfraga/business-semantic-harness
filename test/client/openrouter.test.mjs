@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { OpenRouterClient } from '../../dist/client/openrouter/client.js';
 
-test('Given an OpenRouterClient with apiKey, when verifyApiKey is called and server returns 200, then returns valid true', async () => {
+test('Given an OpenRouterClient with apiKey When verifyApiKey is called and server returns 200 Then returns valid true', async () => {
   const originalFetch = globalThis.fetch;
   try {
     globalThis.fetch = async (url, opts) => {
@@ -23,7 +23,7 @@ test('Given an OpenRouterClient with apiKey, when verifyApiKey is called and ser
   }
 });
 
-test('Given an OpenRouterClient, when getModels is called, then models list is returned and cached', async () => {
+test('Given an OpenRouterClient When getModels is called Then models list is returned and cached', async () => {
   const originalFetch = globalThis.fetch;
   let fetchCount = 0;
   try {
@@ -54,7 +54,7 @@ test('Given an OpenRouterClient, when getModels is called, then models list is r
   }
 });
 
-test('Given an OpenRouterClient, when streamChat is called, then SSE stream chunks are yielded', async () => {
+test('Given an OpenRouterClient When streamChat is called Then SSE stream chunks are yielded', async () => {
   const originalFetch = globalThis.fetch;
   try {
     const sseBody = [

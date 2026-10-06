@@ -145,3 +145,12 @@ Funcionalidade: Entrada, histórico, fila e navegação da TUI
     Quando o usuário rola a conversa
     Então o viewport deve acompanhar o movimento dentro dos limites
     E o suporte previsto deve ser distinguível dos atalhos de teclado já implementados
+
+  @BSH-INPUT-019
+  Cenário: Editar prompt em área multilinha com rolagem
+    Dado o campo de entrada da TUI renderizado por componentes suportados
+    Quando o usuário digita texto longo ou insere quebras de linha
+    Então a área de entrada deve exibir ao menos quatro linhas visíveis
+    E a quebra de linha deve ser automática por palavra ao final de cada linha
+    E o conteúdo que excede a área visível deve rolar dentro do próprio campo
+    E o visual, o foco e os atalhos de submissão existentes devem permanecer inalterados
